@@ -1,0 +1,162 @@
+<rdf:RDF xmlns:meandre="http://www.meandre.org/ontology/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <meandre:data_connector_configuration rdf:about="http://test.org/flow/connector/0">
+    <meandre:connector_instance_data_port_source>
+      <meandre:data_port rdf:about="http://test.org/component/push-string/output/string">
+        <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The string being pushed</dc:description>
+        <dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http://test.org/component/push-string/output/string</dc:identifier>
+        <meandre:name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">string</meandre:name>
+      </meandre:data_port>
+    </meandre:connector_instance_data_port_source>
+    <meandre:connector_instance_data_port_target>
+      <meandre:data_port rdf:about="http://test.org/component/concatenate-strings/input/string_one">
+        <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The first string to concatenate</dc:description>
+        <dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http://test.org/component/concatenate-strings/input/string_one</dc:identifier>
+        <meandre:name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">string_one</meandre:name>
+      </meandre:data_port>
+    </meandre:connector_instance_data_port_target>
+    <meandre:connector_instance_source>
+      <meandre:instance_configuration rdf:about="http://test.org/flow/instance/push_string/0">
+        <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Push hello world</dc:description>
+        <meandre:instance_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Push String 0</meandre:instance_name>
+        <meandre:instance_resource>
+          <meandre:executable_component rdf:about="http://test.org/component/push-string">
+            <dc:creator rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Xavier Llor&amp;agrave;</dc:creator>
+            <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2007-10-24T09:21:23</dc:date>
+            <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pushes the string stored into the properties to the output</dc:description>
+            <dc:format rdf:datatype="http://www.w3.org/2001/XMLSchema#string">java/class</dc:format>
+            <dc:rights rdf:datatype="http://www.w3.org/2001/XMLSchema#string">University of Illinois/NCSA open source license</dc:rights>
+            <meandre:execution_context rdf:resource="http://test.org/component/"/>
+            <meandre:firing_policy rdf:datatype="http://www.w3.org/2001/XMLSchema#string">all</meandre:firing_policy>
+            <meandre:name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Push String</meandre:name>
+            <meandre:output_data_port rdf:resource="http://test.org/component/push-string/output/string"/>
+            <meandre:property_set>
+              <meandre:property rdf:about="http://test.org/component/push-string/property/message">
+                <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The string message to be pushed trough the output port</dc:description>
+                <meandre:key rdf:datatype="http://www.w3.org/2001/XMLSchema#string">message</meandre:key>
+                <meandre:value rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Hello World!!! Happy Meandring!!!</meandre:value>
+              </meandre:property>
+            </meandre:property_set>
+            <meandre:resource_location rdf:resource="http://test.org/component/org.meandre.demo.components.PushStringComponent"/>
+            <meandre:runnable rdf:datatype="http://www.w3.org/2001/XMLSchema#string">java</meandre:runnable>
+            <meandre:tag rdf:datatype="http://www.w3.org/2001/XMLSchema#string">demo</meandre:tag>
+            <meandre:tag rdf:datatype="http://www.w3.org/2001/XMLSchema#string">string</meandre:tag>
+            <meandre:tag rdf:datatype="http://www.w3.org/2001/XMLSchema#string">hello_world</meandre:tag>
+          </meandre:executable_component>
+        </meandre:instance_resource>
+      </meandre:instance_configuration>
+    </meandre:connector_instance_source>
+    <meandre:connector_instance_target>
+      <meandre:instance_configuration rdf:about="http://test.org/flow/instance/concatenate_string/2">
+        <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Concatenates two strings</dc:description>
+        <meandre:instance_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Concatenate String 0</meandre:instance_name>
+        <meandre:instance_resource>
+          <meandre:executable_component rdf:about="http://test.org/component/concatenate-strings">
+            <dc:creator rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Xavier Llor&amp;agrave;</dc:creator>
+            <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2007-10-24T09:21:23</dc:date>
+            <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Concatenates the to input string to the output</dc:description>
+            <dc:format rdf:datatype="http://www.w3.org/2001/XMLSchema#string">java/class</dc:format>
+            <dc:rights rdf:datatype="http://www.w3.org/2001/XMLSchema#string">University of Illinois/NCSA open source license</dc:rights>
+            <meandre:execution_context rdf:resource="http://test.org/component/"/>
+            <meandre:firing_policy rdf:datatype="http://www.w3.org/2001/XMLSchema#string">all</meandre:firing_policy>
+            <meandre:input_data_port>
+              <meandre:data_port rdf:about="http://test.org/component/concatenate-strings/input/string_two">
+                <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The second string to concatenate</dc:description>
+                <dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http://test.org/component/concatenate-strings/input/string_two</dc:identifier>
+                <meandre:name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">string_two</meandre:name>
+              </meandre:data_port>
+            </meandre:input_data_port>
+            <meandre:input_data_port rdf:resource="http://test.org/component/concatenate-strings/input/string_one"/>
+            <meandre:name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Conccatenate Strings</meandre:name>
+            <meandre:output_data_port>
+              <meandre:data_port rdf:about="http://test.org/component/concatenate-strings/output/concatenated_string">
+                <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The concatenated string</dc:description>
+                <dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http://test.org/component/concatenate-strings/output/concatenated_string</dc:identifier>
+                <meandre:name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">concatenated_string</meandre:name>
+              </meandre:data_port>
+            </meandre:output_data_port>
+            <meandre:resource_location rdf:resource="http://test.org/component/org.meandre.demo.components.ConcatenateStringsComponent"/>
+            <meandre:runnable rdf:datatype="http://www.w3.org/2001/XMLSchema#string">java</meandre:runnable>
+            <meandre:tag rdf:datatype="http://www.w3.org/2001/XMLSchema#string">demo</meandre:tag>
+            <meandre:tag rdf:datatype="http://www.w3.org/2001/XMLSchema#string">concatenate</meandre:tag>
+            <meandre:tag rdf:datatype="http://www.w3.org/2001/XMLSchema#string">string</meandre:tag>
+          </meandre:executable_component>
+        </meandre:instance_resource>
+      </meandre:instance_configuration>
+    </meandre:connector_instance_target>
+  </meandre:data_connector_configuration>
+  <meandre:connector_set rdf:about="http://test.org/flow/test-hello-world/connector/set">
+    <meandre:data_connector rdf:resource="http://test.org/flow/connector/0"/>
+    <meandre:data_connector>
+      <meandre:data_connector_configuration rdf:about="http://test.org/flow/connector/2">
+        <meandre:connector_instance_data_port_source rdf:resource="http://test.org/component/concatenate-strings/output/concatenated_string"/>
+        <meandre:connector_instance_data_port_target>
+          <meandre:data_port rdf:about="http://test.org/component/print_object/input/object">
+            <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The object to print</dc:description>
+            <dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http://test.org/component/print_object/input/object</dc:identifier>
+            <meandre:name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">object</meandre:name>
+          </meandre:data_port>
+        </meandre:connector_instance_data_port_target>
+        <meandre:connector_instance_source rdf:resource="http://test.org/flow/instance/concatenate_string/2"/>
+        <meandre:connector_instance_target>
+          <meandre:instance_configuration rdf:about="http://test.org/flow/instance/print_object/3">
+            <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Prints the concatenated object</dc:description>
+            <meandre:instance_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Print Object 0</meandre:instance_name>
+            <meandre:instance_resource>
+              <meandre:executable_component rdf:about="http://test.org/component/print_object">
+                <dc:creator rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Xavier Llor&amp;agrave;</dc:creator>
+                <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2007-10-24T09:21:23</dc:date>
+                <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Prints the object in the input to the standard output</dc:description>
+                <dc:format rdf:datatype="http://www.w3.org/2001/XMLSchema#string">java/class</dc:format>
+                <dc:rights rdf:datatype="http://www.w3.org/2001/XMLSchema#string">University of Illinois/NCSA open source license</dc:rights>
+                <meandre:execution_context rdf:resource="http://test.org/component/"/>
+                <meandre:firing_policy rdf:datatype="http://www.w3.org/2001/XMLSchema#string">all</meandre:firing_policy>
+                <meandre:input_data_port rdf:resource="http://test.org/component/print_object/input/object"/>
+                <meandre:name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Print Object</meandre:name>
+                <meandre:resource_location rdf:resource="http://test.org/component/org.meandre.demo.components.PrintObjectComponent"/>
+                <meandre:runnable rdf:datatype="http://www.w3.org/2001/XMLSchema#string">java</meandre:runnable>
+                <meandre:tag rdf:datatype="http://www.w3.org/2001/XMLSchema#string">print</meandre:tag>
+                <meandre:tag rdf:datatype="http://www.w3.org/2001/XMLSchema#string">object</meandre:tag>
+                <meandre:tag rdf:datatype="http://www.w3.org/2001/XMLSchema#string">demo</meandre:tag>
+              </meandre:executable_component>
+            </meandre:instance_resource>
+          </meandre:instance_configuration>
+        </meandre:connector_instance_target>
+      </meandre:data_connector_configuration>
+    </meandre:data_connector>
+    <meandre:data_connector>
+      <meandre:data_connector_configuration rdf:about="http://test.org/flow/connector/1">
+        <meandre:connector_instance_data_port_source rdf:resource="http://test.org/component/push-string/output/string"/>
+        <meandre:connector_instance_data_port_target rdf:resource="http://test.org/component/concatenate-strings/input/string_two"/>
+        <meandre:connector_instance_source>
+          <meandre:instance_configuration rdf:about="http://test.org/flow/instance/push_string/1">
+            <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Push hello world</dc:description>
+            <meandre:instance_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Push String 1</meandre:instance_name>
+            <meandre:instance_resource rdf:resource="http://test.org/component/push-string"/>
+          </meandre:instance_configuration>
+        </meandre:connector_instance_source>
+        <meandre:connector_instance_target rdf:resource="http://test.org/flow/instance/concatenate_string/2"/>
+      </meandre:data_connector_configuration>
+    </meandre:data_connector>
+  </meandre:connector_set>
+  <meandre:instance_set rdf:about="http://test.org/flow/test-hello-world/components/set">
+    <meandre:executable_component_instance rdf:resource="http://test.org/flow/instance/push_string/1"/>
+    <meandre:executable_component_instance rdf:resource="http://test.org/flow/instance/print_object/3"/>
+    <meandre:executable_component_instance rdf:resource="http://test.org/flow/instance/push_string/0"/>
+    <meandre:executable_component_instance rdf:resource="http://test.org/flow/instance/concatenate_string/2"/>
+  </meandre:instance_set>
+  <rdf:Description rdf:about="http://www.meandre.org/ontology/">
+    <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2007-10-24T09:21:24</dc:date>
+    <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">This is the current repository aggregated using Meandre</dc:description>
+  </rdf:Description>
+  <meandre:flow_component rdf:about="http://test.org/flow/test-hello-world">
+    <dc:creator rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Xavier Llor&amp;agrave;</dc:creator>
+    <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2007-10-24T09:21:23</dc:date>
+    <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A simple hello world test</dc:description>
+    <dc:rights rdf:datatype="http://www.w3.org/2001/XMLSchema#string">University of Illinois/NCSA open source license</dc:rights>
+    <meandre:components_instances rdf:resource="http://test.org/flow/test-hello-world/components/set"/>
+    <meandre:connectors rdf:resource="http://test.org/flow/test-hello-world/connector/set"/>
+    <meandre:name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Hello World!!!</meandre:name>
+    <meandre:tag rdf:datatype="http://www.w3.org/2001/XMLSchema#string">hello_world</meandre:tag>
+    <meandre:tag rdf:datatype="http://www.w3.org/2001/XMLSchema#string">demo</meandre:tag>
+  </meandre:flow_component>
+</rdf:RDF>
