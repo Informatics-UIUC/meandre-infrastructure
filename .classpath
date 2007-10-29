@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="src-test"/>
-	<classpathentry kind="src" path="plugins/vfs"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/Commons-Upload/commons-fileupload-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/Commons-Upload/commons-io-1.3.2.jar"/>
@@ -48,7 +47,6 @@
 	<classpathentry kind="lib" path="lib/Jetty/jsp-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/Jetty/jsp-api-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/Jetty/servlet-api-2.5-6.1.5.jar"/>
-	<classpathentry kind="lib" path="lib/plugins/vfs/truezip/truezip-6.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
