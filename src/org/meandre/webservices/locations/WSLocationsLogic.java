@@ -178,7 +178,7 @@ public class WSLocationsLogic {
 	 * @param sLocation The location to remove
 	 * @return True if the location could be successfully removed
 	 */
-	public static boolean removeLocation(String sUser, String sLocation) {
+	static boolean removeLocation(String sUser, String sLocation) {
 		boolean bRes = true;
 		
 		// Retrieve system store
@@ -227,7 +227,13 @@ public class WSLocationsLogic {
 					//
 					// Read the location and check its consistency
 					//
-					modelTmp.read(url.openStream(),null);
+					if ( sLocation.endsWith(".ttl"))
+						modelTmp.read(url.openStream(),null,"TTL");
+					else if ( sLocation.endsWith(".nt"))
+						modelTmp.read(url.openStream(),null,"N-TRIPLE");
+					else
+						modelTmp.read(url.openStream(),null);
+					
 					new RepositoryImpl(modelTmp);
 					
 					//
