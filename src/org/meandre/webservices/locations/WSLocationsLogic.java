@@ -227,9 +227,9 @@ public class WSLocationsLogic {
 					//
 					// Read the location and check its consistency
 					//
-					if ( sLocation.endsWith(".ttl"))
+					if ( url.toString().endsWith(".ttl"))
 						modelTmp.read(url.openStream(),null,"TTL");
-					else if ( sLocation.endsWith(".nt"))
+					else if ( url.toString().endsWith(".nt"))
 						modelTmp.read(url.openStream(),null,"N-TRIPLE");
 					else
 						modelTmp.read(url.openStream(),null);
