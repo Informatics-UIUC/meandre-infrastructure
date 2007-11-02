@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.meandre.Bootstrapper;
+import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.repository.test.RepositoryGenerator;
 import org.meandre.core.store.Store;
 
@@ -34,9 +34,9 @@ public class WSPublic extends HttpServlet {
 
     // Initializing the logger and its handlers
     static {
-        log = Logger.getLogger(Bootstrapper.class.getName());
+        log = Logger.getLogger(WSCoreBootstrapper.class.getName());
         log.setLevel(Level.CONFIG);
-        log.addHandler(Bootstrapper.handler);
+        log.addHandler(WSCoreBootstrapper.handler);
     }
 	
 	/**

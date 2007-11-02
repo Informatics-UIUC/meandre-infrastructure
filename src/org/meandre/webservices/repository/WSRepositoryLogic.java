@@ -19,7 +19,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.meandre.Bootstrapper;
+import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.repository.ExecutableComponentDescription;
 import org.meandre.core.store.repository.FlowDescription;
@@ -44,9 +44,9 @@ public class WSRepositoryLogic {
 
     // Initializing the logger and its handlers
     static {
-        log = Logger.getLogger(Bootstrapper.class.getName());
+        log = Logger.getLogger(WSCoreBootstrapper.class.getName());
         log.setLevel(Level.CONFIG);
-        log.addHandler(Bootstrapper.handler);
+        log.addHandler(WSCoreBootstrapper.handler);
     }
 	
     /** Regenerates a user repository using the current locations for the user.

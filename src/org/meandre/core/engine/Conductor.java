@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.Bootstrapper;
+import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.ExecutableComponent;
 import org.meandre.core.engine.policies.component.availability.WrappedComponentAllInputsRequired;
 import org.meandre.core.engine.policies.component.availability.WrappedComponentAnyInputRequired;
@@ -63,9 +63,9 @@ public class Conductor {
 
 	// Initializing the logger and its handlers
 	static {
-		log = Logger.getLogger(Bootstrapper.class.getName());
+		log = Logger.getLogger(WSCoreBootstrapper.class.getName());
 		log.setLevel(Level.CONFIG);
-		log.addHandler(Bootstrapper.handler);
+		log.addHandler(WSCoreBootstrapper.handler);
 	}
 
 	/** Initialize a conductor with a set of valid URLs.

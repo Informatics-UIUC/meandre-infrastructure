@@ -8,7 +8,7 @@ import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.Bootstrapper;
+import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.ComponentContextException;
 import org.meandre.core.ComponentContextImpl;
 import org.meandre.core.ComponentExecutionException;
@@ -41,9 +41,9 @@ extends Thread {
 	
 	// Initializing the logger and its handlers
 	static {
-		log = Logger.getLogger(Bootstrapper.class.getName());
+		log = Logger.getLogger(WSCoreBootstrapper.class.getName());
 		log.setLevel(Level.CONFIG);
-		log.addHandler(Bootstrapper.handler);
+		log.addHandler(WSCoreBootstrapper.handler);
 	}
 	
 	/** The last updated input buffer */

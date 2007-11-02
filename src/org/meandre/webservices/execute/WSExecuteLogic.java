@@ -9,7 +9,7 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.meandre.Bootstrapper;
+import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.engine.Conductor;
 import org.meandre.core.engine.ConductorException;
 import org.meandre.core.engine.Executor;
@@ -66,7 +66,7 @@ public class WSExecuteLogic {
 				OutputStream outStream = response.getOutputStream();
 				PrintStream pw = new PrintStream(outStream);
 				
-				pw.println("Meandre Execution Engine version "+Bootstrapper.VERSION);
+				pw.println("Meandre Execution Engine version "+WSCoreBootstrapper.VERSION);
 				pw.println("All rigths reserved by DITA, NCSA, UofI (2007).");
 				pw.println("2007. All rigths reserved by DITA, NCSA, UofI.");
 				pw.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");

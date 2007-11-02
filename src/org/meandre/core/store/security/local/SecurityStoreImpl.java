@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.Bootstrapper;
+import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.security.Action;
 import org.meandre.core.store.security.PasswordEncryptor;
@@ -98,9 +98,9 @@ public class SecurityStoreImpl implements SecurityStore {
 
     // Initializing the logger and its handlers
     static {
-        log = Logger.getLogger(Bootstrapper.class.getName());
+        log = Logger.getLogger(WSCoreBootstrapper.class.getName());
         log.setLevel(Level.CONFIG);
-        log.addHandler(Bootstrapper.handler);
+        log.addHandler(WSCoreBootstrapper.handler);
     }
 
     /** The text search indexer */
@@ -166,7 +166,7 @@ public class SecurityStoreImpl implements SecurityStore {
 		// Dump the realm file
 		try {
 			PrintStream ps = new PrintStream(new FileOutputStream(new File(
-					Bootstrapper.JETTY_HOME + File.separator
+					WSCoreBootstrapper.JETTY_HOME + File.separator
 							+ Store.getRealmFilename())));
 			
 			// username: password[,rolename ...]
@@ -181,7 +181,7 @@ public class SecurityStoreImpl implements SecurityStore {
 	        ps.close();
 	        
 		} catch (IOException e) {
-			log.severe("Could not update realm file: "+Bootstrapper.JETTY_HOME+File.separator+Store.getRealmFilename());
+			log.severe("Could not update realm file: "+WSCoreBootstrapper.JETTY_HOME+File.separator+Store.getRealmFilename());
 		} 
 		catch (SecurityStoreException e) {
 			log.severe("Could not update realm because security exception was thrown");

@@ -7,7 +7,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.Bootstrapper;
+import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.store.repository.QueryableRepository;
 import org.meandre.core.store.repository.RepositoryImpl;
 import org.meandre.core.store.security.SecurityStore;
@@ -101,9 +101,9 @@ public class Store {
 	static {
 		
 		// Initialize the logger
-		log = Logger.getLogger(Bootstrapper.class.getName());
+		log = Logger.getLogger(WSCoreBootstrapper.class.getName());
 		log.setLevel(Level.CONFIG);
-		log.addHandler(Bootstrapper.handler);
+		log.addHandler(WSCoreBootstrapper.handler);
 		
 		// Try to open the config file
 		propStoreConfig = new Properties();
@@ -128,7 +128,7 @@ public class Store {
 			FileOutputStream fos;
 			try {
 				fos = new FileOutputStream(sConfigPath+File.separator+sConfigFile);
-				propStoreConfig.storeToXML(fos, "Meandre default configuration file ("+Bootstrapper.VERSION+")");
+				propStoreConfig.storeToXML(fos, "Meandre default configuration file ("+WSCoreBootstrapper.VERSION+")");
 			    fos.close();
 			} catch (Exception eWrite) {
 				log.warning("Meandre configuration file "+

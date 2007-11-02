@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.meandre.Bootstrapper;
+import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.repository.QueryableRepository;
 import org.meandre.core.store.repository.RepositoryImpl;
@@ -32,9 +32,9 @@ public class WSLocationsLogic {
 
     // Initializing the logger and its handlers
     static {
-        log = Logger.getLogger(Bootstrapper.class.getName());
+        log = Logger.getLogger(WSCoreBootstrapper.class.getName());
         log.setLevel(Level.CONFIG);
-        log.addHandler(Bootstrapper.handler);
+        log.addHandler(WSCoreBootstrapper.handler);
     }
 	
     /** Returns a JSON object for the given location.

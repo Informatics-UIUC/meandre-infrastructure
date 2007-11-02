@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.Bootstrapper;
+import org.meandre.WSCoreBootstrapper;
 import org.meandre.webui.WebUI;
 import org.meandre.webui.WebUIException;
 import org.meandre.webui.WebUIFactory;
@@ -23,9 +23,9 @@ public class Executor {
 	
 	// Initializing the logger and its handlers
 	static {
-		log = Logger.getLogger(Bootstrapper.class.getName());
+		log = Logger.getLogger(WSCoreBootstrapper.class.getName());
 		log.setLevel(Level.CONFIG);
-		log.addHandler(Bootstrapper.handler);
+		log.addHandler(WSCoreBootstrapper.handler);
 	}
 	
 	/** The thread group of the components. */

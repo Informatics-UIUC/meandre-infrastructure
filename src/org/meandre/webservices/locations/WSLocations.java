@@ -14,7 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
-import org.meandre.Bootstrapper;
+import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.security.Action;
 	
@@ -33,9 +33,9 @@ public class WSLocations extends HttpServlet {
 
     // Initializing the logger and its handlers
     static {
-        log = Logger.getLogger(Bootstrapper.class.getName());
+        log = Logger.getLogger(WSCoreBootstrapper.class.getName());
         log.setLevel(Level.CONFIG);
-        log.addHandler(Bootstrapper.handler);
+        log.addHandler(WSCoreBootstrapper.handler);
     }
 
 

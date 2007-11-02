@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.meandre.Bootstrapper;
+import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.security.SecurityStore;
 import org.meandre.core.store.security.SecurityStoreException;
@@ -40,9 +40,9 @@ public class WSAboutLogic {
 
     // Initializing the logger and its handlers
     static {
-        log = Logger.getLogger(Bootstrapper.class.getName());
+        log = Logger.getLogger(WSCoreBootstrapper.class.getName());
         log.setLevel(Level.CONFIG);
-        log.addHandler(Bootstrapper.handler);
+        log.addHandler(WSCoreBootstrapper.handler);
     }
 
 
@@ -115,7 +115,7 @@ public class WSAboutLogic {
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("text/plain");
 		
-		pw.println("Meandre Execution Engine version "+Bootstrapper.VERSION);
+		pw.println("Meandre Execution Engine version "+WSCoreBootstrapper.VERSION);
 		pw.println("All rigths reserved by DITA, NCSA, UofI (2007).");
 		pw.println("2007. All rigths reserved by DITA, NCSA, UofI.");
 		pw.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
@@ -138,7 +138,7 @@ public class WSAboutLogic {
 		//
 		pw.println("Meandre properties:");
 		pw.println();
-		pw.println("VERSION = "+Bootstrapper.VERSION);
+		pw.println("VERSION = "+WSCoreBootstrapper.VERSION);
 		for ( Object oKey:prop.keySet() ) {
 			String sKey = oKey.toString();
 			if ( sKey.startsWith("MEANDRE")) {
@@ -231,27 +231,27 @@ public class WSAboutLogic {
 		model = ModelFactory.createDefaultModel();
 		
 		// Setting the name spaces
-		model.setNsPrefix("meandreWS", Bootstrapper.WS_BASE_URL);
+		model.setNsPrefix("meandreWS", WSCoreBootstrapper.WS_BASE_URL);
 		model.setNsPrefix("meandreSC", Store.BASE_REPSITORY_STORE_CONFIG_URL );
 		model.setNsPrefix("xsd", XSD.getURI());
 		model.setNsPrefix("rdf", RDF.getURI());
 		model.setNsPrefix("rdfs",RDFS.getURI());
 		model.setNsPrefix("dc",DC.getURI());
 
-		Resource resRoot = model.createResource(Bootstrapper.WS_BASE_URL);
+		Resource resRoot = model.createResource(WSCoreBootstrapper.WS_BASE_URL);
 		
 		// Meandre WS ones
 		resRoot.addProperty(ResourceFactory.createProperty(DC.date.getURI()), model.createTypedLiteral(new Date(),XSDDatatype.XSDdate));
 		resRoot.addProperty(ResourceFactory.createProperty(DC.creator.getURI()), model.createTypedLiteral(request.getRemoteUser()));
-		resRoot.addProperty(ResourceFactory.createProperty(Bootstrapper.WS_BASE_URL+"sessionID"), model.createTypedLiteral(request.getSession().getId()));
+		resRoot.addProperty(ResourceFactory.createProperty(WSCoreBootstrapper.WS_BASE_URL+"sessionID"), model.createTypedLiteral(request.getSession().getId()));
 			
 		// Meandre ones
-		resRoot.addProperty(ResourceFactory.createProperty(Bootstrapper.WS_BASE_URL+"version"), model.createTypedLiteral(Bootstrapper.VERSION));
+		resRoot.addProperty(ResourceFactory.createProperty(WSCoreBootstrapper.WS_BASE_URL+"version"), model.createTypedLiteral(WSCoreBootstrapper.VERSION));
 		for ( Object oKey:prop.keySet() ) {
 			String sKey = oKey.toString();
 			if ( sKey.startsWith("MEANDRE")) {
 				String sValue = prop.getProperty(sKey.toString());
-				resRoot.addProperty(ResourceFactory.createProperty(Bootstrapper.WS_BASE_URL+sKey.toString().toLowerCase()), model.createTypedLiteral(sValue));
+				resRoot.addProperty(ResourceFactory.createProperty(WSCoreBootstrapper.WS_BASE_URL+sKey.toString().toLowerCase()), model.createTypedLiteral(sValue));
 			}
 		}
 		

@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.Bootstrapper;
+import org.meandre.WSCoreBootstrapper;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.query.Query;
@@ -49,9 +49,9 @@ public class RepositoryImpl implements QueryableRepository {
 		//
 		// Initializing the logger and its handlers
 		//
-		log = Logger.getLogger(Bootstrapper.class.getName());
+		log = Logger.getLogger(WSCoreBootstrapper.class.getName());
 		log.setLevel(Level.CONFIG);
-		log.addHandler(Bootstrapper.handler);
+		log.addHandler(WSCoreBootstrapper.handler);
 		
 		//
 		// Initialize the sets

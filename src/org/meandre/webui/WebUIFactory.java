@@ -6,7 +6,7 @@ import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.Bootstrapper;
+import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.store.Store;
 
 /** The web ui factory to manager allows modules to create, register,
@@ -22,9 +22,9 @@ public class WebUIFactory {
 	
 	// Initializing the logger and its handlers
 	static {
-		log = Logger.getLogger(Bootstrapper.class.getName());
+		log = Logger.getLogger(WSCoreBootstrapper.class.getName());
 		log.setLevel(Level.CONFIG);
-		log.addHandler(Bootstrapper.handler);
+		log.addHandler(WSCoreBootstrapper.handler);
 	}
 		
 	/** The semaphore to implement mutual exclusion */
