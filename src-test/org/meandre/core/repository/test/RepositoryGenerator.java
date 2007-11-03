@@ -121,7 +121,7 @@ public class RepositoryGenerator {
 		Resource resExecutableComponent =  ModelFactory.createDefaultModel().createResource(sTestBaseComponentURL+"concatenate-strings");
 		
 		// General properties
-		String sName = "Conccatenate Strings";
+		String sName = "Concatenate Strings";
 		String sDescription = "Concatenates the to input string to the output";
 		String sRights = "University of Illinois/NCSA open source license";
 		String sCreator = "Xavier Llor&agrave;";
