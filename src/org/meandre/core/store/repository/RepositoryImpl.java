@@ -3,8 +3,10 @@ package org.meandre.core.store.repository;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -728,6 +730,20 @@ public class RepositoryImpl implements QueryableRepository {
 		return setFD;
 	}
 	
+	/** Returns the map of available executable components descriptions stored
+	 * in the repository.
+	 * 
+	 * @return The set of executable component descriptions
+	 */
+	public Map<String,ExecutableComponentDescription> getAvailableExecutableComponentDescriptionsMap () {
+		Map<String,ExecutableComponentDescription> mapECD = new HashMap<String,ExecutableComponentDescription>();
+		
+		for ( Resource res:getAvailableExecutableComponents() )
+			mapECD.put(res.toString(),getExecutableComponentDescription(res));
+		
+		return mapECD;
+	}
+
 	
 	/** Returns the set of available executable components stored
 	 * in the repository that match the search criteria.
@@ -820,6 +836,20 @@ public class RepositoryImpl implements QueryableRepository {
 			setFD.add(getFlowDescription(res));
 		
 		return setFD;
+	}
+	
+
+	/** Returns the map of available flows descriptions in the repository.
+	 * 
+	 * @return The set of resources describing the available flows
+	 */
+	public Map<String,FlowDescription> getAvailableFlowDecriptionsMap() {
+		Map<String,FlowDescription> mapFD = new HashMap<String,FlowDescription>();
+		
+		for ( Resource res:getAvailableFlows() )
+			mapFD.put(res.toString(),getFlowDescription(res));
+		
+		return mapFD;
 	}
 	
 	/** Returns the set of availabble flows in the repository that match the search criteria. The queries

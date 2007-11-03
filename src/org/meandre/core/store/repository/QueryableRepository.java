@@ -1,5 +1,6 @@
 package org.meandre.core.store.repository;
 
+import java.util.Map;
 import java.util.Set;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -43,7 +44,14 @@ public interface QueryableRepository {
 	 * @return The set of executable component descriptions
 	 */
 	public Set<ExecutableComponentDescription> getAvailableExecutableComponentDescriptions ();
-	
+
+	/** Returns the map of available executable components descriptions stored
+	 * in the repository.
+	 * 
+	 * @return The set of executable component descriptions
+	 */
+	public Map<String,ExecutableComponentDescription> getAvailableExecutableComponentDescriptionsMap ();
+
 	/** Returns the set of available executable components stored
 	 * in the repository that match the search criteria. The queries
 	 * are based on Lucene syntax.
@@ -66,12 +74,19 @@ public interface QueryableRepository {
 	 * @return The set of resources describing the available flows
 	 */
 	public Set<Resource> getAvailableFlows();
-	
+
 	/** Returns the set of available flows descriptions in the repository.
 	 * 
 	 * @return The set of resources describing the available flows
 	 */
 	public Set<FlowDescription> getAvailableFlowDecriptions();
+	
+
+	/** Returns the map of available flows descriptions in the repository.
+	 * 
+	 * @return The set of resources describing the available flows
+	 */
+	public Map<String,FlowDescription> getAvailableFlowDecriptionsMap();
 	
 	/** Returns the set of availabble flows in the repository that match the search criteria. The queries
 	 * are based on Lucene syntax.
