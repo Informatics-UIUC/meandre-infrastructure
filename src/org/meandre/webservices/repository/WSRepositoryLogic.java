@@ -654,7 +654,7 @@ public class WSRepositoryLogic {
 	 * @throws FileUploadException An exception araised while uploading the model
 	 */
 	@SuppressWarnings("unchecked")
-	public static Model addFlow(HttpServletRequest request, String sExtension) 
+	public static Model addToRepository(HttpServletRequest request, String sExtension) 
 	throws IOException, FileUploadException {
 		
 		Model modelTmp = null;
@@ -694,8 +694,7 @@ public class WSRepositoryLogic {
 				//
 				QueryableRepository qrNew = new RepositoryImpl(modelTmp);
 				if ( qrNew.getAvailableFlows().size()==0 ) {
-					log.warning("The upladed description does not contain any flow");
-					throw new IOException("No flow available");
+					log.info("The upladed description does not contain any flow");
 				}
 				
 				//

@@ -298,7 +298,7 @@ public class WSRepository extends HttpServlet {
 			HttpServletResponse response, String sTarget, String sExtension) throws IOException{
 		
 		try {
-			Model modelFlow = WSRepositoryLogic.addFlow(request,sExtension);
+			Model modelFlow = WSRepositoryLogic.addToRepository(request,sExtension);
 			
 			if ( modelFlow == null ) {
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
