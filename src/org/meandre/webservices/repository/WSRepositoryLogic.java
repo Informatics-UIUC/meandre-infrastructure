@@ -693,9 +693,6 @@ public class WSRepositoryLogic {
 				// Check the uploaded description
 				//
 				QueryableRepository qrNew = new RepositoryImpl(modelTmp);
-				if ( qrNew.getAvailableFlows().size()==0 ) {
-					log.info("The upladed description does not contain any flow");
-				}
 				
 				//
 				// Add to the user repository
