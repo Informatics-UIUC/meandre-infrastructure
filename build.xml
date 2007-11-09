@@ -8,11 +8,7 @@
         <available classname="org.apache.tools.ant.DynamicAttribute" property="ant-1.7.0"/>
         <fail unless="ant-1.7.0" message="Ant 1.7.0 for faster unit testing"/>
 
-        <!-- Check that junit.jar is in $ANT_HOME/lib or junit task fails -->
-        <available classname="junit.framework.TestCase" property="junit.present"/>
-        <fail unless="junit.present" message="Please copy junit.jar into ${env.ANT_HOME}/lib"/>
-        
-    </target>
+   </target>
     
     <!-- Check timestamp on files -->                                                                                                       
     <target name="prepare" depends="init" description="create target directories">                                                          
@@ -33,18 +29,13 @@
     <!-- Compile -->
     <target name="compile" depends="prepare" description="compile source code">
         <echo>Compiling Core and Test...</echo>
-         <javac srcdir="${src}"
+         <javac srcdir="${basedir}"
             destdir="${build.dir}/" debug="${compile.debug}"
             deprecation="${compile.deprecation}" optimize="${compile.optimize}"
             classpathref="meandre.core.classpath">
+             <include name="**/*.java"/>
         </javac>
-        <javac srcdir="${test.src}" debug="true"
-            destdir="${build.dir}">
-            <classpath>
-                <path refid="meandre.test.classpath"/>
-                <path location="${build.dir}"/>
-            </classpath>
-        </javac> 
+       
     </target>   
     
     
@@ -62,8 +53,17 @@
         </jar>  
     </target>   
     
-    <!-- run tests-->
     
+    
+    <!-- Remove classes directory for clean build -->
+    <target name="clean" description="Removes build artifacts">
+        <echo level="info">Cleaning build and distribution directories</echo>                                                                                           
+        <delete dir="${build.dir}/*"/>                                                                                                                                    
+        <delete dir="${dist.dir}/*"/>                                                                                                                                     
+      </target>
+    
+    
+    <!-- run tests-->
     <target name="run-tests" depends="dist" description="run tests">
         <junit printsummary="yes" forkmode="once" errorProperty="test.failed"                                                                                        
             failureProperty="test.failed" fork="${junit.fork}" showoutput="${junit.showoutput}">                                                                    
