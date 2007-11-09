@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Meandre-Core-Branch-springOSGi" basedir="." default="dist">
+    <!-- import properties (app settings, classpath, jar file locations) -->
+    <import file="properties.xml"/>
+
+     <target name="init" description="defines custom tasks">
+        <!-- Ensure that Ant 1.7+ is being used -->
+        <available classname="org.apache.tools.ant.DynamicAttribute" property="ant-1.7.0"/>
+        <fail unless="ant-1.7.0" message="Ant 1.7.0 for faster unit testing"/>
+
+        <!-- Check that junit.jar is in $ANT_HOME/lib or junit task fails -->
+        <available classname="junit.framework.TestCase" property="junit.present"/>
+        <fail unless="junit.present" message="Please copy junit.jar into ${env.ANT_HOME}/lib"/>
+        
+    </target>
+    
+    <!-- Check timestamp on files -->                                                                                                       
+    <target name="prepare" depends="init" description="create target directories">                                                          
+        <tstamp/>                                                                                                                           
+        <tstamp><format property="copyright.year" pattern="yyyy"/></tstamp>                                                                 
+        <echo message="Preparing build target '${build.dir}'"/>                                                                     
+        <mkdir dir="${build.dir}"/>                                                                                                     
+        <echo message="Preparing target directory '${dist.dir}'"/>                                                                     
+        <mkdir dir="${dist.dir}"/> 
+        <echo message="Preparing test directory '${test.dir}'"/>                                                                     
+        <mkdir dir="${test.dir}"/> 
+        <echo message="Preparing test data directory '${test.dir}/data'"/>                                                                     
+        <mkdir dir="${test.dir}/data"/> 
+        
+     </target>
+
+    
+    <!-- Compile -->
+    <target name="compile" depends="prepare" description="compile source code">
+        <echo>Compiling Core and Test...</echo>
+         <javac srcdir="${src}"
+            destdir="${build.dir}/" debug="${compile.debug}"
+            deprecation="${compile.deprecation}" optimize="${compile.optimize}"
+            classpathref="meandre.core.classpath">
+        </javac>
+        <javac srcdir="${test.src}" debug="true"
+            destdir="${build.dir}">
+            <classpath>
+                <path refid="meandre.test.classpath"/>
+                <path location="${build.dir}"/>
+            </classpath>
+        </javac> 
+    </target>   
+    
+    
+     <!-- Create jar distribution -->
+    <target name="dist" depends="compile" description="create jar distribution">
+        <jar destfile="${dist.dir}/${app.name}.jar">
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+            </manifest>
+            <fileset dir="${build.dir}">
+                <include name="**/*.class"/>
+                <include name="**/*.properties"/>
+                <include name="**/*.xml"/>
+            </fileset>
+        </jar>  
+    </target>   
+    
+    <!-- run tests-->
+    
+    <target name="run-tests" depends="dist" description="run tests">
+        <junit printsummary="yes" forkmode="once" errorProperty="test.failed"                                                                                        
+            failureProperty="test.failed" fork="${junit.fork}" showoutput="${junit.showoutput}">                                                                    
+            <jvmarg value="-Duser.language=en"/>                                                                                                                    
+            <classpath>                                                                                                                                             
+                <path refid="meandre.core.classpath"/>                                                                                                            
+                <pathelement location="${build.dir}"/>                                                                                            
+                <pathelement path="${java.class.path}"/>                                                                                                            
+                <!-- For .properties and .xml files -->                                                                                                             
+                <pathelement path="src"/>                                                                                                                 
+                
+            </classpath>   
+          <formatter type="xml"/>                                                                                                                                 
+            <formatter type="brief" usefile="false"/>                                                                                                               
+            <batchtest todir="${test.dir}/data">                                                                                                      
+                <fileset dir="${test.src}">                                                                                                       
+                    <include name="**/*Test.java"/>                                                                                                           
+                </fileset>                                                                                                                                          
+            </batchtest>                                                                                                                                            
+         </junit>
+    </target>   
+    
+    
+    
+    
+ </project>      
