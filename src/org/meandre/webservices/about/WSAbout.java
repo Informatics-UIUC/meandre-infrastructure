@@ -1,6 +1,7 @@
 package org.meandre.webservices.about;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,6 +15,8 @@ import org.json.XML;
 import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.security.Action;
+
+import com.sun.org.apache.xerces.internal.util.URI;
 
 /** A basic handler to display basic information.
  * 
@@ -54,7 +57,7 @@ public class WSAbout extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws ServletException, IOException {
     	
-    	String [] saParts = request.getRequestURL().toString().split("\\.");
+    	String [] saParts = new URL(request.getRequestURL().toString()).getPath().split("\\.");
    		String sTarget = saParts[0];
 		String sExtension = "";
 
