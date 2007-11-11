@@ -16,8 +16,6 @@ import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.security.Action;
 
-import com.sun.org.apache.xerces.internal.util.URI;
-
 /** A basic handler to display basic information.
  * 
  * @author Xavier Llor&agrave;

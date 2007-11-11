@@ -760,7 +760,7 @@ public class WSRepositoryLogic {
 		}
 		modUser.commit();
 			
-		return modelTmp;
+		return modUser;
 	}
 
 	/** Returns a string with the deleted URI if successful, blank otherwise.
