@@ -204,7 +204,7 @@ public class RepositoryGenerator {
 	private static ExecutableComponentDescription getPrintObjectComponent() {
 		ExecutableComponentDescription ecdRes = null;
 		
-		Resource resExecutableComponent =  ModelFactory.createDefaultModel().createResource(sTestBaseComponentURL+"print_object");
+		Resource resExecutableComponent =  ModelFactory.createDefaultModel().createResource(sTestBaseComponentURL+"print-object");
 		
 		// General properties
 		String sName = "Print Object";
@@ -405,7 +405,7 @@ public class RepositoryGenerator {
 		PropertiesDescription pdPInsCS0Properties = new PropertiesDescription();
 		ExecutableComponentInstanceDescription ecidCS0 = new ExecutableComponentInstanceDescription(resInsCS0,resInsCS0Component,sInsCS0Name,sInsCS0Desc,pdPInsCS0Properties);
 
-		Resource resInsPO0 = ModelFactory.createDefaultModel().createResource(sTestBaseFlowURL+"instance/print_object/3");
+		Resource resInsPO0 = ModelFactory.createDefaultModel().createResource(sTestBaseFlowURL+"instance/print-object/3");
 		Resource resInsPO0Component = ecdPO.getExecutableComponent();
 		String sInsPO0Name = "Print Object 0";
 		String sInsPO0Desc = "Prints the concatenated object";
@@ -527,7 +527,7 @@ public class RepositoryGenerator {
 		PropertiesDescription pdPInsCS0Properties = new PropertiesDescription();
 		ExecutableComponentInstanceDescription ecidCS0 = new ExecutableComponentInstanceDescription(resInsCS0,resInsCS0Component,sInsCS0Name,sInsCS0Desc,pdPInsCS0Properties);
 
-		Resource resInsPO0 = ModelFactory.createDefaultModel().createResource(sTestBaseFlowURL+"instance/print_object/3");
+		Resource resInsPO0 = ModelFactory.createDefaultModel().createResource(sTestBaseFlowURL+"instance/print-object/3");
 		Resource resInsPO0Component = ecdPO.getExecutableComponent();
 		String sInsPO0Name = "Print Object 0";
 		String sInsPO0Desc = "Prints the concatenated object";
@@ -555,7 +555,7 @@ public class RepositoryGenerator {
 		PropertiesDescription pdPInsCSDProperties = new PropertiesDescription();
 		ExecutableComponentInstanceDescription ecidCSD = new ExecutableComponentInstanceDescription(resInsCSD,resInsCSDComponent,sInsCSDName,sInsCSDDesc,pdPInsCSDProperties);
 
-		Resource resInsPOD = ModelFactory.createDefaultModel().createResource(sTestBaseFlowURL+"instance/print_object/6");
+		Resource resInsPOD = ModelFactory.createDefaultModel().createResource(sTestBaseFlowURL+"instance/print-object/6");
 		Resource resInsPODComponent = ecdPO.getExecutableComponent();
 		String sInsPODName = "Print Object Dangling";
 		String sInsPODDesc = "Prints the concatenated object";
@@ -682,14 +682,14 @@ public class RepositoryGenerator {
 		PropertiesDescription pdPInsRF0Properties = new PropertiesDescription();
 		ExecutableComponentInstanceDescription ecidFO0 = new ExecutableComponentInstanceDescription(resInsRF0,resInsRF0Component,sInsRF0Name,sInsRF0Desc,pdPInsRF0Properties);
 	
-		Resource resInsPO0 = ModelFactory.createDefaultModel().createResource(sTestBaseFlowURL+"instance/print_object/4");
+		Resource resInsPO0 = ModelFactory.createDefaultModel().createResource(sTestBaseFlowURL+"instance/print-object/4");
 		Resource resInsPO0Component = ecdPO.getExecutableComponent();
 		String sInsPO0Name = "Print Object 0";
 		String sInsPO0Desc = "Prints the concatenated object";
 		PropertiesDescription pdPInsPO0Properties = new PropertiesDescription();
 		ExecutableComponentInstanceDescription ecidPO0 = new ExecutableComponentInstanceDescription(resInsPO0,resInsPO0Component,sInsPO0Name,sInsPO0Desc,pdPInsPO0Properties);
 	
-		Resource resInsPO1 = ModelFactory.createDefaultModel().createResource(sTestBaseFlowURL+"instance/print_object/5");
+		Resource resInsPO1 = ModelFactory.createDefaultModel().createResource(sTestBaseFlowURL+"instance/print-object/5");
 		Resource resInsPO1Component = ecdPO.getExecutableComponent();
 		String sInsPO1Name = "Print Object 0";
 		String sInsPO1Desc = "Prints the concatenated object";
@@ -719,7 +719,7 @@ public class RepositoryGenerator {
 		PropertiesDescription pdPInsCSDProperties = new PropertiesDescription();
 		ExecutableComponentInstanceDescription ecidCSD = new ExecutableComponentInstanceDescription(resInsCSD,resInsCSDComponent,sInsCSDName,sInsCSDDesc,pdPInsCSDProperties);
 	
-		Resource resInsPOD = ModelFactory.createDefaultModel().createResource(sTestBaseFlowURL+"instance/print_object/8 ");
+		Resource resInsPOD = ModelFactory.createDefaultModel().createResource(sTestBaseFlowURL+"instance/print-object/8 ");
 		Resource resInsPODComponent = ecdPO.getExecutableComponent();
 		String sInsPODName = "Print Object Dangling";
 		String sInsPODDesc = "Prints the concatenated object";
