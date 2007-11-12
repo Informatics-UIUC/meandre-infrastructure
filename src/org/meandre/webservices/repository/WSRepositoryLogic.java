@@ -3,6 +3,7 @@ package org.meandre.webservices.repository;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -647,7 +648,7 @@ public class WSRepositoryLogic {
 		
 	}
 
-	/** Adds a flow to the user repository.
+	/** Adds components and flows to the user repository.
 	 * 
 	 * @param request The request object
 	 * @param sExtension The extension format
@@ -762,6 +763,68 @@ public class WSRepositoryLogic {
 			
 		return modUser;
 	}
+
+
+	/** Adds a flow to the user repository.
+	 * 
+	 * @param request The request object
+	 * @param sExtension The extension format
+	 * @return The model containing the flow
+	 * @throws FileUploadException An exception araised while uploading the model
+	 */
+	@SuppressWarnings("unchecked")
+	public static Model addFlowsToRepository(HttpServletRequest request, String sExtension) 
+	throws IOException, FileUploadException {
+		
+		// Read the uploaded descriptor into a model
+		String sFlowsDesc = request.getParameter("repository");
+		Model modNew = ModelFactory.createDefaultModel();
+		
+		modNew.setNsPrefix("", "http://www.meandre.org/ontology/");
+		modNew.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
+		modNew.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
+		modNew.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
+		
+		StringReader srModel = new StringReader(sFlowsDesc);
+		
+		if ( sExtension.equals("ttl"))
+			modNew.read(srModel,null,"TTL");
+		else if ( sExtension.equals("nt"))
+			modNew.read(srModel,null,"N-TRIPLE");
+		else
+			modNew.read(srModel,null);
+		
+		// Create the returned model
+		Model modResult = ModelFactory.createDefaultModel();
+		
+		modResult.setNsPrefix("", "http://www.meandre.org/ontology/");
+		modResult.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
+		modResult.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
+		modResult.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
+		
+		// Generate a repository for the uploaded model
+		QueryableRepository qrNew = new RepositoryImpl(modNew);
+		
+		// The user repository
+		QueryableRepository qr = Store.getRepositoryStore(request.getRemoteUser());
+		Model modUser = qr.getModel();
+		
+		for ( FlowDescription fd:qrNew.getAvailableFlowDecriptions()) {
+			if ( !qr.getAvailableFlows().contains(fd.getFlowComponent())) {
+				// The model for the flow to add
+				Model fdModel = fd.getModel();
+				// Add to the user repository
+				modUser.begin();
+				modUser.add(fdModel);
+				modUser.commit();
+				// Add to the result model
+				modResult.add(fdModel);
+			}
+		}
+			
+		return modResult;
+	}
+
 
 	/** Returns a string with the deleted URI if successful, blank otherwise.
 	 * 

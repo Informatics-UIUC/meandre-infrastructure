@@ -74,12 +74,20 @@ public class WSRepository extends HttpServlet {
     	if ( sTarget.endsWith("/add") ) {
     		if ( Store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Flows", request.getRemoteUser()) &&
           		 Store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Components", request.getRemoteUser()) ) {
-                      addFlowAction(request, response, sTarget, sExtension);
+                      addRepositoryAction(request, response, sTarget, sExtension);
     		}
     		else {
     			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
     		}	
     	}
+    	else if ( sTarget.endsWith("/add_flow_descriptors") ) {
+    		if ( Store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Flows", request.getRemoteUser())  ) {
+    			addFlowsAction(request, response, sTarget, sExtension);
+       		}
+       		else {
+       			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+       		}	
+       	}
     	else {
     		// 
 			// Invalid request found
@@ -283,12 +291,13 @@ public class WSRepository extends HttpServlet {
 			// 
 			// Invalid request found
 			//
-			log.info("Uknown about service requested "+sTarget);
+			log.info("Uknown repository service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
 
-	/** Add a flow to the repository.
+
+	/** Add a repository descriptor to the repository.
      * 
      * @param request The request object
      * @param response The response object
@@ -296,7 +305,7 @@ public class WSRepository extends HttpServlet {
      * @param sExtension The extension string
      * @throws IOException A problem arised
 	 */
-	private void addFlowAction(HttpServletRequest request,
+	private void addRepositoryAction(HttpServletRequest request,
 			HttpServletResponse response, String sTarget, String sExtension) throws IOException{
 		
 		try {
@@ -318,7 +327,46 @@ public class WSRepository extends HttpServlet {
 				// 
 				// Invalid request found
 				//
-				log.info("Uknown about service requested "+sTarget);
+				log.info("Uknown repository service requested "+sTarget);
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			}
+		} catch (FileUploadException e) {
+			throw new IOException(e.toString());
+		}
+		
+	}
+	
+	/** Add a flow to the repository.
+     * 
+     * @param request The request object
+     * @param response The response object
+     * @param sTarget The target string
+     * @param sExtension The extension string
+     * @throws IOException A problem arised
+	 */
+	private void addFlowsAction(HttpServletRequest request,
+			HttpServletResponse response, String sTarget, String sExtension) throws IOException{
+		
+		try {
+			Model modelFlow = WSRepositoryLogic.addFlowsToRepository(request,sExtension);
+			
+			if ( modelFlow == null ) {
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			}
+			else if ( sExtension.endsWith("rdf") ) {
+				dumpModel(request,response,modelFlow,"RDF/XML-ABBREV"); 
+			}
+			else if ( sExtension.endsWith("ttl") ) {
+				dumpModel(request,response,modelFlow,"TTL"); 
+			}
+			else if ( sExtension.endsWith("nt") ) {
+				dumpModel(request,response,modelFlow,"N-TRIPLE"); 
+			}
+			else  {
+				// 
+				// Invalid request found
+				//
+				log.info("Uknown repository service requested "+sTarget);
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			}
 		} catch (FileUploadException e) {
@@ -369,7 +417,7 @@ public class WSRepository extends HttpServlet {
 			// 
 			// Invalid request found
 			//
-			log.info("Uknown about service requested "+sTarget);
+			log.info("Uknown repository service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
@@ -416,7 +464,7 @@ public class WSRepository extends HttpServlet {
 			// 
 			// Invalid request found
 			//
-			log.info("Uknown about service requested "+sTarget);
+			log.info("Uknown repository service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
@@ -463,7 +511,7 @@ public class WSRepository extends HttpServlet {
 			// 
 			// Invalid request found
 			//
-			log.info("Uknown about service requested "+sTarget);
+			log.info("Uknown repository service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
@@ -511,7 +559,7 @@ public class WSRepository extends HttpServlet {
 			// 
 			// Invalid request found
 			//
-			log.info("Uknown about service requested "+sTarget);
+			log.info("Uknown repository service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
@@ -546,7 +594,7 @@ public class WSRepository extends HttpServlet {
 			// 
 			// Invalid request found
 			//
-			log.info("Uknown about service requested "+sTarget);
+			log.info("Uknown repository service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
@@ -623,7 +671,7 @@ public class WSRepository extends HttpServlet {
 			// 
 			// Invalid request found
 			//
-			log.info("Uknown about service requested "+sTarget);
+			log.info("Uknown repository service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
@@ -665,7 +713,7 @@ public class WSRepository extends HttpServlet {
 			// 
 			// Invalid request found
 			//
-			log.info("Uknown about service requested "+sTarget);
+			log.info("Uknown repository service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
@@ -707,7 +755,7 @@ public class WSRepository extends HttpServlet {
 			// 
 			// Invalid request found
 			//
-			log.info("Uknown about service requested "+sTarget);
+			log.info("Uknown repository service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
@@ -749,7 +797,7 @@ public class WSRepository extends HttpServlet {
 			// 
 			// Invalid request found
 			//
-			log.info("Uknown about service requested "+sTarget);
+			log.info("Uknown repository service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
@@ -791,7 +839,7 @@ public class WSRepository extends HttpServlet {
 			// 
 			// Invalid request found
 			//
-			log.info("Uknown about service requested "+sTarget);
+			log.info("Uknown repository service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
@@ -829,7 +877,7 @@ public class WSRepository extends HttpServlet {
 			// 
 			// Invalid request found
 			//
-			log.info("Uknown about service requested "+sTarget);
+			log.info("Uknown repository service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}		
 		
@@ -859,7 +907,7 @@ public class WSRepository extends HttpServlet {
 			// 
 			// Invalid request found
 			//
-			log.info("Uknown about service requested "+sTarget);
+			log.info("Uknown repository service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
