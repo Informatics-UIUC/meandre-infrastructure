@@ -2,6 +2,7 @@ package org.meandre.webservices.locations;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,7 +59,7 @@ public class WSLocations extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws ServletException, IOException {
     	
-    	String [] saParts = request.getRequestURL().toString().split("\\.");
+    	String [] saParts = new URL(request.getRequestURL().toString()).getPath().split("\\.");
    		String sTarget = saParts[0];
 		String sExtension = "";
 

@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -661,7 +662,12 @@ public class WSRepositoryLogic {
 		ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
 		List lstItems = upload.parseRequest(request);
 		Iterator<FileItem> itr = lstItems.iterator();
-
+		HashSet<ExecutableComponentDescription> setComponentsToAdd = new HashSet<ExecutableComponentDescription>();
+		HashSet<String> setFiles = new HashSet<String>();
+		
+		// The user repository
+		QueryableRepository qr = Store.getRepositoryStore(request.getRemoteUser());
+		
 		while(itr.hasNext()) {
 			FileItem item = itr.next();
 		    // Get the name of the field
@@ -697,14 +703,13 @@ public class WSRepositoryLogic {
 				//
 				// Add to the user repository
 				//
-				QueryableRepository qr = Store.getRepositoryStore(request.getRemoteUser());
 				Model modelQR = qr.getModel();
-				modelQR.begin();
 				// Adding components
 				for ( Resource resComp:qrNew.getAvailableExecutableComponents() ) {
 					if ( qr.getExecutableComponentDescription(resComp)==null ) {
 						// Component does not exist
-						modelQR.add(qrNew.getExecutableComponentDescription(resComp).getModel());
+						// Add to the set to modify before adding to the repository repository
+						setComponentsToAdd.add(qrNew.getExecutableComponentDescription(resComp));
 					}
 					else {
 						// Component does exist
@@ -722,7 +727,6 @@ public class WSRepositoryLogic {
 						log.warning("Flow "+resFlow+" already exist in "+request.getRemoteUser()+" repository. Discarding it.");
 					}
 				}
-				modelQR.commit();
 			}	
 			// Check if we need to upload jar files
 			else if(fieldName.equals("jar")) {
@@ -733,6 +737,7 @@ public class WSRepositoryLogic {
 	    		File savedFile = new File(Store.getPublicResourceDirectory()+File.separator+sFile);
 				try {
 					item.write(savedFile);
+					setFiles.add(sFile);
 				} catch (Exception e) {
 					log.warning("Problems writing jar "+sFile+" to "+Store.getPublicResourceDirectory());
 					throw new IOException(e.toString());
@@ -741,7 +746,21 @@ public class WSRepositoryLogic {
 			}
 		}
 		
-		return modelTmp;
+		// Adding the components after adding the contexts
+		Model modUser = qr.getModel();
+		URL urlRequest = new URL(request.getRequestURL().toString());
+		modUser.begin();
+		for ( ExecutableComponentDescription ecd:setComponentsToAdd) {
+			for ( String sFile:setFiles ){
+				Resource res = modUser.createResource(urlRequest.getProtocol()+"://"+urlRequest.getHost()+":"+urlRequest.getPort()+"/public/resources/"+sFile);
+				ecd.getContext().add(res);
+				modUser.add(ecd.getModel());
+			}
+			
+		}
+		modUser.commit();
+			
+		return modUser;
 	}
 
 	/** Returns a string with the deleted URI if successful, blank otherwise.

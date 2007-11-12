@@ -1,6 +1,7 @@
 package org.meandre.webservices.repository;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,7 +62,8 @@ public class WSRepository extends HttpServlet {
 	 */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
     throws ServletException, IOException {
-    	String [] saParts = request.getRequestURL().toString().split("\\.");
+    	
+    	String [] saParts = new URL(request.getRequestURL().toString()).getPath().split("\\.");
    		String sTarget = saParts[0];
 		String sExtension = "";
 
@@ -106,7 +108,7 @@ public class WSRepository extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws ServletException, IOException {
     	
-    	String [] saParts = request.getRequestURL().toString().split("\\.");
+    	String [] saParts = new URL(request.getRequestURL().toString()).getPath().split("\\.");
    		String sTarget = saParts[0];
 		String sExtension = "";
 
