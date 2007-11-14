@@ -668,6 +668,8 @@ public class WSRepositoryLogic {
 		
 		// The user repository
 		QueryableRepository qr = Store.getRepositoryStore(request.getRemoteUser());
+		Model modelQR = qr.getModel();
+		modelQR.begin();
 		
 		while(itr.hasNext()) {
 			FileItem item = itr.next();
@@ -704,7 +706,6 @@ public class WSRepositoryLogic {
 				//
 				// Add to the user repository
 				//
-				Model modelQR = qr.getModel();
 				// Adding components
 				for ( Resource resComp:qrNew.getAvailableExecutableComponents() ) {
 					if ( qr.getExecutableComponentDescription(resComp)==null ) {
@@ -752,14 +753,21 @@ public class WSRepositoryLogic {
 		URL urlRequest = new URL(request.getRequestURL().toString());
 		modUser.begin();
 		for ( ExecutableComponentDescription ecd:setComponentsToAdd) {
-			for ( String sFile:setFiles ){
-				Resource res = modUser.createResource(urlRequest.getProtocol()+"://"+urlRequest.getHost()+":"+urlRequest.getPort()+"/public/resources/"+sFile);
-				ecd.getContext().add(res);
+			if ( setFiles.isEmpty() ) {
 				modUser.add(ecd.getModel());
+			}
+			else {
+				for ( String sFile:setFiles ){
+					Resource res = modUser.createResource(urlRequest.getProtocol()+"://"+urlRequest.getHost()+":"+urlRequest.getPort()+"/public/resources/"+sFile);
+					ecd.getContext().add(res);
+					modUser.add(ecd.getModel());
+				}
 			}
 			
 		}
+		//Commiting changes
 		modUser.commit();
+		modelQR.commit();
 			
 		return modUser;
 	}
