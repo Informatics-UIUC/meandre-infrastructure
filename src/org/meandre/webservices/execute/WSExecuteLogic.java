@@ -3,12 +3,16 @@ package org.meandre.webservices.execute;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.engine.Conductor;
 import org.meandre.core.engine.ConductorException;
@@ -17,6 +21,8 @@ import org.meandre.core.store.Store;
 import org.meandre.core.store.repository.CorruptedDescriptionException;
 import org.meandre.core.store.repository.FlowDescription;
 import org.meandre.core.store.repository.QueryableRepository;
+import org.meandre.webui.WebUI;
+import org.meandre.webui.WebUIFactory;
 
 import com.hp.hpl.jena.rdf.model.Resource;
 
@@ -72,11 +78,14 @@ public class WSExecuteLogic {
 				pw.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 				pw.println();
 
+				pw.flush();
 				
 				// Create the execution
 				pw.println("Preparing flow: "+sURI);
 				Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE);
 				Executor exec = conductor.buildExecutor(qr, resURI);
+				
+				pw.flush();
 				
 				// Redirecting the output
 				PrintStream psOUT = System.out;
@@ -91,7 +100,9 @@ public class WSExecuteLogic {
 				pw.print("Execution started at: ");
 				pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
 				pw.println("----------------------------------------------------------------------------");
+				pw.flush();
 				exec.execute();
+				pw.flush();
 				pw.println("----------------------------------------------------------------------------");
 				pw.print("Execution finished at: ");
 				pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
@@ -109,6 +120,8 @@ public class WSExecuteLogic {
 					for ( String sMsg:exec.getAbortMessage() )
 						pw.println("\t"+sMsg);
 				}
+				pw.flush();
+				
 				// Reset the output redirection
 				System.setOut(psOUT);
 				System.setErr(psERR);
@@ -168,7 +181,9 @@ public class WSExecuteLogic {
 				System.setOut(pw);
 				System.setErr(pw);
 	
+				pw.flush();
 				exec.execute();
+				pw.flush();
 				
 				if ( !exec.hadGracefullTermination() ) {
 					//
@@ -178,13 +193,80 @@ public class WSExecuteLogic {
 					for ( String sMsg:exec.getAbortMessage() )
 						pw.println("\t"+sMsg);
 				}
-	
+				pw.flush();
+				
 				// Reset the output redirection
 				System.setOut(psOUT);
 				System.setErr(psERR);
 			}
 			
 		}
+	}
+	
+	/** Returns the list of running flows.
+	 * 
+	 * @param request The request object
+	 * @param response The response object
+	 * @return The JSON object containing the results
+	 * @throws IOException Something went wrong
+	 */
+	public static JSONObject listRunningFlowsAsJSON ( HttpServletRequest request, HttpServletResponse response ) throws IOException {
+		JSONObject joRes = new JSONObject();
+		JSONArray ja = new JSONArray();
+		String sHostName = "http://"+request.getLocalName()+":";
+		
+		try {
+			for ( String sID:WebUIFactory.getFlows() )  {
+				WebUI webuiTmp = WebUIFactory.getExistingWebUI(sID);
+				if ( webuiTmp==null )
+					continue;
+				JSONObject jo = new JSONObject();
+				jo.put("flow_instance_uri", sID);
+				jo.put("flow_instance_webui_uri", sHostName+webuiTmp.getPort()+"/");
+				ja.put(jo);
+			}
+			joRes.put("meandre_running_flows",ja);
+			
+		}
+		catch ( Exception e ) {
+			throw new IOException(e.toString());
+		}		
+		
+		return joRes;
+	}
+	
+	
+	/** Returns the list of running flows.
+	 * 
+	 * @param request The request object
+	 * @param response The response object
+	 * @return The JSON object containing the results
+	 * @throws IOException Something went wrong
+	 */
+	public static JSONObject listRunningFlowsAsTxt ( HttpServletRequest request, HttpServletResponse response ) throws IOException {
+		JSONObject joRes = new JSONObject();
+		JSONArray ja = new JSONArray();
+		String sHostName = "http://"+request.getLocalName()+":";
+		PrintWriter pw = response.getWriter();
+		
+		try {
+			for ( String sID:WebUIFactory.getFlows() )  {
+				WebUI webuiTmp = WebUIFactory.getExistingWebUI(sID);
+				if ( webuiTmp==null )
+					continue;
+				JSONObject jo = new JSONObject();
+				pw.println(sID);
+				pw.println(sHostName+webuiTmp.getPort()+"/");
+				ja.put(jo);
+			}
+			joRes.put("meandre_running_flows",ja);
+			
+		}
+		catch ( Exception e ) {
+			throw new IOException(e.toString());
+		}		
+		
+		return joRes;
 	}
 
 }

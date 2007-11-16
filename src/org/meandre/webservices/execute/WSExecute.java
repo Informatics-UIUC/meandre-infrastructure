@@ -1,6 +1,7 @@
 package org.meandre.webservices.execute;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -9,6 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONException;
+import org.json.XML;
 import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.engine.ConductorException;
 import org.meandre.core.store.Store;
@@ -54,37 +57,52 @@ public class WSExecute extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws ServletException, IOException {
     	
-    	String sTarget = request.getRequestURL().toString();
+
+    	String [] saParts = new URL(request.getRequestURL().toString()).getPath().split("\\.");
+   		String sTarget = saParts[0];
+		String sExtension = "";
+
+    	if ( saParts.length==2 ) {
+    		sExtension = saParts[1];
+    	}
     	
-    	if ( sTarget.endsWith("/flow.txt") ) {
-    		if ( Store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Execution", request.getRemoteUser()) ) {
-				executeTxt(request,response);
+    	if ( Store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Execution", request.getRemoteUser()) ) {
+    		if ( sTarget.endsWith("/flow") ) {
+    			if ( sExtension.equals("txt") )
+    				executeTxt(request,response);
+    			else if ( sExtension.equals("silent") )
+    				executeTxtSilently(request,response);
+    			else  {
+    				// 
+    				// Invalid request found
+    				//
+    				log.info("Uknown execute service requested "+sTarget);
+    				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+    			}	
     		}
-    		else {
-    			//
-    			// Not allowed
-    			//
-    			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+    		else if ( sTarget.endsWith("/list_running_flows") ) {
+    			if ( sExtension.equals("txt") )
+    				listRunningFlowsTxt(request, response);
+    			else if ( sExtension.equals("json") )
+    				listRunningFlowsJson(request, response);
+    			else if ( sExtension.equals("xml") )
+    				listRunningFlowsXML(request, response);
+    			else  {
+    				// 
+    				// Invalid request found
+    				//
+    				log.info("Uknown execute service requested "+sTarget);
+    				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+    			}	
+    			
     		}
 		}
-    	else if ( sTarget.endsWith("/flow.silent") ) {
-    		if ( Store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Execution", request.getRemoteUser()) ) {
-    			executeTxtSilently(request,response);
-    		}
-    		else {
-    			//
-    			// Not allowed
-    			//
-    			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-    		}
-		}
-		else  {
-			// 
-			// Invalid request found
+    	else {
 			//
-			log.info("Uknown execute service requested "+sTarget);
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		}	
+			// Not allowed
+			//
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+    	}
 		
 		
 	}
@@ -130,5 +148,52 @@ public class WSExecute extends HttpServlet {
 		}
 		
 	}
+
+
+	/** List the set of running flows and the links to their webui's as XML.
+	 * @param request The request object
+	 * @param response The response object to use
+	 * @throws IOException Something went wrong
+	 */
+    private void listRunningFlowsXML(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("application/xml");
+		try {
+			response.getWriter().println(XML.toString(WSExecuteLogic.listRunningFlowsAsJSON(request,response),"meandre_execution"));
+		} catch (JSONException e) {
+			throw new IOException(e.toString());
+		}
+		
+	}
+    
+    
+
+    /** List the set of running flows and the links to their webui's as JSON.
+     * @param request The request object
+     * @param response The response object to use
+     * @throws IOException Something went wrong
+     */
+	private void listRunningFlowsJson(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("text/plain");
+		response.getWriter().println(WSExecuteLogic.listRunningFlowsAsJSON(request,response));
+		
+		
+	}
+
+	/** List the set of running flows and the links to their webui's as XML.
+	 * @param request The request object
+	 * @param response The response object to use
+	 * @throws IOException Something went wrong
+	 */
+	private void listRunningFlowsTxt(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("text/plain");
+		WSExecuteLogic.listRunningFlowsAsTxt(request,response);
+	}
+	
+
 
 }
