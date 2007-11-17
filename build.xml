@@ -86,7 +86,18 @@
          </junit>
     </target>   
     
-    
+   <target name="test-reports" description="Generate test reports">
+        <mkdir dir="${test.dir}/reports"/>
+        <junitreport todir="${test.dir}">
+            <fileset dir="${test.dir}/data">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="noframes" todir="${test.dir}/reports"/>
+        </junitreport>
+        <echo level="info">
+        Test reports generated at ${test.dir}/reports
+        </echo>
+    </target>    
     
     
  </project>      
