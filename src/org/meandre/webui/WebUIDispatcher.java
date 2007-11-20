@@ -72,7 +72,6 @@ public class WebUIDispatcher extends AbstractHandler {
 			response.setContentType("text/html");
 			
 			response.getWriter().println(getHeader());
-			response.getWriter().println(getRefreshButton());
 			
 			boolean bHasParams = !request.getParameterMap().isEmpty();
 
@@ -123,23 +122,9 @@ public class WebUIDispatcher extends AbstractHandler {
 				+ "<meta http-equiv=\"content-language\" content=\"EN\" />"
 				+ "<meta name=\"ROBOTS\" content=\"NOINDEX,NOFOLLOW\"/>"
 				+ "<meta name=\"description\" content=\"Meandre Flow Execution\"/>"
-				+ "<link rel=\"stylesheet\" href=\"/theme/Style.css\" type=\"text/css\" media=\"screen\" />"
 				+ "</head>" + "<body>";
 	}
 
-	protected String getRefreshButton() {
-
-		StringBuffer sbRefresh = new StringBuffer("<a" );
-		
-		sbRefresh.append("href=\".\" ");
-		sbRefresh.append("title=\"Refresh the UI\" ");
-		sbRefresh.append("tooltip=\"Refresh the UI\" >");
-		sbRefresh.append("Refresh the UI");
-		sbRefresh.append("</a>");
-		
-		return sbRefresh.toString();
-	}
-	
 	/** Returns the footer of the webui page.
 	 * 
 	 * @return The footer

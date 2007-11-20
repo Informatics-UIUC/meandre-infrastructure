@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="var" path="CLOVER_RUNTIME"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="src-test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
@@ -14,7 +15,6 @@
 	<classpathentry kind="lib" path="lib/JENA/jena.jar"/>
 	<classpathentry kind="lib" path="lib/JENA/jenatest.jar"/>
 	<classpathentry kind="lib" path="lib/JENA/json.jar"/>
-	<classpathentry kind="lib" path="lib/JENA/junit.jar"/>
 	<classpathentry kind="lib" path="lib/JENA/log4j-1.2.12.jar"/>
 	<classpathentry kind="lib" path="lib/JENA/stax-api-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/JENA/wstx-asl-3.0.0.jar"/>
@@ -48,5 +48,7 @@
 	<classpathentry kind="lib" path="lib/Jetty-6.1.5/jsp-api-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/Jetty-6.1.5/servlet-api-2.5-6.1.5.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-2.0.0/lucene-core-2.0.0.jar"/>
+	<classpathentry kind="var" path="AGITAR_TEST_LIB"/>
+	<classpathentry kind="var" path="AGITAR_MOCK_OBJECTS5"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
