@@ -74,9 +74,9 @@ public class WSExecute extends HttpServlet {
     				executeTxtSilently(request,response);
     			else  {
     				// 
-    				// Invalid request found
+    				// Invalid format found
     				//
-    				log.info("Uknown execute service requested "+sTarget);
+    				log.info("Uknown format requested "+sExtension);
     				response.sendError(HttpServletResponse.SC_NOT_FOUND);
     			}	
     		}
@@ -89,13 +89,20 @@ public class WSExecute extends HttpServlet {
     				listRunningFlowsXML(request, response);
     			else  {
     				// 
-    				// Invalid request found
+    				// Invalid format found
     				//
-    				log.info("Uknown execute service requested "+sTarget);
+    				log.info("Uknown format requested "+sExtension);
     				response.sendError(HttpServletResponse.SC_NOT_FOUND);
     			}	
     			
     		}
+    		else  {
+				// 
+				// Invalid request found
+				//
+				log.info("Uknown execute service requested "+sTarget);
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			}	
 		}
     	else {
 			//
