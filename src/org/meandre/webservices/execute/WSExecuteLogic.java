@@ -82,50 +82,74 @@ public class WSExecuteLogic {
 				// Create the execution
 				pw.println("Preparing flow: "+sURI);
 				Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE);
-				Executor exec = conductor.buildExecutor(qr, resURI);
+				Executor exec =null;
 				
-				pw.flush();
+				try {
+					exec = conductor.buildExecutor(qr, resURI);
 				
-				// Redirecting the output
-				PrintStream psOUT = System.out;
-				PrintStream psERR = System.err;
-
-				// Redirecting the streamers
-				System.setOut(pw);
-				System.setErr(pw);
-
-				pw.println("Preparation completed correctly\n");
+					pw.flush();
+					
+					// Redirecting the output
+					PrintStream psOUT = System.out;
+					PrintStream psERR = System.err;
+	
+					// Redirecting the streamers
+					System.setOut(pw);
+					System.setErr(pw);
+	
+					pw.println("Preparation completed correctly\n");
+					
+					pw.print("Execution started at: ");
+					pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
+					pw.println("----------------------------------------------------------------------------");
+					pw.flush();
+					exec.execute();
+					pw.flush();
+					pw.println("----------------------------------------------------------------------------");
+					pw.print("Execution finished at: ");
+					pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
+					if ( exec.hadGracefullTermination() ) {
+						//
+						// Graceful termination
+						//
+						pw.println("Execution finished gracefully.");
+					}
+					else {
+						//
+						// Aborted execution.
+						//
+						pw.println("Execution aborted!!!\nReason:\n");
+						for ( String sMsg:exec.getAbortMessage() )
+							pw.println("\t"+sMsg);
+					}
+					pw.flush();
+					
+					// Reset the output redirection
+					System.setOut(psOUT);
+					System.setErr(psERR);
 				
-				pw.print("Execution started at: ");
-				pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
-				pw.println("----------------------------------------------------------------------------");
-				pw.flush();
-				exec.execute();
-				pw.flush();
-				pw.println("----------------------------------------------------------------------------");
-				pw.print("Execution finished at: ");
-				pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
-				if ( exec.hadGracefullTermination() ) {
-					//
-					// Graceful termination
-					//
-					pw.println("Execution finished gracefully.");
 				}
-				else {
-					//
-					// Aborted execution.
-					//
-					pw.println("Execution aborted!!!\nReason:\n");
-					for ( String sMsg:exec.getAbortMessage() )
-						pw.println("\t"+sMsg);
+				catch ( CorruptedDescriptionException cde ) {
+					pw.println("Preparation could not be completed correctly!\n");
+					pw.println("----------------------------------------------------------------------------");
+					pw.println();
+					pw.println("Reason for aborting the preparation:");
+					pw.println();
+					pw.println(cde);
+					pw.flush();
 				}
-				pw.flush();
-				
-				// Reset the output redirection
-				System.setOut(psOUT);
-				System.setErr(psERR);
+				catch ( ConductorException ce ) {
+					pw.println("----------------------------------------------------------------------------");
+					pw.print("Execution aborted at: ");
+					pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
+					pw.println("----------------------------------------------------------------------------");
+					pw.println();
+					pw.println("Reason for aborting the execution:");
+					pw.println();
+					pw.println(ce);
+					pw.flush();
+				}
 			}
-			
 		}
 	}
 
