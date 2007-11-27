@@ -760,8 +760,8 @@ public class WSRepositoryLogic {
 				for ( String sFile:setFiles ){
 					Resource res = modUser.createResource(urlRequest.getProtocol()+"://"+urlRequest.getHost()+":"+urlRequest.getPort()+"/public/resources/"+sFile);
 					ecd.getContext().add(res);
-					modUser.add(ecd.getModel());
 				}
+				modUser.add(ecd.getModel());
 			}
 			
 		}
