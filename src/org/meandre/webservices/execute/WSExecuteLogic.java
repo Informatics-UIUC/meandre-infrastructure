@@ -84,15 +84,16 @@ public class WSExecuteLogic {
 				Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE);
 				Executor exec =null;
 				
+				// Redirecting the output
+				PrintStream psOUT = System.out;
+				PrintStream psERR = System.err;
+
 				try {
 					exec = conductor.buildExecutor(qr, resURI);
 				
 					pw.flush();
 					
-					// Redirecting the output
-					PrintStream psOUT = System.out;
-					PrintStream psERR = System.err;
-	
+					
 					// Redirecting the streamers
 					System.setOut(pw);
 					System.setErr(pw);
@@ -123,10 +124,6 @@ public class WSExecuteLogic {
 							pw.println("\t"+sMsg);
 					}
 					pw.flush();
-					
-					// Reset the output redirection
-					System.setOut(psOUT);
-					System.setErr(psERR);
 				
 				}
 				catch ( CorruptedDescriptionException cde ) {
@@ -149,6 +146,10 @@ public class WSExecuteLogic {
 					pw.println(ce);
 					pw.flush();
 				}
+				
+				// Reset the output redirection
+				System.setOut(psOUT);
+				System.setErr(psERR);
 			}
 		}
 	}
