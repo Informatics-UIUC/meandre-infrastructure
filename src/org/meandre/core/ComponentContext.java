@@ -46,6 +46,13 @@ public interface ComponentContext {
 	 */
 	public boolean isInputAvailable ( String sInputBuffer ) throws ComponentContextException;
 	
+
+	/** Returns the list of property names.
+	 * 
+	  * @return The array of property names
+	 */
+	public String[] getPropertyNames( );
+	
 	/** Check a given component property value. If the property does not exist
 	 * the call returns null.
 	 * 

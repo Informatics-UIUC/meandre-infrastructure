@@ -225,6 +225,22 @@ implements ComponentContext {
 		dp.cleanAllInputs();
 	}
 	
+
+
+	/** Returns the list of property names.
+	 * 
+	  * @return The array of property names
+	 */
+	public String[] getPropertyNames( ) {
+		String [] saPropNames = new String[htProperties.keySet().size()];
+		int i=0;
+		
+		for ( String sKey:htProperties.keySet() )
+			saPropNames[i++] = sKey;
+		
+		return saPropNames;
+	}
+	
 	/** Check a given component property value. If the property does not exist
 	 * the call returns null.
 	 * 
