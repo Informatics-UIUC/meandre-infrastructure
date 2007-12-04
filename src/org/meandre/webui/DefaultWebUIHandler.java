@@ -1,6 +1,7 @@
 package org.meandre.webui;
 
 import java.io.IOException;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -61,7 +62,8 @@ public class DefaultWebUIHandler extends AbstractHandler {
 				"<div id=\"menu\"> \n" +
 				"<h1>Meandre</h1>\n" +
 				"<div id=\"main\">\n"+
-				"No GUI component available at this point of execution."+
+				"No GUI component available at this point of execution.<br/>"+
+				new Date()+
 				"</div>\n"+
 				"</div>\n"+
 				"</body>\n"+

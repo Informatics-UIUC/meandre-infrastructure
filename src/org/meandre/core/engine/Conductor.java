@@ -129,7 +129,7 @@ public class Conductor {
 			ExecutableComponentDescription comp = qr.getExecutableComponentDescription(ins.getExecutableComponent());
             // If the resource does not exist throw an exeception
 			if (comp == null)
-				throw new CorruptedDescriptionException("The required executable component " + comp + " does not exist in the current repository");
+				throw new CorruptedDescriptionException("The required executable component " + ins.getExecutableComponent() + " does not exist in the current repository");
 			
 			// Check if it is loadable
 			if ( setLoadableLanguages.contains(comp.getRunnable().toLowerCase()) )

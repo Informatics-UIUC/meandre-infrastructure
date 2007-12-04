@@ -259,8 +259,8 @@ public class WSPublishLogic {
 		if ( qrPublic.getExecutableComponentDescription(resURI)!=null || 
 			 qrPublic.getFlowDescription(resURI)!=null ) {
 			// The URI does not exist
-			ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(resURI);
-			FlowDescription fd = qr.getFlowDescription(resURI);
+			ExecutableComponentDescription ecd = qrPublic.getExecutableComponentDescription(resURI);
+			FlowDescription fd = qrPublic.getFlowDescription(resURI);
 			if ( ecd!=null ) {
 				modToUnpublish = ecd.getModel();
 			}
