@@ -164,7 +164,12 @@ extends Thread {
 					synchronized (baStatusFlags) {
 						baStatusFlags[EXECUTING] = true;
 					}
-					ec.execute(cc);
+					try {
+						ec.execute(cc);
+					}
+					catch ( NoClassDefFoundError ncde ) {
+						throw new ComponentExecutionException ( ncde );
+					}
 					synchronized (baStatusFlags) {
 						baStatusFlags[EXECUTING] = false;
 					}
