@@ -1,5 +1,6 @@
 package org.meandre.core;
 
+import java.net.URL;
 import java.util.logging.Logger;
 
 import org.meandre.webui.WebUIFragmentCallback;
@@ -78,6 +79,17 @@ public interface ComponentContext {
 	 * 
 	 */
 	public void stopAllWebUIFragments ();
+	
+	/** Get the webUI URL.
+	 * 
+	 * @param bName True if the url needs to be build using the name. 
+	 *              False build the URL using the IP address.
+	 * @return The webUI URL
+	 * @throws ComponentContextException Problem recovering the IP
+	 * 
+	 * 
+	 */
+	public URL getWebUIUrl ( boolean bName ) throws ComponentContextException;
 	
 	/** Returns the logging facility.
 	 * 
