@@ -168,6 +168,9 @@ extends Thread {
 						ec.execute(cc);
 					}
 					catch ( NoClassDefFoundError ncde ) {
+						synchronized (baStatusFlags) {
+							baStatusFlags[EXECUTING] = false;
+						}
 						throw new ComponentExecutionException ( ncde );
 					}
 					synchronized (baStatusFlags) {
