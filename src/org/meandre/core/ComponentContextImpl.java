@@ -1,5 +1,9 @@
 package org.meandre.core;
 
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Set;
@@ -270,6 +274,40 @@ implements ComponentContext {
 			while (webUIFragments.hasMoreElements())
 				webui.removeFragment(webUIFragments.nextElement());
 		}
+	}
+	
+	
+	/** Get the webUI URL.
+	 * 
+	 * @param bName True if the url needs to be build using the name. 
+	 *              False build the URL using the IP address.
+	 * @return The webUI URL
+	 * @throws ComponentContextException Problem recovering the IP
+	 * 
+	 * 
+	 */
+	public URL getWebUIUrl ( boolean bName ) throws ComponentContextException {
+		URL urlRes = null;
+		
+		try {
+			
+			InetAddress addr = InetAddress.getLocalHost();
+			String sHostName = null;
+			
+			if ( bName )
+				sHostName = "http://"+addr.getCanonicalHostName()+":"+webui.getPort()+"/";
+			else 
+				sHostName = "http://"+addr.toString()+":"+webui.getPort()+"/";
+			
+			urlRes = new URL(sHostName);
+			
+		} catch ( UnknownHostException e ) {
+			throw new ComponentContextException(e);
+		} catch (MalformedURLException e) {
+			throw new ComponentContextException(e);
+		}
+		
+		return urlRes;
 	}
 
 	/** Returns the logging facility.

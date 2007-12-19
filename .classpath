@@ -47,5 +47,6 @@
 	<classpathentry kind="lib" path="lib/Jetty-6.1.5/jsp-api-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/Jetty-6.1.5/servlet-api-2.5-6.1.5.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-2.0.0/lucene-core-2.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/plugins/vfs/truezip/truezip-6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

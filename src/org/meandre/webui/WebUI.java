@@ -3,6 +3,7 @@ package org.meandre.webui;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
+import org.mortbay.jetty.deployer.ContextDeployer;
 
 /** This class implements the basic machinery of a flow web-based UI.
  * 
@@ -38,6 +39,19 @@ public class WebUI {
 		Connector connector = new SocketConnector();
 		connector.setPort(this.iPort);
 		this.server.setConnectors(new Connector[] { connector });
+		
+		ContextDeployer contextDeployer=null;
+	    try {
+			contextDeployer = new ContextDeployer();
+			contextDeployer.setConfigurationDir("published_resources/plugins");
+			contextDeployer.setScanInterval(1);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	    
+		this.server.addLifeCycle(contextDeployer);
+		
 	    
 		// Add the default WebUI dispatcher handler
 		webUIDispatcher = new WebUIDispatcher(this);

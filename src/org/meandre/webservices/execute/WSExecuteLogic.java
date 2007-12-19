@@ -146,6 +146,17 @@ public class WSExecuteLogic {
 					pw.println(ce);
 					pw.flush();
 				}
+				catch ( NoClassDefFoundError te ) {
+					pw.println("----------------------------------------------------------------------------");
+					pw.print("Missing class definition: ");
+					pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
+					pw.println("----------------------------------------------------------------------------");
+					pw.println();
+					pw.println("Reason for aborting the execution:");
+					pw.println();
+					pw.println(te);
+					pw.flush();
+				}
 				
 				// Reset the output redirection
 				System.setOut(psOUT);
