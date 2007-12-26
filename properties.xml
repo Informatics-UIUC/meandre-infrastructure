@@ -1,78 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-    
+
     <!-- app name-->
-    <property name="app.name" value="meandre-core-branch-springOSGi"/>
+    <property name="app.name" value="meandre-osgi"/>
     <property name="build.version" value="'1.1-branch-springOSGi'"/>
-    
+
     <!-- Directory structure of the project -->
     <property name="build.dir" value="${basedir}/bin"/>
     <property name="dist.dir" value="${basedir}/dist"/>
     <property name="test.dir" value="${basedir}/test"/>
-    
-    
+
+
     <!-- Default options for code-generation, compiling and junit-testing -->
     <property name="javac.debug" value="true"/>
     <property name="compile.deprecation" value="true"/>
-    
+
     <!-- build.compiler - seems to be issues using jikes and JDK 1.4 is just as fast-->
     <property name="build.compiler" value="modern"/>
     <property name="junit.fork" value="true"/>
     <property name="junit.showoutput" value="true"/>
-    
-    
+
+
     <!-- Library versions and JARs -->
     <property name="lib.dir" location="lib"/>
     <property file="${lib.dir}/lib.properties"/>
-    
-    
-    <!-- Load user overrides -->                                                                                                            
-   <!-- <property file="${user.home}/.${ant.project.name}-build.properties"/>                                                                   
-    <property file="${user.home}/.build.properties"/>
-    -->                                                                                       
-    <property file="build.properties"/>                                                                                                     
-    
-    
-    <!-- Should Java compilations set the debug compiler option? -->                                                                        
-    <property name="compile.debug" value="true"/>                                                                                           
-    <!-- Should Java compilations set the deprecation compiler option? -->                                                                  
-    <property name="compile.deprecation" value="false"/>                                                                                    
-    <!-- Should Java compilations set the optimize compiler option? -->                                                                     
-    <property name="compile.optimize" value="false"/>                                                                                       
-    <!-- The source directory for the whole project -->                                                                                     
-    <property name="src" value="${basedir}/src"/>   
-    <property name="test.src" value="${basedir}/src-test"/>                                                                                        
-    <property name="tar.user" value="ant"/>                                                                                                 
-    <property name="tar.group" value="ant"/>                                                                                                
-    <property name="tar.mode" value="644"/>
-    
-    
-    
-    <!-- =================================================================== -->                                                                                  
-    <!-- Core Classpaths                                                          -->                                                                                  
-    <!-- =================================================================== -->                                                                                  
-    <path id="meandre.core.classpath">                                                                                                                                 
-        <pathelement location="${apache-commons-upload.jar}"/>                                                                                                                    
-        <pathelement location="${apache-commons-logging.jar}"/>                                                                                                          
-        <pathelement location="${apache-commons-io.jar}"/> 
-       <fileset dir="${apache-derby.dir}" includes="*.jar"/>  
-        <fileset dir="${lucene.dir}" includes="*.jar"/>  
-        <fileset dir="${jetty.dir}" includes="*.jar"/> 
-        <fileset dir="${jena.dir}" includes="*.jar"/> 
-        <pathelement location="${junit.jar}"/>                                                                                                    
-        
-    </path>
-    
-    
-    <!-- =================================================================== -->                                                                                  
-    <!-- Test Classpath                                                        -->                                                                                  
-    <!-- =================================================================== -->                                                                                  
-    <path id="meandre.test.classpath">                                                                                                                                 
-        <pathelement location="${meandre.core.classpath}"/>   
-        <pathelement location="${junit.jar}"/>    
-        <pathelement location="${build.dir}"/>    
-    </path>
-    
-    
 
- </project>    
+
+    <!-- Load user overrides -->
+   <!-- <property file="${user.home}/.${ant.project.name}-build.properties"/>
+    <property file="${user.home}/.build.properties"/>
+    -->
+    <property file="build.properties"/>
+
+
+    <!-- Should Java compilations set the debug compiler option? -->
+    <property name="compile.debug" value="true"/>
+    <!-- Should Java compilations set the deprecation compiler option? -->
+    <property name="compile.deprecation" value="false"/>
+    <!-- Should Java compilations set the optimize compiler option? -->
+    <property name="compile.optimize" value="false"/>
+    <!-- The source directory for the whole project -->
+    <property name="src" value="${basedir}/src"/>
+    <property name="test.src" value="${basedir}/src-test"/>
+    <property name="tar.user" value="ant"/>
+    <property name="tar.group" value="ant"/>
+    <property name="tar.mode" value="644"/>
+
+
+
+    <!-- =================================================================== -->
+    <!-- Core Classpaths                                                          -->
+    <!-- =================================================================== -->
+    <path id="meandre.core.classpath">
+        <pathelement location="${apache-commons-upload.jar}"/>
+        <pathelement location="${apache-commons-logging.jar}"/>
+        <pathelement location="${apache-commons-io.jar}"/>
+       <fileset dir="${apache-derby.dir}" includes="*.jar"/>
+        <fileset dir="${lucene.dir}" includes="*.jar"/>
+        <fileset dir="${jetty.dir}" includes="*.jar"/>
+        <fileset dir="${jena.dir}" includes="*.jar"/>
+        <fileset dir="${osgi.dir}" includes="*.jar"/>
+        <fileset dir="${servletbridge.dir}" includes="*.jar"/>
+        <pathelement location="${junit.jar}"/>
+
+    </path>
+
+
+    <!-- =================================================================== -->
+    <!-- Test Classpath                                                        -->
+    <!-- =================================================================== -->
+    <path id="meandre.test.classpath">
+        <pathelement location="${meandre.core.classpath}"/>
+        <pathelement location="${junit.jar}"/>
+        <pathelement location="${build.dir}"/>
+    </path>
+
+
+
+ </project>
