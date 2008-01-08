@@ -1,0 +1,76 @@
+org/meandre/core/ComponentContext -> org/meandre/webui/WebUIFragmentCallback
+
+org/meandre/core/ComponentContextImpl -> org/meandre/webui/WebUI
+org/meandre/core/ComponentContextImpl -> org/meandre/webui/WebUIFragmentCallback
+org/meandre/core/ComponentContextImpl -> org/meandre/webui/WebUIFragment
+org/meandre/core/ComponentContextImpl -> org/meandre/webui/WebUIException
+org/meandre/core/ComponentContextImpl -> org/meandre/webui/WebUIFactory
+
+org/meandre/core/engine/Conductor -> org/meandre/core/store/repository/QueryableRepository
+org/meandre/core/engine/Conductor -> org/meandre/core/store/repository/CorruptedDescriptionException
+org/meandre/core/engine/Conductor -> org/meandre/core/store/repository/FlowDescription
+org/meandre/core/engine/Conductor -> org/meandre/core/store/repository/ExecutableComponentInstanceDescription
+org/meandre/core/engine/Conductor -> org/meandre/core/store/repository/ExecutableComponentDescription
+org/meandre/core/engine/Conductor -> org/meandre/core/store/repository/ConnectorDescription
+org/meandre/core/engine/Conductor -> org/meandre/core/store/repository/DataPortDescription
+org/meandre/core/engine/Conductor -> org/meandre/core/store/repository/PropertiesDescriptionDefinition
+org/meandre/core/engine/Conductor -> org/meandre/core/store/repository/PropertiesDescription
+
+org/meandre/core/engine/Executor -> org/meandre/webui/WebUIException
+org/meandre/core/engine/Executor -> org/meandre/webui/WebUIFactory
+org/meandre/core/engine/Executor -> org/meandre/webui/WebUI
+
+org/meandre/webservices/about/WSAbout -> org/meandre/core/store/Store
+org/meandre/webservices/about/WSAbout -> org/meandre/core/store/security/SecurityStore
+
+org/meandre/webservices/about/WSAboutLogic -> org/meandre/core/store/security/SecurityStoreException
+org/meandre/webservices/about/WSAboutLogic -> org/meandre/core/store/Store
+org/meandre/webservices/about/WSAboutLogic -> org/meandre/core/store/security/SecurityStore
+org/meandre/webservices/about/WSAboutLogic -> org/meandre/core/store/security/User
+
+org/meandre/webservices/execute/WSExecute -> org/meandre/core/store/Store
+org/meandre/webservices/execute/WSExecute -> org/meandre/core/store/security/SecurityStore
+org/meandre/webservices/execute/WSExecute -> org/meandre/core/store/repository/CorruptedDescriptionException
+org/meandre/webservices/execute/WSExecute -> org/meandre/core/engine/ConductorException
+
+org/meandre/webservices/execute/WSExecuteLogic -> org/meandre/core/store/repository/CorruptedDescriptionException
+org/meandre/webservices/execute/WSExecuteLogic -> org/meandre/core/engine/ConductorException
+org/meandre/webservices/execute/WSExecuteLogic -> org/meandre/core/store/Store
+org/meandre/webservices/execute/WSExecuteLogic -> org/meandre/core/store/repository/QueryableRepository
+org/meandre/webservices/execute/WSExecuteLogic -> org/meandre/core/store/repository/FlowDescription
+org/meandre/webservices/execute/WSExecuteLogic -> org/meandre/core/engine/Conductor
+org/meandre/webservices/execute/WSExecuteLogic -> org/meandre/core/engine/Executor
+org/meandre/webservices/execute/WSExecuteLogic -> org/meandre/webui/WebUIFactory
+org/meandre/webservices/execute/WSExecuteLogic -> org/meandre/webui/WebUI
+
+org/meandre/webservices/locations/WSLocations -> org/meandre/core/store/Store
+org/meandre/webservices/locations/WSLocations -> org/meandre/core/store/security/SecurityStore
+
+org/meandre/webservices/locations/WSLocationsLogic -> org/meandre/core/store/Store
+org/meandre/webservices/locations/WSLocationsLogic -> org/meandre/core/store/system/SystemStore
+org/meandre/webservices/locations/WSLocationsLogic -> org/meandre/core/store/repository/RepositoryImpl
+org/meandre/webservices/locations/WSLocationsLogic -> org/meandre/core/store/repository/QueryableRepository
+
+org/meandre/webservices/pub/WSPublic -> org/meandre/core/store/Store
+org/meandre/webservices/pub/WSPublic -> org/meandre/core/store/repository/RepositoryGenerator
+org/meandre/webservices/publish/WSPublish -> org/meandre/core/store/Store
+org/meandre/webservices/publish/WSPublish -> org/meandre/core/store/security/SecurityStore
+
+org/meandre/webservices/publish/WSPublishLogic -> org/meandre/core/store/Store
+org/meandre/webservices/publish/WSPublishLogic -> org/meandre/core/store/repository/QueryableRepository
+org/meandre/webservices/publish/WSPublishLogic -> org/meandre/core/store/repository/RepositoryImpl
+org/meandre/webservices/publish/WSPublishLogic -> org/meandre/core/store/repository/ExecutableComponentDescription
+org/meandre/webservices/publish/WSPublishLogic -> org/meandre/core/store/repository/FlowDescription
+
+org/meandre/webservices/repository/WSRepository -> org/meandre/core/store/Store
+org/meandre/webservices/repository/WSRepository -> org/meandre/core/store/security/SecurityStore
+org/meandre/webservices/repository/WSRepository -> org/meandre/core/store/repository/QueryableRepository
+
+org/meandre/webservices/repository/WSRepositoryLogic -> org/meandre/core/store/Store
+org/meandre/webservices/repository/WSRepositoryLogic -> org/meandre/core/store/repository/QueryableRepository
+org/meandre/webservices/repository/WSRepositoryLogic -> org/meandre/core/store/system/SystemStore
+org/meandre/webservices/repository/WSRepositoryLogic -> org/meandre/core/store/repository/RepositoryImpl
+org/meandre/webservices/repository/WSRepositoryLogic -> org/meandre/core/store/repository/ExecutableComponentDescription
+org/meandre/webservices/repository/WSRepositoryLogic -> org/meandre/core/store/repository/FlowDescription
+
+org/meandre/webui/WebUIFactory -> org/meandre/core/store/Store

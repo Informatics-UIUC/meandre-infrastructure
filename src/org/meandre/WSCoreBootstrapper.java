@@ -159,13 +159,13 @@ public class WSCoreBootstrapper {
 		//
 		// Adding restrictedly provided services
 		//
-		/*
+		
 		contextWS.addServlet(new ServletHolder((Servlet) new WSAbout()), 		"/services/about/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSLocations()),	"/services/locations/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository()),	"/services/repository/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSExecute()),		"/services/execute/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublish()),		"/services/publish/*");
-*/
+		 
 		//
 		// OSGi bridge servlet
 		//

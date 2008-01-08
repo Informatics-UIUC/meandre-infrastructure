@@ -30,8 +30,8 @@
 
     <!-- Compile -->
     <target name="compile" depends="prepare" description="compile source code">
-        <echo>Compiling Core and Test...</echo>
-        <javac srcdir="${basedir}" destdir="${build.dir}/" debug="${compile.debug}"
+        <echo>Compiling Core</echo>
+        <javac srcdir="${src}" destdir="${build.dir}/" debug="${compile.debug}"
             deprecation="${compile.deprecation}" optimize="${compile.optimize}"
             classpathref="meandre.core.classpath">
             <include name="**/*.java"/>
@@ -50,6 +50,10 @@
                 <include name="**/core/**/*.class"/>
                 <include name="**/core/**/*.properties"/>
                 <include name="**/core/**/*.xml"/>
+
+            	 <exclude name="**/store/**/*.class"/>
+            	 <exclude name="**/store/**/*.properties"/>
+            	 <exclude name="**/store/**/*.xml"/>
 
             </fileset>
         </jar>
@@ -87,6 +91,17 @@
                 <include name="**/demo/**/*.xml"/>
             </fileset>
         </jar>
+
+    	   <jar destfile="${dist.dir}/${app.name}-store.jar">
+    	            <manifest>
+    	                <attribute name="Build-Version" value="${build.version}"/>
+    	            </manifest>
+    	            <fileset dir="${build.dir}">
+    	                <include name="**/store/**/*.class"/>
+    	                <include name="**/store/**/*.properties"/>
+    	                <include name="**/store/**/*.xml"/>
+    	            </fileset>
+    	        </jar>
 
 
         <jar destfile="${dist.dir}/${app.name}-main.jar">

@@ -11,7 +11,7 @@
 	<classpathentry kind="lib" path="lib/JENA/concurrent.jar"/>
 	<classpathentry kind="lib" path="lib/JENA/icu4j_3_4.jar"/>
 	<classpathentry kind="lib" path="lib/JENA/iri.jar"/>
-	<classpathentry kind="lib" path="lib/JENA/jena.jar"/>
+	<classpathentry kind="lib" path="lib/JENA/jena.jar" sourcepath="/Users/amitku/projects/Jena-2.5/src"/>
 	<classpathentry kind="lib" path="lib/JENA/jenatest.jar"/>
 	<classpathentry kind="lib" path="lib/JENA/json.jar"/>
 	<classpathentry kind="lib" path="lib/JENA/log4j-1.2.12.jar"/>

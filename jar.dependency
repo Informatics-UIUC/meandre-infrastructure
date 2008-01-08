@@ -1,0 +1,6 @@
+/contents/workspace2/Meandre-Core-Branch-springOSGi/dist/meandre-osgi-core.jar -> /contents/workspace2/Meandre-Core-Branch-springOSGi/dist/meandre-osgi-webui.jar
+/contents/workspace2/Meandre-Core-Branch-springOSGi/dist/meandre-osgi-core.jar -> /contents/workspace2/Meandre-Core-Branch-springOSGi/dist/meandre-osgi-store.jar
+/contents/workspace2/Meandre-Core-Branch-springOSGi/dist/meandre-osgi-ws.jar -> /contents/workspace2/Meandre-Core-Branch-springOSGi/dist/meandre-osgi-store.jar
+/contents/workspace2/Meandre-Core-Branch-springOSGi/dist/meandre-osgi-ws.jar -> /contents/workspace2/Meandre-Core-Branch-springOSGi/dist/meandre-osgi-core.jar
+/contents/workspace2/Meandre-Core-Branch-springOSGi/dist/meandre-osgi-ws.jar -> /contents/workspace2/Meandre-Core-Branch-springOSGi/dist/meandre-osgi-webui.jar
+/contents/workspace2/Meandre-Core-Branch-springOSGi/dist/meandre-osgi-webui.jar -> /contents/workspace2/Meandre-Core-Branch-springOSGi/dist/meandre-osgi-store.jar

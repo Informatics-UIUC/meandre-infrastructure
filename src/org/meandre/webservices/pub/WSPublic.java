@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.meandre.WSCoreBootstrapper;
-import org.meandre.core.repository.test.RepositoryGenerator;
+import org.meandre.core.store.repository.RepositoryGenerator;
 import org.meandre.core.store.Store;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -21,15 +21,17 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 
 /** A basic handler to display public Meandre information.
- * 
+ *
  * @author Xavier Llor&agrave;
+ * @modified Amit Kumar
+ *  // removed dependence on the test class
  *
  */
 public class WSPublic extends HttpServlet {
 
     /** A default serial ID */
 	private static final long serialVersionUID = 1L;
-	
+
 	/** The logger for the bootstrapper */
     protected static Logger log = null;
 
@@ -39,10 +41,10 @@ public class WSPublic extends HttpServlet {
         log.setLevel(Level.CONFIG);
         log.addHandler(WSCoreBootstrapper.handler);
     }
-	
+
 	/**
 	 * Dispatches web requests for Meandre web services.
-	 * 
+	 *
 	 * @param sTarget
 	 *            The target path
 	 * @param request
@@ -56,9 +58,9 @@ public class WSPublic extends HttpServlet {
 	 * @throws ServletException
 	 *             The servlet could not complete the request
 	 */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-    	
+
     	String [] saParts = new URL(request.getRequestURL().toString()).getPath().split("\\.");
    		String sTarget = saParts[0];
 		String sExtension = "";
@@ -66,7 +68,7 @@ public class WSPublic extends HttpServlet {
     	if ( saParts.length==2 ) {
     		sExtension = saParts[1];
     	}
-    	
+
     	if ( sTarget.endsWith("/repository") ) {
 			if ( sExtension.endsWith("rdf") ) {
 				dumpRepository(request,response,Store.getPublicRepositoryStore(),"RDF/XML-ABBREV");
@@ -78,7 +80,7 @@ public class WSPublic extends HttpServlet {
 				dumpRepository(request,response,Store.getPublicRepositoryStore(),"N-TRIPLE");
 			}
 			else  {
-				// 
+				//
 				// Invalid request found
 				//
 				log.info("Uknown public service requested "+sTarget);
@@ -96,7 +98,7 @@ public class WSPublic extends HttpServlet {
 				dumpRepository(request,response,RepositoryGenerator.testHelloWorld(),"N-TRIPLE");
 			}
 			else  {
-				// 
+				//
 				// Invalid request found
 				//
 				log.info("Uknown public service requested "+sTarget);
@@ -104,18 +106,18 @@ public class WSPublic extends HttpServlet {
 			}
     	}
     	else {
-    		// 
+    		//
 			// Invalid request found
 			//
 			log.info("Uknown public service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
     	}
-		
-		
+
+
 	}
 
     /** Dumps the public repository.
-     * 
+     *
      * @param request The request object
      * @param response The response object
      * @param sFormat The format
@@ -123,7 +125,7 @@ public class WSPublic extends HttpServlet {
      */
 	private void dumpRepository(HttpServletRequest request,
 			HttpServletResponse response, Model model, String sFormat) throws IOException {
-		
+
 		model.setNsPrefix("meandre", Store.MEANDRE_ONTOLOGY_BASE_URL );
 		model.setNsPrefix("xsd", XSD.getURI());
 		model.setNsPrefix("rdf", RDF.getURI());
@@ -131,15 +133,15 @@ public class WSPublic extends HttpServlet {
 		model.setNsPrefix("dc",DC.getURI());
 
 		response.setStatus(HttpServletResponse.SC_OK);
-		
-		if ( sFormat.equals("RDF/XML-ABBREV") ) 
+
+		if ( sFormat.equals("RDF/XML-ABBREV") )
 			response.setContentType("application/xml");
 		else
 			response.setContentType("text/plain");
-		
+
 		model.write(response.getOutputStream(),sFormat);
-		
+
 	}
 
-	
+
 }
