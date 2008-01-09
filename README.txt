@@ -1,4 +1,4 @@
-Fork of the Original Meandre to create a Web Service Execution Engine,
-Repository, etc.
+Meandre Core Web Service Execution Engine, Repository, etc.
 
 X.
+
