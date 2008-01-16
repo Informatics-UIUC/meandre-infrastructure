@@ -122,8 +122,8 @@
     <!-- Remove classes directory for clean build -->
     <target name="clean" description="Removes build artifacts">
         <echo level="info">Cleaning build and distribution directories</echo>
-        <delete dir="${build.dir}/*"/>
-        <delete dir="${dist.dir}/*"/>
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
     </target>
 
 
