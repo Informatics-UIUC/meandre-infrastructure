@@ -3,15 +3,15 @@
     <!-- import properties (app settings, classpath, jar file locations) -->
     <import file="properties.xml"/>
 
-    <target name="init" description="defines custom tasks">
+    <target name="init" description="Defines custom tasks">
         <!-- Ensure that Ant 1.7+ is being used -->
         <available classname="org.apache.tools.ant.DynamicAttribute" property="ant-1.7.0"/>
         <fail unless="ant-1.7.0" message="Ant 1.7.0 for faster unit testing"/>
-
     </target>
 
-    <!-- Check timestamp on files -->
-    <target name="prepare" depends="init" description="create target directories">
+    <!-- prepare -->
+    <target name="prepare" depends="init" description="Creates target directories">
+    	<!-- Check timestamp on files -->
         <tstamp/>
         <tstamp>
             <format property="copyright.year" pattern="yyyy"/>
@@ -24,12 +24,11 @@
         <mkdir dir="${test.dir}"/>
         <echo message="Preparing test data directory '${test.dir}/data'"/>
         <mkdir dir="${test.dir}/data"/>
-
     </target>
 
 
-    <!-- Compile -->
-    <target name="compile" depends="prepare" description="compile source code">
+    <!-- compile -->
+    <target name="compile" depends="prepare" description="Compiles source code">
         <echo>Compiling Core and Test...</echo>
         <echo>Junit cp: ${junit.jar}</echo>
         <javac srcdir="${basedir}" destdir="${build.dir}/" debug="${compile.debug}"
@@ -37,12 +36,11 @@
             classpathref="meandre.core.classpath" >
             <include name="**/*.java"/>
         </javac>
-
     </target>
 
-
-    <!-- Create jar distribution -->
-    <target name="dist" depends="compile" description="create jar distribution">
+    <!-- dist -->
+    <target name="dist" depends="compile" description="Creates jar distribution">
+    	<!-- Create jar distribution -->
         <jar destfile="${dist.dir}/${app.name}-core.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
@@ -51,7 +49,6 @@
                 <include name="**/core/**/*.class"/>
                 <include name="**/core/**/*.properties"/>
                 <include name="**/core/**/*.xml"/>
-
             </fileset>
         </jar>
 
@@ -65,7 +62,6 @@
                 <include name="**/webservices/**/*.xml"/>
             </fileset>
         </jar>
-
 
         <jar destfile="${dist.dir}/${app.name}-webui.jar">
             <manifest>
@@ -89,7 +85,6 @@
             </fileset>
         </jar>
 
-
         <jar destfile="${dist.dir}/${app.name}-main.jar">
                 <manifest>
                     <attribute name="Build-Version" value="${build.version}"/>
@@ -107,39 +102,31 @@
                 	   <exclude  name="**/core/**/*.class"/>
                 	                <exclude  name="**/core/**/*.properties"/>
                 	                <exclude  name="**/core/**/*.xml"/>
-
-
-
                 </fileset>
             </jar>
-
-
-
     </target>
 
-
-
-    <!-- Remove classes directory for clean build -->
+    <!-- clean -->
     <target name="clean" description="Removes build artifacts">
         <echo level="info">Cleaning build and distribution directories</echo>
         <delete dir="${build.dir}"/>
         <delete dir="${dist.dir}"/>
     </target>
 
-
-    <!-- run tests-->
-    <target name="run-tests" depends="dist" description="run tests">
+    <!-- run-tests -->
+    <target name="run-tests" depends="dist" description="Runs tests">
         <junit printsummary="yes" forkmode="once" errorProperty="test.failed"
             failureProperty="test.failed" fork="${junit.fork}" showoutput="${junit.showoutput}">
             <jvmarg value="-Duser.language=en"/>
+
             <classpath>
                 <path refid="meandre.core.classpath"/>
                 <pathelement location="${build.dir}"/>
                 <pathelement path="${java.class.path}"/>
                 <!-- For .properties and .xml files -->
                 <pathelement path="src"/>
-
             </classpath>
+
             <formatter type="xml"/>
             <formatter type="brief" usefile="false"/>
             <batchtest todir="${test.dir}/data">
@@ -150,7 +137,8 @@
         </junit>
     </target>
 
-    <target name="test-reports" description="Generate test reports">
+    <!-- test-reports -->
+    <target name="test-reports" description="Generates test reports">
         <mkdir dir="${test.dir}/reports"/>
         <junitreport todir="${test.dir}">
             <fileset dir="${test.dir}/data">
@@ -161,9 +149,8 @@
         <echo level="info"> Test reports generated at ${test.dir}/reports </echo>
     </target>
  
- 	<!-- Run the default Meandre-Core server -->
-    <target name="run-core" depends="dist" 
-		description="Run the default Meandre-Core server">
+    <!-- run-core -->
+    <target name="run-core" depends="dist" description="Runs the default Meandre-Core server">
         <echo level="info">Run the default Meandre-Core server</echo>
 		<java classname="org.meandre.WSCoreBootstrapper">
 			<classpath refid="meandre.core.classpath"/>
@@ -175,9 +162,5 @@
 				<pathelement location="${dist.dir}/${app.name}-main.jar"/>
 			</classpath>
 		</java>
-		
     </target>
-
-
-
 </project>
