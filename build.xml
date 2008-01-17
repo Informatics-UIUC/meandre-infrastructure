@@ -11,7 +11,7 @@
 
     <!-- prepare -->
     <target name="prepare" depends="init" description="Creates target directories">
-    	<!-- Check timestamp on files -->
+        <!-- Check timestamp on files -->
         <tstamp/>
         <tstamp>
             <format property="copyright.year" pattern="yyyy"/>
@@ -32,15 +32,15 @@
         <echo>Compiling Core and Test...</echo>
         <echo>Junit cp: ${junit.jar}</echo>
         <javac srcdir="${basedir}" destdir="${build.dir}/" debug="${compile.debug}"
-            deprecation="${compile.deprecation}" optimize="${compile.optimize}"
-            classpathref="meandre.core.classpath" >
+               deprecation="${compile.deprecation}" optimize="${compile.optimize}"
+               classpathref="meandre.core.classpath" >
             <include name="**/*.java"/>
         </javac>
     </target>
 
     <!-- dist -->
     <target name="dist" depends="compile" description="Creates jar distribution">
-    	<!-- Create jar distribution -->
+        <!-- Create jar distribution -->
         <jar destfile="${dist.dir}/${app.name}-core.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
@@ -86,24 +86,24 @@
         </jar>
 
         <jar destfile="${dist.dir}/${app.name}-main.jar">
-                <manifest>
-                    <attribute name="Build-Version" value="${build.version}"/>
-                </manifest>
-                <fileset dir="${build.dir}">
-                    <exclude name="**/demo/**/*.class"/>
-                    <exclude name="**/demo/**/*.properties"/>
-                    <exclude name="**/demo/**/*.xml"/>
-                	  <exclude name="**/webui/**/*.class"/>
-                	                <exclude name="**/webui/**/*.properties"/>
-                	                <exclude name="**/webui/**/*.xml"/>
-                	   <exclude name="**/webservices/**/*.class"/>
-                	                <exclude name="**/webservices/**/*.properties"/>
-                	                <exclude name="**/webservices/**/*.xml"/>
-                	   <exclude  name="**/core/**/*.class"/>
-                	                <exclude  name="**/core/**/*.properties"/>
-                	                <exclude  name="**/core/**/*.xml"/>
-                </fileset>
-            </jar>
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+            </manifest>
+            <fileset dir="${build.dir}">
+                <exclude name="**/demo/**/*.class"/>
+                <exclude name="**/demo/**/*.properties"/>
+                <exclude name="**/demo/**/*.xml"/>
+                <exclude name="**/webui/**/*.class"/>
+                <exclude name="**/webui/**/*.properties"/>
+                <exclude name="**/webui/**/*.xml"/>
+                <exclude name="**/webservices/**/*.class"/>
+                <exclude name="**/webservices/**/*.properties"/>
+                <exclude name="**/webservices/**/*.xml"/>
+                <exclude  name="**/core/**/*.class"/>
+                <exclude  name="**/core/**/*.properties"/>
+                <exclude  name="**/core/**/*.xml"/>
+            </fileset>
+        </jar>
     </target>
 
     <!-- clean -->
@@ -116,7 +116,7 @@
     <!-- run-tests -->
     <target name="run-tests" depends="dist" description="Runs tests">
         <junit printsummary="yes" forkmode="once" errorProperty="test.failed"
-            failureProperty="test.failed" fork="${junit.fork}" showoutput="${junit.showoutput}">
+               failureProperty="test.failed" fork="${junit.fork}" showoutput="${junit.showoutput}">
             <jvmarg value="-Duser.language=en"/>
 
             <classpath>
@@ -148,19 +148,19 @@
         </junitreport>
         <echo level="info"> Test reports generated at ${test.dir}/reports </echo>
     </target>
- 
+
     <!-- run-core -->
     <target name="run-core" depends="dist" description="Runs the default Meandre-Core server">
         <echo level="info">Run the default Meandre-Core server</echo>
-		<java classname="org.meandre.WSCoreBootstrapper">
-			<classpath refid="meandre.core.classpath"/>
-			<classpath>
-				<pathelement location="${dist.dir}/${app.name}-core.jar"/>
-				<pathelement location="${dist.dir}/${app.name}-ws.jar"/>
-				<pathelement location="${dist.dir}/${app.name}-webui.jar"/>
-				<pathelement location="${dist.dir}/${app.name}-componentdemo.jar"/>
-				<pathelement location="${dist.dir}/${app.name}-main.jar"/>
-			</classpath>
-		</java>
+        <java classname="org.meandre.WSCoreBootstrapper">
+            <classpath refid="meandre.core.classpath"/>
+            <classpath>
+                <pathelement location="${dist.dir}/${app.name}-core.jar"/>
+                <pathelement location="${dist.dir}/${app.name}-ws.jar"/>
+                <pathelement location="${dist.dir}/${app.name}-webui.jar"/>
+                <pathelement location="${dist.dir}/${app.name}-componentdemo.jar"/>
+                <pathelement location="${dist.dir}/${app.name}-main.jar"/>
+            </classpath>
+        </java>
     </target>
 </project>
