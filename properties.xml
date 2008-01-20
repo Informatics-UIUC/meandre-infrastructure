@@ -53,6 +53,7 @@
         <fileset dir="${lucene.dir}" includes="*.jar"/>
         <fileset dir="${jetty.dir}" includes="*.jar"/>
         <fileset dir="${jena.dir}" includes="*.jar"/>
+        <fileset dir="${saxon.dir}" includes="*.jar"/>
         <pathelement location="${junit.jar}"/>
     </path>
 

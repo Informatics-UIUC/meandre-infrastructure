@@ -150,7 +150,7 @@
     </target>
 
     <!-- run-core -->
-    <target name="run-core" depends="dist" description="Runs the default Meandre-Core server">
+    <target name="run" depends="dist" description="Runs the default Meandre-Core server">
         <echo level="info">Run the default Meandre-Core server</echo>
         <java classname="org.meandre.WSCoreBootstrapper">
             <classpath refid="meandre.core.classpath"/>
