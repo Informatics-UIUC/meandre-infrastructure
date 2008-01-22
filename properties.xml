@@ -5,7 +5,7 @@
     <property name="build.version" value="'1.1'"/>
 
     <!-- Directory structure of the project -->
-    <property name="build.dir" value="${basedir}/build"/>
+    <property name="build.dir" value="${basedir}/bin"/>
     <property name="dist.dir" value="${basedir}/dist"/>
     <property name="test.dir" value="${basedir}/test"/>
 
