@@ -1,11 +1,12 @@
 /**
  * 
  */
-package org.meandre.core.store;
+package org.meandre.core.store.security;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.meandre.core.store.Store;
 import org.meandre.core.store.security.SecurityStore;
 import org.meandre.core.store.security.SecurityStoreException;
 import org.meandre.core.store.system.SystemStore;
