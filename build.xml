@@ -163,4 +163,25 @@
             </classpath>
         </java>
     </target>
+
+	<target name="clean-store"
+		depends=""
+		description="Deletes the MeandreStore directory, which contains the database of all installed (\'uploaded\') components and flows">
+        
+		<delete dir="MeandreStore"/>
+
+	</target>
+	<!---        Documentation (Javadocs)       -->
+	<target name="javadoc"
+		description="build the documentation. (expect lots of warnings when run - don't worry about them)" >
+
+		<javadoc 
+			sourcepath="${src}/"
+			maxmemory="512m" 
+			access="private"
+			windowtitle="Meandre Core API"
+			author="true" 
+			use="true"
+			destdir="${doc.dir}/"/>
+	</target>
 </project>
