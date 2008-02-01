@@ -41,7 +41,7 @@ import org.mortbay.jetty.servlet.ServletHolder;
 public class WSCoreBootstrapper {
 
 	/** The version */
-	public final static String VERSION = "1.1vcli (Carquinyoli)";
+	public final static String VERSION = "1.2vcli (Panellet)";
 
 	/** The base URL for Meandre WS */
 	public final static String WS_BASE_URL = "http://meandre.org/services/";
