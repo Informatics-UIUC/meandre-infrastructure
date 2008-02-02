@@ -2,10 +2,10 @@ package org.meandre.core.engine;
 
 import java.util.Set;
 import java.util.concurrent.Semaphore;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.WSCoreBootstrapper;
+import org.meandre.core.utils.LoggerFactory;
+
 
 /** This thread monitors finalization criteria of the wrapped component
  * 
@@ -14,16 +14,9 @@ import org.meandre.WSCoreBootstrapper;
  */
 public class MrProper extends Thread {
 	
-	/** The logger for the bootstrapper */
-	protected static Logger log = null;
-	
-	// Initializing the logger and its handlers
-	static {
-		log = Logger.getLogger(WSCoreBootstrapper.class.getName());
-		log.setLevel(Level.CONFIG);
-		log.addHandler(WSCoreBootstrapper.handler);
-	}
-	
+	/** The core root logger */
+	protected static Logger log = LoggerFactory.getCoreLogger();
+
 	/** The thread group of the components. */
 	private ThreadGroup tg = null;
 	

@@ -3,11 +3,10 @@ package org.meandre.webui;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.store.Store;
+import org.meandre.core.utils.LoggerFactory;
 
 /** The web ui factory to manager allows modules to create, register,
  * remove, and distroy web ui compnents.
@@ -17,15 +16,8 @@ import org.meandre.core.store.Store;
  */
 public class WebUIFactory {
 	
-	/** The logger for the bootstrapper */
-	protected static Logger log = null;
-	
-	// Initializing the logger and its handlers
-	static {
-		log = Logger.getLogger(WSCoreBootstrapper.class.getName());
-		log.setLevel(Level.CONFIG);
-		log.addHandler(WSCoreBootstrapper.handler);
-	}
+	/** The core root logger */
+	protected static Logger log = LoggerFactory.getCoreLogger();
 		
 	/** The semaphore to implement mutual exclusion */
 	private static Semaphore semMutEX = new Semaphore(1,true);

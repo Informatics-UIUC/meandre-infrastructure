@@ -1,4 +1,4 @@
-package org.meandre;
+package org.meandre.webservices;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,6 +16,7 @@ import javax.servlet.Servlet;
 import org.meandre.core.engine.MeandreSecurityManager;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.security.Action;
+import org.meandre.core.utils.Constants;
 import org.meandre.webservices.about.WSAbout;
 import org.meandre.webservices.execute.WSExecute;
 import org.meandre.webservices.locations.WSLocations;
@@ -39,9 +40,6 @@ import org.mortbay.jetty.servlet.ServletHolder;
  * 
  */
 public class WSCoreBootstrapper {
-
-	/** The version */
-	public final static String VERSION = "1.2vcli (Panellet)";
 
 	/** The base URL for Meandre WS */
 	public final static String WS_BASE_URL = "http://meandre.org/services/";
@@ -180,7 +178,7 @@ public class WSCoreBootstrapper {
 		if ( file.mkdir() ) {
 			try {
 				PrintStream ps = new PrintStream(new FileOutputStream(file.getAbsolutePath()+File.separator+"readme.txt"));
-				ps.println("Meandre Execution Engine version "+WSCoreBootstrapper.VERSION);
+				ps.println("Meandre Execution Engine version "+Constants.MEANDRE_VERSION);
 				ps.println("All rigths reserved by DITA, NCSA, UofI (2007).");
 				ps.println("2007. All rigths reserved by DITA, NCSA, UofI.");
 				ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");

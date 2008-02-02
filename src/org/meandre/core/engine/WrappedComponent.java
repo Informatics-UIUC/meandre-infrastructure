@@ -5,14 +5,13 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.ComponentContextException;
 import org.meandre.core.ComponentContextImpl;
 import org.meandre.core.ComponentExecutionException;
 import org.meandre.core.ExecutableComponent;
+import org.meandre.core.utils.LoggerFactory;
 
 /** This class is the Meandre implementation wrapper of an 
  * ExecutableComponent. This class implements the basic execution
@@ -36,15 +35,8 @@ extends Thread {
 	/** The termination flag index */
 	protected static final int TERMINATION = 3;
 	
-	/** The logger for the bootstrapper */
-	protected static Logger log = null;
-	
-	// Initializing the logger and its handlers
-	static {
-		log = Logger.getLogger(WSCoreBootstrapper.class.getName());
-		log.setLevel(Level.CONFIG);
-		log.addHandler(WSCoreBootstrapper.handler);
-	}
+	/** The core root logger */
+	protected static Logger log = LoggerFactory.getCoreLogger();
 	
 	/** The last updated input buffer */
 	@SuppressWarnings("unchecked")

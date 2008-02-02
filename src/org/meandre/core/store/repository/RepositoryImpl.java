@@ -8,10 +8,9 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.WSCoreBootstrapper;
+import org.meandre.core.utils.LoggerFactory;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.query.Query;
@@ -44,16 +43,10 @@ public class RepositoryImpl implements QueryableRepository {
 	/** The available firing policies */
 	public final static Set<String> setFiringPolicy = new HashSet<String>();
 	
-	/** The logger for the bootstrapper */
-	protected static Logger log = null;
-	
+	/** The core root logger */
+	protected static Logger log = LoggerFactory.getCoreLogger();
+
 	static {
-		//
-		// Initializing the logger and its handlers
-		//
-		log = Logger.getLogger(WSCoreBootstrapper.class.getName());
-		log.setLevel(Level.CONFIG);
-		log.addHandler(WSCoreBootstrapper.handler);
 		
 		//
 		// Initialize the sets

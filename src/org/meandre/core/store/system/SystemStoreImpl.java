@@ -5,10 +5,9 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.WSCoreBootstrapper;
+import org.meandre.core.utils.LoggerFactory;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -69,16 +68,8 @@ public class SystemStoreImpl implements SystemStore {
     /** The model repository */
     protected Model model = null;
 
-    /** The logger for the bootstrapper */
-    protected static Logger log = null;
-
-    // Initializing the logger and its handlers
-    static {
-        log = Logger.getLogger(WSCoreBootstrapper.class.getName());
-        log.setLevel(Level.CONFIG);
-        log.addHandler(WSCoreBootstrapper.handler);
-    }
-
+    /** The core root logger */
+	protected static Logger log = LoggerFactory.getCoreLogger();
 
     /** Create a system store for properties and configuration related stuff.
      *

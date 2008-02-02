@@ -1,5 +1,6 @@
 package org.meandre.core;
 
+
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -7,12 +8,11 @@ import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.engine.ActiveBuffer;
 import org.meandre.core.engine.ActiveBufferException;
+import org.meandre.core.utils.LoggerFactory;
 import org.meandre.webui.WebUI;
 import org.meandre.webui.WebUIException;
 import org.meandre.webui.WebUIFactory;
@@ -27,15 +27,8 @@ import org.meandre.webui.WebUIFragmentCallback;
 public class ComponentContextImpl 
 implements ComponentContext {
 	
-	/** The logger for the bootstrapper */
-	protected static Logger log = null;
-	
-	// Initializing the logger and its handlers
-	static {
-		log = Logger.getLogger(WSCoreBootstrapper.class.getName());
-		log.setLevel(Level.CONFIG);
-		log.addHandler(WSCoreBootstrapper.handler);
-	}
+	/** The core root logger */
+	protected static Logger log = LoggerFactory.getCoreLogger();
 
 	/** The unique flow execution ID */
 	protected String sFlowUniqueExecutionID = null;

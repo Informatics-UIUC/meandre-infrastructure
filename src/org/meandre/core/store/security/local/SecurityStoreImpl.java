@@ -8,10 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.security.Action;
 import org.meandre.core.store.security.PasswordEncryptor;
@@ -19,6 +17,7 @@ import org.meandre.core.store.security.Role;
 import org.meandre.core.store.security.SecurityStore;
 import org.meandre.core.store.security.SecurityStoreException;
 import org.meandre.core.store.security.User;
+import org.meandre.core.utils.LoggerFactory;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -93,15 +92,8 @@ public class SecurityStoreImpl implements SecurityStore {
     /** The model repository */
     protected Model model = null;
 
-    /** The logger for the bootstrapper */
-    protected static Logger log = null;
-
-    // Initializing the logger and its handlers
-    static {
-        log = Logger.getLogger(WSCoreBootstrapper.class.getName());
-        log.setLevel(Level.CONFIG);
-        log.addHandler(WSCoreBootstrapper.handler);
-    }
+    /** The core root logger */
+	protected static Logger log = LoggerFactory.getCoreLogger();
 
     /** The text search indexer */
 	private IndexBuilderString larqBuilder = null;
@@ -163,10 +155,13 @@ public class SecurityStoreImpl implements SecurityStore {
      */
     public void flush() {
   
+    	//
 		// Dump the realm file
-		try {
+		// 
+    	// The realm file is dump to the place were the engine was started
+    	try {
 			PrintStream ps = new PrintStream(new FileOutputStream(new File(
-					WSCoreBootstrapper.JETTY_HOME + File.separator
+					"." + File.separator
 							+ Store.getRealmFilename())));
 			
 			// username: password[,rolename ...]
@@ -181,7 +176,7 @@ public class SecurityStoreImpl implements SecurityStore {
 	        ps.close();
 	        
 		} catch (IOException e) {
-			log.severe("Could not update realm file: "+WSCoreBootstrapper.JETTY_HOME+File.separator+Store.getRealmFilename());
+			log.severe("Could not update realm file: ."+File.separator+Store.getRealmFilename());
 		} 
 		catch (SecurityStoreException e) {
 			log.severe("Could not update realm because security exception was thrown");

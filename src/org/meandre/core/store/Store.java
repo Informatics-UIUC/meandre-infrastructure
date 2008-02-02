@@ -4,10 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.store.repository.QueryableRepository;
 import org.meandre.core.store.repository.RepositoryImpl;
 import org.meandre.core.store.security.SecurityStore;
@@ -15,6 +13,8 @@ import org.meandre.core.store.security.SecurityStoreException;
 import org.meandre.core.store.security.local.SecurityStoreImpl;
 import org.meandre.core.store.system.SystemStore;
 import org.meandre.core.store.system.SystemStoreImpl;
+import org.meandre.core.utils.Constants;
+import org.meandre.core.utils.LoggerFactory;
 
 import com.hp.hpl.jena.db.DBConnection;
 import com.hp.hpl.jena.db.IDBConnection;
@@ -69,8 +69,8 @@ public class Store {
 	/** Contains the basic properties of storage mechanism */
 	private static Properties propStoreConfig = null;
 	
-	/** The logger  */
-	private static Logger log = null;
+	/** The core root logger */
+	protected static Logger log = LoggerFactory.getCoreLogger();
 
 	/** The default Model Maker */
 	private static ModelMaker makerJenaModel = null;
@@ -100,11 +100,6 @@ public class Store {
 	/** The default initialization based on properties. */
 	static {
 		
-		// Initialize the logger
-		log = Logger.getLogger(WSCoreBootstrapper.class.getName());
-		log.setLevel(Level.CONFIG);
-		log.addHandler(WSCoreBootstrapper.handler);
-		
 		// Try to open the config file
 		propStoreConfig = new Properties();
 	    FileInputStream fis;
@@ -128,7 +123,7 @@ public class Store {
 			FileOutputStream fos;
 			try {
 				fos = new FileOutputStream(sConfigPath+File.separator+sConfigFile);
-				propStoreConfig.storeToXML(fos, "Meandre default configuration file ("+WSCoreBootstrapper.VERSION+")");
+				propStoreConfig.storeToXML(fos, "Meandre default configuration file ("+Constants.MEANDRE_VERSION+")");
 			    fos.close();
 			} catch (Exception eWrite) {
 				log.warning("Meandre configuration file "+

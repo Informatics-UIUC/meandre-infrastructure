@@ -8,10 +8,8 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Random;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.WSCoreBootstrapper;
 import org.meandre.core.ExecutableComponent;
 import org.meandre.core.engine.policies.component.availability.WrappedComponentAllInputsRequired;
 import org.meandre.core.engine.policies.component.availability.WrappedComponentAnyInputRequired;
@@ -24,6 +22,7 @@ import org.meandre.core.store.repository.FlowDescription;
 import org.meandre.core.store.repository.PropertiesDescription;
 import org.meandre.core.store.repository.PropertiesDescriptionDefinition;
 import org.meandre.core.store.repository.QueryableRepository;
+import org.meandre.core.utils.LoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Resource;
 
@@ -58,15 +57,8 @@ public class Conductor {
 	/** The default active buffer size */
 	private int iActiveBufferSize;
 
-	/** The logger for the bootstrapper */
-	protected static Logger log = null;
-
-	// Initializing the logger and its handlers
-	static {
-		log = Logger.getLogger(WSCoreBootstrapper.class.getName());
-		log.setLevel(Level.CONFIG);
-		log.addHandler(WSCoreBootstrapper.handler);
-	}
+	/** The core root logger */
+	protected static Logger log = LoggerFactory.getCoreLogger();
 
 	/** Initialize a conductor with a set of valid URLs.
 	 *
