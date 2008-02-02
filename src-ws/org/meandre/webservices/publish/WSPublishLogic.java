@@ -1,11 +1,7 @@
 package org.meandre.webservices.publish;
 
-import org.meandre.webservices.WSCoreBootstrapper;
-
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,17 +25,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
  */
 public class WSPublishLogic {
 
-    /** The logger for the bootstrapper */
-    protected static Logger log = null;
-
-    // Initializing the logger and its handlers
-    static {
-        log = Logger.getLogger(WSCoreBootstrapper.class.getName());
-        log.setLevel(Level.CONFIG);
-        log.addHandler(WSCoreBootstrapper.handler);
-    }
-
-    /** Publish a URI and returns the uri in text if succeed.
+	/** Publish a URI and returns the uri in text if succeed.
      * 
      * @param request The request object
      * @param response The response object

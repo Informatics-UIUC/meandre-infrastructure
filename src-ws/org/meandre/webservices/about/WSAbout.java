@@ -1,10 +1,7 @@
 package org.meandre.webservices.about;
 
-import org.meandre.webservices.WSCoreBootstrapper;
-
 import java.io.IOException;
 import java.net.URL;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -16,6 +13,7 @@ import org.json.JSONException;
 import org.json.XML;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.security.Action;
+import org.meandre.webservices.utils.WSLoggerFactory;
 
 /** A basic handler to display basic information.
  * 
@@ -27,15 +25,8 @@ public class WSAbout extends HttpServlet {
     /** A default serial ID */
 	private static final long serialVersionUID = 1L;
 	
-	/** The logger for the bootstrapper */
-    protected static Logger log = null;
-
-    // Initializing the logger and its handlers
-    static {
-        log = Logger.getLogger(WSCoreBootstrapper.class.getName());
-        log.setLevel(Level.CONFIG);
-        log.addHandler(WSCoreBootstrapper.handler);
-    }
+	/** The logger for the WebServices */
+	private static Logger log = WSLoggerFactory.getWSLogger();
 	
 	/**
 	 * Dispatches web requests for Meandre web services.

@@ -1,4 +1,4 @@
-package org.meandre.demo.utils;
+package org.meandre.webservices.utils;
 
 import java.io.IOException;
 import java.util.logging.FileHandler;
@@ -7,41 +7,42 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
+
 /** This class implements a disposable logger factory for demo components and flows.
  * 
  * @author Xavier Llor&agrave;
  *
  */
-public class DemoLoggerFactory {
+public class WSLoggerFactory {
 	
 	/** The base logger for the demo code */
-	private static Logger logDemo = null;
+	private static Logger logWS = null;
 	
 	/** The basic handler for all the loggers */
-	public static Handler handlerDemo = null;
+	public static Handler handlerWS = null;
 	
 	// Initializing the logger and its handlers
 	static {
-		logDemo = Logger.getLogger(DemoLoggerFactory.class.getName());
-		logDemo.setLevel(Level.FINEST);
+		logWS = Logger.getLogger(WSLoggerFactory.class.getName());
+		logWS.setLevel(Level.FINEST);
 		try {
-			logDemo.addHandler(handlerDemo = new FileHandler("meandre-log-demo.xml"));
+			logWS.addHandler(handlerWS = new FileHandler("meandre-log-ws.xml"));
 		} catch (SecurityException e) {
-			System.err.println("Could not initialize meandre-log-demo.xml");
+			System.err.println("Could not initialize meandre-log-ws.xml");
 			System.exit(1);
 		} catch (IOException e) {
-			System.err.println("Could not initialize meandre-log-demo.xml");
+			System.err.println("Could not initialize meandre-log-ws.xml");
 			System.exit(1);
 		}
-		handlerDemo.setLevel(Level.FINEST);
+		handlerWS.setLevel(Level.FINEST);
 	}
 	
 	/** Returns the core main logger.
 	 * 
 	 * @return The core logger 
 	 */
-	public static Logger getDemoLogger() {
-		return logDemo;
+	public static Logger getWSLogger() {
+		return logWS;
 	}
 	
 }

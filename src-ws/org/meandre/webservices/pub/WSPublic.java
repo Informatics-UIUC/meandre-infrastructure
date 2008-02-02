@@ -1,10 +1,7 @@
 package org.meandre.webservices.pub;
 
-import org.meandre.webservices.WSCoreBootstrapper;
-
 import java.io.IOException;
 import java.net.URL;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -14,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.meandre.core.store.Store;
 import org.meandre.demo.repository.DemoRepositoryGenerator;
+import org.meandre.webservices.utils.WSLoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.DC;
@@ -31,15 +29,8 @@ public class WSPublic extends HttpServlet {
     /** A default serial ID */
 	private static final long serialVersionUID = 1L;
 	
-	/** The logger for the bootstrapper */
-    protected static Logger log = null;
-
-    // Initializing the logger and its handlers
-    static {
-        log = Logger.getLogger(WSCoreBootstrapper.class.getName());
-        log.setLevel(Level.CONFIG);
-        log.addHandler(WSCoreBootstrapper.handler);
-    }
+	/** The logger for the WebServices */
+	private static Logger log = WSLoggerFactory.getWSLogger();
 	
 	/**
 	 * Dispatches web requests for Meandre web services.

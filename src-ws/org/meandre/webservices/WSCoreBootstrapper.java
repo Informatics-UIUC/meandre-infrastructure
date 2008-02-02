@@ -6,9 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Date;
-import java.util.logging.FileHandler;
 import java.util.logging.Handler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.Servlet;
@@ -23,6 +21,7 @@ import org.meandre.webservices.locations.WSLocations;
 import org.meandre.webservices.pub.WSPublic;
 import org.meandre.webservices.publish.WSPublish;
 import org.meandre.webservices.repository.WSRepository;
+import org.meandre.webservices.utils.WSLoggerFactory;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ResourceHandler;
 import org.mortbay.jetty.security.Constraint;
@@ -47,29 +46,12 @@ public class WSCoreBootstrapper {
 	/** The base directory for Jetty */
 	public static final String JETTY_HOME = ".";
 	
-	/** The logger for the bootstrapper */
-	private static Logger log = null;
+	/** The logger for the WebServices */
+	private static Logger log = WSLoggerFactory.getWSLogger();
 	
 	/** The basic handler for all the loggers */
 	public static Handler handler = null;
-	
-	// Initializing the logger and its handlers
-	static {
-		log = Logger.getLogger(WSCoreBootstrapper.class.getName());
-		log.setLevel(Level.FINEST);
-		try {
-			log.addHandler(handler = new FileHandler("meandre-log.xml"));
-		} catch (SecurityException e) {
-			System.err.println("Could not initialize meandre-log.xml");
-			System.exit(1);
-		} catch (IOException e) {
-			System.err.println("Could not initialize meandre-log.xml");
-			System.exit(1);
-		}
 		
-		handler.setLevel(Level.FINEST);
-	}
-	
 	/**
 	 * Boostraps the Meandre execution engine.
 	 * 

@@ -1,7 +1,5 @@
 package org.meandre.webservices.about;
 
-import org.meandre.webservices.WSCoreBootstrapper;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
@@ -18,7 +16,8 @@ import org.meandre.core.store.Store;
 import org.meandre.core.store.security.SecurityStore;
 import org.meandre.core.store.security.SecurityStoreException;
 import org.meandre.core.utils.Constants;
-import org.meandre.core.utils.LoggerFactory;
+import org.meandre.webservices.WSCoreBootstrapper;
+import org.meandre.webservices.utils.WSLoggerFactory;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -37,9 +36,9 @@ import com.hp.hpl.jena.vocabulary.XSD;
  */
 public class WSAboutLogic {
 
-	/** The core root logger */
-	protected static Logger log = LoggerFactory.getCoreLogger();
-
+	/** The logger for the WebServices */
+	private static Logger log = WSLoggerFactory.getWSLogger();
+	
 	/** Prints the list of user roles.
 	 * 
 	 * @param request The request object

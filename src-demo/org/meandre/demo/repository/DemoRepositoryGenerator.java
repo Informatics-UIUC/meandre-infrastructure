@@ -1,7 +1,5 @@
 package org.meandre.demo.repository;
 
-
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;

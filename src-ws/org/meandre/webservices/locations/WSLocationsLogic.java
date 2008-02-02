@@ -1,12 +1,9 @@
 package org.meandre.webservices.locations;
 
-import org.meandre.webservices.WSCoreBootstrapper;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.json.JSONArray;
@@ -16,6 +13,7 @@ import org.meandre.core.store.Store;
 import org.meandre.core.store.repository.QueryableRepository;
 import org.meandre.core.store.repository.RepositoryImpl;
 import org.meandre.core.store.system.SystemStore;
+import org.meandre.webservices.utils.WSLoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -28,15 +26,8 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
  */
 public class WSLocationsLogic {
 
-	/** The logger for the bootstrapper */
-    protected static Logger log = null;
-
-    // Initializing the logger and its handlers
-    static {
-        log = Logger.getLogger(WSCoreBootstrapper.class.getName());
-        log.setLevel(Level.CONFIG);
-        log.addHandler(WSCoreBootstrapper.handler);
-    }
+	/** The logger for the WebServices */
+	private static Logger log = WSLoggerFactory.getWSLogger();
 	
     /** Returns a JSON object for the given location.
      * 
