@@ -1,4 +1,4 @@
-package org.meandre.core.repository.test;
+package org.meandre.demo.repository;
 
 import static org.junit.Assert.fail;
 
@@ -31,7 +31,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * @author Xavier Llor&agrave;
  *
  */
-public class RepositoryGenerator {
+public class DemoRepositoryGenerator {
 
 	/** Base testing URL */
 	public static String sTestBaseURL = "http://test.org";
@@ -46,7 +46,7 @@ public class RepositoryGenerator {
 	 * 
 	 * @return The executable component description
 	 */
-	private static ExecutableComponentDescription getPushString() {
+	private static ExecutableComponentDescription getPushStringComponent() {
 		ExecutableComponentDescription ecdRes = null;
 		
 		Resource resExecutableComponent =  ModelFactory.createDefaultModel().createResource(sTestBaseComponentURL+"push-string");
@@ -115,7 +115,7 @@ public class RepositoryGenerator {
 	 * 
 	 * @return The executable component description
 	 */
-	private static ExecutableComponentDescription getConcatenateStrings() {
+	private static ExecutableComponentDescription getConcatenateStringsComponent() {
 		ExecutableComponentDescription ecdRes = null;
 		
 		Resource resExecutableComponent =  ModelFactory.createDefaultModel().createResource(sTestBaseComponentURL+"concatenate-strings");
@@ -356,13 +356,13 @@ public class RepositoryGenerator {
 	 * 
 	 * @return The model with the 3 component descriptors and the flow
 	 */
-	public static Model testHelloWorld() {
+	public static Model getTestHelloWorldRepository() {
 		
 		///
 		// Create the components
 		//
-		ExecutableComponentDescription ecdPS = getPushString(); 
-		ExecutableComponentDescription ecdCS = getConcatenateStrings(); 
+		ExecutableComponentDescription ecdPS = getPushStringComponent(); 
+		ExecutableComponentDescription ecdCS = getConcatenateStringsComponent(); 
 		ExecutableComponentDescription ecdPO = getPrintObjectComponent(); 
 		
 		//
@@ -477,13 +477,13 @@ public class RepositoryGenerator {
 	 * 
 	 * @return The model with the 3 component descriptors and the flow
 	 */
-	public static Model testHelloWorldWithDanglingComponents () {
+	public static Model getTestHelloWorldWithDanglingComponentsRepository () {
 		
 		///
 		// Create the components
 		//
-		ExecutableComponentDescription ecdPS = getPushString(); 
-		ExecutableComponentDescription ecdCS = getConcatenateStrings(); 
+		ExecutableComponentDescription ecdPS = getPushStringComponent(); 
+		ExecutableComponentDescription ecdCS = getConcatenateStringsComponent(); 
 		ExecutableComponentDescription ecdPO = getPrintObjectComponent(); 
 		
 		//
@@ -625,13 +625,13 @@ public class RepositoryGenerator {
 	 * 
 	 * @return The model with the 3 component descriptors and the flow
 	 */
-	public static Model testHelloWorldWithDanglingComponentsAndInAndOutForks () {
+	public static Model getTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository () {
 		
 		///
 		// Create the components
 		//
-		ExecutableComponentDescription ecdPS = getPushString(); 
-		ExecutableComponentDescription ecdCS = getConcatenateStrings(); 
+		ExecutableComponentDescription ecdPS = getPushStringComponent(); 
+		ExecutableComponentDescription ecdCS = getConcatenateStringsComponent(); 
 		ExecutableComponentDescription ecdPO = getPrintObjectComponent(); 
 		ExecutableComponentDescription ecdFO = getReferenceForkComponent();
 		//

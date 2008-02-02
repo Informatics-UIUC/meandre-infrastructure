@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.meandre.core.repository.test.RepositoryGenerator;
 import org.meandre.core.store.Store;
+import org.meandre.demo.repository.DemoRepositoryGenerator;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.DC;
@@ -88,13 +88,13 @@ public class WSPublic extends HttpServlet {
     	}
     	else if ( sTarget.endsWith("/demo_repository") ) {
 			if ( sExtension.endsWith("rdf") ) {
-				dumpRepository(request,response,RepositoryGenerator.testHelloWorld(),"RDF/XML-ABBREV");
+				dumpRepository(request,response,DemoRepositoryGenerator.getTestHelloWorldRepository(),"RDF/XML-ABBREV");
 			}
 			else if ( sExtension.endsWith("ttl") ) {
-				dumpRepository(request,response,RepositoryGenerator.testHelloWorld(),"TTL");
+				dumpRepository(request,response,DemoRepositoryGenerator.getTestHelloWorldRepository(),"TTL");
 			}
 			else if ( sExtension.endsWith("nt") ) {
-				dumpRepository(request,response,RepositoryGenerator.testHelloWorld(),"N-TRIPLE");
+				dumpRepository(request,response,DemoRepositoryGenerator.getTestHelloWorldRepository(),"N-TRIPLE");
 			}
 			else  {
 				// 

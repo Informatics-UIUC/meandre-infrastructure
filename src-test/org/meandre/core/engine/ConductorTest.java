@@ -6,10 +6,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import org.junit.Test;
-import org.meandre.core.repository.test.RepositoryGenerator;
 import org.meandre.core.store.repository.CorruptedDescriptionException;
 import org.meandre.core.store.repository.QueryableRepository;
 import org.meandre.core.store.repository.RepositoryImpl;
+import org.meandre.demo.repository.DemoRepositoryGenerator;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -30,21 +30,21 @@ public class ConductorTest {
 		
 		try {
 			// Run simple hello world
-			Model model = RepositoryGenerator.testHelloWorld();
+			Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
 			QueryableRepository qr = new RepositoryImpl(model);
 			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
 			// Run the basic text
 			runHelloWorldFlow(conductor, qr);
 			
 			// Run simple hello world dangling input/outputs
-			model = RepositoryGenerator.testHelloWorldWithDanglingComponents();
+			model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsRepository();
 			qr = new RepositoryImpl(model);
 			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
 			// Run the basic text
 			runHelloWorldFlowWidthDanglingComponents(conductor, qr);
 			
 			// Run simple hello world dangling input/outputs + fork
-			model = RepositoryGenerator.testHelloWorldWithDanglingComponentsAndInAndOutForks();
+			model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
 			qr = new RepositoryImpl(model);
 			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
 			// Run the basic text

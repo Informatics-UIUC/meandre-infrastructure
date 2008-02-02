@@ -8,9 +8,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.meandre.core.repository.test.RepositoryGenerator;
 import org.meandre.core.store.repository.QueryableRepository;
 import org.meandre.core.store.repository.RepositoryImpl;
+import org.meandre.demo.repository.DemoRepositoryGenerator;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -28,7 +28,7 @@ public class RepositoryImplTest {
 	 */
 	@Test
 	public void testRepositoryImpl() {
-		Model model = RepositoryGenerator.testHelloWorld();
+		Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
 		
 		QueryableRepository qr = new RepositoryImpl(model);
 		
@@ -41,8 +41,8 @@ public class RepositoryImplTest {
 	 */
 	@Test
 	public void testRefreshCacheModel() {
-		Model modelOne = RepositoryGenerator.testHelloWorld();
-		Model modelTwo = RepositoryGenerator.testHelloWorld();
+		Model modelOne = DemoRepositoryGenerator.getTestHelloWorldRepository();
+		Model modelTwo = DemoRepositoryGenerator.getTestHelloWorldRepository();
 		
 		QueryableRepository qr1 = new RepositoryImpl(modelOne);
 		QueryableRepository qr2 = new RepositoryImpl(modelTwo);
@@ -58,7 +58,7 @@ public class RepositoryImplTest {
 	 */
 	@Test
 	public void testGetModel() {
-		Model model = RepositoryGenerator.testHelloWorld();
+		Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
 		
 		QueryableRepository qr = new RepositoryImpl(model);
 		
@@ -74,7 +74,7 @@ public class RepositoryImplTest {
 	 */
 	@Test
 	public void testGetAvailableExecutableComponents() {
-		Model model = RepositoryGenerator.testHelloWorld();
+		Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
 		
 		QueryableRepository qr = new RepositoryImpl(model);
 		
@@ -86,7 +86,7 @@ public class RepositoryImplTest {
 	 */
 	@Test
 	public void testGetAvailableExecutableComponentsString() {
-		Model model = RepositoryGenerator.testHelloWorld();
+		Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
 		
 		QueryableRepository qr = new RepositoryImpl(model);
 		
@@ -98,7 +98,7 @@ public class RepositoryImplTest {
 	 */
 	@Test
 	public void testGetExecutableComponentDescription() {	
-		Model model = RepositoryGenerator.testHelloWorld();
+		Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
 		
 		QueryableRepository qr = new RepositoryImpl(model);
 		
@@ -114,7 +114,7 @@ public class RepositoryImplTest {
 	 */
 	@Test
 	public void testGetAvailableFlows() {
-		Model model = RepositoryGenerator.testHelloWorld();
+		Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
 		
 		QueryableRepository qr = new RepositoryImpl(model);
 		
@@ -128,7 +128,7 @@ public class RepositoryImplTest {
 	 */
 	@Test
 	public void testGetAvailableFlowsString() {
-		Model model = RepositoryGenerator.testHelloWorld();
+		Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
 		
 		QueryableRepository qr = new RepositoryImpl(model);
 		
@@ -140,7 +140,7 @@ public class RepositoryImplTest {
 	 */
 	@Test
 	public void testGetFlowDescription() {
-		Model model = RepositoryGenerator.testHelloWorld();
+		Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
 		
 		QueryableRepository qr = new RepositoryImpl(model);
 		
@@ -153,7 +153,7 @@ public class RepositoryImplTest {
 	 */
 	@Test
 	public void testGetTags() {
-		Model model = RepositoryGenerator.testHelloWorld();
+		Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
 		
 		QueryableRepository qr = new RepositoryImpl(model);
 		
