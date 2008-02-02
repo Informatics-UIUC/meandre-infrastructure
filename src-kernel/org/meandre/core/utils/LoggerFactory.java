@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  *
  */
 public class LoggerFactory {
-	
+
 	/** The base logger for the core */
 	private static Logger logCore = null;
 	
@@ -24,12 +24,12 @@ public class LoggerFactory {
 		logCore = Logger.getLogger(LoggerFactory.class.getName());
 		logCore.setLevel(Level.FINEST);
 		try {
-			logCore.addHandler(handlerCore = new FileHandler("meandre-log.xml"));
+			logCore.addHandler(handlerCore = new FileHandler("meandre-log-kernel.xml"));
 		} catch (SecurityException e) {
-			System.err.println("Could not initialize meandre-log.xml");
+			System.err.println("Could not initialize meandre-log-kernel.xml");
 			System.exit(1);
 		} catch (IOException e) {
-			System.err.println("Could not initialize meandre-log.xml");
+			System.err.println("Could not initialize meandre-log-kernel.xml");
 			System.exit(1);
 		}
 		handlerCore.setLevel(Level.FINEST);

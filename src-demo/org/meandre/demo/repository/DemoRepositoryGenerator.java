@@ -1,12 +1,13 @@
 package org.meandre.demo.repository;
 
-import static org.junit.Assert.fail;
+
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.meandre.core.store.repository.ConnectorDescription;
 import org.meandre.core.store.repository.CorruptedDescriptionException;
@@ -21,6 +22,7 @@ import org.meandre.demo.components.ConcatenateStringsComponent;
 import org.meandre.demo.components.ForkByReference;
 import org.meandre.demo.components.PrintObjectComponent;
 import org.meandre.demo.components.PushStringComponent;
+import org.meandre.demo.utils.DemoLoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -33,6 +35,9 @@ import com.hp.hpl.jena.rdf.model.Resource;
  */
 public class DemoRepositoryGenerator {
 
+	/** The demo logger */
+	public static Logger log = DemoLoggerFactory.getDemoLogger();
+	
 	/** Base testing URL */
 	public static String sTestBaseURL = "http://test.org";
 	
@@ -77,7 +82,7 @@ public class DemoRepositoryGenerator {
 		try {
 			setOutputs.add(new DataPortDescription(resDPDOutput,sDPDIdent,sDPDName,sDPDDesc));
 		} catch (CorruptedDescriptionException e) {
-			fail("An exception should have not been trown: "+e);
+			log.severe("An exception should have not been trown: "+e);
 		}
 		
 		// Properties
@@ -105,7 +110,7 @@ public class DemoRepositoryGenerator {
 					setInputs, setOutputs, pddProperties, tagDesc);
 			
 		} catch (CorruptedDescriptionException e) {
-			fail("An exception should have not been trown: "+e);
+			log.severe("An exception should have not been trown: "+e);
 		}
 		
 		return ecdRes;
@@ -143,7 +148,7 @@ public class DemoRepositoryGenerator {
 		try {
 			setInputs.add(new DataPortDescription(resDPDInput1,sDPDIn1Ident,sDPDIn1Name,sDPDIn1Desc));
 		} catch (CorruptedDescriptionException e) {
-			fail("An exception should have not been trown: "+e);
+			log.severe("An exception should have not been trown: "+e);
 		}
 		
 		Resource resDPDInput2 = ModelFactory.createDefaultModel().createResource(resExecutableComponent.toString()+"/input/string_two");
@@ -153,7 +158,7 @@ public class DemoRepositoryGenerator {
 		try {
 			setInputs.add(new DataPortDescription(resDPDInput2,sDPDIn2Ident,sDPDIn2Name,sDPDIn2Desc));
 		} catch (CorruptedDescriptionException e) {
-			fail("An exception should have not been trown: "+e);
+			log.severe("An exception should have not been trown: "+e);
 		}
 		
 		// One output port
@@ -165,7 +170,7 @@ public class DemoRepositoryGenerator {
 		try {
 			setOutputs.add(new DataPortDescription(resDPDOutput,sDPDIdent,sDPDName,sDPDDesc));
 		} catch (CorruptedDescriptionException e) {
-			fail("An exception should have not been trown: "+e);
+			log.severe("An exception should have not been trown: "+e);
 		}
 		
 		// Properties
@@ -191,7 +196,7 @@ public class DemoRepositoryGenerator {
 					setInputs, setOutputs, pddProperties, tagDesc);
 			
 		} catch (CorruptedDescriptionException e) {
-			fail("An exception should have not been trown: "+e);
+			log.severe("An exception should have not been trown: "+e);
 		}
 		
 		return ecdRes;
@@ -229,7 +234,7 @@ public class DemoRepositoryGenerator {
 		try {
 			setInputs.add(new DataPortDescription(resDPDInput,sDPDInIdent,sDPDInName,sDPDInDesc));
 		} catch (CorruptedDescriptionException e) {
-			fail("An exception should have not been trown: "+e);
+			log.severe("An exception should have not been trown: "+e);
 		}
 		
 		// One output port
@@ -258,7 +263,7 @@ public class DemoRepositoryGenerator {
 					setInputs, setOutputs, pddProperties, tagDesc);
 			
 		} catch (CorruptedDescriptionException e) {
-			fail("An exception should have not been trown: "+e);
+			log.severe("An exception should have not been trown: "+e);
 		}
 		
 		return ecdRes;
@@ -296,7 +301,7 @@ public class DemoRepositoryGenerator {
 		try {
 			setInputs.add(new DataPortDescription(resDPDInput,sDPDInIdent,sDPDInName,sDPDInDesc));
 		} catch (CorruptedDescriptionException e) {
-			fail("An exception should have not been trown: "+e);
+			log.severe("An exception should have not been trown: "+e);
 		}
 		
 		// One output port
@@ -308,7 +313,7 @@ public class DemoRepositoryGenerator {
 		try {
 			setOutputs.add(new DataPortDescription(resDPDOutput,sDPDIdent,sDPDName,sDPDDesc));
 		} catch (CorruptedDescriptionException e) {
-			fail("An exception should have not been trown: "+e);
+			log.severe("An exception should have not been trown: "+e);
 		}
 		
 		Resource resDPDOutput2 = ModelFactory.createDefaultModel().createResource(resExecutableComponent.toString()+"/output/object_ref_two");
@@ -318,7 +323,7 @@ public class DemoRepositoryGenerator {
 		try {
 			setOutputs.add(new DataPortDescription(resDPDOutput2,sDPDIdent2,sDPDName2,sDPDDesc2));
 		} catch (CorruptedDescriptionException e) {
-			fail("An exception should have not been trown: "+e);
+			log.severe("An exception should have not been trown: "+e);
 		}
 		
 		// Properties
@@ -344,7 +349,7 @@ public class DemoRepositoryGenerator {
 					setInputs, setOutputs, pddProperties, tagDesc);
 			
 		} catch (CorruptedDescriptionException e) {
-			fail("An exception should have not been trown: "+e);
+			log.severe("An exception should have not been trown: "+e);
 		}
 		
 		return ecdRes;
