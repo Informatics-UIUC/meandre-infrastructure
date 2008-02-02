@@ -1,4 +1,4 @@
-1.2:
+1.2vcli Panellet:
 
 * Main log file splitted:
 	- The kernel logging goes to meandre-log-kernel.xml file
@@ -10,9 +10,13 @@
 	- ant
 	- nbproject
 
-1.1:
+1.1vcli Carquinyoli:
 
-Meandre Core Web Service Execution Engine, Repository, etc.
+* Meandre Core Web Service Execution Engine, Repository, etc.
+
+1.0vcli Farina:
+
+* Plain all mixed together
 
 X.
 
