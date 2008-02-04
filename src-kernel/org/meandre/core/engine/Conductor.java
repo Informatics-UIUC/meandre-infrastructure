@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import org.meandre.core.ExecutableComponent;
 import org.meandre.core.engine.policies.component.availability.WrappedComponentAllInputsRequired;
 import org.meandre.core.engine.policies.component.availability.WrappedComponentAnyInputRequired;
+import org.meandre.core.logger.LoggerFactory;
 import org.meandre.core.store.repository.ConnectorDescription;
 import org.meandre.core.store.repository.CorruptedDescriptionException;
 import org.meandre.core.store.repository.DataPortDescription;
@@ -22,7 +23,6 @@ import org.meandre.core.store.repository.FlowDescription;
 import org.meandre.core.store.repository.PropertiesDescription;
 import org.meandre.core.store.repository.PropertiesDescriptionDefinition;
 import org.meandre.core.store.repository.QueryableRepository;
-import org.meandre.core.utils.LoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Resource;
 

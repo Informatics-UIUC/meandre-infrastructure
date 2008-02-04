@@ -6,11 +6,16 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
 
+import org.meandre.core.utils.vocabulary.RepositoryVocabulary;
+
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
+import com.hp.hpl.jena.vocabulary.XSD;
 
 
 /** This class wraps the basic description of an executable component.
@@ -289,32 +294,32 @@ public class FlowDescription {
 		Model model = ModelFactory.createDefaultModel();
 
 		// Setting the name spaces
-		model.setNsPrefix("", "http://www.meandre.org/ontology/");
-		model.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
-		model.setNsPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-		model.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
-		model.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
+		model.setNsPrefix("", RepositoryVocabulary.NS);
+		model.setNsPrefix("xsd", XSD.getURI());
+		model.setNsPrefix("rdf", RDF.getURI());
+		model.setNsPrefix("rdfs",RDFS.getURI());
+		model.setNsPrefix("dc",DC.getURI());
 
 		if ( resFlowComponent!=null ) {
 			Resource res = model.createResource(resFlowComponent.toString());
 	
 			// Plain properties
-			res.addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/name"),model.createTypedLiteral(sName))
-			   .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/description"),model.createTypedLiteral(sDescription))
-			   .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/rights"),model.createTypedLiteral(sRights))
-			   .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/creator"),model.createTypedLiteral(sCreator))
-			   .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/date"),model.createTypedLiteral(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(dateCreation),XSDDatatype.XSDdate))
-			   .addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),model.createResource("http://www.meandre.org/ontology/flow_component"));
+			res.addProperty(RepositoryVocabulary.name,model.createTypedLiteral(sName))
+			   .addProperty(DC.description,model.createTypedLiteral(sDescription))
+			   .addProperty(DC.rights,model.createTypedLiteral(sRights))
+			   .addProperty(DC.creator,model.createTypedLiteral(sCreator))
+			   .addProperty(DC.date,model.createTypedLiteral(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(dateCreation),XSDDatatype.XSDdate))
+			   .addProperty(RDF.type,RepositoryVocabulary.flow_component);
 			   ;
 	
 			// Adding tags
 			for ( String sTag:tagDesc.getTags() )
-				res.addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/tag"),model.createTypedLiteral(sTag));
+				res.addProperty(RepositoryVocabulary.tag,model.createTypedLiteral(sTag));
 	
 			// Adding connectors
 			Resource resCons = null;
 			if ( setConnectorDescription.size()>0 ) {
-				res.addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/connectors"),
+				res.addProperty(RepositoryVocabulary.connectors,
 					resCons=model.createResource(resFlowComponent.toString()+"/connector/set"));
 				for ( ConnectorDescription cd:setConnectorDescription ) {
 					String sConID = cd.getConnector().toString();
@@ -322,21 +327,21 @@ public class FlowDescription {
 					String sSourceDP = cd.getSourceIntaceDataPort().toString();
 					String sTarget = cd.getTargetInstance().toString();
 					String sTargetDP = cd.getTargetIntaceDataPort().toString();
-					resCons.addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-							model.createResource("http://www.meandre.org/ontology/connector_set"))
-							     .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/data_connector"),
-								  model.createResource(sConID).addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/connector_instance_source"), model.createResource(sSource))
-	                                                          .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/connector_instance_data_port_source"), model.createResource(sSourceDP))
-	                                                          .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/connector_instance_target"), model.createResource(sTarget))
-	                                                          .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/connector_instance_data_port_target"), model.createResource(sTargetDP))
-	                                                          .addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), model.createResource("http://www.meandre.org/ontology/data_connector_configuration"))
+					resCons.addProperty(RDF.type,
+							RepositoryVocabulary.connector_set)
+							     .addProperty(RepositoryVocabulary.data_connector,
+								  model.createResource(sConID).addProperty(RepositoryVocabulary.connector_instance_source, model.createResource(sSource))
+	                                                          .addProperty(RepositoryVocabulary.connector_instance_data_port_source, model.createResource(sSourceDP))
+	                                                          .addProperty(RepositoryVocabulary.connector_instance_target, model.createResource(sTarget))
+	                                                          .addProperty(RepositoryVocabulary.connector_instance_data_port_target, model.createResource(sTargetDP))
+	                                                          .addProperty(RDF.type, RepositoryVocabulary.data_connector_configuration)
 	                      );
 				}
 			}
 	
 			// Adding instances
 			if ( setExecutableComponentInstances.size()>0 ) {
-				res.addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/components_instances"),
+				res.addProperty(RepositoryVocabulary.components_instances,
 						resCons=model.createResource(resFlowComponent.toString()+"/components/set"));
 				for ( ExecutableComponentInstanceDescription ecid:setExecutableComponentInstances ) {
 					String sConID = ecid.getExecutableComponentInstance().toString();
@@ -344,22 +349,22 @@ public class FlowDescription {
 					String sName = ecid.getName();
 					String sDesc = ecid.getDescription();
 					Resource resIns = null;
-					resCons.addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-							model.createResource("http://www.meandre.org/ontology/instance_set"))
-							     .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/executable_component_instance"),
-								  (resIns=model.createResource(sConID)).addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/instance_resource"), model.createResource(sComp))
-		                                                         .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/instance_name"), model.createTypedLiteral(sName))
-		                                                         .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/description"), model.createTypedLiteral(sDesc))
-		                                                         .addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), model.createResource("http://www.meandre.org/ontology/instance_configuration"))
+					resCons.addProperty(RDF.type,
+							RepositoryVocabulary.instance_set)
+							     .addProperty(RepositoryVocabulary.executable_component_instance,
+								  (resIns=model.createResource(sConID)).addProperty(RepositoryVocabulary.instance_resource, model.createResource(sComp))
+		                                                         .addProperty(RepositoryVocabulary.instance_name, model.createTypedLiteral(sName))
+		                                                         .addProperty(DC.description, model.createTypedLiteral(sDesc))
+		                                                         .addProperty(RDF.type, RepositoryVocabulary.instance_configuration)
 		                     );
 					// Adding properties if any
 					PropertiesDescription propIns = ecid.getProperties();
 					if ( propIns!=null )
 						for ( String sKey:propIns.getKeys() )
-							resIns.addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/property_set"),
-									model.createResource(sConID+"/property/"+sKey).addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/key"), model.createTypedLiteral(sKey))
-	                                                                             .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/value"), model.createTypedLiteral(propIns.getValue(sKey)))
-	                                                                             .addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), model.createResource("http://www.meandre.org/ontology/property"))
+							resIns.addProperty(RepositoryVocabulary.property_set,
+									model.createResource(sConID+"/property/"+sKey).addProperty(RepositoryVocabulary.key, model.createTypedLiteral(sKey))
+	                                                                             .addProperty(RepositoryVocabulary.value, model.createTypedLiteral(propIns.getValue(sKey)))
+	                                                                             .addProperty(RDF.type, RepositoryVocabulary.property)
 							     );
 				}
 			}

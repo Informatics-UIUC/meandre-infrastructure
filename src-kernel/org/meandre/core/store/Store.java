@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import org.meandre.core.logger.LoggerFactory;
 import org.meandre.core.store.repository.QueryableRepository;
 import org.meandre.core.store.repository.RepositoryImpl;
 import org.meandre.core.store.security.SecurityStore;
@@ -14,7 +15,6 @@ import org.meandre.core.store.security.local.SecurityStoreImpl;
 import org.meandre.core.store.system.SystemStore;
 import org.meandre.core.store.system.SystemStoreImpl;
 import org.meandre.core.utils.Constants;
-import org.meandre.core.utils.LoggerFactory;
 
 import com.hp.hpl.jena.db.DBConnection;
 import com.hp.hpl.jena.db.IDBConnection;

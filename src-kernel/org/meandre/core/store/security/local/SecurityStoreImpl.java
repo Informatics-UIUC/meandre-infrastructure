@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.meandre.core.logger.LoggerFactory;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.security.Action;
 import org.meandre.core.store.security.PasswordEncryptor;
@@ -17,7 +18,6 @@ import org.meandre.core.store.security.Role;
 import org.meandre.core.store.security.SecurityStore;
 import org.meandre.core.store.security.SecurityStoreException;
 import org.meandre.core.store.security.User;
-import org.meandre.core.utils.LoggerFactory;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;

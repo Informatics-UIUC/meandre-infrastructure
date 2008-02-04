@@ -11,7 +11,7 @@ import org.meandre.core.ComponentContextException;
 import org.meandre.core.ComponentContextImpl;
 import org.meandre.core.ComponentExecutionException;
 import org.meandre.core.ExecutableComponent;
-import org.meandre.core.utils.LoggerFactory;
+import org.meandre.core.logger.LoggerFactory;
 
 /** This class is the Meandre implementation wrapper of an 
  * ExecutableComponent. This class implements the basic execution

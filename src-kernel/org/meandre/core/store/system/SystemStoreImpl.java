@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.meandre.core.utils.LoggerFactory;
+import org.meandre.core.logger.LoggerFactory;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -20,6 +20,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.vocabulary.DC;
 
 /** This class provides a wrapper for a system store property storage.
  * It is backed up by a file and when modified the content flushes the
@@ -211,8 +212,7 @@ public class SystemStoreImpl implements SystemStore {
                     );
             lst.add(model.createStatement(
                     sol.getResource("prop"),
-                    ResourceFactory.createProperty(
-                    "http://purl.org/dc/elements/1.1/description"),
+                    DC.description,
                     sol.getLiteral("desc")
                     )
                     );

@@ -20,45 +20,6 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
  *
  */
 public class ConductorTest {
-
-	/**
-	 * Test method for {@link org.meandre.core.engine.Conductor#buildExecutor(org.meandre.core.store.repository.QueryableRepository, com.hp.hpl.jena.rdf.model.Resource)}.
-	 */
-	@Test
-	public void testBuildExecutor() {
-		Conductor conductor = new Conductor(10);
-		
-		try {
-			// Run simple hello world
-			Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
-			QueryableRepository qr = new RepositoryImpl(model);
-			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
-			// Run the basic text
-			runHelloWorldFlow(conductor, qr);
-			
-			// Run simple hello world dangling input/outputs
-			model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsRepository();
-			qr = new RepositoryImpl(model);
-			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
-			// Run the basic text
-			runHelloWorldFlowWidthDanglingComponents(conductor, qr);
-			
-			// Run simple hello world dangling input/outputs + fork
-			model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
-			qr = new RepositoryImpl(model);
-			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
-			// Run the basic text
-			runHelloWorldFlowWidthDanglingComponentsAndFork(conductor, qr);
-			
-		} catch (CorruptedDescriptionException e) {
-			fail("Corrupted description encounterd: "+e);
-		} catch (ConductorException e) {
-			fail("Conductor exception: "+e);
-		}
-		
-		
-	}
-
 	/** Run the basic hello world test with dangling outputs.
 	 * 
 	 * @param conductor The conductor to use
@@ -155,6 +116,60 @@ public class ConductorTest {
 		sResult += sResult;
 		assertEquals(sResult.length(),baosOut.size());
 		assertEquals(sResult,baosOut.toString());
+	}
+
+	/**
+	 * Test method for {@link org.meandre.core.engine.Conductor#buildExecutor(org.meandre.core.store.repository.QueryableRepository, com.hp.hpl.jena.rdf.model.Resource)}.
+	 */
+	@Test
+	public void testBuildExecutor() {
+		Conductor conductor = new Conductor(10);
+		
+		try {
+			// Run simple hello world
+			Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
+			QueryableRepository qr = new RepositoryImpl(model);
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
+			// Run the basic text
+			runHelloWorldFlow(conductor, qr);
+			
+			// Run simple hello world dangling input/outputs
+			model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsRepository();
+			qr = new RepositoryImpl(model);
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
+			// Run the basic text
+			runHelloWorldFlowWidthDanglingComponents(conductor, qr);
+			
+			// Run simple hello world dangling input/outputs + fork
+			model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
+			qr = new RepositoryImpl(model);
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
+			// Run the basic text
+			runHelloWorldFlowWidthDanglingComponentsAndFork(conductor, qr);
+			
+		} catch (CorruptedDescriptionException e) {
+			fail("Corrupted description encounterd: "+e);
+		} catch (ConductorException e) {
+			fail("Conductor exception: "+e);
+		}
+	}
+	
+	
+	/** This test keeps updating a repository and reflushing it. Used to check for 
+	 * memory leaks.
+	 */
+	@Test
+	public void runRepetitiveUpdaterTest() {
+		
+		// Run simple hello world dangling input/outputs + fork
+		Model model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
+		RepositoryImpl qr = new RepositoryImpl(model);
+		for ( int i=0 ; i<100 ; i++ ) {
+			Model modNew = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
+			qr.refreshCache(modNew);
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
+		}
+		
 	}
 
 }

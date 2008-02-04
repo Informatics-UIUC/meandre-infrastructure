@@ -5,11 +5,16 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Set;
 
+import org.meandre.core.utils.vocabulary.RepositoryVocabulary;
+
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
+import com.hp.hpl.jena.vocabulary.XSD;
 
 /** This class wraps the basic description of an executable component.
  * 
@@ -294,45 +299,45 @@ public class ExecutableComponentDescription {
 		Model model = ModelFactory.createDefaultModel();
 		
 		// Setting the name spaces
-		model.setNsPrefix("", "http://www.meandre.org/ontology/");
-		model.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
-		model.setNsPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-		model.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
-		model.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
-		
+		model.setNsPrefix("", RepositoryVocabulary.NS);
+		model.setNsPrefix("xsd", XSD.getURI());
+		model.setNsPrefix("rdf", RDF.getURI());
+		model.setNsPrefix("rdfs",RDFS.getURI());
+		model.setNsPrefix("dc",DC.getURI());
+
 		Resource res = model.createResource(resExecutableComponent.toString());
 		
 		// Plain properties
-		res.addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/name"),model.createTypedLiteral(sName))
-		   .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/description"),model.createTypedLiteral(sDescription))
-		   .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/rights"),model.createTypedLiteral(sRights))
-		   .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/creator"),model.createTypedLiteral(sCreator))
-		   .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/date"),model.createTypedLiteral(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(dateCreation),XSDDatatype.XSDdate))
-		   .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/format"),model.createTypedLiteral(sFormat))
-		   .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/runnable"),model.createTypedLiteral(sRunnable))
-		   .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/firing_policy"),model.createTypedLiteral(sFiringPolicy))
-		   .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/resource_location"),model.createResource(resLocation.toString()))
-		   .addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),model.createResource("http://www.meandre.org/ontology/executable_component"))
+		res.addProperty(RepositoryVocabulary.name,model.createTypedLiteral(sName))
+		   .addProperty(DC.description,model.createTypedLiteral(sDescription))
+		   .addProperty(DC.rights,model.createTypedLiteral(sRights))
+		   .addProperty(DC.creator,model.createTypedLiteral(sCreator))
+		   .addProperty(DC.date,model.createTypedLiteral(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(dateCreation),XSDDatatype.XSDdate))
+		   .addProperty(DC.format,model.createTypedLiteral(sFormat))
+		   .addProperty(RepositoryVocabulary.runnable,model.createTypedLiteral(sRunnable))
+		   .addProperty(RepositoryVocabulary.firing_policy,model.createTypedLiteral(sFiringPolicy))
+		   .addProperty(RepositoryVocabulary.resource_location,model.createResource(resLocation.toString()))
+		   .addProperty(RDF.type,RepositoryVocabulary.executable_component)
 		   ;
 		
 		// Adding tags
 		for ( String sTag:tagDesc.getTags() )
-			res.addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/tag"),model.createTypedLiteral(sTag));
+			res.addProperty(RepositoryVocabulary.tag,model.createTypedLiteral(sTag));
 			   
 		// Adding execution contexts
 		for ( Resource resContext:setContext )
-			res.addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/execution_context"),model.createResource(resContext.toString()));
+			res.addProperty(RepositoryVocabulary.execution_context,model.createResource(resContext.toString()));
 		
 		// Adding properties
 		for ( String sKey:pddProperties.getKeys()) {
 			String sValue = pddProperties.getValue(sKey);
 			String  sDesc = pddProperties.getDescription(sKey);
-			res.addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/property_set"),
+			res.addProperty(RepositoryVocabulary.property_set,
 					model.createResource(resExecutableComponent.toString()+"/property/"+sKey)
-						 .addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),model.createResource("http://www.meandre.org/ontology/property"))
-					     .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/key"),model.createTypedLiteral(sKey))
-					     .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/value"),model.createTypedLiteral(sValue))
-					     .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/description"),model.createTypedLiteral(sDesc))
+						 .addProperty(RDF.type,RepositoryVocabulary.property)
+					     .addProperty(RepositoryVocabulary.key,model.createTypedLiteral(sKey))
+					     .addProperty(RepositoryVocabulary.value,model.createTypedLiteral(sValue))
+					     .addProperty(DC.description,model.createTypedLiteral(sDesc))
 				);
 		}
 		
@@ -342,12 +347,12 @@ public class ExecutableComponentDescription {
 			String sName = dpd.getName();
 			Resource resdpd = dpd.getResource();
 			String sDesc = dpd.getDescription();
-			res.addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/input_data_port"),
+			res.addProperty(RepositoryVocabulary.input_data_port,
 					model.createResource(resdpd.toString())
-						 .addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),model.createResource("http://www.meandre.org/ontology/data_port"))
-					     .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/identifier"),model.createTypedLiteral(sID))
-					     .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/name"),model.createTypedLiteral(sName))
-					     .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/description"),model.createTypedLiteral(sDesc))
+						 .addProperty(RDF.type,RepositoryVocabulary.data_port)
+					     .addProperty(DC.identifier,model.createTypedLiteral(sID))
+					     .addProperty(RepositoryVocabulary.name,model.createTypedLiteral(sName))
+					     .addProperty(DC.description,model.createTypedLiteral(sDesc))
 				);
 		}
 		
@@ -357,12 +362,12 @@ public class ExecutableComponentDescription {
 			String sName = dpd.getName();
 			Resource resdpd = dpd.getResource();
 			String sDesc = dpd.getDescription();
-			res.addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/output_data_port"),
+			res.addProperty(RepositoryVocabulary.output_data_port,
 					model.createResource(resdpd.toString())
-					     .addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),model.createResource("http://www.meandre.org/ontology/data_port"))
-					     .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/identifier"),model.createTypedLiteral(sID))
-					     .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/name"),model.createTypedLiteral(sName))
-					     .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/description"),model.createTypedLiteral(sDesc))
+					     .addProperty(RDF.type,RepositoryVocabulary.data_port)
+					     .addProperty(DC.identifier,model.createTypedLiteral(sID))
+					     .addProperty(RepositoryVocabulary.name,model.createTypedLiteral(sName))
+					     .addProperty(DC.description,model.createTypedLiteral(sDesc))
 				);
 		}
 		

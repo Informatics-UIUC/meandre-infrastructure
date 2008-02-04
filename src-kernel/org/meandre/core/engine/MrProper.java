@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Logger;
 
-import org.meandre.core.utils.LoggerFactory;
+import org.meandre.core.logger.LoggerFactory;
 
 
 /** This thread monitors finalization criteria of the wrapped component

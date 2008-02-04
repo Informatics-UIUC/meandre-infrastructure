@@ -1,4 +1,4 @@
-package org.meandre.core.utils;
+package org.meandre.core.logger;
 
 import java.io.IOException;
 import java.util.logging.FileHandler;

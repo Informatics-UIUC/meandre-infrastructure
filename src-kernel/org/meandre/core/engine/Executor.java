@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.meandre.core.utils.LoggerFactory;
+import org.meandre.core.logger.LoggerFactory;
 import org.meandre.webui.WebUI;
 import org.meandre.webui.WebUIException;
 import org.meandre.webui.WebUIFactory;

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.meandre.core.utils.LoggerFactory;
+import org.meandre.core.logger.LoggerFactory;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.query.Query;
@@ -25,7 +25,7 @@ import com.hp.hpl.jena.query.larq.IndexLARQ;
 import com.hp.hpl.jena.query.larq.LARQ;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.vocabulary.DC;
 
 /** This class implements a basic component repository.
  * 
@@ -369,10 +369,11 @@ public class RepositoryImpl implements QueryableRepository {
 		
 		if ( model.size()==0 ) {
 			model.createResource("http://www.meandre.org/ontology/")
-			     .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/description"), model.createTypedLiteral("This is the current repository aggregated using Meandre"))
-			     .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/date"), model.createTypedLiteral(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()),XSDDatatype.XSDdate));
+			     .addProperty(DC.description, model.createTypedLiteral("This is the current repository aggregated using Meandre"))
+			     .addProperty(DC.date, model.createTypedLiteral(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()),XSDDatatype.XSDdate));
 		}
 		
+		// Index what needs t be indexed
 		// Read and index all literal strings.
 		this.larqBuilder = new IndexBuilderString();
 		

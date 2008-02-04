@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 import org.meandre.core.engine.ActiveBuffer;
 import org.meandre.core.engine.ActiveBufferException;
-import org.meandre.core.utils.LoggerFactory;
+import org.meandre.core.logger.LoggerFactory;
 import org.meandre.webui.WebUI;
 import org.meandre.webui.WebUIException;
 import org.meandre.webui.WebUIFactory;

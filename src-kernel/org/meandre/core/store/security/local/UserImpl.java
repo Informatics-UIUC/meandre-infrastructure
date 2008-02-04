@@ -14,6 +14,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 /** This object contains a description of a system user.
  * 
@@ -312,8 +314,8 @@ public class UserImpl implements User {
 		resUser.addProperty(ResourceFactory.createProperty(SecurityStoreImpl.BASE_SECURITY_URL_PROPERTY+"name"), ResourceFactory.createTypedLiteral(sName))
 			   .addProperty(ResourceFactory.createProperty(SecurityStoreImpl.BASE_SECURITY_URL_PROPERTY+"nickname"), ResourceFactory.createTypedLiteral(sNickName))
 			   .addProperty(ResourceFactory.createProperty(SecurityStoreImpl.BASE_SECURITY_URL_PROPERTY+"password"), ResourceFactory.createTypedLiteral(sPassword))
-			   .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/date"), ResourceFactory.createTypedLiteral(sDate,XSDDatatype.XSDdateTime))
-			   .addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), model.createResource(UserImpl.BASE_USER_URL));
+			   .addProperty(DC.date, ResourceFactory.createTypedLiteral(sDate,XSDDatatype.XSDdateTime))
+			   .addProperty(RDF.type, model.createResource(UserImpl.BASE_USER_URL));
 		
 		for ( String sActionRole:setActionRoles ) {
 			resUser.addProperty(ResourceFactory.createProperty(Role.ROLE_GRANT_PROPERTY_URL), ResourceFactory.createResource(sActionRole));
