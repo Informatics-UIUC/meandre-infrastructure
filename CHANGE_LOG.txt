@@ -1,5 +1,8 @@
 1.2vcli Panellet:
 
+* Added org.meandre.core.utils.vocabulary to contain all metadata relate vocabulary
+	- Add the repository one and patched the RepositoryImpl, ComponentDescriptionImpl, and FlowDescriptionImpl
+* Move the WSCoreBootstrapper from org.meandre in the src-kernel tree to org.meandre.webservices in the src-ws tree
 * Main log file splitted:
 	- The kernel logging goes to meandre-log-kernel.xml file
 	- The demo logging goes to meandre-log-demo.xml file
