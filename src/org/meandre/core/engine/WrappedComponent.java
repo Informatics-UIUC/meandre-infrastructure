@@ -14,14 +14,14 @@ import org.meandre.core.ComponentContextImpl;
 import org.meandre.core.ComponentExecutionException;
 import org.meandre.core.ExecutableComponent;
 
-/** This class is the Meandre implementation wrapper of an 
+/** This class is the Meandre implementation wrapper of an
  * ExecutableComponent. This class implements the basic execution
  * mechanism of a component.
- * 
+ *
  * @author Xavier Llor&agrave;
  *
  */
-public abstract class WrappedComponent 
+public abstract class WrappedComponent
 extends Thread {
 
 	/** The running flag index */
@@ -32,40 +32,40 @@ extends Thread {
 
 	/** The termination flag index */
 	protected static final int SLEEPING    = 2;
-	
+
 	/** The termination flag index */
 	protected static final int TERMINATION = 3;
-	
+
 	/** The logger for the bootstrapper */
 	protected static Logger log = null;
-	
+
 	// Initializing the logger and its handlers
 	static {
 		log = Logger.getLogger(WSCoreBootstrapper.class.getName());
 		log.setLevel(Level.CONFIG);
 		log.addHandler(WSCoreBootstrapper.handler);
 	}
-	
+
 	/** The last updated input buffer */
 	@SuppressWarnings("unchecked")
 	private Queue qUpdatedActiveBuffer = null;
-	
+
 	/** Wrapped component status flags */
 	protected boolean [] baStatusFlags = null;
-	
+
 	/** The semaphore use to control execution flow */
 	protected Semaphore semBlocking = null;
-	
+
 	/** The input active buffers */
 	private Hashtable<String,ActiveBuffer> htInputs = null;
-	
+
 	/** The output active buffers */
 	private Hashtable<String,ActiveBuffer> htOutputs = null;
-	
+
 	/** The map of output names to the real active buffer name */
 	@SuppressWarnings("unused")
 	private Hashtable<String, String> htOutputMap = null;
-	
+
 	/** The executable component wrapped */
 	protected ExecutableComponent ec = null;
 
@@ -80,9 +80,9 @@ extends Thread {
 
 	/** Abortion message thrown */
 	protected String sAbortMessage = null;
-	
+
 	/** Builds a runnable component wrapper given the abstracted EcecutableComponent.
-	 * 
+	 *
 	 * @param sFlowUniqueID A flow execution unique ID
 	 * @param sComponentInstanceID The component instance ID
 	 * @param ec The executable component to wrap
@@ -106,23 +106,24 @@ extends Thread {
 			String sThreadName, Hashtable<String, String> htProperties)
 			throws InterruptedException {
 		super(tg,sThreadName);
-		
+
 		// Basic initialization
 		this.ec            = ec;
 		this.semBlocking   = new Semaphore(1,true); // With fairness
+		System.out.println("COMPONENT ID: "+ sComponentInstanceID);
 		this.cc            = new ComponentContextImpl(sFlowUniqueID, sComponentInstanceID, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, htProperties);
-		this.hasNInputs     = htInputLogicNameMap.size(); 
+		this.hasNInputs     = htInputLogicNameMap.size();
 		// Setting execution flags
 		this.baStatusFlags = new boolean [4];
-		
+
 		this.baStatusFlags[RUNNING]     = true;
 		this.baStatusFlags[EXECUTING]   = false;
 		this.baStatusFlags[SLEEPING]    = false;
 		this.baStatusFlags[TERMINATION] = false;
-		
+
 		// Cleaning Mr Proper object
 		this.thdMrProper         = null;
-		
+
 		// Create hash tables for input and output active buffers
 		this.htInputs = new Hashtable<String,ActiveBuffer>();
 		for (ActiveBuffer ab:setInputs) {
@@ -131,30 +132,30 @@ extends Thread {
 			// Registering me as a consumer
 			ab.addConsumer(this);
 		}
-		
+
 		this.htOutputs = new Hashtable<String,ActiveBuffer>();
 		for (ActiveBuffer ab:setOutputs)
 			this.htOutputs.put(ab.getName(),ab);
-		
+
 		this.htOutputMap = htOutputMap;
-		
+
 		// Clean the last updated active buffer
 		this.qUpdatedActiveBuffer = new ConcurrentLinkedQueue();
-		
+
 		// Waste the only ticket to the blocking semaphore
 		this.semBlocking.acquire();
-		
+
 		// Initialize the executable component
 		this.ec.initialize();
 	}
-	
-	
+
+
 	/** Implements the basic machinery to execute the wrapped component
-	 * 
-	 */ 
+	 *
+	 */
 	public void run () {
 		log.info("Initializing a the wrapping component "+ec.toString());
-		
+
 		while ( baStatusFlags[RUNNING] && !baStatusFlags[TERMINATION]) {
 			if ( isExecutable() ) {
 				// The executable component is ready for execution
@@ -177,7 +178,7 @@ extends Thread {
 						baStatusFlags[EXECUTING] = false;
 					}
 					log.finest("Component "+ec.toString()+" executed");
-					
+
 					log.finest("Component "+ec.toString()+" outputs pushed");
 					// Clean the data proxy
 					updateComponentContext();
@@ -194,14 +195,14 @@ extends Thread {
 						sAbortMessage = e.toString();
 					}
 					log.warning(e.getMessage());
-				} 
+				}
 				catch (Exception e) {
 					synchronized (baStatusFlags) {
 						baStatusFlags[TERMINATION] = true;
 						sAbortMessage = e.toString();
 					}
 					log.warning(e.toString());
-				} 
+				}
 			}
 			else {
 				// The executable component is not ready for execution
@@ -216,7 +217,7 @@ extends Thread {
 					synchronized (baStatusFlags) {
 						baStatusFlags[SLEEPING] = false;
 					}
-					
+
 					// Check if termination is requested
 					if ( baStatusFlags[TERMINATION] || !baStatusFlags[RUNNING] )
 						continue;
@@ -224,9 +225,9 @@ extends Thread {
 					// Retrieve the added element to the data proxy
 					String sLastUpdated = qUpdatedActiveBuffer.poll().toString();
 					cc.setDataComponentToInput(
-							sLastUpdated, 
+							sLastUpdated,
 							htInputs.get(sLastUpdated).popDataComponent()
-						);	
+						);
 					log.finest("Component "+ec.toString()+" populated input "+qUpdatedActiveBuffer);
 				} catch (InterruptedException e) {
 					synchronized (baStatusFlags) {
@@ -241,15 +242,15 @@ extends Thread {
 					}
 					log.severe("The requested input does not exist "+e.toString());
 				}
-				
+
 			}
 			thdMrProper.awake();
 		}
 		log.info("Disposing WebUI if any." );
 		cc.stopAllWebUIFragments();
-		log.info("Finalizing the execution of the wrapping component "+ec.toString());		
+		log.info("Finalizing the execution of the wrapping component "+ec.toString());
 		ec.dispose();
-		
+
 	}
 
 	/** After flushing the outputed data components, this method rebuilds the
@@ -259,13 +260,13 @@ extends Thread {
 	private void updateComponentContext() {
 		// Reset the data proxy
 		cc.resetDataProxy();
-		
+
 		// Checking if new elements are available to populate the proxy
 		try {
 			for ( String sInput:htInputs.keySet() ) {
 				Object obj = htInputs.get(sInput).popDataComponent();
 				cc.setDataComponentToInput(sInput,obj);
-			} 
+			}
 		}
 		catch (ComponentContextException e) {
 			synchronized (baStatusFlags) {
@@ -276,7 +277,7 @@ extends Thread {
 	}
 
 	/** Awakes the modules to the arrival of a new data.
-	 * 
+	 *
 	 * @param sInput The updated input active buffer
 	 */
 	@SuppressWarnings("unchecked")
@@ -285,9 +286,9 @@ extends Thread {
 			qUpdatedActiveBuffer.offer(sInput);
 		semBlocking.release();
 	}
-	
+
 	/** Awakes the modules due a termination request.
-	 * 
+	 *
 	 */
 	@SuppressWarnings("unchecked")
 	public void awake() {
@@ -295,45 +296,45 @@ extends Thread {
 	}
 
 	/** Check if the input active buffers are empty.
-	 * 
+	 *
 	 * @return True if no data component is available in the active buffers
 	 */
 	public boolean emptyInputs () {
 		for ( String sInput:htInputs.keySet() )
 			if ( !htInputs.get(sInput).isEmpty() )
 				return false;
-		
+
 		return true;
 	}
-	
+
 	/** The wrapped component is ready for execution.
-	 * 
+	 *
 	 * @return A boolean True it the wrapped component can be executed
 	 */
 	protected abstract boolean isExecutable();
 
 
-	/** Returns the current termination criteria. 
-	 * 
+	/** Returns the current termination criteria.
+	 *
 	 * @return The current termination criteria
 	 */
 	public boolean hadGracefullTermination () {
 		boolean bFlag = false;
-		
+
 		synchronized (baStatusFlags) {
 			bFlag = baStatusFlags[TERMINATION]==false;
 		}
-		
+
 		return bFlag;
 	}
-	
+
 	/** Returns the aborting message if any. If there was a gracefull
 	 * termination the call returns null.
-	 * 
+	 *
 	 * @return The abort message
 	 */
 	public String getAbortMessage () {
 		return sAbortMessage;
 	}
-	
+
 }

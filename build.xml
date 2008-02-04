@@ -30,12 +30,18 @@
     <!-- compile -->
     <target name="compile" depends="prepare" description="Compiles source code">
         <echo>Compiling Core and Test...</echo>
-        <echo>Junit cp: ${junit.jar}</echo>
         <javac srcdir="${basedir}" destdir="${build.dir}/" debug="${compile.debug}"
                deprecation="${compile.deprecation}" optimize="${compile.optimize}"
                classpathref="meandre.core.classpath" >
             <include name="**/*.java"/>
         </javac>
+    	 <copy todir="${build.dir}/" includeEmptyDirs="no">
+    	            <fileset dir="${basedir}/src">
+    	                <include name="**/*.properties"/>
+    	                <include name="**/*.xml"/>
+    	                <include name="**/*.vm"/>
+    	            </fileset>
+    	   </copy>
     </target>
 
     <!-- dist -->
