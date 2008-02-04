@@ -20,13 +20,13 @@ import org.meandre.webui.WebUIFragment;
 import org.meandre.webui.WebUIFragmentCallback;
 
 /** This class implement the component context for executable components.
- * 
+ *
  * @author Xavier Llor&agrave;
  *
  */
-public class ComponentContextImpl 
+public class ComponentContextImpl
 implements ComponentContext {
-	
+
 	/** The core root logger */
 	protected static Logger log = LoggerFactory.getCoreLogger();
 
@@ -38,25 +38,25 @@ implements ComponentContext {
 
 	/** The data proxy for input and outputs */
 	private DataProxy dp = null;
-	
+
 	/** The set of possible inputs */
 	private Set<String> setInputs = null;
-	
+
 	/** The set of possible outputs. */
 	private Set<String> setOutputs = null;
-	
+
 	/** The array of output buffer names */
 	private String [] saOutputNames = null;
-	
+
 	/** The hash table containing the active buffers */
 	private Hashtable<String,ActiveBuffer> htActiveBufferOuputs = null;
-	
+
 	/** The hash table containing the component properties */
 	private Hashtable<String,String> htProperties = null;
 
 	/** The base webui */
 	private WebUI webui = null;
-	
+
 	/** The webui fragments tracking system */
 	private Hashtable<WebUIFragmentCallback,WebUIFragment> htWebUIframent = new Hashtable<WebUIFragmentCallback,WebUIFragment>();
 
@@ -74,12 +74,12 @@ implements ComponentContext {
 
 	/** Create a component context with the given input and output active buffers
 	 * for a given wrapped component.
-	 * 
+	 *
 	 * @param sFlowUniqueID The unique flow execution ID
 	 * @param sComponentInstanceID The unique component ID
 	 * @param setInputs The name of the input active buffers
 	 * @param setOutputs The name of the output active buffers
-	 * @param htOutputMap The map of the output to the real active buffer name 
+	 * @param htOutputMap The map of the output to the real active buffer name
 	 * @param htOutputLogicNameMap The input logic name map
 	 * @param htInputLogicNameMap The output logic name map
 	 * @param htProperties The component properties
@@ -91,14 +91,14 @@ implements ComponentContext {
 			Hashtable<String, String> htInputLogicNameMap,
 			Hashtable<String, String> htOutputLogicNameMap,
 			Hashtable<String, String> htProperties) {
-		
+
 		// Create the data proxy
 		this.sFlowUniqueExecutionID = sFlowUniqueID;
 		this.sComponentInstanceID = sComponentInstanceID;
-	
+
 		this.htInputLogicNameMap = htInputLogicNameMap;
 		this.htOutputLogicNameMap = htOutputLogicNameMap;
-		
+
 		this.dp = new DataProxy(setInputs);
 		this.htActiveBufferOuputs = new Hashtable<String,ActiveBuffer>();
 		this.htProperties = htProperties;
@@ -113,7 +113,7 @@ implements ComponentContext {
 				this.htInputLogicNameMapReverse.put(htInputLogicNameMap.get(sKey), sKey);
 			}
 		}
-		
+
 		// Create the proper output set
 		this.setOutputs    = htOutputLogicNameMap.keySet();
 		this.saOutputNames = new String[htOutputLogicNameMap.size()];
@@ -121,16 +121,16 @@ implements ComponentContext {
 		for ( String sOutputName:htOutputLogicNameMap.keySet() ) {
 			saOutputNames[iCnt++] = sOutputName;
 		}
-		
+
 		// Create a reverse hash table with the maping of output names
 		Hashtable<String,String> htReverse = new Hashtable<String,String>();
 		for ( String sOutputName:htOutputMap.keySet() )
 			htReverse.put(htOutputMap.get(sOutputName), sOutputName);
-		
+
 		for ( ActiveBuffer abOutput:setOutputs ) {
 			this.htActiveBufferOuputs.put(htReverse.get(abOutput.getName()),abOutput);
 		}
-		
+
 		try {
 			 webui = WebUIFactory.getWebUI(sFlowUniqueExecutionID);
 		} catch (WebUIException e) {
@@ -139,16 +139,16 @@ implements ComponentContext {
 	}
 
 	/** The name of the available inputs.
-	 * 
+	 *
 	 * @return The array containing the names
 	 */
 	public String [] getInputNames () {
-		
+
 		return saInputNames;
 	}
-	
+
 	/** The name of the available outputs.
-	 * 
+	 *
 	 * @return The array containing the names
 	 */
 	public String [] getOutputNames () {
@@ -156,43 +156,43 @@ implements ComponentContext {
 	}
 
 	/** Add a given data component to the given active buffer.
-	 * 
+	 *
 	 * @param sInputBuffer The name of the input
 	 * @param obj The data component
 	 * @throws ComponentContextException Violation of the component context detected
 	 */
 	public void setDataComponentToInput ( String sInputBuffer, Object obj ) throws ComponentContextException {
 		String sLogicName = htInputLogicNameMapReverse.get(sInputBuffer);
-		if ( !setInputs.contains(sLogicName) ) 
+		if ( !setInputs.contains(sLogicName) )
 			throw new ComponentContextException("The requested input "+sInputBuffer+" does not exist.");
 		if ( obj!=null )
 			dp.setInput(sInputBuffer,obj);
 	}
-	
+
 	/** Returns the current data component on the given active buffer.
-	 * 
+	 *
 	 * @param The name of the input
 	 * @return The data component
 	 * @throws ComponentContextException Violation of the component context detected
 	 */
 	public Object getDataComponentFromInput ( String sInputBuffer ) throws ComponentContextException {
-		if ( !setInputs.contains(sInputBuffer) ) 
+		if ( !setInputs.contains(sInputBuffer) )
 			throw new ComponentContextException("The requested input "+sInputBuffer+" does not exist.");
 		return dp.getInput(htInputLogicNameMap.get(sInputBuffer));
 	}
-	
+
 	/** Push an object to the given named output.
-	 * 
+	 *
 	 * @param sOutputBuffer The name of the output
 	 * @param obj The object to push
 	 * @throws ComponentContextException Violation of the component context detected
 	 */
 	public void pushDataComponentToOutput ( String sOutputBuffer, Object obj ) throws ComponentContextException {
-		if ( !setOutputs.contains(sOutputBuffer) ) 
+		if ( !setOutputs.contains(sOutputBuffer) )
 			throw new ComponentContextException("The requested input "+sOutputBuffer+" does not exist.");
 		try {
 			ActiveBuffer ab = htActiveBufferOuputs.get(htOutputLogicNameMap.get(sOutputBuffer));
-			if ( ab!=null ) 
+			if ( ab!=null )
 				ab.pushDataComponent(obj);
 			else
 				log.info("Dangling output has received data in a push. Discarding the data.");
@@ -201,9 +201,9 @@ implements ComponentContext {
 		}
 	}
 
-	
+
 	/** Checks if a given input is available.
-	 * 
+	 *
 	 * @return The name of the input
 	 * @throws ComponentContextException A violation of the component context is detected
 	 */
@@ -213,45 +213,45 @@ implements ComponentContext {
 		else
 			return false;
 	}
-	
-	
+
+
 	/** Resets the data proxy contents.
-	 * 
+	 *
 	 */
 	public void resetDataProxy () {
 		dp.cleanAllInputs();
 	}
-	
+
 
 
 	/** Returns the list of property names.
-	 * 
+	 *
 	  * @return The array of property names
 	 */
 	public String[] getPropertyNames( ) {
 		String [] saPropNames = new String[htProperties.keySet().size()];
 		int i=0;
-		
+
 		for ( String sKey:htProperties.keySet() )
 			saPropNames[i++] = sKey;
-		
+
 		return saPropNames;
 	}
-	
+
 	/** Check a given component property value. If the property does not exist
 	 * the call returns null.
-	 * 
-	 * @param sKey The property key 
+	 *
+	 * @param sKey The property key
 	 * @return The property value (null if property does not exist)
 	 */
 	public String getProperty ( String sKey ) {
 		return htProperties.get(sKey);
 	}
-	
-	
+
+
 	/** Starts the web-based user interface given the proper implementation of the
 	 * webui callback to deal with user action on the client.
-	 * 
+	 *
 	 * @param wuiCall The webui call back object
 	 */
 	public void startWebUIFragment ( WebUIFragmentCallback wuiCall ) {
@@ -261,9 +261,9 @@ implements ComponentContext {
 			htWebUIframent.put(wuiCall,wuif);
 		}
 	}
-	
+
 	/** Stops the web-based user interface.
-	 * 
+	 *
 	 * @param wuiCall The webui call back object
 	 */
 	public void stopWebUIFragment (WebUIFragmentCallback wuiCall) {
@@ -275,7 +275,7 @@ implements ComponentContext {
 	}
 
 	/** Stops all the web-based user interface created by this module.
-	 * 
+	 *
 	 */
 	public void stopAllWebUIFragments () {
 		synchronized ( htWebUIframent ) {
@@ -284,55 +284,62 @@ implements ComponentContext {
 				webui.removeFragment(webUIFragments.nextElement());
 		}
 	}
-	
-	
+
+
 	/** Get the webUI URL.
-	 * 
-	 * @param bName True if the url needs to be build using the name. 
+	 *
+	 * @param bName True if the url needs to be build using the name.
 	 *              False build the URL using the IP address.
 	 * @return The webUI URL
 	 * @throws ComponentContextException Problem recovering the IP
-	 * 
-	 * 
+	 *
+	 *
 	 */
 	public URL getWebUIUrl ( boolean bName ) throws ComponentContextException {
 		URL urlRes = null;
-		
+
 		try {
-			
+
 			InetAddress addr = InetAddress.getLocalHost();
 			String sHostName = null;
-			
+
 			if ( bName )
 				sHostName = "http://"+addr.getCanonicalHostName()+":"+webui.getPort()+"/";
-			else 
+			else
 				sHostName = "http://"+addr.toString()+":"+webui.getPort()+"/";
-			
+
 			urlRes = new URL(sHostName);
-			
+
 		} catch ( UnknownHostException e ) {
 			throw new ComponentContextException(e);
 		} catch (MalformedURLException e) {
 			throw new ComponentContextException(e);
 		}
-		
+
 		return urlRes;
 	}
 
 	/** Returns the logging facility.
-	 * 
+	 *
 	 * @return The logger object
 	 */
 	public Logger getLogger() {
 		return log;
 	}
-	
+
 	/** Returns the unique ID of the executable instance for the current flow.
-	 * 
+	 *
 	 * @return The unique execution instance ID
 	 */
 	public String getExecutionInstanceID () {
 		return sComponentInstanceID;
 	}
 
+
+	/**Returns the uniqueID of the flow  instance for the current flow
+	 *	@return The unique flow ID
+	 */
+	public String getFlowExecutionInstanceID() {
+		return this.sFlowUniqueExecutionID;
+	}
 }
