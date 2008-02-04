@@ -1,5 +1,6 @@
 package org.meandre.core.logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -13,6 +14,12 @@ import java.util.logging.Logger;
  */
 public class LoggerFactory {
 
+	/** Number of rotating files */
+	private static final int LOG_NUM_ROTATING_FILES = 10;
+
+	/** Size of each log file */
+	private static final int LOG_FILE_SIZE = 20971520;
+
 	/** The base logger for the core */
 	private static Logger logCore = null;
 	
@@ -24,12 +31,13 @@ public class LoggerFactory {
 		logCore = Logger.getLogger(LoggerFactory.class.getName());
 		logCore.setLevel(Level.FINEST);
 		try {
-			logCore.addHandler(handlerCore = new FileHandler("meandre-log-kernel.xml"));
+			new File("."+File.separator+"log").mkdir();
+			logCore.addHandler(handlerCore = new FileHandler("."+File.separator+"log"+File.separator+"meandre-kernel.log",LOG_FILE_SIZE,LOG_NUM_ROTATING_FILES));
 		} catch (SecurityException e) {
-			System.err.println("Could not initialize meandre-log-kernel.xml");
+			System.err.println("Could not initialize "+"."+File.separator+"log"+File.separator+"meandre-kernel.log");
 			System.exit(1);
 		} catch (IOException e) {
-			System.err.println("Could not initialize meandre-log-kernel.xml");
+			System.err.println("Could not initialize "+"."+File.separator+"log"+File.separator+"meandre-kernel.log");
 			System.exit(1);
 		}
 		handlerCore.setLevel(Level.FINEST);

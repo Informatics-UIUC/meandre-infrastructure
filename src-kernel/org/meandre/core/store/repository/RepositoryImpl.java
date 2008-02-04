@@ -1,5 +1,6 @@
 package org.meandre.core.store.repository;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -11,6 +12,8 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.meandre.core.logger.LoggerFactory;
+import org.meandre.core.store.Store;
+import org.meandre.core.utils.vocabulary.RepositoryVocabulary;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.query.Query;
@@ -24,6 +27,7 @@ import com.hp.hpl.jena.query.larq.IndexBuilderString;
 import com.hp.hpl.jena.query.larq.IndexLARQ;
 import com.hp.hpl.jena.query.larq.LARQ;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.DC;
 
@@ -323,6 +327,7 @@ public class RepositoryImpl implements QueryableRepository {
 		setFlowRes.clear();
 		htCompTags.clear();
 		htFlowTags.clear();
+		
 		LARQ.removeDefaultIndex();
 
 		log.info("Refreshing cached descriptions");
@@ -373,12 +378,15 @@ public class RepositoryImpl implements QueryableRepository {
 			     .addProperty(DC.date, model.createTypedLiteral(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()),XSDDatatype.XSDdate));
 		}
 		
-		// Index what needs t be indexed
 		// Read and index all literal strings.
-		this.larqBuilder = new IndexBuilderString();
+		this.larqBuilder = new IndexBuilderString(new File(Store.getRunResourcesDirectory()+File.separator+Store.getRepositoryIndexFile()));
 		
 		// Create an index based on existing statements
-		larqBuilder.indexStatements(model.listStatements());
+		larqBuilder.indexStatements(model.listStatements(null,DC.description,(RDFNode)null));
+		larqBuilder.indexStatements(model.listStatements(null,DC.rights,(RDFNode)null));
+		larqBuilder.indexStatements(model.listStatements(null,DC.creator,(RDFNode)null));
+		larqBuilder.indexStatements(model.listStatements(null,RepositoryVocabulary.name,(RDFNode)null));
+		larqBuilder.indexStatements(model.listStatements(null,RepositoryVocabulary.tag,(RDFNode)null));
 		// Finish indexing
 		larqBuilder.closeForWriting();
 		// -- Create the access index  

@@ -164,10 +164,16 @@ public class ConductorTest {
 		// Run simple hello world dangling input/outputs + fork
 		Model model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
 		RepositoryImpl qr = new RepositoryImpl(model);
-		for ( int i=0 ; i<100 ; i++ ) {
-			Model modNew = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
-			qr.refreshCache(modNew);
-			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
+		
+		try {
+			for ( int i=0 ; i<100 ; i++ ) {
+				Model modNew = DemoRepositoryGenerator.getNextTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
+				model.add(modNew);
+				qr.refreshCache(model);
+				//assertEquals(i+1,qr.getAvailableFlowDecriptions().size());
+			}
+		} catch (InterruptedException e) {
+			fail(e.toString());
 		}
 		
 	}

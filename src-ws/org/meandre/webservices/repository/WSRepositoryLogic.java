@@ -728,7 +728,7 @@ public class WSRepositoryLogic {
 				String sFile = item.getName();
 				sFile = (new File(sFile)).getName();
 
-	    		File savedFile = new File(Store.getPublicResourceDirectory()+File.separator+sFile);
+	    		File savedFile = new File(Store.getPublicResourcesDirectory()+File.separator+sFile);
 				try {
 					item.write(savedFile);
 					setFiles.add(sFile);

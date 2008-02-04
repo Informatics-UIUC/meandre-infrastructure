@@ -32,6 +32,7 @@ import com.hp.hpl.jena.query.larq.LARQ;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 /** Implements a secury store. Sensitive information should be store
  * here. For instance, it maintains all the accounting for the Meandre
@@ -140,7 +141,7 @@ public class SecurityStoreImpl implements SecurityStore {
 		// Create the actions
 		Resource resBaseAct = model.createResource(Action.BASE_WEB_ACTION_URL);
 		for ( String sURL:Action.ALL_BASIC_ACTION_URLS)
-			resBaseAct.addProperty(ResourceFactory.createProperty("http://www.w3.org/2000/01/rdf-schema#subClassOf"), model.createResource(sURL));
+			resBaseAct.addProperty(RDFS.subClassOf, model.createResource(sURL));
 		resRoot.addProperty(ResourceFactory.createProperty(Action.BASE_ACTION_URL),resBaseAct);
 		
 		// Creates the admin user and grant all roles
@@ -161,7 +162,7 @@ public class SecurityStoreImpl implements SecurityStore {
     	// The realm file is dump to the place were the engine was started
     	try {
 			PrintStream ps = new PrintStream(new FileOutputStream(new File(
-					"." + File.separator
+					Store.getRunResourcesDirectory() + File.separator
 							+ Store.getRealmFilename())));
 			
 			// username: password[,rolename ...]

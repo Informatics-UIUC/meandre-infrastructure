@@ -121,7 +121,7 @@ public class WSCoreBootstrapper {
 		sJettyHome = (sJettyHome==null)?JETTY_HOME:sJettyHome;
 				
 		SecurityHandler sh = new SecurityHandler();
-		sh.setUserRealm(new HashUserRealm("Meandre Flow Execution Engine",sJettyHome+File.separator+Store.getRealmFilename()));
+		sh.setUserRealm(new HashUserRealm("Meandre Flow Execution Engine",sJettyHome+File.separator+Store.getRunResourcesDirectory()+File.separator+Store.getRealmFilename()));
 		sh.setConstraintMappings(new ConstraintMapping[]{cm});
 		
 		contextWS.addHandler(sh);
@@ -155,7 +155,7 @@ public class WSCoreBootstrapper {
 		//
 		Context contextResources = new Context(server,"/public/resources",Context.NO_SESSIONS);
 		
-		File file = new File(Store.getPublicResourceDirectory());
+		File file = new File(Store.getPublicResourcesDirectory());
 		
 		if ( file.mkdir() ) {
 			try {

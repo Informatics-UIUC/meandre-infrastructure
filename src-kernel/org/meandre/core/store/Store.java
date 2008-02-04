@@ -44,6 +44,12 @@ public class Store {
 	/** The directory containing the public resources */
 	private static final String MEANDRE_PUBLIC_RESOURCE_DIRECTORY = "MEANDRE_PUBLIC_RESOURCE_DIRECTORY";
 	
+	/** The directory containing the private resources for a run */
+	private static final String MEANDRE_PRIVATE_RUN_DIRECTORY = "MEANDRE_PRIVATE_RUN_DIRECTORY";
+	
+	/** The directory containing the private resources for a run */
+	private static final String MEANDRE_REPOSITORY_INDEX = "MEANDRE_REPOSITORY_INDEX";
+	
 	/** The Jena database backend name constant */
 	private static final String JENA_DB = "DB";
 
@@ -133,6 +139,9 @@ public class Store {
 			}	
 		}
 		
+		// Create the run file
+		new File("."+File.separator+Store.getRunResourcesDirectory()).mkdir();
+		
 		// Report the current configuration to the log file
 		log.info("JENA RBM driver: "+getDriverClassName());
 		log.info("JENA RBM database: "+getDBName());
@@ -170,10 +179,13 @@ public class Store {
 		propStoreConfig.setProperty(MEANDRE_BASE_PORT, "1714");
 		propStoreConfig.setProperty(MEANDRE_AUTHENTICATION_REALM_FILENAME,"meandre-realm.properties");
 		propStoreConfig.setProperty(MEANDRE_PUBLIC_RESOURCE_DIRECTORY, "."+File.separator+"published_resources");
+		propStoreConfig.setProperty(MEANDRE_PRIVATE_RUN_DIRECTORY,"."+File.separator+"run");
 		propStoreConfig.setProperty(MEANDRE_ADMIN_USER,"admin");
 		
+		propStoreConfig.setProperty(MEANDRE_REPOSITORY_INDEX,"meandre-repository-index.dat");
+		
 		//
-		// Jena Derby properties
+		// Jena DB relational background properties
 		//
 		propStoreConfig.setProperty(JENA_DB_DRIVER_CLASS_NAME, "org.apache.derby.jdbc.EmbeddedDriver");
 		propStoreConfig.setProperty(JENA_DB_URL,"jdbc:derby:MeandreStore;create=true");
@@ -304,15 +316,31 @@ public class Store {
 	public static String getAdminUserNickName () {
 		return propStoreConfig.getProperty(MEANDRE_ADMIN_USER);
 	}
-	
+
 	/** Returns the location of public resources for Meandre
 	 * 
 	 * @return The resource directory
 	 */
-	public static String getPublicResourceDirectory() {
+	public static String getPublicResourcesDirectory() {
 		return propStoreConfig.getProperty(MEANDRE_PUBLIC_RESOURCE_DIRECTORY);
 	}
 
+	/** Returns the location of run resources directory for Meandre
+	 * 
+	 * @return The resource directory
+	 */
+	public static String getRunResourcesDirectory() {
+		return propStoreConfig.getProperty(MEANDRE_PRIVATE_RUN_DIRECTORY);
+	}
+
+	/** Gets the repository index file name.
+	 * 
+	 * @return The file name
+	 */
+	public static String getRepositoryIndexFile() {
+		return propStoreConfig.getProperty(MEANDRE_REPOSITORY_INDEX);
+	}
+	
 	/** Returns all the store properties.
 	 * 
 	 * @return All the properties
