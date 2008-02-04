@@ -1,22 +1,25 @@
-1.2vcli Panellet:
+This repository contains the Meandre Core code.
 
-* Main log file splitted:
-	- The kernel logging goes to meandre-log-kernel.xml file
-	- The demo logging goes to meandre-log-demo.xml file
-	- The WS logging goes to meandre-log-ws.xml file
+src-kernel/
+	Contains the basic engine, components beans, and rdf management. 
+	This is the seed for any embedded use of Meandre data flow execution.
 
-* WSCoreBootstrapper got moved to org.meandre.webservices.
-* Source refactoring. Will broke:
-	- ant
-	- nbproject
+src-ws/
+	The classes that expose the web service interface via a REST paradigm.
 
-1.1vcli Carquinyoli:
+src-test/
+	All the tests related to the kernel and the web services
 
-* Meandre Core Web Service Execution Engine, Repository, etc.
+src-demo/
+	Some demo components and flows
 
-1.0vcli Farina:
+auxiliary/
+	Basic auxiliary tools like upload forms, scripts, etc.
 
-* Plain all mixed together
+lib/
+	All the libraries required to build the Meandre Core
 
-X.
+
+___
+Edited by Xavier.
 
