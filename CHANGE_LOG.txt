@@ -1,6 +1,9 @@
 1.2vcli Panellet:
 
-* Trying to use the file indexer instead of the memory one, slow (?)
+* Move LARQ indexer to a file indexer instead of the memory one.
+	- Reduces the memory usage
+	- Lucene is slow
+
 
 * Modified the loggers to work on a rotating scheme 
 	- ./log dir destination of the loggers
