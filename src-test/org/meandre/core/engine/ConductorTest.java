@@ -161,16 +161,21 @@ public class ConductorTest {
 	@Test
 	public void runRepetitiveUpdaterTest() {
 		
-		// Run simple hello world dangling input/outputs + fork
-		Model model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
-		RepositoryImpl qr = new RepositoryImpl(model);
-		
 		try {
-			for ( int i=0 ; i<100 ; i++ ) {
+			// Run simple hello world dangling input/outputs + fork
+			Model model = DemoRepositoryGenerator.getNextTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
+			RepositoryImpl qr = new RepositoryImpl(model);
+			
+			for ( int i=0 ; i<20 ; i++ ) {
 				Model modNew = DemoRepositoryGenerator.getNextTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
 				model.add(modNew);
 				qr.refreshCache(model);
-				//assertEquals(i+1,qr.getAvailableFlowDecriptions().size());
+//				System.out.println(i);
+//				System.out.println(qr.getModel().size());
+//				System.out.println(qr.getAvailableExecutableComponentDescriptions().size());
+//				System.out.println(qr.getAvailableFlowDecriptions().size());
+				assertEquals(i+2,qr.getAvailableFlowDecriptions().size());
+				assertEquals(4*(i+2),qr.getAvailableExecutableComponentDescriptions().size());
 			}
 		} catch (InterruptedException e) {
 			fail(e.toString());

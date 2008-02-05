@@ -283,9 +283,9 @@ public class RepositoryImpl implements QueryableRepository {
 	/** The text search indexer */
 	private IndexBuilderString larqBuilder = null;
 
-	/** the current text model */
+	/** The current text model */
 	private IndexLARQ index = null;
-	
+
 	/** The tag information for components */
 	protected Hashtable<String,Set<ExecutableComponentDescription>> htCompTags = null;
 	
@@ -380,15 +380,20 @@ public class RepositoryImpl implements QueryableRepository {
 		
 		// Read and index all literal strings.
 		this.larqBuilder = new IndexBuilderString(new File(Store.getRunResourcesDirectory()+File.separator+Store.getRepositoryIndexFile()));
+		//this.larqBuilder = new IndexBuilderString();
 		
 		// Create an index based on existing statements
 		larqBuilder.indexStatements(model.listStatements(null,DC.description,(RDFNode)null));
-		larqBuilder.indexStatements(model.listStatements(null,DC.rights,(RDFNode)null));
+		//larqBuilder.indexStatements(model.listStatements(null,DC.rights,(RDFNode)null));
 		larqBuilder.indexStatements(model.listStatements(null,DC.creator,(RDFNode)null));
 		larqBuilder.indexStatements(model.listStatements(null,RepositoryVocabulary.name,(RDFNode)null));
 		larqBuilder.indexStatements(model.listStatements(null,RepositoryVocabulary.tag,(RDFNode)null));
+		
+		//larqBuilder.indexStatements(model.listStatements());
+		
 		// Finish indexing
 		larqBuilder.closeForWriting();
+		
 		// -- Create the access index  
 		this.index = larqBuilder.getIndex() ;
 		// -- Make globally available
