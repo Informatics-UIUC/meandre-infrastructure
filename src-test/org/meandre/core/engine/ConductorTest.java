@@ -161,12 +161,13 @@ public class ConductorTest {
 	@Test
 	public void runRepetitiveUpdaterTest() {
 		
+		int REPETITIONS = 20;
 		try {
 			// Run simple hello world dangling input/outputs + fork
 			Model model = DemoRepositoryGenerator.getNextTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
 			RepositoryImpl qr = new RepositoryImpl(model);
 			
-			for ( int i=0 ; i<20 ; i++ ) {
+			for ( int i=0 ; i<REPETITIONS ; i++ ) {
 				Model modNew = DemoRepositoryGenerator.getNextTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
 				model.add(modNew);
 				qr.refreshCache(model);
