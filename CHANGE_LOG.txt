@@ -1,9 +1,9 @@
 1.2vcli Panellet:
 
-* Move LARQ indexer to a file indexer instead of the memory one.
-	- Reduces the memory usage
-	- Lucene is slow
-
+* Rework the repository implementation metadata processing
+	- Moved from SPARQL prototypes to the equivalent procedural version using JENA API
+	- Also used the indexer straight will manual filtering to boost search performance
+	- Performance of the repository interaction hugely improved.
 
 * Modified the loggers to work on a rotating scheme 
 	- ./log dir destination of the loggers
