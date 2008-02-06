@@ -17,6 +17,7 @@ import org.meandre.core.store.security.Action;
 import org.meandre.webservices.utils.WSLoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -925,7 +926,7 @@ public class WSRepository extends HttpServlet {
 			response.setContentType("application/xml");
 		else
 			response.setContentType("text/plain");
-		
+			
 		model.write(response.getOutputStream(),sFormat);
 		
 	}

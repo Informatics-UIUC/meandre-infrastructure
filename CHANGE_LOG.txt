@@ -1,9 +1,18 @@
 1.2vcli Panellet:
 
+* (!) Patched JENA to allow proper embedding:
+	- Added case Text.CLOB to line 2238 in file DriverRDB.java to allow large literals in Derby
+	- Haked the derby.sql definition and replace the tail of the literal table to CLOB to allow long literals
+	
+* The add service modified:
+	- jar parameter renamed as context
+	- Added the embed check button for contexts
+	
 * Rework the repository implementation metadata processing
 	- Moved from SPARQL prototypes to the equivalent procedural version using JENA API
 	- Also used the indexer straight will manual filtering to boost search performance
 	- Performance of the repository interaction hugely improved.
+	- Remove the SPARQL injection problem on the full text search
 
 * Modified the loggers to work on a rotating scheme 
 	- ./log dir destination of the loggers
@@ -24,9 +33,13 @@
 	- ant
 	- nbproject
 
+------------------------------------------------------------------------------
+
 1.1vcli Carquinyoli:
 
 * Meandre Core Web Service Execution Engine, Repository, etc.
+
+------------------------------------------------------------------------------
 
 1.0vcli Farina:
 

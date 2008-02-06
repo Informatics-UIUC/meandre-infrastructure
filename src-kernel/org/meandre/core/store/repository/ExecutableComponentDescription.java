@@ -10,6 +10,7 @@ import org.meandre.core.utils.vocabulary.RepositoryVocabulary;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -51,7 +52,7 @@ public class ExecutableComponentDescription {
 	private String sFormat = null;
 
 	/** The set of contexts required for execution */
-	private Set<Resource> setContext = null;
+	private Set<RDFNode> setContext = null;
 	
 	/** The resource pointing to the executable component implementation */
 	private Resource resLocation = null;
@@ -103,7 +104,7 @@ public class ExecutableComponentDescription {
 			String sRunnable,
 			String sFiringPolicy,
 			String sFormat,
-			Set<Resource> setContext,
+			Set<RDFNode> setContext,
 			Resource resLocation,
 			Set<DataPortDescription> setInputs,
 			Set<DataPortDescription> setOutputs, 
@@ -229,7 +230,7 @@ public class ExecutableComponentDescription {
 	 * 
 	 * @return The context set
 	 */
-	public Set<Resource> getContext () {
+	public Set<RDFNode> getContext () {
 		return setContext;
 	}
 	
@@ -325,8 +326,8 @@ public class ExecutableComponentDescription {
 			res.addProperty(RepositoryVocabulary.tag,model.createTypedLiteral(sTag));
 			   
 		// Adding execution contexts
-		for ( Resource resContext:setContext )
-			res.addProperty(RepositoryVocabulary.execution_context,model.createResource(resContext.toString()));
+		for ( RDFNode rdfNode:setContext )
+			res.addProperty(RepositoryVocabulary.execution_context,rdfNode);
 		
 		// Adding properties
 		for ( String sKey:pddProperties.getKeys()) {

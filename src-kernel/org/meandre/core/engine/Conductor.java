@@ -24,6 +24,7 @@ import org.meandre.core.store.repository.PropertiesDescription;
 import org.meandre.core.store.repository.PropertiesDescriptionDefinition;
 import org.meandre.core.store.repository.QueryableRepository;
 
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /** This class is devoted to the arrengement required to execute a given
@@ -136,8 +137,11 @@ public class Conductor {
 				throw new CorruptedDescriptionException("Component of type "+comp.getFormat()+" could not be loaded by the conductor");
 			
 			// Retrieve the contextes
-			for ( Resource resContext:comp.getContext() )
-				setURLContext.add(resContext.getURI().trim());
+			for ( RDFNode rdfnodeContext:comp.getContext() )
+				if ( rdfnodeContext.isResource() )
+					setURLContext.add(((Resource)rdfnodeContext).getURI().trim());
+				else
+					throw new CorruptedDescriptionException ( "Literal contexes not supported yet");
 			
 			// Retrieve the location
 			boolean bChomped = false;

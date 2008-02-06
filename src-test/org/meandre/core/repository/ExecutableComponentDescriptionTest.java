@@ -18,6 +18,7 @@ import org.meandre.demo.components.PushStringComponent;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
@@ -51,7 +52,7 @@ public class ExecutableComponentDescriptionTest {
 		String sCreator = "creator-"+iInstance;
 		Date dateCreation = new Date();
 		
-		Set<Resource> setContext = new HashSet<Resource>();
+		Set<RDFNode> setContext = new HashSet<RDFNode>();
 		setContext.add(ModelFactory.createDefaultModel().createResource("http://meandre.org/test/ecd/"+iInstance+"/"));
 		
 		Resource resLocation = ModelFactory.createDefaultModel().createResource("http://meandre.org/test/ecd/"+iInstance+"/"+PushStringComponent.class.getName());

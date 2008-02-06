@@ -2,6 +2,8 @@ package org.meandre.webservices.repository;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
@@ -28,9 +30,12 @@ import org.meandre.core.store.repository.RepositoryImpl;
 import org.meandre.core.store.system.SystemStore;
 import org.meandre.webservices.utils.WSLoggerFactory;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.XSD;
 
 /** This class groups all the basic logic required to maintain the locations
  * for the Meandre webservices interface.
@@ -651,12 +656,13 @@ public class WSRepositoryLogic {
 	public static Model addToRepository(HttpServletRequest request, String sExtension)
 	throws IOException, FileUploadException {
 
+		boolean bEmbed = false;
 		Model modelTmp = null;
 		ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
 		List lstItems = upload.parseRequest(request);
 		Iterator<FileItem> itr = lstItems.iterator();
 		HashSet<ExecutableComponentDescription> setComponentsToAdd = new HashSet<ExecutableComponentDescription>();
-		HashSet<String> setFiles = new HashSet<String>();
+		Hashtable<String,byte[]> htContextBytes = new Hashtable<String,byte[]>();
 
 		// The user repository
 		QueryableRepository qr = Store.getRepositoryStore(request.getRemoteUser());
@@ -723,35 +729,61 @@ public class WSRepositoryLogic {
 				}
 			}
 			// Check if we need to upload jar files
-			else if(fieldName.equals("jar")) {
-
+			else if(fieldName.equals("context")) {
 				String sFile = item.getName();
-				sFile = (new File(sFile)).getName();
-
-	    		File savedFile = new File(Store.getPublicResourcesDirectory()+File.separator+sFile);
-				try {
-					item.write(savedFile);
-					setFiles.add(sFile);
-				} catch (Exception e) {
-					log.warning("Problems writing jar "+sFile+" to "+savedFile.getAbsolutePath());
-					throw new IOException(e.toString());
-				}
-				// TODO: Check that this was really a jar :D
+				htContextBytes.put(sFile, item.get());
+			}
+			else if ( fieldName.equals("embed") ) {
+				String sValue = item.getString();
+				bEmbed = sValue.equals("true");
 			}
 		}
+
+		// TODO: Check that this uploaded contexts are really proper contexts :D
 
 		// Adding the components after adding the contexts
 		Model modUser = qr.getModel();
 		URL urlRequest = new URL(request.getRequestURL().toString());
+		Set<String> setFiles = htContextBytes.keySet();
+		boolean bWriteOnce = true;
 		modUser.begin();
 		for ( ExecutableComponentDescription ecd:setComponentsToAdd) {
-			if ( setFiles.isEmpty() ) {
+			if ( htContextBytes.keySet().isEmpty() ) {
 				modUser.add(ecd.getModel());
 			}
 			else {
-				for ( String sFile:setFiles ){
-					Resource res = modUser.createResource(urlRequest.getProtocol()+"://"+urlRequest.getHost()+":"+urlRequest.getPort()+"/public/resources/"+sFile);
-					ecd.getContext().add(res);
+				if ( bEmbed ) {
+					//
+					// Embed all the context per descriptor
+					//
+					for ( String sFile:setFiles) {
+						// TODO: Embed
+						Literal lit = modUser.createTypedLiteral(htContextBytes.get(sFile),XSDDatatype.XSDbase64Binary);
+						ecd.getContext().add(lit);
+					}
+				}
+				else if ( bWriteOnce ) {
+					//
+					// Dump the context file to the disc only once
+					// 
+					for ( String sFile:setFiles) {
+						// Dump the files to disk
+						new File(Store.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator).mkdirs();
+			    		File savedFile = new File(Store.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator+sFile);
+						try {
+							FileOutputStream fos = new FileOutputStream(savedFile);
+							fos.write(htContextBytes.get(sFile));
+							fos.close();
+						} catch (Exception e) {
+							log.warning("Problems writing context "+sFile+" to "+savedFile.getAbsolutePath());
+							throw new IOException(e.toString());
+						}
+						// Add the proper context resources
+						Resource res = modUser.createResource(urlRequest.getProtocol()+"://"+urlRequest.getHost()+":"+urlRequest.getPort()+"/public/resources/contexts/java/"+sFile);
+						ecd.getContext().add(res);
+					}
+					// Avoid dumping them multiple times
+					bWriteOnce = false;
 				}
 				modUser.add(ecd.getModel());
 			}

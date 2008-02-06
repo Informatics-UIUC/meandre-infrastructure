@@ -290,6 +290,23 @@ public class RepositoryImpl implements QueryableRepository {
 	}
 	
 
+	/** Returns the resources matching that particular subject/predicate combination as RDFNodes.
+	 * 
+	 * @param resSubj The subject resource
+	 * @param prop The predicate property
+	 * @param bCheckUnique Force a check for a unique value
+	 * @return Return the list of matching RDFNodes
+	 * @throws CorruptedDescriptionException A unique check was placed and more than one value was found
+	 */
+	@SuppressWarnings("unchecked")
+	private List<RDFNode> getObjectResourcesFromModelAsRDFNodes ( Resource resSubj, Property prop, boolean bCheckUnique ) 
+	throws CorruptedDescriptionException {
+		List list = model.listObjectsOfProperty(resSubj, prop).toList();
+		if ( bCheckUnique && list.size()!=1 ) 
+			throw new CorruptedDescriptionException("Not an unique value "+list);
+		return list;
+	}
+
 	/** Returns the resources matching that particular predicate/object resource combination.
 	 * 
 	 * @param prop The predicate property
@@ -343,7 +360,7 @@ public class RepositoryImpl implements QueryableRepository {
 		String sRunnable = null;
 		String sFiringPolicy = "all";
 		String sFormat = null;
-		Set<Resource> setContext  = null;
+		Set<RDFNode> setContext  = null;
 		Resource resLocation = null;
 		Set<DataPortDescription> setInputs = null;
 		Set<DataPortDescription> setOutputs = null;
@@ -533,9 +550,9 @@ public class RepositoryImpl implements QueryableRepository {
 		//
 		// TODO: This should be smarter to distinguish resources and literals
 		//
-		setContext = new HashSet<Resource>();
-		for ( Resource resLoc:getObjectResourcesFromModel(res,RepositoryVocabulary.execution_context,false)) 
-			setContext.add(resLoc);
+		setContext = new HashSet<RDFNode>();
+		for ( RDFNode rdfnodeLoc:getObjectResourcesFromModelAsRDFNodes(res,RepositoryVocabulary.execution_context,false)) 
+			setContext.add(rdfnodeLoc);
 		
 		
 		/* The original SPARQL version
