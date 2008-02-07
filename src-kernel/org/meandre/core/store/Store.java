@@ -3,6 +3,7 @@ package org.meandre.core.store;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.Hashtable;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -100,6 +101,9 @@ public class Store {
 	@SuppressWarnings("unused")
 	private static SecurityStoreImpl ssSecurityStore = null;
 
+	/** The repository cache entry */
+	private static Hashtable<String,RepositoryImpl> htMapRepImpl = new Hashtable<String,RepositoryImpl>();
+	
 	/** The default initialization based on properties. */
 	static {
 		
@@ -277,7 +281,13 @@ public class Store {
 	 * @return The repository store for the given user
 	 */
 	public static QueryableRepository getRepositoryStore ( String sNickName ) {
-		return new RepositoryImpl(getMaker().createModel(BASE_REPSITORY_STORE_URL+sNickName));
+		if ( htMapRepImpl.containsKey(sNickName) )
+			return htMapRepImpl.get(sNickName);
+		else {
+			RepositoryImpl rep = new RepositoryImpl(getMaker().createModel(BASE_REPSITORY_STORE_URL+sNickName));
+			htMapRepImpl.put(sNickName, rep);
+			return new RepositoryImpl(getMaker().createModel(BASE_REPSITORY_STORE_URL+sNickName));
+		}
 	}
 	
 	/** Returns the persistent public repository.

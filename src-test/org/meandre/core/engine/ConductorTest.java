@@ -161,7 +161,7 @@ public class ConductorTest {
 	@Test
 	public void runRepetitiveUpdaterTest() {
 		
-		int REPETITIONS = 20;
+		int REPETITIONS = 30;
 		try {
 			// Run simple hello world dangling input/outputs + fork
 			Model model = DemoRepositoryGenerator.getNextTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();

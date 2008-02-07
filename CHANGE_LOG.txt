@@ -2,7 +2,7 @@
 
 * (!) Patched JENA to allow proper embedding:
 	- Added case Text.CLOB to line 2238 in file DriverRDB.java to allow large literals in Derby
-	- Haked the derby.sql definition and replace the tail of the literal table to CLOB to allow long literals
+	- Hacked the derby.sql definition and replace the tail of the literal table to CLOB to allow long literals
 	
 * The add service modified:
 	- jar parameter renamed as context

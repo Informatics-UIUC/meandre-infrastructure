@@ -3,7 +3,6 @@ package org.meandre.webservices.repository;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
@@ -35,7 +34,6 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.XSD;
 
 /** This class groups all the basic logic required to maintain the locations
  * for the Meandre webservices interface.
@@ -757,7 +755,6 @@ public class WSRepositoryLogic {
 					// Embed all the context per descriptor
 					//
 					for ( String sFile:setFiles) {
-						// TODO: Embed
 						Literal lit = modUser.createTypedLiteral(htContextBytes.get(sFile),XSDDatatype.XSDbase64Binary);
 						ecd.getContext().add(lit);
 					}

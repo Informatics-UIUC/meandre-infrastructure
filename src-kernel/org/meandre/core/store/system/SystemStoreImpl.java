@@ -87,7 +87,7 @@ public class SystemStoreImpl implements SystemStore {
 
         if ( model.size()==0 ) {
         	log.info("Empty model. Initializing a clean one.");
-            setProperty(REPOSITORY_LOCATION,"http://localhost:1714/public/services/repository.ttl","The locally published components");
+            setProperty(REPOSITORY_LOCATION,"http://localhost:1714/public/services/repository.nt","The locally published components");
         }
 
         flush();

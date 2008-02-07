@@ -1,6 +1,9 @@
 package org.meandre.core.engine;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -14,6 +17,7 @@ import org.meandre.core.ExecutableComponent;
 import org.meandre.core.engine.policies.component.availability.WrappedComponentAllInputsRequired;
 import org.meandre.core.engine.policies.component.availability.WrappedComponentAnyInputRequired;
 import org.meandre.core.logger.LoggerFactory;
+import org.meandre.core.store.Store;
 import org.meandre.core.store.repository.ConnectorDescription;
 import org.meandre.core.store.repository.CorruptedDescriptionException;
 import org.meandre.core.store.repository.DataPortDescription;
@@ -23,7 +27,9 @@ import org.meandre.core.store.repository.FlowDescription;
 import org.meandre.core.store.repository.PropertiesDescription;
 import org.meandre.core.store.repository.PropertiesDescriptionDefinition;
 import org.meandre.core.store.repository.QueryableRepository;
+import org.meandre.core.utils.HexConverter;
 
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 
@@ -61,6 +67,9 @@ public class Conductor {
 	/** The core root logger */
 	protected static Logger log = LoggerFactory.getCoreLogger();
 
+	/** Embeded context to file URI mapper */
+	private static Hashtable<Literal,String> htMapLiteralToFile = new Hashtable<Literal,String>();
+	
 	/** Initialize a conductor with a set of valid URLs.
 	 *
 	 */
@@ -75,16 +84,6 @@ public class Conductor {
 			setLoadableComponents.add(sType.toLowerCase());
 	}
 
-	/*
-	public void reload() {
-		int iCnt = 0;
-		URL [] ua = new URL[setLoadableLocations.size()];
-		for ( URL url:setLoadableLocations )
-			ua[iCnt++] = url;
-		urlCL = new URLClassLoader(ua);
-	}
-	*/
-
 	/** Creates an execution object for the given flow description.
 	 *
 	 * @param qr The queryable repository containing component descriptions
@@ -94,79 +93,21 @@ public class Conductor {
 	 * @throws ConductorException The counductor could not create an executable flow
 	 */
 	@SuppressWarnings("unchecked")
-	public Executor buildExecutor(QueryableRepository qr, Resource res) throws CorruptedDescriptionException, ConductorException {
+	public Executor buildExecutor(QueryableRepository qr, Resource res) 
+	throws CorruptedDescriptionException, ConductorException {
 		// The unique execution flow ID
 		String sFlowUniqueExecutionID = res.toString()+File.pathSeparator+System.currentTimeMillis()+File.pathSeparator+(new Random().nextInt());
-		// Set of loadable context URLs
-		Set<String> setURLContext = new HashSet<String>();
-		// Set of loadable locations
-		Set<String> setURLLocations = new HashSet<String>();
 		// Map class names to classes
 		Hashtable<String,Class> htMapNameToClass = new Hashtable<String,Class>();
 		// Map reource names to classes
 		Hashtable<Resource,String> htMapResourceToName = new Hashtable<Resource,String>();
-		// Map reource names to classes
-		Hashtable<String,Resource> htMapNameToResource = new Hashtable<String,Resource>();
-		// Map resource names to runnable
-		Hashtable<Resource,String> htMapResourceToRunnable = new Hashtable<Resource,String>();
-		// Map resource names to runnable
-		Hashtable<Resource,String> htMapResourceToFormat = new Hashtable<Resource,String>();
-
+		
 		// Get the description
 		FlowDescription fd = qr.getFlowDescription(res);
 
-		// Preparing the URLs for the class loader
-		log.info("Processing executable components contexts and locations");
-		Set<ExecutableComponentInstanceDescription> setIns = fd.getExecutableComponentInstances();
-		for ( ExecutableComponentInstanceDescription ins:setIns ) {
-			ExecutableComponentDescription comp = qr.getExecutableComponentDescription(ins.getExecutableComponent());
-            // If the resource does not exist throw an exeception
-			if (comp == null)
-				throw new CorruptedDescriptionException("The required executable component " + ins.getExecutableComponent() + " does not exist in the current repository");
-			
-			// Check if it is loadable
-			if ( setLoadableLanguages.contains(comp.getRunnable().toLowerCase()) )
-				htMapResourceToRunnable.put(comp.getExecutableComponent(),comp.getRunnable().toLowerCase());
-			else
-				throw new CorruptedDescriptionException("Cannot process executable components runnable as "+comp.getRunnable());
-			
-			// Check if it is loadable
-			if ( setLoadableComponents.contains(comp.getFormat().toLowerCase()) )
-				htMapResourceToFormat.put(comp.getExecutableComponent(), comp.getFormat().toLowerCase());
-			else
-				throw new CorruptedDescriptionException("Component of type "+comp.getFormat()+" could not be loaded by the conductor");
-			
-			// Retrieve the contextes
-			for ( RDFNode rdfnodeContext:comp.getContext() )
-				if ( rdfnodeContext.isResource() )
-					setURLContext.add(((Resource)rdfnodeContext).getURI().trim());
-				else
-					throw new CorruptedDescriptionException ( "Literal contexes not supported yet");
-			
-			// Retrieve the location
-			boolean bChomped = false;
-			String sURI = comp.getLocation().getURI().trim();
-			String sURIHead = null;
-			for ( String sCntx:setURLContext )
-				if ( sURI.startsWith(sCntx) ) {
-					bChomped = true;
-					sURIHead = sURI.substring(0,sCntx.length());
-					sURI = sURI.substring(sCntx.length());
-				}
-			
-			// Check if location does not match any context
-			if ( bChomped ) {
-				setURLLocations.add(sURI);
-				setURLContext.remove(sURIHead);
-				htMapResourceToName.put(comp.getExecutableComponent(), sURI);
-				htMapNameToResource.put(sURI, comp.getExecutableComponent());
-			}
-			else
-				throw new CorruptedDescriptionException("Location "+sURI+" does not match any of the executable component contexts");
-		}
-		
-		// Load the component classes
-		loadExecutableComponentImplementation(setURLContext, setURLLocations, htMapNameToClass, htMapNameToResource, htMapResourceToRunnable, htMapResourceToFormat);
+		// STEP 0: Gather all the required contexts and load them
+		log.info("STEP 0: Plugging the required contexts");
+		plugRequiredContexts(qr, htMapNameToClass, htMapResourceToName,fd);
 
 		// STEP 1: Instantiate the flow instances
 		log.info("STEP 1: Instantiate the flow instances");
@@ -330,6 +271,122 @@ public class Conductor {
 		}
 	}
 
+	/** Loads and plugs the required contexts to the flow being prepared.
+	 * 
+	 * @param qr The queriable repository
+	 * @param htMapNameToClass The map from the name to the class
+	 * @param htMapResourceToName The map from the resource to a name
+	 * @param fd The flow descriptor 
+	 * @throws CorruptedDescriptionException The descriptor is corrupted
+	 * @throws ConductorException The literal containing the resource could not be dumped to a file
+	 */
+	@SuppressWarnings("unchecked")
+	protected void plugRequiredContexts(QueryableRepository qr,
+			Hashtable<String, Class> htMapNameToClass, Hashtable<Resource, String> htMapResourceToName,
+			FlowDescription fd) throws CorruptedDescriptionException, ConductorException {
+		
+		// Set of loadable context URLs
+		Set<String> setContexts = new HashSet<String>();
+		// Set of loadable locations
+		Set<String> setURLLocations = new HashSet<String>();
+		// Map reource names to classes
+		Hashtable<String,Resource> htMapNameToResource = new Hashtable<String,Resource>();
+		// Map resource names to runnable
+		Hashtable<Resource,String> htMapResourceToRunnable = new Hashtable<Resource,String>();
+		// Map resource names to runnable
+		Hashtable<Resource,String> htMapResourceToFormat = new Hashtable<Resource,String>();
+		
+		
+		// Preparing the URLs for the class loader
+		log.info("Processing executable components contexts and locations");
+		Set<ExecutableComponentInstanceDescription> setIns = fd.getExecutableComponentInstances();
+		for ( ExecutableComponentInstanceDescription ins:setIns ) {
+			ExecutableComponentDescription comp = qr.getExecutableComponentDescription(ins.getExecutableComponent());
+            // If the resource does not exist throw an exeception
+			if (comp == null)
+				throw new CorruptedDescriptionException("The required executable component " + ins.getExecutableComponent() + " does not exist in the current repository");
+			
+			// Check if it is loadable
+			if ( setLoadableLanguages.contains(comp.getRunnable().toLowerCase()) )
+				htMapResourceToRunnable.put(comp.getExecutableComponent(),comp.getRunnable().toLowerCase());
+			else
+				throw new CorruptedDescriptionException("Cannot process executable components runnable as "+comp.getRunnable());
+			
+			// Check if it is loadable
+			if ( setLoadableComponents.contains(comp.getFormat().toLowerCase()) )
+				htMapResourceToFormat.put(comp.getExecutableComponent(), comp.getFormat().toLowerCase());
+			else
+				throw new CorruptedDescriptionException("Component of type "+comp.getFormat()+" could not be loaded by the conductor");
+			
+			// Retrieve the contextes
+			for ( RDFNode rdfnodeContext:comp.getContext() )
+				if ( rdfnodeContext.isResource() )
+					// Just a usual URI pointing to the resource 
+					setContexts.add(((Resource)rdfnodeContext).getURI().trim());
+				else 
+					// The literal is dumped to the file system and a URI generated
+					setContexts.add(prepareLiteralToTheFileSystem((Literal)rdfnodeContext));
+			
+			// Retrieve the location
+			boolean bChomped = false;
+			String sURI = comp.getLocation().getURI().trim();
+			String sURIHead = null;
+			for ( String sCntx:setContexts )
+				if ( sURI.startsWith(sCntx) ) {
+					bChomped = true;
+					sURIHead = sURI.substring(0,sCntx.length());
+					sURI = sURI.substring(sCntx.length());
+				}
+			
+			// Check if location does not match any context
+			if ( bChomped ) {
+				setURLLocations.add(sURI);
+				setContexts.remove(sURIHead);
+				htMapResourceToName.put(comp.getExecutableComponent(), sURI);
+				htMapNameToResource.put(sURI, comp.getExecutableComponent());
+			}
+			else
+				throw new CorruptedDescriptionException("Location "+sURI+" does not match any of the executable component contexts");
+		}
+		
+		// Load the component classes
+		loadExecutableComponentImplementation(setContexts, setURLLocations, htMapNameToClass, htMapNameToResource, htMapResourceToRunnable, htMapResourceToFormat);
+	}
+
+	/** This methods dump the Literal to the file system and creates a URI for the class loader.
+	 * 
+	 * @param lit The literal to dump
+	 * @return The URI to the loader resource
+	 * @throws ConductorException The literal could not be dump to a file
+	 */
+	private String prepareLiteralToTheFileSystem(Literal lit) throws ConductorException {
+		String sURI = htMapLiteralToFile.get(lit);
+		
+		if ( sURI==null ) {
+			// The Literal has not been mapped to a file before
+			byte [] ba = (byte[]) lit.getValue();
+			String sURIPath = new File(".").toURI().toString();
+			String sFilePath = Store.getRunResourcesDirectory()+File.separator+"java"+File.separator;
+			new File(sFilePath).mkdirs();
+			sFilePath += HexConverter.stringToHex("lit-hash-"+lit.hashCode())+".jar";
+			sURIPath += sFilePath;
+			sURIPath = sURIPath.replaceAll("(\\./)+", "/").replaceAll("/+", "/");
+			try {
+				FileOutputStream fos = new FileOutputStream(new File(sFilePath));
+				fos.write(ba);
+				fos.close();
+				htMapLiteralToFile.put(lit, sURIPath);
+			} catch (FileNotFoundException e) {
+				throw new ConductorException(e);
+			} catch (IOException e) {
+				throw new ConductorException(e);
+			}
+			return sURIPath;
+		}
+		else
+			return sURI;
+	}
+
 	/** Loads the java implementations of the given locations and contexts
 	 * storing the results into a map.
 	 *
@@ -342,7 +399,14 @@ public class Conductor {
 	 * @throws CorruptedDescriptionException A corrupted description was found
 	 */
 	@SuppressWarnings("unchecked")
-	protected void loadExecutableComponentImplementation(Set<String> setURLContext, Set<String> setURLLocations, Hashtable<String, Class> htMapNameToClass, Hashtable<String, Resource> htMapNameToResource, Hashtable<Resource, String> htMapResourceToRunnable, Hashtable<Resource, String> htMapResourceToFormat) throws CorruptedDescriptionException {
+	protected void loadExecutableComponentImplementation(
+			Set<String> setURLContext, 
+			Set<String> setURLLocations,
+			Hashtable<String, Class> htMapNameToClass,
+			Hashtable<String, Resource> htMapNameToResource,
+			Hashtable<Resource, String> htMapResourceToRunnable,
+			Hashtable<Resource, String> htMapResourceToFormat )
+	throws CorruptedDescriptionException {
 		log.info("Preparing the class loader");
 		int iCnt = 0;
 		URL [] ua = new URL[setURLContext.size()];
