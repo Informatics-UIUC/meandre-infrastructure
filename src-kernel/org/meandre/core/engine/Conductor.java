@@ -70,6 +70,9 @@ public class Conductor {
 	/** Embeded context to file URI mapper */
 	private static Hashtable<Literal,String> htMapLiteralToFile = new Hashtable<Literal,String>();
 	
+	/** Embeded context to hash code mapper */
+	private static Hashtable<Literal,Integer> htMapLiteralToHashcode = new Hashtable<Literal,Integer>();
+	
 	/** Initialize a conductor with a set of valid URLs.
 	 *
 	 */
@@ -367,7 +370,7 @@ public class Conductor {
 	private String prepareLiteralToTheFileSystem(Literal lit) throws ConductorException {
 		String sURI = htMapLiteralToFile.get(lit);
 		
-		if ( sURI==null ) {
+		if ( sURI==null || htMapLiteralToHashcode.get(lit)!=lit.hashCode() ) {
 			// The Literal has not been mapped to a file before
 			byte [] ba = (byte[]) lit.getValue();
 			String sURIPath = new File(".").toURI().toString();
@@ -381,6 +384,7 @@ public class Conductor {
 				fos.write(ba);
 				fos.close();
 				htMapLiteralToFile.put(lit, sURIPath);
+				htMapLiteralToHashcode.put(lit, lit.hashCode());
 			} catch (FileNotFoundException e) {
 				throw new ConductorException(e);
 			} catch (IOException e) {
