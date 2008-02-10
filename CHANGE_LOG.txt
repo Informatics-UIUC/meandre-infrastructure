@@ -1,5 +1,16 @@
 1.2vcli Panellet:
 
+* Modified the Conductor to allow embedding:
+	- When preparing the URL class loader
+	- If context is a resource pass the URI to the class loader
+	- If context is a literal the content is dumped to /run/java with an encode name ending in .jar
+	- Conductor implements a cache of the already dumped flows to boost up the preparation time
+	
+* Modified the Repository beans to deal with RDFNodes
+	- Old URI formats to contexts (jars) are expressed as Resources (external contexts)
+	- Embeddable contexts (jars) are expressed as Literals
+	- RDFNode homogenizes the use of contexts (external or embedded)
+	
 * (!) Patched JENA to allow proper embedding:
 	- Added case Text.CLOB to line 2238 in file DriverRDB.java to allow large literals in Derby
 	- Hacked the derby.sql definition and replace the tail of the literal table to CLOB to allow long literals
