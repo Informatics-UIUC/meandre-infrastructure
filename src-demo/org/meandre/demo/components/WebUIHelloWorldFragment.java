@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.meandre.core.ComponentContext;
 import org.meandre.core.ComponentContextException;
+import org.meandre.core.ComponentContextProperties;
 import org.meandre.core.ComponentExecutionException;
 import org.meandre.core.ExecutableComponent;
 import org.meandre.webui.WebUIException;
@@ -78,11 +79,11 @@ public class WebUIHelloWorldFragment implements ExecutableComponent, WebUIFragme
 			emptyRequest(response);
 	}
 
-	/** Call at the end of an execution flow.
+	/** This method is called when the Menadre Flow execution is completed.
 	 *
-	 *
+	 * @param ccp The properties associated to a component context
 	 */
-	public void dispose() {
+	public void dispose ( ComponentContextProperties ccp ) {
 
 	}
 
@@ -111,10 +112,12 @@ public class WebUIHelloWorldFragment implements ExecutableComponent, WebUIFragme
 
 	}
 
-	/** Called when a flow is started.
+	/** This method is invoked when the Meandre Flow is being prepared for 
+	 * getting run.
 	 *
+	 * @param ccp The properties associated to a component context
 	 */
-	public void initialize() {
+	public void initialize ( ComponentContextProperties ccp ) {
 
 	}
 

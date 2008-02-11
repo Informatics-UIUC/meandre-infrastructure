@@ -11,8 +11,9 @@ public interface ExecutableComponent {
 	/** This method is invoked when the Meandre Flow is being prepared for 
 	 * getting run.
 	 *
+	 * @param ccp The properties associated to a component context
 	 */
-	public void initialize ();
+	public void initialize ( ComponentContextProperties ccp );
 	
 	/** When Meandre schedules a component for execution, this method is 
 	 * invoked. The ComponentContext object encapsulate the API a component 
@@ -29,6 +30,7 @@ public interface ExecutableComponent {
 
 	/** This method is called when the Menadre Flow execution is completed.
 	 *
+	 * @param ccp The properties associated to a component context
 	 */
-	public void dispose ();
+	public void dispose ( ComponentContextProperties ccp );
 }

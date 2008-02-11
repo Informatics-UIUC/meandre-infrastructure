@@ -1,5 +1,13 @@
 1.2vcli Panellet:
 
+* (!!) Updated ExecutableContext. This change will break all components so far
+	- initialize() changed to initialize(ComponentContextProperties ccp)
+	- dispose() changed to dispose(ComponentContextPropoerties ccp)
+
+* Root the ComponentContext in to th root interface ComponentContextProperties
+	- ComponentContext presents the same API as before
+	- ComponentContextProperties expose the subset of the original API not related to execution
+	
 * Created and tested the class JythonExecutableComponentAdapter
 	- This class acts as an adapter
 	- The adapter translate the ExcecutableComponent interface into it Jython counter part

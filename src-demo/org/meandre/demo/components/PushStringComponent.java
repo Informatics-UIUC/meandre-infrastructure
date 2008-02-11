@@ -2,6 +2,7 @@ package org.meandre.demo.components;
 
 import org.meandre.core.ComponentContext;
 import org.meandre.core.ComponentContextException;
+import org.meandre.core.ComponentContextProperties;
 import org.meandre.core.ComponentExecutionException;
 import org.meandre.core.ExecutableComponent;
 
@@ -12,11 +13,12 @@ import org.meandre.core.ExecutableComponent;
  */
 public class PushStringComponent implements ExecutableComponent {
 
-	/** This method is invoked when the Meandre Flow is being prepared for
+	/** This method is invoked when the Meandre Flow is being prepared for 
 	 * getting run.
 	 *
+	 * @param ccp The properties associated to a component context
 	 */
-	public void initialize () {
+	public void initialize ( ComponentContextProperties ccp ) {
 
 	}
 
@@ -39,8 +41,9 @@ public class PushStringComponent implements ExecutableComponent {
 
 	/** This method is called when the Menadre Flow execution is completed.
 	 *
+	 * @param ccp The properties associated to a component context
 	 */
-	public void dispose () {
+	public void dispose ( ComponentContextProperties ccp ) {
 
 	}
 }

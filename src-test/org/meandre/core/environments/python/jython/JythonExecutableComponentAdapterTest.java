@@ -26,7 +26,7 @@ public class JythonExecutableComponentAdapterTest {
 	
 	/** A simple Hello World printing script */
 	protected static String sSimpleExecutableComponent = "" +
-			"def initialize():\n" +
+			"def initialize(ccp):\n" +
 			"   print \"Initilize called\"\n"+
 			"\n" +
 			"def execute(cc):\n" +
@@ -35,7 +35,7 @@ public class JythonExecutableComponentAdapterTest {
 			"   print cc.executionInstanceID \n" +
 			"   print cc.flowExecutionInstanceID \n" +
 			"\n" +
-			"def dispose():\n" +
+			"def dispose(ccp):\n" +
 			"   print \"Dispose called\"\n" +
 			"\n";
 	
@@ -56,11 +56,12 @@ public class JythonExecutableComponentAdapterTest {
 	@Test
 	public void testInitializeAndDispose() {
 		String sRes = null;
+		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>());
 		JythonExecutableComponentAdapter jeca = new JythonExecutableComponentAdapter(sSimpleExecutableComponent);
-		jeca.initialize();
+		jeca.initialize(cc);
 		sRes = jeca.getOutput().toString();
 		assertEquals("Initilize called\n",sRes);
-		jeca.dispose();
+		jeca.dispose(cc);
 		sRes = jeca.getOutput().toString();
 		assertEquals("Initilize called\nDispose called\n",sRes);
 	}

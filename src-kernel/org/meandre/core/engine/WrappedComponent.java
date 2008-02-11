@@ -137,7 +137,7 @@ extends Thread {
 		this.semBlocking.acquire();
 		
 		// Initialize the executable component
-		this.ec.initialize();
+		this.ec.initialize(cc);
 	}
 	
 	
@@ -240,7 +240,7 @@ extends Thread {
 		log.info("Disposing WebUI if any." );
 		cc.stopAllWebUIFragments();
 		log.info("Finalizing the execution of the wrapping component "+ec.toString());		
-		ec.dispose();
+		ec.dispose(cc);
 		
 	}
 

@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 
 import org.meandre.core.ComponentContext;
 import org.meandre.core.ComponentContextException;
+import org.meandre.core.ComponentContextProperties;
 import org.meandre.core.ComponentExecutionException;
 import org.meandre.core.ExecutableComponent;
 import org.python.util.PythonInterpreter;
@@ -43,10 +44,12 @@ public class JythonExecutableComponentAdapter implements ExecutableComponent {
 	/** This method is invoked when the Meandre Flow is being prepared for 
 	 * getting run.
 	 *
+	 * @param ccp The properties associated to a component context
 	 */
-	public void initialize () {
+	public void initialize ( ComponentContextProperties ccp ) {
 		// Call the python initialize function
-		pi.exec("initialize()");
+		pi.set("ccp", ccp);
+		pi.exec("initialize(ccp)");
 	}
 	
 	/** When Meandre schedules a component for execution, this method is 
@@ -69,10 +72,12 @@ public class JythonExecutableComponentAdapter implements ExecutableComponent {
 
 	/** This method is called when the Menadre Flow execution is completed.
 	 *
+	 * @param ccp The properties associated to a component context
 	 */
-	public void dispose () {
+	public void dispose ( ComponentContextProperties ccp ) {
 		// Call the python initialize function
-		pi.exec("dispose()");
+		pi.set("ccp", ccp);
+		pi.exec("dispose(ccp)");
 		
 		// Get rid of the interpreter
 		pi.cleanup();
