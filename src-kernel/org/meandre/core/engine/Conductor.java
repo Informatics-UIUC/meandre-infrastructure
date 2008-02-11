@@ -186,7 +186,7 @@ public class Conductor {
 			String  sIDInSet = cd.getTargetInstance().toString();
 			String  sIDIn = cd.getTargetInstance().toString()+URL_SEAPARTOR+cd.getTargetIntaceDataPort().toString();
 
-			fd.getModel().write(System.out,"TTL",null);
+			//fd.getModel().write(System.out,"TTL",null);
 			ActiveBuffer ab = htMapInAB.get(sIDIn);
 			
 			// Update the output mapping name for a given instance

@@ -1,5 +1,16 @@
 1.2vcli Panellet:
 
+* Created and tested the class JythonExecutableComponentAdapter
+	- This class acts as an adapter
+	- The adapter translate the ExcecutableComponent interface into it Jython counter part
+	- The ComponentContext instance is accessible thanks to the Jython bindings 
+	- The Jython bindings turn getters/setters into pythonic assignable instance variables
+	
+* Created the new package subtree org.meandre.core.environments
+	- This package is intended to group all non-java executable components
+	- The package org.meandre.core.environments.python contains Python related environments
+	- The package org.meandre.core.environments.python.jython contains the adapter to run Jython flavored executable components
+	
 * Modified the Conductor to allow embedding:
 	- When preparing the URL class loader
 	- If context is a resource pass the URI to the class loader
@@ -11,7 +22,7 @@
 	- Embeddable contexts (jars) are expressed as Literals
 	- RDFNode homogenizes the use of contexts (external or embedded)
 	
-* (!) Patched JENA to allow proper embedding:
+* (!!) Patched JENA to allow proper embedding:
 	- Added case Text.CLOB to line 2238 in file DriverRDB.java to allow large literals in Derby
 	- Hacked the derby.sql definition and replace the tail of the literal table to CLOB to allow long literals
 	

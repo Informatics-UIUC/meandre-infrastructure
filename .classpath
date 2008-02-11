@@ -50,5 +50,6 @@
 	<classpathentry kind="lib" path="lib/Derby/derbynet.jar"/>
 	<classpathentry kind="lib" path="lib/Derby/derbyrun.jar"/>
 	<classpathentry kind="lib" path="lib/Derby/derbytools.jar"/>
+	<classpathentry kind="lib" path="lib/Jython-2.2.1/jython.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
