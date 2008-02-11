@@ -790,6 +790,9 @@ public class WSRepositoryLogic {
 		modUser.commit();
 		modelQR.commit();
 
+		// Regenerate the cache after adding
+		qr.refreshCache();
+		
 		return modUser;
 	}
 
@@ -851,6 +854,9 @@ public class WSRepositoryLogic {
 			}
 		}
 
+		// Regenerate the cache after adding
+		qr.refreshCache();
+		
 		return modResult;
 	}
 
@@ -885,6 +891,9 @@ public class WSRepositoryLogic {
 	 		sRes = sURI;
 	 	}
 
+	 	// Regenerate the cache after adding
+		qr.refreshCache();
+		
 		return sRes;
 	}
 
@@ -923,6 +932,9 @@ public class WSRepositoryLogic {
 		 		joRes.put("meandre_uri", sURI);
 		 	}
 
+		 	// Regenerate the cache after adding
+			qr.refreshCache();
+			
 		}
 		catch ( Exception e ) {
 			throw new IOException(e.toString());

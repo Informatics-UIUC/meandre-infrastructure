@@ -83,7 +83,7 @@ public class JythonExecutableComponentAdapterTest {
 		}
 		sRes = jeca.getOutput().toString();
 		assertTrue(sRes.startsWith("Execute called"));
-		System.out.println(sRes);
+		// System.out.println(sRes);
 	}
 
 }

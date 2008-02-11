@@ -988,12 +988,20 @@ public class RepositoryImpl implements QueryableRepository {
 		// Retrieve the data port connector desciption
 		//
 		Set<ConnectorDescription> setConnectorDescription = new HashSet<ConnectorDescription>();
-		for ( Resource resDataCon:getSubjectResourcesFromModel(RDF.type, RepositoryVocabulary.data_connector_configuration, false) ) {
-			Resource resComponentInstanceSource = getObjectResourcesFromModel(resDataCon, RepositoryVocabulary.connector_instance_source, true).iterator().next();
-			Resource resComponentInstaceDataPortSource = getObjectResourcesFromModel(resDataCon, RepositoryVocabulary.connector_instance_data_port_source, true).iterator().next();
-			Resource resComponentInstanceTarget = getObjectResourcesFromModel(resDataCon, RepositoryVocabulary.connector_instance_target, true).iterator().next();
-			Resource resComponentInstaceDataPortTarget = getObjectResourcesFromModel(resDataCon, RepositoryVocabulary.connector_instance_data_port_target, true).iterator().next();
-			setConnectorDescription.add(new ConnectorDescription(resDataCon,resComponentInstanceSource,resComponentInstaceDataPortSource,resComponentInstanceTarget,resComponentInstaceDataPortTarget));
+		List<Resource> lstRes = getSubjectResourcesFromModel(RDF.type, RepositoryVocabulary.data_connector_configuration, false);
+		List<Resource> lstCS = getObjectResourcesFromModel(res, RepositoryVocabulary.connectors, false);
+		Resource resCS = null;
+		if ( lstCS.size()>0 ) {
+			resCS = lstCS.iterator().next();
+			for ( Resource resDataCon:lstRes ) {
+				if  ( model.contains(resCS,RepositoryVocabulary.data_connector,resDataCon) ) {
+					Resource resComponentInstanceSource = getObjectResourcesFromModel(resDataCon, RepositoryVocabulary.connector_instance_source, true).iterator().next();
+					Resource resComponentInstaceDataPortSource = getObjectResourcesFromModel(resDataCon, RepositoryVocabulary.connector_instance_data_port_source, true).iterator().next();
+					Resource resComponentInstanceTarget = getObjectResourcesFromModel(resDataCon, RepositoryVocabulary.connector_instance_target, true).iterator().next();
+					Resource resComponentInstaceDataPortTarget = getObjectResourcesFromModel(resDataCon, RepositoryVocabulary.connector_instance_data_port_target, true).iterator().next();
+					setConnectorDescription.add(new ConnectorDescription(resDataCon,resComponentInstanceSource,resComponentInstaceDataPortSource,resComponentInstanceTarget,resComponentInstaceDataPortTarget));
+				}
+			}
 		}
 			
 		return new FlowDescription(resFlow,sName,sDescription,sRights,sCreator,dateCreation,setExecutableComponentInstances,setConnectorDescription,tagsDesc);

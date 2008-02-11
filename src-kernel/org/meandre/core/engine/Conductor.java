@@ -182,17 +182,14 @@ public class Conductor {
 			
 		}
 		for ( ConnectorDescription cd:fd.getConnectorDescriptions() ) {
+			System.out.println("(0)"+cd.getConnector());
 			String sIDOutSet = cd.getSourceInstance().toString();
 			String  sIDInSet = cd.getTargetInstance().toString();
 			String  sIDIn = cd.getTargetInstance().toString()+URL_SEAPARTOR+cd.getTargetIntaceDataPort().toString();
 
-			//fd.getModel().write(System.out,"TTL",null);
 			ActiveBuffer ab = htMapInAB.get(sIDIn);
 			
 			// Update the output mapping name for a given instance
-			//System.out.println(cd.getSourceInstance());
-			//System.out.println(fd.getExecutableComponentResourceForInstance(cd.getSourceInstance()));
-			//System.out.println(qr.getExecutableComponentDescription(fd.getExecutableComponentResourceForInstance(cd.getSourceInstance()))==null);
 			
 			ExecutableComponentDescription compDesc = qr.getExecutableComponentDescription(fd.getExecutableComponentResourceForInstance(cd.getSourceInstance()));
 			DataPortDescription dpdOut = compDesc.getOutput(cd.getSourceIntaceDataPort());

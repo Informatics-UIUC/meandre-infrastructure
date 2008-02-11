@@ -58,7 +58,7 @@ public class DemoRepositoryGenerator {
 		
 		ExecutableComponentDescription ecdRes = null;
 		
-		Resource resExecutableComponent =  ModelFactory.createDefaultModel().createResource(sBaseURL+"push-string");
+		Resource resExecutableComponent =  ModelFactory.createDefaultModel().createResource(sBaseURL+"push_string");
 		
 		// General properties
 		String sName = "Push String";
