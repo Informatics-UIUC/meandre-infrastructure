@@ -152,7 +152,7 @@
     <!-- run-core -->
     <target name="run" depends="dist" description="Runs the default Meandre-Core server">
         <echo level="info">Run the default Meandre-Core server</echo>
-        <java classname="org.meandre.WSCoreBootstrapper">
+        <java classname="org.meandre.webservices.WSCoreBootstrapper">
             <classpath refid="meandre.core.classpath"/>
             <classpath>
                 <pathelement location="${dist.dir}/${app.name}-core.jar"/>
