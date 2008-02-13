@@ -1,6 +1,9 @@
 package org.meandre.core.engine;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -118,6 +121,38 @@ public class ConductorTest {
 		assertEquals(sResult,baosOut.toString());
 	}
 
+	/** Run the basic hello world test with dangling outputs.
+	 * 
+	 * @param conductor The conductor to use
+	 * @param qr The query repository
+	 * @throws CorruptedDescriptionException A corrupted description  was found
+	 * @throws ConductorException The conductor could not build the flow
+	 */
+	private void runHelloWorldHetereogenousFlow(Conductor conductor,
+			QueryableRepository qr) throws CorruptedDescriptionException,
+			ConductorException {
+		// Create the execution
+		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next());
+		// Redirect the output
+		PrintStream psOut = System.out;
+		PrintStream psErr = System.err;
+		ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
+		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
+		System.setOut(new PrintStream(baosOut));
+		System.setErr(new PrintStream(baosErr));
+		exec.execute();
+		System.setOut(psOut);
+		System.setErr(psErr);
+		// Restore the output
+		assertTrue(exec.hadGracefullTermination());
+		assertEquals(0,exec.getAbortMessage().size());
+		assertEquals(0,baosErr.size());
+		
+		String sResult = "HELLO WORLD!!! HAPPY MEANDRING!!!HELLO WORLD!!! HAPPY MEANDRING!!!\n";
+		assertEquals(sResult.length(),baosOut.size());
+		assertEquals(sResult,baosOut.toString());
+	}
+	
 	/**
 	 * Test method for {@link org.meandre.core.engine.Conductor#buildExecutor(org.meandre.core.store.repository.QueryableRepository, com.hp.hpl.jena.rdf.model.Resource)}.
 	 */
@@ -130,8 +165,18 @@ public class ConductorTest {
 			Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
 			QueryableRepository qr = new RepositoryImpl(model);
 			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
-			// Run the basic text
+			// Run the basic test
 			runHelloWorldFlow(conductor, qr);
+			
+			// Run simple hetereogenous hello world (Java+Python)
+			model = DemoRepositoryGenerator.getTestHelloWorldHetereogenousRepository();
+			qr = new RepositoryImpl(model);
+			//for ( Resource res:qr.getAvailableExecutableComponents())
+			//	System.out.println(res);
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/to-uppercase")));
+			// Run the basic test
+			runHelloWorldHetereogenousFlow(conductor, qr);
+
 			
 			// Run simple hello world dangling input/outputs
 			model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsRepository();
@@ -152,36 +197,6 @@ public class ConductorTest {
 		} catch (ConductorException e) {
 			fail("Conductor exception: "+e);
 		}
-	}
-	
-	
-	/** This test keeps updating a repository and reflushing it. Used to check for 
-	 * memory leaks.
-	 */
-	@Test
-	public void runRepetitiveUpdaterTest() {
-		
-		int REPETITIONS = 30;
-		try {
-			// Run simple hello world dangling input/outputs + fork
-			Model model = DemoRepositoryGenerator.getNextTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
-			RepositoryImpl qr = new RepositoryImpl(model);
-			
-			for ( int i=0 ; i<REPETITIONS ; i++ ) {
-				Model modNew = DemoRepositoryGenerator.getNextTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
-				model.add(modNew);
-				qr.refreshCache(model);
-//				System.out.println(i);
-//				System.out.println(qr.getModel().size());
-//				System.out.println(qr.getAvailableExecutableComponentDescriptions().size());
-//				System.out.println(qr.getAvailableFlowDecriptions().size());
-				assertEquals(i+2,qr.getAvailableFlowDecriptions().size());
-				assertEquals(4*(i+2),qr.getAvailableExecutableComponentDescriptions().size());
-			}
-		} catch (InterruptedException e) {
-			fail(e.toString());
-		}
-		
 	}
 
 }

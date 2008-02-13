@@ -19,26 +19,34 @@ public class JythonExecutableComponentAdapter implements ExecutableComponent {
 	/** The Jython interpreter that will use this executable component. */
 	protected PythonInterpreter pi = null;
 	
-	/** The script containing the executable component definitions */
-	protected String sScript = null;
-
 	/** The output stream of the interpreter */
 	protected ByteArrayOutputStream baosOut = null;
 
 	/** The error stream of the interpreter */
 	protected ByteArrayOutputStream baosErr = null;
 	
-	/** Initialize the interpreter and runs the provided scripts containing the 
-	 * executable component function calls
+	/** Just creates an empty adapters
 	 * 
-	 * @param sScript The script to run.
 	 */
-	public JythonExecutableComponentAdapter ( String sScript ) {
+	public JythonExecutableComponentAdapter ( ) {
+	}
+	
+	/** Prepares the interpreter and runs the provided scripts containing the 
+	 * executable component function calls
+	 */
+	public void prepare () {
 		// Setup the interpreter
 		pi = new PythonInterpreter();
 		pi.setOut(baosOut=new ByteArrayOutputStream());
 		pi.setErr(baosErr=new ByteArrayOutputStream());
-		pi.exec(this.sScript=sScript);
+	}
+	
+	/** Process the given script on an already prepared adapter.
+	 * 
+	 * @param sScript The scrip to process
+	 */
+	public void process ( String sScript ) {
+		pi.exec(sScript);
 	}
 	
 	/** This method is invoked when the Meandre Flow is being prepared for 

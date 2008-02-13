@@ -750,7 +750,8 @@ public class WSRepositoryLogic {
 				modUser.add(ecd.getModel());
 			}
 			else {
-				if ( bEmbed ) {
+				if ( (bEmbed && ecd.getRunnable().equals("java") && ecd.getFormat().equals("java/class") ) || 
+					 (ecd.getRunnable().equals("python") && ecd.getFormat().equals("jython")) ) {
 					//
 					// Embed all the context per descriptor
 					//

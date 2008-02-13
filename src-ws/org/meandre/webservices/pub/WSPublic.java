@@ -79,13 +79,13 @@ public class WSPublic extends HttpServlet {
     	}
     	else if ( sTarget.endsWith("/demo_repository") ) {
 			if ( sExtension.endsWith("rdf") ) {
-				dumpRepository(request,response,DemoRepositoryGenerator.getTestHelloWorldRepository(),"RDF/XML-ABBREV");
+				dumpRepository(request,response,DemoRepositoryGenerator.getTestHelloWorldHetereogenousRepository(),"RDF/XML-ABBREV");
 			}
 			else if ( sExtension.endsWith("ttl") ) {
-				dumpRepository(request,response,DemoRepositoryGenerator.getTestHelloWorldRepository(),"TTL");
+				dumpRepository(request,response,DemoRepositoryGenerator.getTestHelloWorldHetereogenousRepository(),"TTL");
 			}
 			else if ( sExtension.endsWith("nt") ) {
-				dumpRepository(request,response,DemoRepositoryGenerator.getTestHelloWorldRepository(),"N-TRIPLE");
+				dumpRepository(request,response,DemoRepositoryGenerator.getTestHelloWorldHetereogenousRepository(),"N-TRIPLE");
 			}
 			else  {
 				// 

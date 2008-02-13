@@ -6,6 +6,7 @@ package org.meandre.core.repository;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.meandre.core.store.repository.QueryableRepository;
@@ -161,6 +162,35 @@ public class RepositoryImplTest {
 
 		assertEquals(qr.getFlowTags().size(),2);
 		assertEquals(qr.getComponentTags().size(),6);
+	}
+	
+	/** This test keeps updating a repository and reflushing it. Used to check for 
+	 * memory leaks.
+	 */
+	@Test
+	public void runRepetitiveUpdaterTest() {
+		
+		int REPETITIONS = 30;
+		try {
+			// Run simple hello world dangling input/outputs + fork
+			Model model = DemoRepositoryGenerator.getNextTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
+			RepositoryImpl qr = new RepositoryImpl(model);
+			
+			for ( int i=0 ; i<REPETITIONS ; i++ ) {
+				Model modNew = DemoRepositoryGenerator.getNextTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
+				model.add(modNew);
+				qr.refreshCache(model);
+//				System.out.println(i);
+//				System.out.println(qr.getModel().size());
+//				System.out.println(qr.getAvailableExecutableComponentDescriptions().size());
+//				System.out.println(qr.getAvailableFlowDecriptions().size());
+				assertEquals(i+2,qr.getAvailableFlowDecriptions().size());
+				assertEquals(4*(i+2),qr.getAvailableExecutableComponentDescriptions().size());
+			}
+		} catch (InterruptedException e) {
+			fail(e.toString());
+		}
+		
 	}
 
 }

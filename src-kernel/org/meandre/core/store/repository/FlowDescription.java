@@ -320,7 +320,7 @@ public class FlowDescription {
 			Resource resCons = null;
 			if ( setConnectorDescription.size()>0 ) {
 				res.addProperty(RepositoryVocabulary.connectors,
-					resCons=model.createResource(resFlowComponent.toString()+"/connector/set"));
+					resCons=model.createResource(resFlowComponent.toString()+"connector/set"));
 				for ( ConnectorDescription cd:setConnectorDescription ) {
 					String sConID = cd.getConnector().toString();
 					String sSource = cd.getSourceInstance().toString();
@@ -342,7 +342,7 @@ public class FlowDescription {
 			// Adding instances
 			if ( setExecutableComponentInstances.size()>0 ) {
 				res.addProperty(RepositoryVocabulary.components_instances,
-						resCons=model.createResource(resFlowComponent.toString()+"/components/set"));
+						resCons=model.createResource(resFlowComponent.toString()+"components/set"));
 				for ( ExecutableComponentInstanceDescription ecid:setExecutableComponentInstances ) {
 					String sConID = ecid.getExecutableComponentInstance().toString();
 					String sComp = ecid.getExecutableComponent().toString();

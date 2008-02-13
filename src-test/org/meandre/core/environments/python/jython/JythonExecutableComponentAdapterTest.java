@@ -26,6 +26,7 @@ public class JythonExecutableComponentAdapterTest {
 	
 	/** A simple Hello World printing script */
 	protected static String sSimpleExecutableComponent = "" +
+			"\n" +
 			"def initialize(ccp):\n" +
 			"   print \"Initilize called\"\n"+
 			"\n" +
@@ -34,6 +35,9 @@ public class JythonExecutableComponentAdapterTest {
 			"   print dir(cc)\n" +
 			"   print cc.executionInstanceID \n" +
 			"   print cc.flowExecutionInstanceID \n" +
+			"   s = \"Execute called\" \n" +
+//			"   s = cc.getDataComponentFromInput(\"string\") \n" +
+//			"   cc.pushDataComponentToOutput(\"string\",s.upper()) \n" +
 			"\n" +
 			"def dispose(ccp):\n" +
 			"   print \"Dispose called\"\n" +
@@ -44,7 +48,9 @@ public class JythonExecutableComponentAdapterTest {
 	 */
 	@Test
 	public void testSimpleAdapter () {
-		JythonExecutableComponentAdapter jeca =  new JythonExecutableComponentAdapter(sSimpleScript);
+		JythonExecutableComponentAdapter jeca =  new JythonExecutableComponentAdapter();
+		jeca.prepare();
+		jeca.process(sSimpleScript);
 		String sRes = jeca.getOutput().toString();
 		assertEquals("Hello World!\n",sRes);
 		assertEquals(0, jeca.getError().size());
@@ -57,7 +63,9 @@ public class JythonExecutableComponentAdapterTest {
 	public void testInitializeAndDispose() {
 		String sRes = null;
 		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>());
-		JythonExecutableComponentAdapter jeca = new JythonExecutableComponentAdapter(sSimpleExecutableComponent);
+		JythonExecutableComponentAdapter jeca = new JythonExecutableComponentAdapter();
+		jeca.prepare();
+		jeca.process(sSimpleExecutableComponent);
 		jeca.initialize(cc);
 		sRes = jeca.getOutput().toString();
 		assertEquals("Initilize called\n",sRes);
@@ -71,9 +79,12 @@ public class JythonExecutableComponentAdapterTest {
 	 */
 	@Test
 	public void testExecute() {
+		System.out.println(sSimpleExecutableComponent);
 		String sRes = null;
 		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>());
-		JythonExecutableComponentAdapter jeca = new JythonExecutableComponentAdapter(sSimpleExecutableComponent);
+		JythonExecutableComponentAdapter jeca = new JythonExecutableComponentAdapter();
+		jeca.prepare();
+		jeca.process(sSimpleExecutableComponent);
 		try {
 			jeca.execute(cc);
 		} catch (ComponentExecutionException e) {
@@ -82,8 +93,10 @@ public class JythonExecutableComponentAdapterTest {
 			fail("This execption should not be thrown "+e);
 		}
 		sRes = jeca.getOutput().toString();
+		System.out.println(sSimpleExecutableComponent);
+		System.out.println(sRes);
 		assertTrue(sRes.startsWith("Execute called"));
-		// System.out.println(sRes);
+		
 	}
 
 }

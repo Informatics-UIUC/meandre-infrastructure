@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import org.meandre.core.ExecutableComponent;
 import org.meandre.core.engine.policies.component.availability.WrappedComponentAllInputsRequired;
 import org.meandre.core.engine.policies.component.availability.WrappedComponentAnyInputRequired;
+import org.meandre.core.environments.python.jython.JythonExecutableComponentAdapter;
 import org.meandre.core.logger.LoggerFactory;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.repository.ConnectorDescription;
@@ -44,15 +45,15 @@ import com.hp.hpl.jena.rdf.model.Resource;
 public class Conductor {
 
 	/** List of working implementations for executable components. */
-	static private final String [] saExecutableComponentLanguages = { "java" };
+	static private final String [] saExecutableComponentLanguages = { "java", "python" };
 
 	/** Set of loadable implementations */
 	private Set<String> setLoadableLanguages = null;
 
 	/** List of working implementations for executable components. */
-	static private final String [] saExecutableComponentTypes = { "java/class" };
+	static private final String [] saExecutableComponentTypes = { "java/class", "jython" };
 
-	/** A simple separator caracter for URLs */
+	/** A simple separator character for URLs */
 	static private final String URL_SEAPARTOR = "##--##--##";
 
 	/** The default queue size for the active buffers */
@@ -77,7 +78,7 @@ public class Conductor {
 	 *
 	 */
 	public Conductor( int iActiveBufferSize ) {
-		log.info("Creating a conductor object");
+		log.info("Creating a conductor object"); 
 		this.iActiveBufferSize = iActiveBufferSize;
 		setLoadableLanguages = new HashSet<String>();
 		for ( String sLang:saExecutableComponentLanguages )
@@ -107,10 +108,10 @@ public class Conductor {
 		
 		// Get the description
 		FlowDescription fd = qr.getFlowDescription(res);
-
+		
 		// STEP 0: Gather all the required contexts and load them
 		log.info("STEP 0: Plugging the required contexts");
-		plugRequiredContexts(qr, htMapNameToClass, htMapResourceToName,fd);
+		URLClassLoader urlFlowCL = plugRequiredContexts(qr, htMapNameToClass, htMapResourceToName,fd);
 
 		// STEP 1: Instantiate the flow instances
 		log.info("STEP 1: Instantiate the flow instances");
@@ -118,12 +119,39 @@ public class Conductor {
 		for ( ExecutableComponentInstanceDescription ec:fd.getExecutableComponentInstances() ) {
 			Resource   ins = ec.getExecutableComponentInstance();
 			Resource ecomp = ec.getExecutableComponent();
-			try {
-				htECInstances.put(ins,htMapNameToClass.get(htMapResourceToName.get(ecomp)).newInstance());
-			} catch (InstantiationException e) {
-				throw new ConductorException("Condcuctor could not instantiate class "+htMapResourceToName.get(ecomp)+"\n"+e);
-			} catch (IllegalAccessException e) {
-				throw new ConductorException("Condcuctor could not instantiate class "+htMapResourceToName.get(ecomp)+"\n"+e);
+			ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(ecomp);
+			if ( ecd.getRunnable().equals("java") && ecd.getFormat().equals("java/class")) {
+				// Creates a java instance of the component implementation
+				try {
+//					System.out.println(ecomp);
+//					System.out.println(htMapResourceToName.keySet());
+//					System.out.println(htMapResourceToName.get(ecomp));
+//					System.out.println(htMapNameToClass.keySet());
+					htECInstances.put(ins,htMapNameToClass.get(htMapResourceToName.get(ecomp)).newInstance());
+				} catch (InstantiationException e) {
+					throw new ConductorException("Condcuctor could not instantiate class "+htMapResourceToName.get(ecomp)+"\n"+e);
+				} catch (IllegalAccessException e) {
+					throw new ConductorException("Condcuctor could not instantiate class "+htMapResourceToName.get(ecomp)+"\n"+e);
+				}
+			}
+			else if ( ecd.getRunnable().equals("python") && ecd.getFormat().equals("jython") ){
+				// Creates a jython wrapper and sources all the scripts
+				Set<RDFNode> setScripts = ecd.getContext();
+				JythonExecutableComponentAdapter jeca;
+				try {
+					jeca = (JythonExecutableComponentAdapter) urlFlowCL.loadClass(JythonExecutableComponentAdapter.class.getName()).newInstance();
+				} catch (InstantiationException e) {
+					throw new ConductorException(e);
+				} catch (IllegalAccessException e) {
+					throw new ConductorException(e);
+				} catch (ClassNotFoundException e) {
+					throw new ConductorException(e);
+				}
+				jeca.prepare();
+				for ( RDFNode rdfn:setScripts ) 
+					if ( rdfn.isLiteral() ) 
+						jeca.process(((Literal)rdfn).getLexicalForm());
+				htECInstances.put(ins,jeca);
 			}
 		}
 
@@ -182,7 +210,6 @@ public class Conductor {
 			
 		}
 		for ( ConnectorDescription cd:fd.getConnectorDescriptions() ) {
-			System.out.println("(0)"+cd.getConnector());
 			String sIDOutSet = cd.getSourceInstance().toString();
 			String  sIDInSet = cd.getTargetInstance().toString();
 			String  sIDIn = cd.getTargetInstance().toString()+URL_SEAPARTOR+cd.getTargetIntaceDataPort().toString();
@@ -282,11 +309,12 @@ public class Conductor {
 	 * @param htMapNameToClass The map from the name to the class
 	 * @param htMapResourceToName The map from the resource to a name
 	 * @param fd The flow descriptor 
+	 * @return The flow classloader
 	 * @throws CorruptedDescriptionException The descriptor is corrupted
 	 * @throws ConductorException The literal containing the resource could not be dumped to a file
 	 */
 	@SuppressWarnings("unchecked")
-	protected void plugRequiredContexts(QueryableRepository qr,
+	protected URLClassLoader plugRequiredContexts(QueryableRepository qr,
 			Hashtable<String, Class> htMapNameToClass, Hashtable<Resource, String> htMapResourceToName,
 			FlowDescription fd) throws CorruptedDescriptionException, ConductorException {
 		
@@ -329,8 +357,9 @@ public class Conductor {
 					// Just a usual URI pointing to the resource 
 					setContexts.add(((Resource)rdfnodeContext).getURI().trim());
 				else 
-					// The literal is dumped to the file system and a URI generated
-					setContexts.add(prepareLiteralToTheFileSystem((Literal)rdfnodeContext));
+					if ( comp.getRunnable().equals("java") && comp.getFormat().equals("java/class")) 
+						// The literal is dumped to the file system and a URI generated
+						setContexts.add(prepareJarLiteralToTheFileSystem((Literal)rdfnodeContext));
 			
 			// Retrieve the location
 			boolean bChomped = false;
@@ -355,7 +384,7 @@ public class Conductor {
 		}
 		
 		// Load the component classes
-		loadExecutableComponentImplementation(setContexts, setURLLocations, htMapNameToClass, htMapNameToResource, htMapResourceToRunnable, htMapResourceToFormat);
+		return loadExecutableComponentImplementation(setContexts, setURLLocations, htMapNameToClass, htMapNameToResource, htMapResourceToRunnable, htMapResourceToFormat);
 	}
 
 	/** This methods dump the Literal to the file system and creates a URI for the class loader.
@@ -364,7 +393,7 @@ public class Conductor {
 	 * @return The URI to the loader resource
 	 * @throws ConductorException The literal could not be dump to a file
 	 */
-	private String prepareLiteralToTheFileSystem(Literal lit) throws ConductorException {
+	private String prepareJarLiteralToTheFileSystem(Literal lit) throws ConductorException {
 		String sURI = htMapLiteralToFile.get(lit);
 		
 		if ( sURI==null || htMapLiteralToHashcode.get(lit)!=lit.hashCode() ) {
@@ -402,10 +431,11 @@ public class Conductor {
 	 * @param htMapNameToResource The map to resource
 	 * @param htMapResourceToFormat The map to runnable type
 	 * @param htMapResourceToRunnable The map to format type
+	 * @return The flow classloader
 	 * @throws CorruptedDescriptionException A corrupted description was found
 	 */
 	@SuppressWarnings("unchecked")
-	protected void loadExecutableComponentImplementation(
+	protected URLClassLoader loadExecutableComponentImplementation(
 			Set<String> setURLContext, 
 			Set<String> setURLLocations,
 			Hashtable<String, Class> htMapNameToClass,
@@ -424,14 +454,18 @@ public class Conductor {
 			}
 		// Initializing the java class loader
 		URLClassLoader urlCL = new URLClassLoader(ua);
-		for ( String sClassName:setURLLocations )
+		for ( String sClassName:setURLLocations ) {
 			try {
 				if ( htMapResourceToRunnable.get(htMapNameToResource.get(sClassName)).equals("java") ) {
 					log.info("Loading java component "+sClassName);
 					htMapNameToClass.put(sClassName,Class.forName(sClassName,true,urlCL));
 				}
 			} catch (ClassNotFoundException e) {
+				log.severe("Class "+sClassName+" could not be loaded");
 				throw new CorruptedDescriptionException(e);
 			}
+		}
+		return urlCL;
+		
 	}
 }

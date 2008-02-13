@@ -56,9 +56,11 @@ public class RepositoryImpl implements QueryableRepository {
 		
 		// Runnable
 		setRunnable.add("java");
+		setRunnable.add("python");
 		
 		// Format
 		setFormat.add("java/class");
+		setFormat.add("jython");
 		
 		// Firing policy
 		setFiringPolicy.add("any");
