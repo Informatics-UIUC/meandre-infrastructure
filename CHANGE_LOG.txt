@@ -1,6 +1,6 @@
 1.2vcli Panellet:
 
-* Modified the add and add_flow services
+* Modified the /services/repository/add and /services/repository/add_flow services
 	- Added overwrite flag (if true overwrites the component/flow descriptor)
 	- Added dump flag (if true dumps the repository after the requested modifications using the same format of requested modifications)
 
