@@ -109,6 +109,8 @@ public class WSRepositoryLogic {
 			}
 		}
 
+		qr.refreshCache();
+		
 		return bRes;
 	}
 
@@ -647,15 +649,17 @@ public class WSRepositoryLogic {
 	 *
 	 * @param request The request object
 	 * @param sExtension The extension format
+	 * @param baDump The array to set the dump flag
 	 * @return The model containing the flow
 	 * @throws FileUploadException An exception araised while uploading the model
 	 */
 	@SuppressWarnings("unchecked")
-	public static Model addToRepository(HttpServletRequest request, String sExtension)
+	public static Model addToRepository(HttpServletRequest request, String sExtension, boolean [] baDump)
 	throws IOException, FileUploadException {
 
 		boolean bEmbed = false;
-		Model modelTmp = null;
+		boolean bOverwrite = false;
+		Model modelAcc = ModelFactory.createDefaultModel();
 		ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
 		List lstItems = upload.parseRequest(request);
 		Iterator<FileItem> itr = lstItems.iterator();
@@ -664,9 +668,7 @@ public class WSRepositoryLogic {
 
 		// The user repository
 		QueryableRepository qr = Store.getRepositoryStore(request.getRemoteUser());
-		Model modelQR = qr.getModel();
-		modelQR.begin();
-
+		
 		while(itr.hasNext()) {
 			FileItem item = itr.next();
 		    // Get the name of the field
@@ -677,7 +679,7 @@ public class WSRepositoryLogic {
 
 				ByteArrayInputStream bais = new ByteArrayInputStream(item.get());
 
-				modelTmp = ModelFactory.createDefaultModel();
+				Model modelTmp = ModelFactory.createDefaultModel();
 
 				modelTmp.setNsPrefix("", "http://www.meandre.org/ontology/");
 				modelTmp.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
@@ -695,36 +697,9 @@ public class WSRepositoryLogic {
 					modelTmp.read(bais,null);
 
 				//
-				// Check the uploaded description
+				// Accumulate the models
 				//
-				QueryableRepository qrNew = new RepositoryImpl(modelTmp);
-
-				//
-				// Add to the user repository
-				//
-				// Adding components
-				for ( Resource resComp:qrNew.getAvailableExecutableComponents() ) {
-					if ( qr.getExecutableComponentDescription(resComp)==null ) {
-						// Component does not exist
-						// Add to the set to modify before adding to the repository repository
-						setComponentsToAdd.add(qrNew.getExecutableComponentDescription(resComp));
-					}
-					else {
-						// Component does exist
-						log.warning("Component "+resComp+" already exist in "+request.getRemoteUser()+" repository. Discarding it.");
-					}
-				}
-				// Adding flows
-				for ( Resource resFlow:qrNew.getAvailableFlows() ) {
-					if ( qr.getFlowDescription(resFlow)==null ) {
-						// Component does not exist
-						modelQR.add(qrNew.getFlowDescription(resFlow).getModel());
-					}
-					else {
-						// Component does exist
-						log.warning("Flow "+resFlow+" already exist in "+request.getRemoteUser()+" repository. Discarding it.");
-					}
-				}
+				modelAcc.add(modelTmp);
 			}
 			// Check if we need to upload jar files
 			else if(fieldName.equals("context")) {
@@ -735,19 +710,74 @@ public class WSRepositoryLogic {
 				String sValue = item.getString();
 				bEmbed = sValue.equals("true");
 			}
+			else if ( fieldName.equals("dump") ) {
+				String sValue = item.getString();
+				baDump[0] = sValue.equals("true");
+			}
+			else if ( fieldName.equals("overwrite") ) {
+				String sValue = item.getString();
+				bOverwrite = sValue.equals("true");
+			}
 		}
 
 		// TODO: Check that this uploaded contexts are really proper contexts :D
+		//
+		// Check the uploaded description
+		//
+		QueryableRepository qrNew = new RepositoryImpl(modelAcc);
 
-		// Adding the components after adding the contexts
+		//
+		// Add to the user repository
+		//
+		// Adding components
+		for ( Resource resComp:qrNew.getAvailableExecutableComponents() ) {
+			if ( qr.getExecutableComponentDescription(resComp)==null || bOverwrite) {
+				// Component does not exist
+				// Add to the set to modify before adding to the repository repository
+				setComponentsToAdd.add(qrNew.getExecutableComponentDescription(resComp));
+			}
+			else {
+				// Component does exist
+				log.warning("Component "+resComp+" already exist in "+request.getRemoteUser()+" repository. Discarding it.");
+			}
+		}
+		// Adding flows
 		Model modUser = qr.getModel();
+		modUser.begin();
+		for ( Resource resFlow:qrNew.getAvailableFlows() ) {
+			if ( qr.getFlowDescription(resFlow)==null ) {
+				// Component does not exist
+				modUser.add(qrNew.getFlowDescription(resFlow).getModel());
+			}
+			else {
+				if ( bOverwrite ) {
+					log.info("Overwriting flow "+resFlow);
+					modUser.remove(qr.getFlowDescription(resFlow).getModel());
+					modUser.add(qrNew.getFlowDescription(resFlow).getModel());
+				}
+				else
+					// Component does exist
+					log.warning("Flow "+resFlow+" already exist in "+request.getRemoteUser()+" repository. Discarding it. No overwrite flag provided.");
+			}
+		}
+		
+		// Adding the components after adding the contexts
 		URL urlRequest = new URL(request.getRequestURL().toString());
 		Set<String> setFiles = htContextBytes.keySet();
 		boolean bWriteOnce = true;
-		modUser.begin();
 		for ( ExecutableComponentDescription ecd:setComponentsToAdd) {
 			if ( htContextBytes.keySet().isEmpty() ) {
-				modUser.add(ecd.getModel());
+				if ( qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent()) ) {
+					if ( bOverwrite ) {
+						modUser.remove(qr.getExecutableComponentDescription(ecd.getExecutableComponent()).getModel());
+						modUser.add(ecd.getExecutableComponent().getModel());
+					}
+					else
+						log.warning("Discarding upload of the existem component "+ecd.getExecutableComponent()+". No overwrite flag provided.");
+				}
+				else {
+					modUser.add(ecd.getModel());
+				}
 			}
 			else {
 				if ( (bEmbed && ecd.getRunnable().equals("java") && ecd.getFormat().equals("java/class") ) || 
@@ -780,16 +810,27 @@ public class WSRepositoryLogic {
 						Resource res = modUser.createResource(urlRequest.getProtocol()+"://"+urlRequest.getHost()+":"+urlRequest.getPort()+"/public/resources/contexts/java/"+sFile);
 						ecd.getContext().add(res);
 					}
+					ecd.getModel().write(System.out,"TTL");
 					// Avoid dumping them multiple times
 					bWriteOnce = false;
 				}
-				modUser.add(ecd.getModel());
+				
+				if ( qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent()) ) {
+					if ( bOverwrite ) {
+						modUser.remove(qr.getExecutableComponentDescription(ecd.getExecutableComponent()).getModel());
+						modUser.add(ecd.getModel());
+					}
+					else
+						log.warning("Discarding upload of the existem component "+ecd.getExecutableComponent()+". No overwrite flag provided.");
+				}
+				else {
+					modUser.add(ecd.getModel());
+				}
 			}
 
 		}
 		//Commiting changes
 		modUser.commit();
-		modelQR.commit();
 
 		// Regenerate the cache after adding
 		qr.refreshCache();
@@ -811,6 +852,7 @@ public class WSRepositoryLogic {
 
 		// Read the uploaded descriptor into a model
 		String sFlowsDesc = request.getParameter("repository");
+		boolean bOverwrite = request.getParameter("overwrite").equals("true");
 		Model modNew = ModelFactory.createDefaultModel();
 
 		modNew.setNsPrefix("", "http://www.meandre.org/ontology/");
@@ -852,6 +894,18 @@ public class WSRepositoryLogic {
 				modUser.commit();
 				// Add to the result model
 				modResult.add(fdModel);
+			}
+			else if ( bOverwrite ) {
+				// Flow is there byt needs to be overwritten
+				Model modOld = qr.getFlowDescription(fd.getFlowComponent()).getModel();
+				Model modRep = qr.getModel();
+				modRep.begin();
+				modRep.remove(modOld);
+				modRep.add(fd.getModel());
+				modRep.commit();
+			}
+			else {
+				log.info("Flow already exist and the overwrite flag has not been provided. Discading flow update "+fd.getFlowComponent());
 			}
 		}
 

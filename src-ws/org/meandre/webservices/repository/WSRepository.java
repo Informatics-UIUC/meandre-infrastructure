@@ -300,21 +300,22 @@ public class WSRepository extends HttpServlet {
 			HttpServletResponse response, String sTarget, String sExtension) throws IOException{
 		
 		try {
-			Model modelFlow = WSRepositoryLogic.addToRepository(request,sExtension);
+			boolean [] baDump = {false};
+			Model modelFlow = WSRepositoryLogic.addToRepository(request,sExtension,baDump);
 			
 			if ( modelFlow == null ) {
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			}
-			else if ( sExtension.endsWith("rdf") ) {
+			else if ( sExtension.endsWith("rdf") && baDump[0] ) {
 				dumpModel(request,response,modelFlow,"RDF/XML-ABBREV"); 
 			}
-			else if ( sExtension.endsWith("ttl") ) {
+			else if ( sExtension.endsWith("ttl") && baDump[0] ) {
 				dumpModel(request,response,modelFlow,"TTL"); 
 			}
-			else if ( sExtension.endsWith("nt") ) {
+			else if ( sExtension.endsWith("nt") && baDump[0] ) {
 				dumpModel(request,response,modelFlow,"N-TRIPLE"); 
 			}
-			else  {
+			else if ( baDump[0]) {
 				// 
 				// Invalid request found
 				//
@@ -340,20 +341,25 @@ public class WSRepository extends HttpServlet {
 		
 		try {
 			Model modelFlow = WSRepositoryLogic.addFlowsToRepository(request,sExtension);
+			boolean bDump = request.getParameter("dump").equals("true");
 			
 			if ( modelFlow == null ) {
+				log.warning("No flow provided");
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			}
-			else if ( sExtension.endsWith("rdf") ) {
+			else if ( sExtension.endsWith("rdf") && bDump ) {
+				log.info("Dumping the uploaded flow");
 				dumpModel(request,response,modelFlow,"RDF/XML-ABBREV"); 
 			}
-			else if ( sExtension.endsWith("ttl") ) {
+			else if ( sExtension.endsWith("ttl") && bDump ) {
+				log.info("Dumping the uploaded flow");
 				dumpModel(request,response,modelFlow,"TTL"); 
 			}
-			else if ( sExtension.endsWith("nt") ) {
+			else if ( sExtension.endsWith("nt") && bDump ) {
+				log.info("Dumping the uploaded flow");
 				dumpModel(request,response,modelFlow,"N-TRIPLE"); 
 			}
-			else  {
+			else  if ( bDump ){
 				// 
 				// Invalid request found
 				//
