@@ -76,6 +76,7 @@ public class ResultReaderServlet extends HttpServlet implements MeandrePlugin {
 	String paramName=null;
 	while(enum1.hasMoreElements()){
 			paramName = enum1.nextElement();
+			System.out.println(paramName+ " " + req.getParameter(paramName) + " <br/>");
 			res.getWriter().write(paramName+ " " + req.getParameter(paramName) + " <br/>");
 
 	}

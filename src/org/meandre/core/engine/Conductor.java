@@ -33,6 +33,8 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * which will eventually execute the flow.
  *
  * @author Xavier Llor&agrave;
+ * @modified Amit Kumar: -added flowID as a constructor argument
+ * for WrappedComponents
  *
  */
 public class Conductor {
@@ -102,8 +104,10 @@ public class Conductor {
 	 */
 	@SuppressWarnings("unchecked")
 	public Executor buildExecutor(QueryableRepository qr, Resource res) throws CorruptedDescriptionException, ConductorException {
+		//Flow ID
+		String flowID = res.toString();
 		// The unique execution flow ID
-		String sFlowUniqueExecutionID = res.toString()+File.pathSeparator+System.currentTimeMillis()+File.pathSeparator+(new Random().nextInt());
+		String sFlowUniqueExecutionID =  flowID+File.pathSeparator+System.currentTimeMillis()+File.pathSeparator+(new Random().nextInt());
 		// Set of loadable context URLs
 		Set<String> setURLContext = new HashSet<String>();
 		// Set of loadable locations
@@ -130,23 +134,23 @@ public class Conductor {
             // If the resource does not exist throw an exeception
 			if (comp == null)
 				throw new CorruptedDescriptionException("The required executable component " + ins.getExecutableComponent() + " does not exist in the current repository");
-			
+
 			// Check if it is loadable
 			if ( setLoadableLanguages.contains(comp.getRunnable().toLowerCase()) )
 				htMapResourceToRunnable.put(comp.getExecutableComponent(),comp.getRunnable().toLowerCase());
 			else
 				throw new CorruptedDescriptionException("Cannot process executable components runnable as "+comp.getRunnable());
-			
+
 			// Check if it is loadable
 			if ( setLoadableComponents.contains(comp.getFormat().toLowerCase()) )
 				htMapResourceToFormat.put(comp.getExecutableComponent(), comp.getFormat().toLowerCase());
 			else
 				throw new CorruptedDescriptionException("Component of type "+comp.getFormat()+" could not be loaded by the conductor");
-			
+
 			// Retrieve the contextes
 			for ( Resource resContext:comp.getContext() )
 				setURLContext.add(resContext.getURI().trim());
-			
+
 			// Retrieve the location
 			boolean bChomped = false;
 			String sURI = comp.getLocation().getURI().trim();
@@ -157,7 +161,7 @@ public class Conductor {
 					sURIHead = sURI.substring(0,sCntx.length());
 					sURI = sURI.substring(sCntx.length());
 				}
-			
+
 			// Check if location does not match any context
 			if ( bChomped ) {
 				setURLLocations.add(sURI);
@@ -168,7 +172,7 @@ public class Conductor {
 			else
 				throw new CorruptedDescriptionException("Location "+sURI+" does not match any of the executable component contexts");
 		}
-		
+
 		// Load the component classes
 		loadExecutableComponentImplementation(setURLContext, setURLLocations, htMapNameToClass, htMapNameToResource, htMapResourceToRunnable, htMapResourceToFormat);
 
@@ -222,24 +226,24 @@ public class Conductor {
 		Hashtable<Resource,Hashtable<String,String>> htMapOutputLogicNameTranslation = new Hashtable<Resource,Hashtable<String,String>>();
 		for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() ) {
 			ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(ecid.getExecutableComponent());
-			
+
 			Hashtable<String, String> htMapInLog = new Hashtable<String,String>();
 			htMapInputLogicNameTranslation.put(ecid.getExecutableComponentInstance(),htMapInLog);
 			for ( DataPortDescription dpd:ecd.getInputs() ) {
 				String  sIDIn = ecid.getExecutableComponentInstance()+URL_SEAPARTOR+dpd.getResource();
 				htMapInLog.put(dpd.getName(), sIDIn);
 			}
-				
+
 			Hashtable<String, String> htMapOutLog = new Hashtable<String,String>();
 			htMapOutputLogicNameTranslation.put(ecid.getExecutableComponentInstance(),htMapOutLog);
 			for ( DataPortDescription dpd:ecd.getOutputs() ) {
 				String  sIDOut = ecid.getExecutableComponentInstance()+URL_SEAPARTOR+dpd.getResource();
 				htMapOutLog.put(dpd.getName(), sIDOut);
 			}
-			
+
 			Hashtable<String, String> htMapOut = new Hashtable<String,String>();
 			htMapOutputTranslation.put(ecid.getExecutableComponentInstance(),htMapOut);
-			
+
 		}
 		for ( ConnectorDescription cd:fd.getConnectorDescriptions() ) {
 			String sIDOutSet = cd.getSourceInstance().toString();
@@ -253,7 +257,7 @@ public class Conductor {
 			DataPortDescription dpdOut = compDesc.getOutput(cd.getSourceIntaceDataPort());
 			Hashtable<String,String> htMapOut = htMapOutputTranslation.get(cd.getSourceInstance());
 			htMapOut.put(sIDOutSet+URL_SEAPARTOR+dpdOut.getIdentifier(), ab.getName());
-			
+
 			// Update the input and output sets
 			htInsOutputSet.get(sIDOutSet).add(ab);
 			htInsInputSet.get(sIDInSet).add(ab);
@@ -291,6 +295,7 @@ public class Conductor {
 					setWC.add(
 							new WrappedComponentAllInputsRequired (
 									sFlowUniqueExecutionID,
+									flowID,
 									ecid.getExecutableComponentInstance().toString(),
 									(ExecutableComponent) htECInstances.get(resECI),
 									htInsInputSet.get(sResECI),
@@ -307,6 +312,7 @@ public class Conductor {
 					setWC.add(
 							new WrappedComponentAnyInputRequired (
 									sFlowUniqueExecutionID,
+									flowID,
 									ecid.getExecutableComponentInstance().toString(),
 									(ExecutableComponent) htECInstances.get(resECI),
 									htInsInputSet.get(sResECI),

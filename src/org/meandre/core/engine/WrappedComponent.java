@@ -85,6 +85,7 @@ extends Thread {
 	 *
 	 * @param sFlowUniqueID A flow execution unique ID
 	 * @param sComponentInstanceID The component instance ID
+	 * @param componentInstanceID
 	 * @param ec The executable component to wrap
 	 * @param setInputs The input active buffers
 	 * @param setOutputs The output active buffers
@@ -97,8 +98,8 @@ extends Thread {
 	 * @throws InterruptedException The semaphore could not be adquired twice
 	 */
 	@SuppressWarnings("unchecked")
-	public WrappedComponent(String sFlowUniqueID, String sComponentInstanceID,
-			ExecutableComponent ec, Set<ActiveBuffer> setInputs,
+	public WrappedComponent(String sFlowUniqueID, String flowID,
+			String sComponentInstanceID, ExecutableComponent ec, Set<ActiveBuffer> setInputs,
 			Set<ActiveBuffer> setOutputs,
 			Hashtable<String, String> htOutputMap,
 			Hashtable<String, String> htInputLogicNameMap,
@@ -106,12 +107,11 @@ extends Thread {
 			String sThreadName, Hashtable<String, String> htProperties)
 			throws InterruptedException {
 		super(tg,sThreadName);
-
+		System.out.println("WRAPPED COMPONENT FLOW ID: " + flowID);
 		// Basic initialization
 		this.ec            = ec;
 		this.semBlocking   = new Semaphore(1,true); // With fairness
-		System.out.println("COMPONENT ID: "+ sComponentInstanceID);
-		this.cc            = new ComponentContextImpl(sFlowUniqueID, sComponentInstanceID, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, htProperties);
+		this.cc            = new ComponentContextImpl(sFlowUniqueID, flowID,sComponentInstanceID, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, htProperties);
 		this.hasNInputs     = htInputLogicNameMap.size();
 		// Setting execution flags
 		this.baStatusFlags = new boolean [4];

@@ -10,27 +10,27 @@ import org.meandre.webui.WebUI;
 import org.meandre.webui.WebUIException;
 import org.meandre.webui.WebUIFactory;
 
-/** This class is the main execution engine of Meandre. Given a set of 
+/** This class is the main execution engine of Meandre. Given a set of
  * WrappedComponents describing a MeandreFlow, it executes the flow.
- * 
+ *
  * @author Xavier Llora
  *
  */
 public class Executor {
-	
+
 	/** The logger for the bootstrapper */
 	protected static Logger log = null;
-	
+
 	// Initializing the logger and its handlers
 	static {
 		log = Logger.getLogger(WSCoreBootstrapper.class.getName());
 		log.setLevel(Level.CONFIG);
 		log.addHandler(WSCoreBootstrapper.handler);
 	}
-	
+
 	/** The thread group of the components. */
 	private ThreadGroup tg = null;
-	
+
 	/** The set of wrapped compnents */
 	private Set<? extends WrappedComponent> setWC = null;
 
@@ -55,9 +55,9 @@ public class Executor {
 		for ( WrappedComponent wc:setWC )
 			wc.thdMrProper = thdMrPropper;
 	}
-	
+
 	/** Fires the execution of a given MeandreFlow.
-	 * 
+	 *
 	 * @param iPriority The execution priority
 	 */
 	public void execute ( int iPriority ) {
@@ -67,7 +67,7 @@ public class Executor {
 		} catch (WebUIException e) {
 			log.warning("WebUI could not be started: "+e.getMessage());
 		}
-		
+
 		tg.setMaxPriority(iPriority);
 		for ( WrappedComponent wc:setWC )
 			wc.start();
@@ -79,7 +79,7 @@ public class Executor {
 		} catch (InterruptedException e) {
 			log.warning("Executor join failed: "+e.getMessage());
 		}
-		
+
 		try {
 			if ( webui!=null )
 				WebUIFactory.disposeWebUI(sFlowUniqueExecutionID);
@@ -87,42 +87,42 @@ public class Executor {
 			log.warning("WebUI could not be stoped: "+e.getMessage());
 		}
 	}
-	
+
 	/** Fires the execution of a given MeandreFlow.
-	 * 
-	 * 
+	 *
+	 *
 	 */
 	public void execute () {
 		execute(Thread.NORM_PRIORITY);
 	}
-	
-	/** Returns the current termination criteria. 
-	 * 
+
+	/** Returns the current termination criteria.
+	 *
 	 * @return The current termination criteria
 	 */
 	public boolean hadGracefullTermination () {
 		boolean bFlag = true;
-		
+
 		for ( WrappedComponent wc:setWC )
 			if ( !wc.hadGracefullTermination() )
 				return false;
-		
+
 		return bFlag;
 	}
-	
+
 	/** Returns the aborting message if any. If there was a gracefull
 	 * termination the call returns null.
-	 * 
+	 *
 	 * @return The abort message
 	 */
 	public Set<String> getAbortMessage () {
 		String sMsg = null;
 		Set<String> setRes = new HashSet<String>();
-		
+
 		for ( WrappedComponent wc:setWC )
 			if ( (sMsg=wc.getAbortMessage())!=null )
 				setRes.add(sMsg);
-		
+
 		return setRes;
 	}
 

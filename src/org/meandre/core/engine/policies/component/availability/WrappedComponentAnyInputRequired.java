@@ -8,10 +8,10 @@ import org.meandre.core.ExecutableComponent;
 import org.meandre.core.engine.ActiveBuffer;
 import org.meandre.core.engine.WrappedComponent;
 
-/** This wrapped component just fires the execution of and executalbe 
+/** This wrapped component just fires the execution of and executalbe
  * component when ANY the inputs are populated with at least one data
  * component.
- * 
+ *
  * @author Xavier Llor&agrave;
  *
  */
@@ -21,12 +21,13 @@ public class WrappedComponentAnyInputRequired extends WrappedComponent {
 	private boolean bFirst;
 
 	/** Builds a runnable component wrapper given the abstracted EcecutableComponent.
-	 * This wrapped component just fires the execution of and executalbe 
+	 * This wrapped component just fires the execution of and executalbe
      * component when ANY the inputs are populated with at least one data
      * component.
-     * 
+     *
 	 * @param sFlowUniqueID The flow unique execution ID
 	 * @param sComponentInstanceID The instance unique ID
+	 * @param string
 	 * @param ec The executable component to wrap
 	 * @param setInputs The input active buffers
 	 * @param setOutputs The output active buffers
@@ -38,7 +39,7 @@ public class WrappedComponentAnyInputRequired extends WrappedComponent {
 	 * @param htProperties The component properties
 	 * @throws InterruptedException The semaphore could not be adquired twice
 	 */
-	public WrappedComponentAnyInputRequired(String sFlowUniqueID,
+	public WrappedComponentAnyInputRequired(String sFlowUniqueID,String flowID,
 			String sComponentInstanceID, ExecutableComponent ec,
 			Set<ActiveBuffer> setInputs, Set<ActiveBuffer> setOutputs,
 			Hashtable<String, String> htOutputMap,
@@ -46,14 +47,14 @@ public class WrappedComponentAnyInputRequired extends WrappedComponent {
 			Hashtable<String, String> htOutputLogicNameMap, ThreadGroup tg,
 			String sThreadName, Hashtable<String, String> htProperties)
 			throws InterruptedException {
-		super(sFlowUniqueID, sComponentInstanceID, ec, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, tg, sThreadName, htProperties);
-		
+		super(sFlowUniqueID, flowID,sComponentInstanceID, ec, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, tg, sThreadName, htProperties);
+
 		this.bFirst = true;
 	}
 
 	/** The wrapped component is ready for execution.
-	 * 
-	 * @return A boolean asking if 
+	 *
+	 * @return A boolean asking if
 	 */
 	protected boolean isExecutable()  {
 		boolean bRes      = false;
@@ -73,7 +74,7 @@ public class WrappedComponentAnyInputRequired extends WrappedComponent {
 			}
 		}
 
-		if ( saIN.length==hasNInputs && hasNInputs>0 ) 
+		if ( saIN.length==hasNInputs && hasNInputs>0 )
 			// All inputs connected
 			return bRes;
 		else if ( hasNInputs==0 ){
@@ -82,7 +83,7 @@ public class WrappedComponentAnyInputRequired extends WrappedComponent {
 				bFirst = false;
 				return true;
 			}
-			else { 
+			else {
 				return false;
 			}
 		}
