@@ -70,15 +70,15 @@ public class Conductor {
 
 	/** Embeded context to file URI mapper */
 	private static Hashtable<Literal,String> htMapLiteralToFile = new Hashtable<Literal,String>();
-	
+
 	/** Embeded context to hash code mapper */
 	private static Hashtable<Literal,Integer> htMapLiteralToHashcode = new Hashtable<Literal,Integer>();
-	
+
 	/** Initialize a conductor with a set of valid URLs.
 	 *
 	 */
 	public Conductor( int iActiveBufferSize ) {
-		log.info("Creating a conductor object"); 
+		log.info("Creating a conductor object");
 		this.iActiveBufferSize = iActiveBufferSize;
 		setLoadableLanguages = new HashSet<String>();
 		for ( String sLang:saExecutableComponentLanguages )
@@ -97,18 +97,19 @@ public class Conductor {
 	 * @throws ConductorException The counductor could not create an executable flow
 	 */
 	@SuppressWarnings("unchecked")
-	public Executor buildExecutor(QueryableRepository qr, Resource res) 
+	public Executor buildExecutor(QueryableRepository qr, Resource res)
 	throws CorruptedDescriptionException, ConductorException {
 		// The unique execution flow ID
 		String sFlowUniqueExecutionID = res.toString()+File.pathSeparator+System.currentTimeMillis()+File.pathSeparator+(new Random().nextInt());
+		String flowID = res.toString();
 		// Map class names to classes
 		Hashtable<String,Class> htMapNameToClass = new Hashtable<String,Class>();
 		// Map reource names to classes
 		Hashtable<Resource,String> htMapResourceToName = new Hashtable<Resource,String>();
-		
+
 		// Get the description
 		FlowDescription fd = qr.getFlowDescription(res);
-		
+
 		// STEP 0: Gather all the required contexts and load them
 		log.info("STEP 0: Plugging the required contexts");
 		URLClassLoader urlFlowCL = plugRequiredContexts(qr, htMapNameToClass, htMapResourceToName,fd);
@@ -148,8 +149,8 @@ public class Conductor {
 					throw new ConductorException(e);
 				}
 				jeca.prepare();
-				for ( RDFNode rdfn:setScripts ) 
-					if ( rdfn.isLiteral() ) 
+				for ( RDFNode rdfn:setScripts )
+					if ( rdfn.isLiteral() )
 						jeca.process(((Literal)rdfn).getLexicalForm());
 				htECInstances.put(ins,jeca);
 			}
@@ -190,24 +191,24 @@ public class Conductor {
 		Hashtable<Resource,Hashtable<String,String>> htMapOutputLogicNameTranslation = new Hashtable<Resource,Hashtable<String,String>>();
 		for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() ) {
 			ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(ecid.getExecutableComponent());
-			
+
 			Hashtable<String, String> htMapInLog = new Hashtable<String,String>();
 			htMapInputLogicNameTranslation.put(ecid.getExecutableComponentInstance(),htMapInLog);
 			for ( DataPortDescription dpd:ecd.getInputs() ) {
 				String  sIDIn = ecid.getExecutableComponentInstance()+URL_SEAPARTOR+dpd.getResource();
 				htMapInLog.put(dpd.getName(), sIDIn);
 			}
-				
+
 			Hashtable<String, String> htMapOutLog = new Hashtable<String,String>();
 			htMapOutputLogicNameTranslation.put(ecid.getExecutableComponentInstance(),htMapOutLog);
 			for ( DataPortDescription dpd:ecd.getOutputs() ) {
 				String  sIDOut = ecid.getExecutableComponentInstance()+URL_SEAPARTOR+dpd.getResource();
 				htMapOutLog.put(dpd.getName(), sIDOut);
 			}
-			
+
 			Hashtable<String, String> htMapOut = new Hashtable<String,String>();
 			htMapOutputTranslation.put(ecid.getExecutableComponentInstance(),htMapOut);
-			
+
 		}
 		for ( ConnectorDescription cd:fd.getConnectorDescriptions() ) {
 			String sIDOutSet = cd.getSourceInstance().toString();
@@ -215,14 +216,14 @@ public class Conductor {
 			String  sIDIn = cd.getTargetInstance().toString()+URL_SEAPARTOR+cd.getTargetIntaceDataPort().toString();
 
 			ActiveBuffer ab = htMapInAB.get(sIDIn);
-			
+
 			// Update the output mapping name for a given instance
-			
+
 			ExecutableComponentDescription compDesc = qr.getExecutableComponentDescription(fd.getExecutableComponentResourceForInstance(cd.getSourceInstance()));
 			DataPortDescription dpdOut = compDesc.getOutput(cd.getSourceIntaceDataPort());
 			Hashtable<String,String> htMapOut = htMapOutputTranslation.get(cd.getSourceInstance());
 			htMapOut.put(sIDOutSet+URL_SEAPARTOR+dpdOut.getIdentifier(), ab.getName());
-			
+
 			// Update the input and output sets
 			htInsOutputSet.get(sIDOutSet).add(ab);
 			htInsInputSet.get(sIDInSet).add(ab);
@@ -260,6 +261,7 @@ public class Conductor {
 					setWC.add(
 							new WrappedComponentAllInputsRequired (
 									sFlowUniqueExecutionID,
+									flowID,
 									ecid.getExecutableComponentInstance().toString(),
 									(ExecutableComponent) htECInstances.get(resECI),
 									htInsInputSet.get(sResECI),
@@ -276,6 +278,7 @@ public class Conductor {
 					setWC.add(
 							new WrappedComponentAnyInputRequired (
 									sFlowUniqueExecutionID,
+									flowID,
 									ecid.getExecutableComponentInstance().toString(),
 									(ExecutableComponent) htECInstances.get(resECI),
 									htInsInputSet.get(sResECI),
@@ -304,11 +307,11 @@ public class Conductor {
 	}
 
 	/** Loads and plugs the required contexts to the flow being prepared.
-	 * 
+	 *
 	 * @param qr The queriable repository
 	 * @param htMapNameToClass The map from the name to the class
 	 * @param htMapResourceToName The map from the resource to a name
-	 * @param fd The flow descriptor 
+	 * @param fd The flow descriptor
 	 * @return The flow classloader
 	 * @throws CorruptedDescriptionException The descriptor is corrupted
 	 * @throws ConductorException The literal containing the resource could not be dumped to a file
@@ -317,7 +320,7 @@ public class Conductor {
 	protected URLClassLoader plugRequiredContexts(QueryableRepository qr,
 			Hashtable<String, Class> htMapNameToClass, Hashtable<Resource, String> htMapResourceToName,
 			FlowDescription fd) throws CorruptedDescriptionException, ConductorException {
-		
+
 		// Set of loadable context URLs
 		Set<String> setContexts = new HashSet<String>();
 		// Set of loadable locations
@@ -328,8 +331,8 @@ public class Conductor {
 		Hashtable<Resource,String> htMapResourceToRunnable = new Hashtable<Resource,String>();
 		// Map resource names to runnable
 		Hashtable<Resource,String> htMapResourceToFormat = new Hashtable<Resource,String>();
-		
-		
+
+
 		// Preparing the URLs for the class loader
 		log.info("Processing executable components contexts and locations");
 		Set<ExecutableComponentInstanceDescription> setIns = fd.getExecutableComponentInstances();
@@ -338,29 +341,29 @@ public class Conductor {
             // If the resource does not exist throw an exeception
 			if (comp == null)
 				throw new CorruptedDescriptionException("The required executable component " + ins.getExecutableComponent() + " does not exist in the current repository");
-			
+
 			// Check if it is loadable
 			if ( setLoadableLanguages.contains(comp.getRunnable().toLowerCase()) )
 				htMapResourceToRunnable.put(comp.getExecutableComponent(),comp.getRunnable().toLowerCase());
 			else
 				throw new CorruptedDescriptionException("Cannot process executable components runnable as "+comp.getRunnable());
-			
+
 			// Check if it is loadable
 			if ( setLoadableComponents.contains(comp.getFormat().toLowerCase()) )
 				htMapResourceToFormat.put(comp.getExecutableComponent(), comp.getFormat().toLowerCase());
 			else
 				throw new CorruptedDescriptionException("Component of type "+comp.getFormat()+" could not be loaded by the conductor");
-			
+
 			// Retrieve the contextes
 			for ( RDFNode rdfnodeContext:comp.getContext() )
 				if ( rdfnodeContext.isResource() )
-					// Just a usual URI pointing to the resource 
+					// Just a usual URI pointing to the resource
 					setContexts.add(((Resource)rdfnodeContext).getURI().trim());
-				else 
-					if ( comp.getRunnable().equals("java") && comp.getFormat().equals("java/class")) 
+				else
+					if ( comp.getRunnable().equals("java") && comp.getFormat().equals("java/class"))
 						// The literal is dumped to the file system and a URI generated
 						setContexts.add(prepareJarLiteralToTheFileSystem((Literal)rdfnodeContext));
-			
+
 			// Retrieve the location
 			boolean bChomped = false;
 			String sURI = comp.getLocation().getURI().trim();
@@ -371,7 +374,7 @@ public class Conductor {
 					sURIHead = sURI.substring(0,sCntx.length());
 					sURI = sURI.substring(sCntx.length());
 				}
-			
+
 			// Check if location does not match any context
 			if ( bChomped ) {
 				setURLLocations.add(sURI);
@@ -382,20 +385,20 @@ public class Conductor {
 			else
 				throw new CorruptedDescriptionException("Location "+sURI+" does not match any of the executable component contexts");
 		}
-		
+
 		// Load the component classes
 		return loadExecutableComponentImplementation(setContexts, setURLLocations, htMapNameToClass, htMapNameToResource, htMapResourceToRunnable, htMapResourceToFormat);
 	}
 
 	/** This methods dump the Literal to the file system and creates a URI for the class loader.
-	 * 
+	 *
 	 * @param lit The literal to dump
 	 * @return The URI to the loader resource
 	 * @throws ConductorException The literal could not be dump to a file
 	 */
 	private String prepareJarLiteralToTheFileSystem(Literal lit) throws ConductorException {
 		String sURI = htMapLiteralToFile.get(lit);
-		
+
 		if ( sURI==null || htMapLiteralToHashcode.get(lit)!=lit.hashCode() ) {
 			// The Literal has not been mapped to a file before
 			byte [] ba = (byte[]) lit.getValue();
@@ -436,7 +439,7 @@ public class Conductor {
 	 */
 	@SuppressWarnings("unchecked")
 	protected URLClassLoader loadExecutableComponentImplementation(
-			Set<String> setURLContext, 
+			Set<String> setURLContext,
 			Set<String> setURLLocations,
 			Hashtable<String, Class> htMapNameToClass,
 			Hashtable<String, Resource> htMapNameToResource,
@@ -466,6 +469,6 @@ public class Conductor {
 			}
 		}
 		return urlCL;
-		
+
 	}
 }

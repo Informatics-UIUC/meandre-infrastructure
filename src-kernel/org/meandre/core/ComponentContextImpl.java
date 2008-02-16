@@ -23,6 +23,8 @@ import org.meandre.webui.WebUIFragmentCallback;
  *
  * @author Xavier Llor&agrave;
  * @last-modified: Amit Kumar -added the getter for sFlowUniqueExecutionID
+ * @last-modified: Amit Kumat -added support for flowID
+ *
  *
  */
 public class ComponentContextImpl
@@ -33,6 +35,9 @@ implements ComponentContext {
 
 	/** The unique flow execution ID */
 	protected String sFlowUniqueExecutionID = null;
+
+	/** The flow ID */
+	protected String flowID = null;
 
 	/** The unique flow execution ID */
 	protected String sComponentInstanceID = null;
@@ -85,7 +90,7 @@ implements ComponentContext {
 	 * @param htInputLogicNameMap The output logic name map
 	 * @param htProperties The component properties
 	 */
-	public ComponentContextImpl(String sFlowUniqueID,
+	public ComponentContextImpl(String sFlowUniqueID,String flowID,
 			String sComponentInstanceID, Set<ActiveBuffer> setInputs,
 			Set<ActiveBuffer> setOutputs,
 			Hashtable<String, String> htOutputMap,
@@ -95,6 +100,7 @@ implements ComponentContext {
 
 		// Create the data proxy
 		this.sFlowUniqueExecutionID = sFlowUniqueID;
+		this.flowID=flowID;
 		this.sComponentInstanceID = sComponentInstanceID;
 
 		this.htInputLogicNameMap = htInputLogicNameMap;
@@ -342,5 +348,12 @@ implements ComponentContext {
 	 */
 	public String getFlowExecutionInstanceID() {
 		return this.sFlowUniqueExecutionID;
+	}
+
+	/**Returns the flowID of the flow
+	 *
+	 */
+	public String getFlowID() {
+		return this.flowID;
 	}
 }

@@ -1,5 +1,8 @@
 1.2vcli Panellet:
 
+* Modified the ComponentContextProperties to provide getFlowID function [Feb 16th 2008]
+	-Added the function implmentation in ComponentContextImpl/Wrapped*Required/Conductor and WrappedComponents
+
 * Modified the /services/repository/add and /services/repository/add_flow services
 	- Added overwrite flag (if true overwrites the component/flow descriptor)
 	- Added dump flag (if true dumps the repository after the requested modifications using the same format of requested modifications)
@@ -8,13 +11,13 @@
 
 * Added a Python component to the demo set
 	- The component just turns a string to upper case (named To Uppercase)
-	
+
 * Modified the conductor to run embedded Python/Jython components
 	- Python scripts are embedded contexts
 	- Location should point to the component base URI
 	- Multiple contexts (scripts can be attached)
 	- There is no guarante about the order of scripts execution
-	
+
 * Passed the embedding test using the upgraded (see updates ExecutableContext) E2K demo components
 	- Test demo and traditional context URIs work (Fixed a typo on the connector URI convention)
 	- Test with all the embedded components
@@ -26,49 +29,49 @@
 * Root the ComponentContext in to the root interface ComponentContextProperties
 	- ComponentContext presents the same API as before
 	- ComponentContextProperties expose the subset of the original API not related to execution
-	
+
 * Created and tested the class JythonExecutableComponentAdapter
 	- This class acts as an adapter
 	- The adapter translate the ExcecutableComponent interface into it Jython counter part
-	- The ComponentContext instance is accessible thanks to the Jython bindings 
+	- The ComponentContext instance is accessible thanks to the Jython bindings
 	- The Jython bindings turn getters/setters into pythonic assignable instance variables
-	
+
 * Created the new package subtree org.meandre.core.environments
 	- This package is intended to group all non-java executable components
 	- The package org.meandre.core.environments.python contains Python related environments
 	- The package org.meandre.core.environments.python.jython contains the adapter to run Jython flavored executable components
-	
+
 * Modified the Conductor to allow embedding:
 	- When preparing the URL class loader
 	- If context is a resource pass the URI to the class loader
 	- If context is a literal the content is dumped to /run/java with an encode name ending in .jar
 	- Conductor implements a cache of the already dumped flows to boost up the preparation time (unless the hash code of the literal has changed)
-	
+
 * Modified the Repository beans to deal with RDFNodes
 	- Old URI formats to contexts (jars) are expressed as Resources (external contexts)
 	- Embeddable contexts (jars) are expressed as Literals
 	- RDFNode homogenizes the use of contexts (external or embedded)
-	
+
 * (!!) Patched JENA to allow proper embedding:
 	- Added case Text.CLOB to line 2238 in file DriverRDB.java to allow large literals in Derby
 	- Hacked the derby.sql definition and replace the tail of the literal table to CLOB to allow long literals
-	
+
 * The add service modified:
 	- jar parameter renamed as context
 	- Added the embed check button for contexts
-	
+
 * Rework the repository implementation metadata processing
 	- Moved from SPARQL prototypes to the equivalent procedural version using JENA API
 	- Also used the indexer straight will manual filtering to boost search performance
 	- Performance of the repository interaction hugely improved.
 	- Remove the SPARQL injection problem on the full text search
 
-* Modified the loggers to work on a rotating scheme 
+* Modified the loggers to work on a rotating scheme
 	- ./log dir destination of the loggers
-	
+
 * Added org.meandre.core.utils.vocabulary to contain all metadata relate vocabulary.
 	- Add the repository one and patched the RepositoryImpl, ComponentDescriptionImpl, and FlowDescriptionImpl
-	
+
 * Moved the WSCoreBootstrapper from org.meandre in the src-kernel tree to org.meandre.webservices in the src-ws tree
 
 * Main log file splitted:
@@ -96,4 +99,5 @@
 
 ___
 Edited by Xavier.
+-Last Updated: Amit Kumar on  Feb 16th 2008
 

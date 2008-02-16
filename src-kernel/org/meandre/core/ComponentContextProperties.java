@@ -45,7 +45,7 @@ public interface ComponentContextProperties {
 	 * @return The logger object
 	 */
 	public Logger getLogger();
-	
+
 
 	/** Starts the web-based user interface given the proper implementation of the
 	 * webui callback to deal with user action on the client.
@@ -86,4 +86,8 @@ public interface ComponentContextProperties {
 	 * @return
 	 */
 	public String getFlowExecutionInstanceID();
+	/**Return the flow ID of the flow
+	 *
+	 */
+	public String getFlowID();
 }
