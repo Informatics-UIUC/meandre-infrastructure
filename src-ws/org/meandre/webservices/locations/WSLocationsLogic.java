@@ -236,6 +236,7 @@ public class WSLocationsLogic {
 					mod.begin();
 					mod.add(modelTmp);
 					mod.commit();
+					qr.refreshCache();
 				}
 				catch ( Exception e ) {
 					log.warning("Failed to load location\n"+e.toString());
