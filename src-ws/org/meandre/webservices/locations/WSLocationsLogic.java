@@ -127,6 +127,7 @@ public class WSLocationsLogic {
 				qr.getModel().begin();
 				qr.getModel().add(modelTmp);
 				qr.getModel().commit();
+				qr.refreshCache();
 			}
 			catch ( Exception e ) {
 				log.warning("Failed to add location\n"+e.toString());
