@@ -41,6 +41,13 @@
     <!-- dist -->
     <target name="dist" depends="compile" description="Creates jar distribution">
         <!-- Create jar distribution -->
+        <jar destfile="${dist.dir}/${app.name}-all.jar">
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+            </manifest>
+            <fileset dir="${build.dir}">
+            </fileset>
+        </jar>
         <jar destfile="${dist.dir}/${app.name}-core.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
