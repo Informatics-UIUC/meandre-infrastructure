@@ -65,7 +65,7 @@
             <manifest>
                 <attribute name="Build-Version" value="${testStatus.revision}"/>
             	<attribute name="Last-Commit-Author" value="${testStatus.lastCommitAuthor}"/>
-            	<attribute name="Status:" value="${testStatus.textStatus}"/>
+            	<attribute name="Status" value="${testStatus.textStatus}"/>
             </manifest>
             <fileset dir="${build.dir}">
             </fileset>
@@ -74,7 +74,9 @@
 
 
 	<!-- The distribution is created with a revision it is tied to the trunk -->
-	<target name="release" depends="create-distribution" if="isValidRevision">
+	<target name="release" depends="create-distribution" if="isValidRevision"
+		description="-->Creates the distribution for maven/ivy"
+		>
 		<mkdir dir="${release.location}/trunk-${testStatus.revision}"/>
 		<copy file="${dist.dir}/${app.name}-${testStatus.revision}.jar"
 		todir="${release.location}/trunk-${testStatus.revision}"/>
