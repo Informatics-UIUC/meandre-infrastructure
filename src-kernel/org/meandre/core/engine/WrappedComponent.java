@@ -86,6 +86,7 @@ extends Thread {
 	 * @param tg The thread group holding the thread
 	 * @param sThreadName The name of the thread
 	 * @param htProperties The component properties
+	 * @param thdMrProbe The MrProbe thread
 	 * @throws InterruptedException The semaphore could not be adquired twice
 	 */
 	@SuppressWarnings("unchecked")
@@ -95,7 +96,7 @@ extends Thread {
 			Hashtable<String, String> htOutputMap,
 			Hashtable<String, String> htInputLogicNameMap,
 			Hashtable<String, String> htOutputLogicNameMap, ThreadGroup tg,
-			String sThreadName, Hashtable<String, String> htProperties)
+			String sThreadName, Hashtable<String, String> htProperties, MrProbe thdMrProbe)
 			throws InterruptedException {
 		super(tg,sThreadName);
 
@@ -326,6 +327,22 @@ extends Thread {
 	 */
 	public String getAbortMessage () {
 		return sAbortMessage;
+	}
+
+	/** Sets MrProper.
+	 * 
+	 * @param thdMrPropper MrPropper thread
+	 */
+	public void setMrPropper(MrProper thdMrPropper) {
+		this.thdMrProper = thdMrPropper;
+	}
+	
+	/** Returns the unique ID of this executable instance.
+	 * 
+	 * @return The unique ID
+	 */
+	public String getExecutableComponentInstanceID () {
+		return cc.getExecutionInstanceID();
 	}
 
 }

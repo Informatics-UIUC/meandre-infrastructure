@@ -80,14 +80,18 @@ public interface ComponentContextProperties {
 	 *
 	 * @return The unique execution instance ID
 	 */
+	
 	public String getExecutionInstanceID ();
-	/** Return the unique ID of the executable flow.
+	
+	/** Return the unique ID of the running flow.
 	 *
-	 * @return
+	 * @return The unique ID of the running flow
 	 */
 	public String getFlowExecutionInstanceID();
+	
 	/**Return the flow ID of the flow
 	 *
+	 * @return The flow ID being run
 	 */
 	public String getFlowID();
 }

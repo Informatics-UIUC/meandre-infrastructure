@@ -1,7 +1,11 @@
 1.2vcli Panellet:
 
-* Modified the ComponentContextProperties to provide getFlowID function [Feb 16th 2008]
-	-Added the function implmentation in ComponentContextImpl/Wrapped*Required/Conductor and WrappedComponents
+
+* Added cacheRefresh to the add/remove location services
+
+* Modified the ComponentContextProperties to provide getFlowID function [Feb 16th 2008 by Amit Kumar]
+	-Added the function implementation in ComponentContextImpl/Wrapped*Required/Conductor and WrappedComponents
+	- This distinguishes getFlowID/getFlowExecutionID
 
 * Modified the /services/repository/add and /services/repository/add_flow services
 	- Added overwrite flag (if true overwrites the component/flow descriptor)

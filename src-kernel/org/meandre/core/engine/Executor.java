@@ -45,7 +45,7 @@ public class Executor {
 		this.setWC = setWC;
 		this.thdMrPropper = new MrProper(tg,setWC);
 		for ( WrappedComponent wc:setWC )
-			wc.thdMrProper = thdMrPropper;
+			wc.setMrPropper(thdMrPropper);
 	}
 	
 	/** Fires the execution of a given MeandreFlow.

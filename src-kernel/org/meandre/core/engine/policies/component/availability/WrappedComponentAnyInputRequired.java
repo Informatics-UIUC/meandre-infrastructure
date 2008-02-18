@@ -6,6 +6,7 @@ import java.util.Set;
 import org.meandre.core.ComponentContextException;
 import org.meandre.core.ExecutableComponent;
 import org.meandre.core.engine.ActiveBuffer;
+import org.meandre.core.engine.MrProbe;
 import org.meandre.core.engine.WrappedComponent;
 
 /** This wrapped component just fires the execution of and executalbe
@@ -36,6 +37,7 @@ public class WrappedComponentAnyInputRequired extends WrappedComponent {
 	 * @param tg The thread group holding the thread
 	 * @param sThreadName The name of the thread
 	 * @param htProperties The component properties
+	 * @param thdMrProbe The MrProbe thread
 	 * @throws InterruptedException The semaphore could not be adquired twice
 	 */
 	public WrappedComponentAnyInputRequired(String sFlowUniqueID,String flowID,
@@ -44,9 +46,9 @@ public class WrappedComponentAnyInputRequired extends WrappedComponent {
 			Hashtable<String, String> htOutputMap,
 			Hashtable<String, String> htInputLogicNameMap,
 			Hashtable<String, String> htOutputLogicNameMap, ThreadGroup tg,
-			String sThreadName, Hashtable<String, String> htProperties)
+			String sThreadName, Hashtable<String, String> htProperties, MrProbe thdMrProbe)
 			throws InterruptedException {
-		super(sFlowUniqueID, flowID,sComponentInstanceID, ec, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, tg, sThreadName, htProperties);
+		super(sFlowUniqueID, flowID,sComponentInstanceID, ec, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, tg, sThreadName, htProperties, thdMrProbe);
 
 		this.bFirst = true;
 	}

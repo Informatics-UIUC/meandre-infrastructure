@@ -113,7 +113,7 @@ public class ActiveBuffer {
 			// Queueing the objects
 			while ( !queueObjects.isEmpty() ) {
 				semCapacity.acquire();
-				queueBuffer.offer(queueObjects.poll());
+				queueBuffer.offer((WrappedComponent) queueObjects.poll());
 			}
 			// Waking up the consumers
 			for ( WrappedComponent wc:wcConsumer )

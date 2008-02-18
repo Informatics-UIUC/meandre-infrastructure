@@ -334,7 +334,7 @@ implements ComponentContext {
 		return log;
 	}
 
-	/** Returns the unique ID of the executable instance for the current flow.
+	/** Returns the unique ID of the executable instance for the current execution component.
 	 *
 	 * @return The unique execution instance ID
 	 */

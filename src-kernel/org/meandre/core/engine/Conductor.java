@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import org.meandre.core.ExecutableComponent;
 import org.meandre.core.engine.policies.component.availability.WrappedComponentAllInputsRequired;
 import org.meandre.core.engine.policies.component.availability.WrappedComponentAnyInputRequired;
+import org.meandre.core.engine.probes.NullProbeImpl;
 import org.meandre.core.environments.python.jython.JythonExecutableComponentAdapter;
 import org.meandre.core.logger.LoggerFactory;
 import org.meandre.core.store.Store;
@@ -88,6 +89,7 @@ public class Conductor {
 			setLoadableComponents.add(sType.toLowerCase());
 	}
 
+
 	/** Creates an execution object for the given flow description.
 	 *
 	 * @param qr The queryable repository containing component descriptions
@@ -98,6 +100,22 @@ public class Conductor {
 	 */
 	@SuppressWarnings("unchecked")
 	public Executor buildExecutor(QueryableRepository qr, Resource res)
+	throws CorruptedDescriptionException, ConductorException {
+		MrProbe thdMrProbe = new MrProbe(log,new NullProbeImpl(),false,false);
+		return buildExecutor(qr, res,thdMrProbe);
+	}
+	
+	/** Creates an execution object for the given flow description.
+	 *
+	 * @param qr The queryable repository containing component descriptions
+	 * @param resFlow The resource identifying the flow to prepare for execution
+	 * @param thdMrProbe The MrProbe to use
+	 * @return The executor object
+	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
+	 * @throws ConductorException The counductor could not create an executable flow
+	 */
+	@SuppressWarnings("unchecked")
+	public Executor buildExecutor(QueryableRepository qr, Resource res, MrProbe thdMrProbe)
 	throws CorruptedDescriptionException, ConductorException {
 		// The unique execution flow ID
 		String sFlowUniqueExecutionID = res.toString()+File.pathSeparator+System.currentTimeMillis()+File.pathSeparator+(new Random().nextInt());
@@ -116,7 +134,7 @@ public class Conductor {
 
 		// STEP 1: Instantiate the flow instances
 		log.info("STEP 1: Instantiate the flow instances");
-		Hashtable<Resource,Object> htECInstances = new Hashtable<Resource,Object>();
+		Hashtable<Resource,ExecutableComponent> htECInstances = new Hashtable<Resource,ExecutableComponent>();
 		for ( ExecutableComponentInstanceDescription ec:fd.getExecutableComponentInstances() ) {
 			Resource   ins = ec.getExecutableComponentInstance();
 			Resource ecomp = ec.getExecutableComponent();
@@ -128,7 +146,7 @@ public class Conductor {
 //					System.out.println(htMapResourceToName.keySet());
 //					System.out.println(htMapResourceToName.get(ecomp));
 //					System.out.println(htMapNameToClass.keySet());
-					htECInstances.put(ins,htMapNameToClass.get(htMapResourceToName.get(ecomp)).newInstance());
+					htECInstances.put(ins,(ExecutableComponent) htMapNameToClass.get(htMapResourceToName.get(ecomp)).newInstance());
 				} catch (InstantiationException e) {
 					throw new ConductorException("Condcuctor could not instantiate class "+htMapResourceToName.get(ecomp)+"\n"+e);
 				} catch (IllegalAccessException e) {
@@ -271,7 +289,8 @@ public class Conductor {
 									htMapOutputLogicNameTranslation.get(resECI),
 									tgFlow,
 									sResECI,
-									htInstaceProperties.get(resECI)
+									htInstaceProperties.get(resECI),
+									thdMrProbe
 								)
 						);
 				else if ( firing.equals("any") )
@@ -288,7 +307,8 @@ public class Conductor {
 									htMapOutputLogicNameTranslation.get(resECI),
 									tgFlow,
 									sResECI,
-									htInstaceProperties.get(resECI)
+									htInstaceProperties.get(resECI),
+									thdMrProbe
 								)
 						);
 			} catch (InterruptedException e) {
