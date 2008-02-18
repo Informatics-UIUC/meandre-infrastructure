@@ -59,7 +59,7 @@
 	</target>
 
 
-	<!-- The distribution is created with a  -->
+	<!-- The distribution is created with a revision -->
 	<target name="create-distribution" depends="check-if-svn" if="isValidRevision">
         <jar destfile="${dist.dir}/${app.name}-${testStatus.revision}.jar">
             <manifest>
@@ -70,6 +70,14 @@
             <fileset dir="${build.dir}">
             </fileset>
         </jar>
+	</target>
+
+
+	<!-- The distribution is created with a revision it is tied to the trunk -->
+	<target name="release" depends="create-distribution" if="isValidRevision">
+		<mkdir dir="${release.location}/trunk-${testStatus.revision}"/>
+		<copy file="${dist.dir}/${app.name}-${testStatus.revision}.jar"
+		todir="${release.location}/trunk-${testStatus.revision}"/>
 	</target>
 
 
