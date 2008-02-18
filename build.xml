@@ -38,16 +38,48 @@
         </javac>
     </target>
 
-    <!-- dist -->
-    <target name="dist" depends="compile" description="Creates jar distribution">
-        <!-- Create jar distribution -->
-        <jar destfile="${dist.dir}/${app.name}-all.jar">
+	<target name="check-if-svn">
+		   <typedef resource="org/tigris/subversion/svnant/svnantlib.xml"  classpathref="meandre.core.classpath" />
+		        <svn javahl="false">
+		        <status path="." textStatusProperty="testStatus.textStatus"
+		        	propStatusProperty="testStatus.propStatus"
+		        	lastChangedRevisionProperty="testStatus.lastCommitRevision"
+		        	revisionProperty="testStatus.revision"
+		        	lastCommitAuthorProperty="testStatus.lastCommitAuthor"/>
+		        </svn>
+		        <echo>${testStatus.revision}</echo>
+
+		    	  <condition property="isValidRevision">
+		    	  	<and>
+		    	   <equals arg1="${testStatus.textStatus}" arg2="normal" />
+		    	  	<isset property="testStatus.revision"/>
+		    	  		</and>
+		    	  </condition>
+		    	 <echo>${isValidRevision}</echo>
+	</target>
+
+
+	<!-- The distribution is created with a  -->
+	<target name="create-distribution" depends="check-if-svn" if="isValidRevision">
+        <jar destfile="${dist.dir}/${app.name}-${testStatus.revision}.jar">
             <manifest>
-                <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="Build-Version" value="${testStatus.revision}"/>
+            	<attribute name="Last-Commit-Author" value="${testStatus.lastCommitAuthor}"/>
+            	<attribute name="Status:" value="${testStatus.textStatus}"/>
             </manifest>
             <fileset dir="${build.dir}">
             </fileset>
         </jar>
+	</target>
+
+
+    <!-- dist -->
+    <target name="dist" depends="compile" description="Creates jar distribution">
+
+    	   <antcall target="create-distribution">
+    	    </antcall>
+
+        <!-- Create jar distribution -->
         <jar destfile="${dist.dir}/${app.name}-core.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
@@ -174,7 +206,7 @@
 	<target name="clean-store"
 		depends=""
 		description="Deletes the MeandreStore directory, which contains the database of all installed (\'uploaded\') components and flows">
-        
+
 		<delete dir="MeandreStore"/>
 
 	</target>
@@ -182,12 +214,12 @@
 	<target name="javadoc"
 		description="build the documentation. (expect lots of warnings when run - don't worry about them)" >
 
-		<javadoc 
+		<javadoc
 			sourcepath="${src}/"
-			maxmemory="512m" 
+			maxmemory="512m"
 			access="private"
 			windowtitle="Meandre Core API"
-			author="true" 
+			author="true"
 			use="true"
 			destdir="${doc.dir}/"/>
 	</target>

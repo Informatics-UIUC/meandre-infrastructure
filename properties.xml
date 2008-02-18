@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
     <!-- app name-->
-    <property name="app.name" value="meandre-trunk"/>
+    <property name="app.name" value="meandre-core-trunk"/>
     <property name="build.version" value="'1.2'"/>
 
     <!-- Directory structure of the project -->
@@ -54,6 +54,7 @@
         <fileset dir="${jetty.dir}" includes="*.jar"/>
         <fileset dir="${jena.dir}" includes="*.jar"/>
         <fileset dir="${saxon.dir}" includes="*.jar"/>
+        <fileset dir="${svnant.dir}" includes="*.jar"/>
         <pathelement location="${junit.jar}"/>
 		<pathelement location="${jython.jar}"/>
     </path>
