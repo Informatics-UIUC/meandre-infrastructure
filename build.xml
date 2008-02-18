@@ -33,7 +33,7 @@
         <echo>Junit cp: ${junit.jar}</echo>
         <javac srcdir="${basedir}" destdir="${build.dir}/" debug="${compile.debug}"
                deprecation="${compile.deprecation}" optimize="${compile.optimize}"
-               classpathref="meandre.core.classpath" >
+               classpathref="meandre.core.classpath">
             <include name="**/*.java"/>
         </javac>
     </target>
@@ -191,7 +191,7 @@
     <!-- run-core -->
     <target name="run" depends="dist" description="Runs the default Meandre-Core server">
         <echo level="info">Run the default Meandre-Core server</echo>
-        <java classname="org.meandre.webservices.WSCoreBootstrapper">
+        <java classname="org.meandre.webservices.WSCoreBootstrapper" fork="yes" maxmemory="1024m">
             <classpath refid="meandre.core.classpath"/>
             <classpath>
                 <pathelement location="${dist.dir}/${app.name}-core.jar"/>
@@ -202,6 +202,7 @@
             </classpath>
         </java>
     </target>
+
 
 	<target name="clean-store"
 		depends=""
