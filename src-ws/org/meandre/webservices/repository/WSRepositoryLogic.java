@@ -852,7 +852,11 @@ public class WSRepositoryLogic {
 
 		// Read the uploaded descriptor into a model
 		String sFlowsDesc = request.getParameter("repository");
-		boolean bOverwrite = request.getParameter("overwrite").equals("true");
+		boolean bOverwrite = false;
+		String sReq = request.getParameter("overwrite");
+		if ( sReq!=null )
+				bOverwrite = sReq.equals("true");
+		
 		Model modNew = ModelFactory.createDefaultModel();
 
 		modNew.setNsPrefix("", "http://www.meandre.org/ontology/");
