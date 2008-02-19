@@ -118,5 +118,12 @@ public class Executor {
 		return setRes;
 	}
 
+	/** Returns the set of wrapped components.
+	 * 
+	 * @return The set of wrapped components
+	 */
+	public Set<? extends WrappedComponent> getWrappedComponents() {
+		return setWC;
+	}
 
 }

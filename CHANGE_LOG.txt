@@ -1,5 +1,11 @@
 1.2vcli Panellet:
 
+* Added MrProbe class. This thread stands during the execution to gather information of the run
+	- New class added MrProbe
+	- New package org.meandre.core.engine.probes added
+		* This package contains different implementations of the probe mechanisms
+		* NullProbeImpl discards all the information
+		* ToPrintStreamProbreImpl diverts all the info as text to the provided print stream
 
 * Added cacheRefresh to the add/remove location services
 

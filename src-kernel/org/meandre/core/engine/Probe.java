@@ -16,8 +16,10 @@ public interface Probe {
 		FLOW_ABORTED,			// Flow aborted execution
 		
 		EXECUTABLE_COMPONENT_INITIALIZED,	// The executable component has been initialized
-		EXECUTABLE_COMPONENT_DISPOSED		// The executable component has been initialized
+		EXECUTABLE_COMPONENT_DISPOSED,		// The executable component has been initialized
 
+		EXECUTABLE_COMPONENT_PUSH_DATA, 	// The executable component has push a piece of data
+		EXECUTABLE_COMPONENT_PULL_DATA	 	// The executable component has pull a piece of data
 	}
 	
 	
@@ -50,7 +52,6 @@ public interface Probe {
 	 */
 	public void probeExecutableComponentInitialized(String sECID, Object owc, Date ts);
 	
-
 	/** The executable component finished disposing itself.
 	 * 
 	 * @param sECID The unique executable component ID
@@ -58,6 +59,24 @@ public interface Probe {
 	 * @param ts The time stamp
 	 */
 	public void probeExecutableComponentDisposed(String sECID, Object owc, Date ts);
+
+	/** The executable component pushed a piece of data.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param owc The wrapped component done with the disposing call
+	 * @param odata The data being pushed
+	 * @param ts The time stamp
+	 */
+	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts);
+
+	/** The executable component pulled a piece of data.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param owc The wrapped component done with the disposing call
+	 * @param odata The data being pulled
+	 * @param ts The time stamp
+	 */
+	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts);
 	
 
 }

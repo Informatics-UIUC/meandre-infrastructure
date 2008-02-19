@@ -1,6 +1,7 @@
 package org.meandre.core.engine;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -9,6 +10,11 @@ import org.junit.Test;
 import org.meandre.core.engine.probes.NullProbeImpl;
 import org.meandre.core.engine.probes.ToPrintStreamProbeImpl;
 import org.meandre.core.engine.test.TestLoggerFactory;
+import org.meandre.core.store.repository.QueryableRepository;
+import org.meandre.core.store.repository.RepositoryImpl;
+import org.meandre.demo.repository.DemoRepositoryGenerator;
+
+import com.hp.hpl.jena.rdf.model.Model;
 
 /** This class gathers together the tests related to MrProbe.
  * 
@@ -17,13 +23,15 @@ import org.meandre.core.engine.test.TestLoggerFactory;
  */
 public class MrProbeTest {
 	
+	/** The base URI for the tests */
+	private static final String BASE_TEST_URI = "http://test.org/flow/0";
+
 	/** The number of repetitions of the battery of calls */
-	final int NUMBER_OF_REPETITIONS = 10;
+	private final int NUMBER_OF_REPETITIONS = 10;
 	
 	/** The number of calls in the battery */
-	final int NUMBER_OF_CALLS = 3;
-	
-	
+	private final int NUMBER_OF_CALLS = 7;
+
 	/** MrProbe test against the null probe with no serialization.
 	 * 
 	 */
@@ -85,11 +93,31 @@ public class MrProbeTest {
 		}
 	}
 
+	/** Run a battery of probe calls.
+	 * 
+	 * @param mp The MrProbe object to use
+	 */
 	private void runBatteryOfProbeCalls(MrProbe mp) {
-		for ( int i=0; i<NUMBER_OF_REPETITIONS; i++ ) {
-			mp.probeFlowStart("http://test.org/flow/0");
-			mp.probeFlowFinish("http://test.org/flow/0");
-			mp.probeFlowAbort("http://test.org/flow/0");
+		try {
+			// Preparing some wrapped components for testing
+			Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
+			QueryableRepository qr = new RepositoryImpl(model);
+			Conductor cnd = new Conductor(10);
+			Executor exec = cnd.buildExecutor(qr, qr.getAvailableFlowDecriptions().iterator().next().getFlowComponent());
+			WrappedComponent wc = exec.getWrappedComponents().iterator().next();
+			// Run the tests
+			for ( int i=0; i<NUMBER_OF_REPETITIONS; i++ ) {
+				mp.probeFlowStart(BASE_TEST_URI);
+				mp.probeFlowFinish(BASE_TEST_URI);
+				mp.probeFlowAbort(BASE_TEST_URI);
+				mp.probeWrappedComponentInitialize(wc);
+				mp.probeWrappedComponentDispose(wc);
+				mp.probeWrappedComponentPushData(wc, "string", "hello");
+				mp.probeWrappedComponentPullData(wc, "string", "hello");
+			}
+		}
+		catch (Exception e) {
+			fail("An exception should have never been thrown "+e.toString());
 		}
 	}
 }

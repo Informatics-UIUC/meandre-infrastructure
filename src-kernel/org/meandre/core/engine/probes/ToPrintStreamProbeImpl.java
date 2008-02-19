@@ -70,8 +70,31 @@ implements Probe {
 	 * @param ts The time stamp
 	 */
 	public void probeExecutableComponentDisposed(String sECID, Object owc, Date ts) {
-		psOut.println("Executable component "+sECID+" inialized at "+ts+" to state "+owc.toString());		
+		psOut.println("Executable component "+sECID+" disposed at "+ts+" to state "+owc.toString());		
 	}
 	
+
+	/** The executable component pushed a piece of data.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param owc The wrapped component done with the disposing call
+	 * @param odata The data being pushed
+	 * @param ts The time stamp
+	 */
+	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts) {
+		psOut.println("Executable component "+sECID+" pushed data "+odata.toString()+" at "+ts+" to state "+owc.toString());	
+	}
+
+	/** The executable component pulled a piece of data.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param owc The wrapped component done with the disposing call
+	 * @param odata The data being pulled
+	 * @param ts The time stamp
+	 */
+	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts) {
+		psOut.println("Executable component "+sECID+" pulled data "+odata.toString()+" at "+ts+" to state "+owc.toString());	
+	}
+
 
 }

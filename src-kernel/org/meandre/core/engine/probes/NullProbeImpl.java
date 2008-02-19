@@ -63,4 +63,24 @@ implements Probe {
 	}
 	
 
+	/** The executable component pushed a piece of data.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param owc The wrapped component done with the disposing call
+	 * @param odata The data being pushed
+	 * @param ts The time stamp
+	 */
+	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts) {
+	}
+
+	/** The executable component pulled a piece of data.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param owc The wrapped component done with the disposing call
+	 * @param odata The data being pulled
+	 * @param ts The time stamp
+	 */
+	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts) {
+	}
+
 }
