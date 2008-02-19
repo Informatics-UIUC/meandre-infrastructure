@@ -15,15 +15,15 @@ public class RepositoryVocabulary {
 	/** The RDF model that holds the vocabulary terms */
 	private static Model m_model = ModelFactory.createDefaultModel();
 
-	/** The namespace of the vocabalary as a string  */
+	/** The namespace of the vocabulary as a string  */
 	public static final String NS = "http://www.meandre.org/ontology/";
 
-	/** The namespace of the vocabalary as a string */
+	/** The namespace of the vocabulary as a string */
 	public static String getURI() {
 		return NS;
 	}
 
-	/** The namespace of the vocabalary as a resource */
+	/** The namespace of the vocabulary as a resource */
 	public static final Resource NAMESPACE = m_model.createResource(NS);
 
 	/** The components instances identifier. */

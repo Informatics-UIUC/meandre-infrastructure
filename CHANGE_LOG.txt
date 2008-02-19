@@ -1,5 +1,14 @@
 1.2vcli Panellet:
 
+* Meandre provenance infrastructure.
+	- Added MeandreProbingVocabulary (native Meandre provenance dialect)
+	- Implemented the MeandreRDFDialectProbeImpl
+	- Tested and verified the spitted triples
+	
+* MrProbe merge against the Conductor, Executor, WrappedComponent, and ComponentContext
+	- Modification to allow them to be probed
+	- All the present engine tests passed
+	
 * Added MrProbe class. This thread stands during the execution to gather information of the run
 	- New class added MrProbe
 	- New package org.meandre.core.engine.probes added

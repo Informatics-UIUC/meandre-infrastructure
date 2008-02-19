@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import org.junit.Test;
+import org.meandre.core.engine.probes.MeandreRDFDialectProbeImpl;
 import org.meandre.core.engine.probes.NullProbeImpl;
 import org.meandre.core.engine.probes.ToPrintStreamProbeImpl;
 import org.meandre.core.engine.test.TestLoggerFactory;
@@ -64,6 +65,28 @@ public class MrProbeTest {
 			assertEquals(NUMBER_OF_CALLS*NUMBER_OF_REPETITIONS, sa.length);
 			// Release the content
 			ps.close();
+		}
+		catch ( Exception e ) {
+			fail("Unexpected exception: "+e.toString());
+		}
+	}
+	
+	/** Runs a battery of test against the rdf backended probe.
+	 * 
+	 */
+	@Test
+	public void meandreMemoryRDFDialectProblemTest () {
+		try {
+			// Create the probe
+			MeandreRDFDialectProbeImpl mmrdpi = new MeandreRDFDialectProbeImpl();
+			
+			// Run the probe
+			runMrProbeTestWithProvidedProbe(mmrdpi, false, false);
+			
+			// Dump the results
+			Model modProbe = mmrdpi.getModel();
+			modProbe.write(System.out,"TTL",null);
+			System.out.println(modProbe.size());
 		}
 		catch ( Exception e ) {
 			fail("Unexpected exception: "+e.toString());
