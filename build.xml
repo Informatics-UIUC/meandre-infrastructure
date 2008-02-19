@@ -73,13 +73,35 @@
 
 
 	<!-- The distribution is created with a revision it is tied to the trunk -->
-	<target name="release" depends="create-distribution" if="isValidRevision"
+	<target name="lib-release" depends="create-distribution" if="isValidRevision"
 		description="-->Creates the distribution for maven/ivy"
 		>
 		<mkdir dir="${release.location}/trunk-${testStatus.revision}"/>
 		<copy file="${dist.dir}/${app.name}-${testStatus.revision}.jar"
 		todir="${release.location}/trunk-${testStatus.revision}"/>
 	</target>
+
+	<target name="app-release" depends="create-distribution" if="isValidRevision"
+		description="-->Creates the distribution to run as an application"
+		>
+		<mkdir dir="${release.location.app}/trunk-${testStatus.revision}"/>
+		<copy file="${dist.dir}/${app.name}-${testStatus.revision}.jar"
+		todir="${release.location}/trunk-${testStatus.revision}"/>
+
+                  <delete>
+                  <fileset dir="." includes="dist/*.tar"/>
+                  </delete>
+
+
+
+
+                <tar destfile="${dist.dir}/${app.name}-${testStatus.revision}.tar"
+                basedir="."
+                excludes="**/.svn,log/**,bin/**,MeandreStore/**,test/**,*.log">
+                </tar>
+
+	</target>
+
 
 
     <!-- dist -->
@@ -212,6 +234,19 @@
         </java>
     </target>
 
+    <target name="run-silent" depends="dist" description="--> Runs the Meandre-Core server and return. This target provides 2gigs of memory to the server.">
+        <echo level="info">Run the default Meandre-Core server</echo>
+        <java classname="org.meandre.webservices.WSCoreBootstrapper" fork="yes"  spawn="yes" maxmemory="2048m">
+            <classpath refid="meandre.core.classpath"/>
+            <classpath>
+                <pathelement location="${dist.dir}/${app.name}-core.jar"/>
+                <pathelement location="${dist.dir}/${app.name}-ws.jar"/>
+                <pathelement location="${dist.dir}/${app.name}-webui.jar"/>
+                <pathelement location="${dist.dir}/${app.name}-componentdemo.jar"/>
+                <pathelement location="${dist.dir}/${app.name}-main.jar"/>
+            </classpath>
+        </java>
+    </target>
 
 	<target name="clean-store"
 		depends=""
