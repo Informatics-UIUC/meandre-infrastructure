@@ -13,6 +13,9 @@ import org.meandre.core.ComponentContextException;
 import org.meandre.core.ComponentContextImpl;
 import org.meandre.core.ComponentExecutionException;
 import org.meandre.core.engine.ActiveBuffer;
+import org.meandre.core.engine.MrProbe;
+import org.meandre.core.engine.probes.NullProbeImpl;
+import org.meandre.core.engine.test.TestLoggerFactory;
 
 /** This class is used to test the Jython execution compoment adapter.
  *
@@ -62,7 +65,9 @@ public class JythonExecutableComponentAdapterTest {
 	@Test
 	public void testInitializeAndDispose() {
 		String sRes = null;
-		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>());
+		MrProbe thdMrProbe = new MrProbe(TestLoggerFactory.getDemoLogger(), new NullProbeImpl(), false, false);
+		thdMrProbe.start();
+		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,null);
 		JythonExecutableComponentAdapter jeca = new JythonExecutableComponentAdapter();
 		jeca.prepare();
 		jeca.process(sSimpleExecutableComponent);
@@ -72,6 +77,7 @@ public class JythonExecutableComponentAdapterTest {
 		jeca.dispose(cc);
 		sRes = jeca.getOutput().toString();
 		assertEquals("Initilize called\nDispose called\n",sRes);
+		thdMrProbe.done();
 	}
 
 	/** Test the execute method.
@@ -81,7 +87,9 @@ public class JythonExecutableComponentAdapterTest {
 	public void testExecute() {
 		System.out.println(sSimpleExecutableComponent);
 		String sRes = null;
-		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>());
+		MrProbe thdMrProbe = new MrProbe(TestLoggerFactory.getDemoLogger(), new NullProbeImpl(), false, false);
+		thdMrProbe.start();
+		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,null);
 		JythonExecutableComponentAdapter jeca = new JythonExecutableComponentAdapter();
 		jeca.prepare();
 		jeca.process(sSimpleExecutableComponent);
@@ -96,7 +104,7 @@ public class JythonExecutableComponentAdapterTest {
 		System.out.println(sSimpleExecutableComponent);
 		System.out.println(sRes);
 		assertTrue(sRes.startsWith("Execute called"));
-
+		thdMrProbe.done();
 	}
 
 }

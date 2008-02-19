@@ -30,7 +30,7 @@ public class MrProbeTest {
 	private final int NUMBER_OF_REPETITIONS = 10;
 	
 	/** The number of calls in the battery */
-	private final int NUMBER_OF_CALLS = 10;
+	private final int NUMBER_OF_CALLS = 11;
 
 	/** MrProbe test against the null probe with no serialization.
 	 * 
@@ -111,6 +111,7 @@ public class MrProbeTest {
 				mp.probeFlowFinish(BASE_TEST_URI);
 				mp.probeFlowAbort(BASE_TEST_URI);
 				mp.probeWrappedComponentInitialize(wc);
+				mp.probeWrappedComponentAbort(wc);
 				mp.probeWrappedComponentDispose(wc);
 				mp.probeWrappedComponentPushData(wc, "string", "hello");
 				mp.probeWrappedComponentPullData(wc, "string", "hello");

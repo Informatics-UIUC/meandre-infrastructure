@@ -12,6 +12,8 @@ import java.util.logging.Logger;
 
 import org.meandre.core.engine.ActiveBuffer;
 import org.meandre.core.engine.ActiveBufferException;
+import org.meandre.core.engine.MrProbe;
+import org.meandre.core.engine.WrappedComponent;
 import org.meandre.core.logger.LoggerFactory;
 import org.meandre.webui.WebUI;
 import org.meandre.webui.WebUIException;
@@ -76,7 +78,13 @@ implements ComponentContext {
 	private Hashtable<String, String> htInputLogicNameMapReverse = null;
 
 	/** The array of available input names */
-	private String[] saInputNames;;
+	private String[] saInputNames;
+
+	/** MrProbe thread */
+	private MrProbe thdMrProbe = null;
+	
+	/** The wrapped component parent */
+	private WrappedComponent wcParent = null;
 
 	/** Create a component context with the given input and output active buffers
 	 * for a given wrapped component.
@@ -89,6 +97,7 @@ implements ComponentContext {
 	 * @param htOutputLogicNameMap The input logic name map
 	 * @param htInputLogicNameMap The output logic name map
 	 * @param htProperties The component properties
+	 * @param thdMrProbe The MrProbe thread
 	 */
 	public ComponentContextImpl(String sFlowUniqueID,String flowID,
 			String sComponentInstanceID, Set<ActiveBuffer> setInputs,
@@ -96,12 +105,16 @@ implements ComponentContext {
 			Hashtable<String, String> htOutputMap,
 			Hashtable<String, String> htInputLogicNameMap,
 			Hashtable<String, String> htOutputLogicNameMap,
-			Hashtable<String, String> htProperties) {
+			Hashtable<String, String> htProperties,
+			MrProbe thdMrProbe,
+			WrappedComponent wc ) {
 
 		// Create the data proxy
 		this.sFlowUniqueExecutionID = sFlowUniqueID;
 		this.flowID=flowID;
 		this.sComponentInstanceID = sComponentInstanceID;
+		this.thdMrProbe = thdMrProbe;
+		this.wcParent = wc;
 
 		this.htInputLogicNameMap = htInputLogicNameMap;
 		this.htOutputLogicNameMap = htOutputLogicNameMap;
@@ -185,7 +198,10 @@ implements ComponentContext {
 	public Object getDataComponentFromInput ( String sInputBuffer ) throws ComponentContextException {
 		if ( !setInputs.contains(sInputBuffer) )
 			throw new ComponentContextException("The requested input "+sInputBuffer+" does not exist.");
-		return dp.getInput(htInputLogicNameMap.get(sInputBuffer));
+		
+		Object obj = dp.getInput(htInputLogicNameMap.get(sInputBuffer));
+		thdMrProbe.probeWrappedComponentPullData(wcParent, sInputBuffer, obj);
+		return obj;
 	}
 
 	/** Push an object to the given named output.
@@ -195,6 +211,7 @@ implements ComponentContext {
 	 * @throws ComponentContextException Violation of the component context detected
 	 */
 	public void pushDataComponentToOutput ( String sOutputBuffer, Object obj ) throws ComponentContextException {
+		thdMrProbe.probeWrappedComponentPushData(wcParent, sOutputBuffer, obj);
 		if ( !setOutputs.contains(sOutputBuffer) )
 			throw new ComponentContextException("The requested input "+sOutputBuffer+" does not exist.");
 		try {
@@ -252,7 +269,9 @@ implements ComponentContext {
 	 * @return The property value (null if property does not exist)
 	 */
 	public String getProperty ( String sKey ) {
-		return htProperties.get(sKey);
+		String sPropertyValue = htProperties.get(sKey);
+		thdMrProbe.probeWrappedComponentGetProperty(wcParent, sKey, sPropertyValue);
+		return sPropertyValue;
 	}
 
 

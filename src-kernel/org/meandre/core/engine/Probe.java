@@ -15,6 +15,7 @@ public interface Probe {
 		FLOW_FINISHED,						// Flow finished executing
 		FLOW_ABORTED,						// Flow aborted execution
 		
+		EXECUTABLE_COMPONENT_ABORTED,		// The executable component requested execution abortion
 		EXECUTABLE_COMPONENT_INITIALIZED,	// The executable component has been initialized
 		EXECUTABLE_COMPONENT_DISPOSED,		// The executable component has been initialized
 
@@ -56,7 +57,15 @@ public interface Probe {
 	 * @param ts The time stamp
 	 */
 	public void probeExecutableComponentInitialized(String sECID, Object owc, Date ts);
-	
+
+	/** The executable component requested execution abortion.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param owc The wrapped component done with the initialization
+	 * @param ts The time stamp
+	 */
+	public void probeExecutableComponentAbort(String sECID, Object owc, Date ts);
+
 	/** The executable component finished disposing itself.
 	 * 
 	 * @param sECID The unique executable component ID

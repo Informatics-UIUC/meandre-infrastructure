@@ -53,6 +53,14 @@ public class Executor {
 	 * @param iPriority The execution priority
 	 */
 	public void execute ( int iPriority ) {
+		// Setting up MrProbe info
+		WrappedComponent wcTmp = setWC.iterator().next();
+		MrProbe thdMrProbe = wcTmp.thdMrProbe;
+		String sFlowExecutionID = wcTmp.cc.getFlowExecutionInstanceID();
+		
+		// MrProbe start
+		thdMrProbe.probeFlowStart(sFlowExecutionID);
+		
 		WebUI webui = null;
 		try {
 			 webui = WebUIFactory.getWebUI(sFlowUniqueExecutionID);
@@ -70,6 +78,7 @@ public class Executor {
 			thdMrPropper.join();
 		} catch (InterruptedException e) {
 			log.warning("Executor join failed: "+e.getMessage());
+			
 		}
 		
 		try {
@@ -78,6 +87,14 @@ public class Executor {
 		} catch (WebUIException e) {
 			log.warning("WebUI could not be stoped: "+e.getMessage());
 		}
+		
+		// MrProbe last words
+		if ( hadGracefullTermination() ) 
+			thdMrProbe.probeFlowFinish(sFlowExecutionID);
+		else
+			thdMrProbe.probeFlowAbort(sFlowExecutionID);
+		
+		thdMrProbe.done();
 	}
 	
 	/** Fires the execution of a given MeandreFlow.

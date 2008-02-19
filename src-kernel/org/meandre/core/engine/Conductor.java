@@ -112,7 +112,7 @@ public class Conductor {
 	 * @param thdMrProbe The MrProbe to use
 	 * @return The executor object
 	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
-	 * @throws ConductorException The counductor could not create an executable flow
+	 * @throws ConductorException The conductor could not create an executable flow
 	 */
 	@SuppressWarnings("unchecked")
 	public Executor buildExecutor(QueryableRepository qr, Resource res, MrProbe thdMrProbe)
@@ -125,6 +125,9 @@ public class Conductor {
 		// Map reource names to classes
 		Hashtable<Resource,String> htMapResourceToName = new Hashtable<Resource,String>();
 
+		// Start MrProbe
+		thdMrProbe.start();
+		
 		// Get the description
 		FlowDescription fd = qr.getFlowDescription(res);
 
@@ -148,8 +151,10 @@ public class Conductor {
 //					System.out.println(htMapNameToClass.keySet());
 					htECInstances.put(ins,(ExecutableComponent) htMapNameToClass.get(htMapResourceToName.get(ecomp)).newInstance());
 				} catch (InstantiationException e) {
+					thdMrProbe.done();
 					throw new ConductorException("Condcuctor could not instantiate class "+htMapResourceToName.get(ecomp)+"\n"+e);
 				} catch (IllegalAccessException e) {
+					thdMrProbe.done();
 					throw new ConductorException("Condcuctor could not instantiate class "+htMapResourceToName.get(ecomp)+"\n"+e);
 				}
 			}
@@ -160,10 +165,13 @@ public class Conductor {
 				try {
 					jeca = (JythonExecutableComponentAdapter) urlFlowCL.loadClass(JythonExecutableComponentAdapter.class.getName()).newInstance();
 				} catch (InstantiationException e) {
+					thdMrProbe.done();
 					throw new ConductorException(e);
 				} catch (IllegalAccessException e) {
+					thdMrProbe.done();
 					throw new ConductorException(e);
 				} catch (ClassNotFoundException e) {
+					thdMrProbe.done();
 					throw new ConductorException(e);
 				}
 				jeca.prepare();
@@ -312,6 +320,7 @@ public class Conductor {
 								)
 						);
 			} catch (InterruptedException e) {
+				thdMrProbe.done();
 				throw new ConductorException("Condcuctor could not instantiate the wapping component for instance"+sResECI+"\n"+e);
 			}
 
@@ -322,6 +331,7 @@ public class Conductor {
 		try {
 			return new Executor(sFlowUniqueExecutionID,tgFlow,setWC);
 		} catch (InterruptedException e) {
+			thdMrProbe.done();
 			throw new ConductorException("Condcuctor could not create the executor object\n"+e);
 		}
 	}

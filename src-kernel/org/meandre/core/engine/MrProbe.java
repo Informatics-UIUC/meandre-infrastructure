@@ -131,6 +131,23 @@ extends Thread {
 		semWorkAvailable.release();
 	}
 	
+	/** The wrapped component was aborted.
+	 * 
+	 * @param wc The wrapped component
+	 */
+	public void probeWrappedComponentAbort ( WrappedComponent wc ) {
+		Object oSWCXML = wc;
+		
+		// Check for state serialization
+		if ( bStateSerialization ) 
+			oSWCXML = serializeObject(wc);
+		
+		Object[] oa = {Probe.ProbeCommands.EXECUTABLE_COMPONENT_ABORTED,wc.getExecutableComponentInstanceID(),oSWCXML,new Date()};
+		clqStatements.add(oa);
+		semWorkAvailable.release();
+	}
+	
+
 	/** The wrapped component was initialized.
 	 * 
 	 * @param wc The wrapped component
@@ -283,6 +300,9 @@ extends Thread {
 				break;
 			case EXECUTABLE_COMPONENT_INITIALIZED:
 				probe.probeExecutableComponentInitialized((String)oa[1],oa[2],(Date)oa[3]);
+				break;
+			case EXECUTABLE_COMPONENT_ABORTED:
+				probe.probeExecutableComponentAbort((String)oa[1],oa[2],(Date)oa[3]);
 				break;
 			case EXECUTABLE_COMPONENT_DISPOSED:
 				probe.probeExecutableComponentDisposed((String)oa[1],oa[2],(Date)oa[3]);

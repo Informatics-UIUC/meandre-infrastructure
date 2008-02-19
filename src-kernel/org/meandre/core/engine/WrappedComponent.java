@@ -73,6 +73,9 @@ extends Thread {
 	/** Abortion message thrown */
 	protected String sAbortMessage = null;
 
+	/** MrProbe instance */
+	protected MrProbe thdMrProbe;
+
 	/** Builds a runnable component wrapper given the abstracted EcecutableComponent.
 	 *
 	 * @param sFlowUniqueID A flow execution unique ID
@@ -103,7 +106,7 @@ extends Thread {
 		// Basic initialization
 		this.ec            = ec;
 		this.semBlocking   = new Semaphore(1,true); // With fairness
-		this.cc            = new ComponentContextImpl(sFlowUniqueID,flowID,sComponentInstanceID, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, htProperties);
+		this.cc            = new ComponentContextImpl(sFlowUniqueID,flowID,sComponentInstanceID, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, htProperties, thdMrProbe, this);
 		this.hasNInputs     = htInputLogicNameMap.size();
 		// Setting execution flags
 		this.baStatusFlags = new boolean [4];
@@ -115,6 +118,7 @@ extends Thread {
 
 		// Cleaning Mr Proper object
 		this.thdMrProper         = null;
+		this.thdMrProbe     	 = thdMrProbe;
 
 		// Create hash tables for input and output active buffers
 		this.htInputs = new Hashtable<String,ActiveBuffer>();
@@ -139,6 +143,7 @@ extends Thread {
 
 		// Initialize the executable component
 		this.ec.initialize(cc);
+		this.thdMrProbe.probeWrappedComponentInitialize(this);
 	}
 
 
@@ -154,6 +159,7 @@ extends Thread {
 				log.finest("Component "+ec.toString()+" ready for execution");
 				try {
 					// Execute
+					this.thdMrProbe.probeWrappedComponentFired(this);
 					synchronized (baStatusFlags) {
 						baStatusFlags[EXECUTING] = true;
 					}
@@ -169,6 +175,8 @@ extends Thread {
 					synchronized (baStatusFlags) {
 						baStatusFlags[EXECUTING] = false;
 					}
+					this.thdMrProbe.probeWrappedComponentCoolingDown(this);
+					
 					log.finest("Component "+ec.toString()+" executed");
 
 					log.finest("Component "+ec.toString()+" outputs pushed");
@@ -179,12 +187,14 @@ extends Thread {
 					synchronized (baStatusFlags) {
 						baStatusFlags[TERMINATION] = true;
 						sAbortMessage = e.toString();
+						this.thdMrProbe.probeWrappedComponentAbort(this);
 					}
 					log.warning(e.getMessage());
 				} catch (ComponentContextException e) {
 					synchronized (baStatusFlags) {
 						baStatusFlags[TERMINATION] = true;
 						sAbortMessage = e.toString();
+						this.thdMrProbe.probeWrappedComponentAbort(this);
 					}
 					log.warning(e.getMessage());
 				}
@@ -192,6 +202,7 @@ extends Thread {
 					synchronized (baStatusFlags) {
 						baStatusFlags[TERMINATION] = true;
 						sAbortMessage = e.toString();
+						this.thdMrProbe.probeWrappedComponentAbort(this);
 					}
 					log.warning(e.toString());
 				}
@@ -225,12 +236,14 @@ extends Thread {
 					synchronized (baStatusFlags) {
 						baStatusFlags[TERMINATION] = true;
 						sAbortMessage = e.toString();
+						this.thdMrProbe.probeWrappedComponentAbort(this);
 					}
 					log.warning("The blocking sempahore for "+ec.toString()+" was interrupted!");
 				} catch (ComponentContextException e) {
 					synchronized (baStatusFlags) {
 						baStatusFlags[TERMINATION] = true;
 						sAbortMessage = e.toString();
+						this.thdMrProbe.probeWrappedComponentAbort(this);
 					}
 					log.severe("The requested input does not exist "+e.toString());
 				}
@@ -242,6 +255,7 @@ extends Thread {
 		cc.stopAllWebUIFragments();
 		log.info("Finalizing the execution of the wrapping component "+ec.toString());
 		ec.dispose(cc);
+		this.thdMrProbe.probeWrappedComponentDispose(this);
 
 	}
 

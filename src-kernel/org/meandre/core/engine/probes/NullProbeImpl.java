@@ -52,6 +52,14 @@ implements Probe {
 	public void probeExecutableComponentInitialized(String sECID, Object owc, Date ts){
 	}
 	
+	/** The executable component requested execution abortion.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param owc The wrapped component done with the initialization
+	 * @param ts The time stamp
+	 */
+	public void probeExecutableComponentAbort(String sECID, Object owc, Date ts){
+	}
 
 	/** The executable component finished disposing itself.
 	 * 
