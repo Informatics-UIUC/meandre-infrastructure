@@ -96,5 +96,40 @@ implements Probe {
 		psOut.println("Executable component "+sECID+" pulled data "+odata.toString()+" at "+ts+" to state "+owc.toString());	
 	}
 
+	/** The executable component was fired.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param owc The wrapped component done with the disposing call
+	 * @param ts The time stamp
+	 */
+	public void probeExecutableComponentFired(String sECID, Object owc, Date ts) {
+		psOut.println("Executable component "+sECID+" fire at "+ts+" to state "+owc.toString());		
+	}
+	
+
+	/** The executable component was fired.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param owc The wrapped component done with the disposing call
+	 * @param ts The time stamp
+	 */
+	public void probeExecutableComponentCoolingDown(String sECID, Object owc, Date ts) {
+		psOut.println("Executable component "+sECID+" is cooling down at "+ts+" to state "+owc.toString());		
+	}
+	
+
+	/** The executable component requested a property value.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param sPropertyName The requested property
+	 * @param sPropertyValue The property value
+	 * @param ts The time stamp
+	 */
+	public void probeExecutableComponentGetProperty(String sECID, String sPropertyName, String sPropertyValue, Date ts)  {
+		psOut.println("Executable component "+sECID+" requested property "+sPropertyName+" and got "+sPropertyValue+" at "+ts.toString());		
+	}
+	
+
+
 
 }

@@ -83,4 +83,33 @@ implements Probe {
 	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts) {
 	}
 
+	/** The executable component was fired.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param owc The wrapped component done with the disposing call
+	 * @param ts The time stamp
+	 */
+	public void probeExecutableComponentFired(String sECID, Object owc, Date ts) {
+	}
+
+	/** The executable component was fired.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param owc The wrapped component done with the disposing call
+	 * @param ts The time stamp
+	 */
+	public void probeExecutableComponentCoolingDown(String sECID, Object owc, Date ts) {
+	}
+
+	/** The executable component requested a property value.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param sPropertyName The requested property
+	 * @param sPropertyValue The property value
+	 * @param ts The time stamp
+	 */
+	public void probeExecutableComponentGetProperty(String sECID, String sPropertyName, String sPropertyValue, Date ts) {
+	}
+
+
 }

@@ -11,15 +11,20 @@ public interface Probe {
 
 	/** The probe commands */
 	public static enum ProbeCommands { 
-		FLOW_STARTED,			// Flow started executing
-		FLOW_FINISHED,			// Flow finished executing
-		FLOW_ABORTED,			// Flow aborted execution
+		FLOW_STARTED,						// Flow started executing
+		FLOW_FINISHED,						// Flow finished executing
+		FLOW_ABORTED,						// Flow aborted execution
 		
 		EXECUTABLE_COMPONENT_INITIALIZED,	// The executable component has been initialized
 		EXECUTABLE_COMPONENT_DISPOSED,		// The executable component has been initialized
 
 		EXECUTABLE_COMPONENT_PUSH_DATA, 	// The executable component has push a piece of data
-		EXECUTABLE_COMPONENT_PULL_DATA	 	// The executable component has pull a piece of data
+		EXECUTABLE_COMPONENT_PULL_DATA,	 	// The executable component has pull a piece of data
+
+		EXECUTABLE_COMPONENT_GET_PROPERTY,	// The executable component got a property value
+		
+		EXECUTABLE_COMPONENT_FIRED,			// The executable component is being fired
+		EXECUTABLE_COMPONENT_COOLING_DOWN	// The executable component is cooling down
 	}
 	
 	
@@ -78,5 +83,31 @@ public interface Probe {
 	 */
 	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts);
 	
+	/** The executable component was fired.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param owc The wrapped component done with the disposing call
+	 * @param ts The time stamp
+	 */
+	public void probeExecutableComponentFired(String sECID, Object owc, Date ts);
+
+	/** The executable component was fired.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param owc The wrapped component done with the disposing call
+	 * @param ts The time stamp
+	 */
+	public void probeExecutableComponentCoolingDown(String sECID, Object owc, Date ts);
+
+	/** The executable component requested a property value.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param sPropertyName The requested property
+	 * @param sPropertyValue The property value
+	 * @param ts The time stamp
+	 */
+	public void probeExecutableComponentGetProperty(String sECID, String sPropertyName, String sPropertyValue, Date ts);
+
+
 
 }

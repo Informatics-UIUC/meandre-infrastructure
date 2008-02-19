@@ -209,6 +209,53 @@ extends Thread {
 		semWorkAvailable.release();
 	}
 	
+	/** The wrapped component requested a property value.
+	 * 
+	 * @param wc The wrapped component
+	 * @param sPropertyName The requested property
+	 * @param sPropertyValue The requested value
+	 */
+	public void probeWrappedComponentGetProperty( WrappedComponent wc, String sPropertyName, String sPropertyValue ) {
+		Object[] oa = {Probe.ProbeCommands.EXECUTABLE_COMPONENT_GET_PROPERTY,wc.getExecutableComponentInstanceID(),sPropertyName,sPropertyValue,new Date()};
+		clqStatements.add(oa);
+		semWorkAvailable.release();
+	}
+	
+	
+	/** The wrapped component was fired.
+	 * 
+	 * @param wc The wrapped component
+	 */
+	public void probeWrappedComponentFired ( WrappedComponent wc ) {
+		Object oSWCXML = wc;
+		
+		// Check for state serialization
+		if ( bStateSerialization ) 
+			oSWCXML = serializeObject(wc);
+		
+		Object[] oa = {Probe.ProbeCommands.EXECUTABLE_COMPONENT_FIRED,wc.getExecutableComponentInstanceID(),oSWCXML,new Date()};
+		clqStatements.add(oa);
+		semWorkAvailable.release();
+	}
+	
+	
+	/** The wrapped component is cooling down.
+	 * 
+	 * @param wc The wrapped component
+	 */
+	public void probeWrappedComponentCoolingDown ( WrappedComponent wc ) {
+		Object oSWCXML = wc;
+		
+		// Check for state serialization
+		if ( bStateSerialization ) 
+			oSWCXML = serializeObject(wc);
+		
+		Object[] oa = {Probe.ProbeCommands.EXECUTABLE_COMPONENT_COOLING_DOWN,wc.getExecutableComponentInstanceID(),oSWCXML,new Date()};
+		clqStatements.add(oa);
+		semWorkAvailable.release();
+	}
+	
+	
 	/** The executable component gets serialize to keep its state.
 	 * 
 	 * @param wc The Wrapped component to serialize
@@ -245,6 +292,15 @@ extends Thread {
 				break;
 			case EXECUTABLE_COMPONENT_PULL_DATA:
 				probe.probeExecutableComponentPullData((String)oa[1],oa[2],oa[3],(Date)oa[4]);
+				break;
+			case EXECUTABLE_COMPONENT_GET_PROPERTY:
+				probe.probeExecutableComponentGetProperty((String)oa[1],(String)oa[2],(String)oa[3],(Date)oa[4]);
+				break;
+			case EXECUTABLE_COMPONENT_FIRED:
+				probe.probeExecutableComponentFired((String)oa[1],oa[2],(Date)oa[3]);
+				break;
+			case EXECUTABLE_COMPONENT_COOLING_DOWN:
+				probe.probeExecutableComponentCoolingDown((String)oa[1],oa[2],(Date)oa[3]);
 				break;
 			default:
 				log.warning("Unknown probe command "+oa[0]);
