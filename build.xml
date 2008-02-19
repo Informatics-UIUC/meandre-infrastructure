@@ -89,6 +89,7 @@
 		todir="${release.location}/trunk-${testStatus.revision}"/>
 
                   <delete>
+                  <fileset dir="." includes="dist/*.tar.gz"/>
                   <fileset dir="." includes="dist/*.tar"/>
                   </delete>
 
@@ -99,6 +100,11 @@
                 basedir="."
                 excludes="**/.svn,log/**,bin/**,MeandreStore/**,test/**,*.log">
                 </tar>
+                <gzip zipfile="${dist.dir}/${app.name}-${testStatus.revision}.tar.gz"
+                src="${dist.dir}/${app.name}-${testStatus.revision}.tar"/> 
+
+		<copy file="${dist.dir}/${app.name}-${testStatus.revision}.tar.gz"
+		todir="${release.location.app}/trunk-${testStatus.revision}"/>
 
 	</target>
 
