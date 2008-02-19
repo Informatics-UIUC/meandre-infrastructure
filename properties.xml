@@ -55,6 +55,8 @@
         <fileset dir="${jena.dir}" includes="*.jar"/>
         <fileset dir="${saxon.dir}" includes="*.jar"/>
         <fileset dir="${svnant.dir}" includes="*.jar"/>
+        <fileset dir="${plugins.dir}" includes="*.jar"/>
+        <fileset dir="${xstream.dir}" includes="*.jar"/>
         <pathelement location="${junit.jar}"/>
 		<pathelement location="${jython.jar}"/>
     </path>
