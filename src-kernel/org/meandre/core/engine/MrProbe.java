@@ -5,6 +5,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Logger;
 
+import org.meandre.core.ExecutableComponent;
+import org.meandre.core.environments.python.jython.JythonExecutableComponentAdapter;
+import org.python.core.PyObject;
+
 import com.thoughtworks.xstream.XStream;
 
 /** This class is the one in charge of keeping track of what is going on/happen during
@@ -140,7 +144,7 @@ extends Thread {
 		
 		// Check for state serialization
 		if ( bStateSerialization ) 
-			oSWCXML = serializeObject(wc);
+			oSWCXML = serializeWrappedComponent(wc);
 		
 		Object[] oa = {Probe.ProbeCommands.EXECUTABLE_COMPONENT_ABORTED,wc.getExecutableComponentInstanceID(),oSWCXML,new Date()};
 		clqStatements.add(oa);
@@ -157,7 +161,7 @@ extends Thread {
 		
 		// Check for state serialization
 		if ( bStateSerialization ) 
-			oSWCXML = serializeObject(wc);
+			oSWCXML = serializeWrappedComponent(wc);
 		
 		Object[] oa = {Probe.ProbeCommands.EXECUTABLE_COMPONENT_INITIALIZED,wc.getExecutableComponentInstanceID(),oSWCXML,new Date()};
 		clqStatements.add(oa);
@@ -173,7 +177,7 @@ extends Thread {
 		
 		// Check for state serialization
 		if ( bStateSerialization ) 
-			oSWCXML = serializeObject(wc);
+			oSWCXML = serializeWrappedComponent(wc);
 		
 		Object[] oa = {Probe.ProbeCommands.EXECUTABLE_COMPONENT_DISPOSED,wc.getExecutableComponentInstanceID(),oSWCXML,new Date()};
 		clqStatements.add(oa);
@@ -192,11 +196,11 @@ extends Thread {
 		
 		// Check for state serialization
 		if ( bStateSerialization ) 
-			oSWCXML = serializeObject(wc);
+			oSWCXML = serializeWrappedComponent(wc);
 		
 		// Check for data serialization
 		if ( bDataSerialization )
-			oSDataXML = serializeObject(objData);
+			oSDataXML = serializeDataPiece(objData);
 		
 		Object[] oa = {Probe.ProbeCommands.EXECUTABLE_COMPONENT_PUSH_DATA,wc.getExecutableComponentInstanceID(),oSWCXML,oSDataXML,new Date()};
 		clqStatements.add(oa);
@@ -215,11 +219,11 @@ extends Thread {
 		
 		// Check for state serialization
 		if ( bStateSerialization ) 
-			oSWCXML = serializeObject(wc);
+			oSWCXML = serializeWrappedComponent(wc);
 		
 		// Check for data serialization
 		if ( bDataSerialization )
-			oSDataXML = serializeObject(objData);
+			oSDataXML = serializeDataPiece(objData);
 		
 		Object[] oa = {Probe.ProbeCommands.EXECUTABLE_COMPONENT_PULL_DATA,wc.getExecutableComponentInstanceID(),oSWCXML,oSDataXML,new Date()};
 		clqStatements.add(oa);
@@ -248,7 +252,7 @@ extends Thread {
 		
 		// Check for state serialization
 		if ( bStateSerialization ) 
-			oSWCXML = serializeObject(wc);
+			oSWCXML = serializeWrappedComponent(wc);
 		
 		Object[] oa = {Probe.ProbeCommands.EXECUTABLE_COMPONENT_FIRED,wc.getExecutableComponentInstanceID(),oSWCXML,new Date()};
 		clqStatements.add(oa);
@@ -265,7 +269,7 @@ extends Thread {
 		
 		// Check for state serialization
 		if ( bStateSerialization ) 
-			oSWCXML = serializeObject(wc);
+			oSWCXML = serializeWrappedComponent(wc);
 		
 		Object[] oa = {Probe.ProbeCommands.EXECUTABLE_COMPONENT_COOLING_DOWN,wc.getExecutableComponentInstanceID(),oSWCXML,new Date()};
 		clqStatements.add(oa);
@@ -278,9 +282,30 @@ extends Thread {
 	 * @param wc The Wrapped component to serialize
 	 * @return The XML serialized object
 	 */
-	protected String serializeObject ( Object obj ) {
+	protected String serializeWrappedComponent ( WrappedComponent wc ) {
+		String sRes = null;
+	
+		ExecutableComponent ec = wc.getExecutableComponentImplementation();
+		if ( ec.getClass()==JythonExecutableComponentAdapter.class ) {
+			JythonExecutableComponentAdapter jeca = (JythonExecutableComponentAdapter)wc.getExecutableComponentImplementation();
+			PyObject pyobj = jeca.getLocals();
+			sRes = pyobj.toString();
+		}
+		else
+			sRes = xstream.toXML(ec);
+		
+		return sRes;
+	}
+	
+	/** The data object to serialize .
+	 * 
+	 * @param obj The data piece to serialize
+	 * @return The XML serialized object
+	 */
+	protected String serializeDataPiece ( Object obj ) {
 		return xstream.toXML(obj);
 	}
+
 
 	/** Processes the probe command calling to the proper probe call on the 
 	 * probe instantiation object.
@@ -299,28 +324,28 @@ extends Thread {
 				probe.probeFlowAbort((String)oa[1], (Date)oa[2]);
 				break;
 			case EXECUTABLE_COMPONENT_INITIALIZED:
-				probe.probeExecutableComponentInitialized((String)oa[1],oa[2],(Date)oa[3]);
+				probe.probeExecutableComponentInitialized((String)oa[1],oa[2],(Date)oa[3],bStateSerialization);
 				break;
 			case EXECUTABLE_COMPONENT_ABORTED:
-				probe.probeExecutableComponentAbort((String)oa[1],oa[2],(Date)oa[3]);
+				probe.probeExecutableComponentAbort((String)oa[1],oa[2],(Date)oa[3],bStateSerialization);
 				break;
 			case EXECUTABLE_COMPONENT_DISPOSED:
-				probe.probeExecutableComponentDisposed((String)oa[1],oa[2],(Date)oa[3]);
+				probe.probeExecutableComponentDisposed((String)oa[1],oa[2],(Date)oa[3],bStateSerialization);
 				break;
 			case EXECUTABLE_COMPONENT_PUSH_DATA:
-				probe.probeExecutableComponentPushData((String)oa[1],oa[2],oa[3],(Date)oa[4]);
+				probe.probeExecutableComponentPushData((String)oa[1],oa[2],oa[3],(Date)oa[4],bStateSerialization,bDataSerialization);
 				break;
 			case EXECUTABLE_COMPONENT_PULL_DATA:
-				probe.probeExecutableComponentPullData((String)oa[1],oa[2],oa[3],(Date)oa[4]);
+				probe.probeExecutableComponentPullData((String)oa[1],oa[2],oa[3],(Date)oa[4],bStateSerialization,bDataSerialization);
 				break;
 			case EXECUTABLE_COMPONENT_GET_PROPERTY:
 				probe.probeExecutableComponentGetProperty((String)oa[1],(String)oa[2],(String)oa[3],(Date)oa[4]);
 				break;
 			case EXECUTABLE_COMPONENT_FIRED:
-				probe.probeExecutableComponentFired((String)oa[1],oa[2],(Date)oa[3]);
+				probe.probeExecutableComponentFired((String)oa[1],oa[2],(Date)oa[3],bStateSerialization);
 				break;
 			case EXECUTABLE_COMPONENT_COOLING_DOWN:
-				probe.probeExecutableComponentCoolingDown((String)oa[1],oa[2],(Date)oa[3]);
+				probe.probeExecutableComponentCoolingDown((String)oa[1],oa[2],(Date)oa[3],bStateSerialization);
 				break;
 			default:
 				log.warning("Unknown probe command "+oa[0]);

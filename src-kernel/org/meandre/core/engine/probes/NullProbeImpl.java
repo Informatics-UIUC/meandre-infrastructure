@@ -13,18 +13,14 @@ import org.meandre.core.engine.Probe;
 public class NullProbeImpl 
 implements Probe {
 
-	/** Create a new probe given that does not record anything
-	 * 
-	 */
-	public NullProbeImpl () {
-	}
 	
 	/** The flow started executing.
 	 * 
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowStart(String sFlowUniqueID, Date ts){
+	public void probeFlowStart(String sFlowUniqueID, Date ts) {
+		
 	}
 	
 	/** The flow stopped executing.
@@ -32,7 +28,8 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowFinish(String sFlowUniqueID, Date ts){
+	public void probeFlowFinish(String sFlowUniqueID, Date ts) {
+		
 	}
 	
 	/** The flow aborted the execution.
@@ -40,7 +37,8 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowAbort(String sFlowUniqueID, Date ts){
+	public void probeFlowAbort(String sFlowUniqueID, Date ts) {
+		
 	}
 
 	/** The executable component finished initialization.
@@ -48,17 +46,21 @@ implements Probe {
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the initialization
 	 * @param ts The time stamp
+	 * @param bSerializeState The wrapped component is serialized
 	 */
-	public void probeExecutableComponentInitialized(String sECID, Object owc, Date ts){
+	public void probeExecutableComponentInitialized(String sECID, Object owc, Date ts, boolean bSerializeState) {
+		
 	}
-	
+
 	/** The executable component requested execution abortion.
 	 * 
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the initialization
 	 * @param ts The time stamp
+	 * @param bSerializeState The wrapped component is serialized
 	 */
-	public void probeExecutableComponentAbort(String sECID, Object owc, Date ts){
+	public void probeExecutableComponentAbort(String sECID, Object owc, Date ts, boolean bSerializeState) {
+		
 	}
 
 	/** The executable component finished disposing itself.
@@ -66,10 +68,12 @@ implements Probe {
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the disposing call
 	 * @param ts The time stamp
+	 * @param bSerializeState The wrapped component is serialized
+	 * @param bSerializedData The data provided has been serialized
 	 */
-	public void probeExecutableComponentDisposed(String sECID, Object owc, Date ts){
+	public void probeExecutableComponentDisposed(String sECID, Object owc, Date ts, boolean bSerializeState) {
+		
 	}
-	
 
 	/** The executable component pushed a piece of data.
 	 * 
@@ -77,8 +81,11 @@ implements Probe {
 	 * @param owc The wrapped component done with the disposing call
 	 * @param odata The data being pushed
 	 * @param ts The time stamp
+	 * @param bSerializeState The wrapped component is serialized
+	 * @param bSerializedData The data provided has been serialized
 	 */
-	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts) {
+	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts, boolean bSerializeState, boolean bSerializedData) {
+		
 	}
 
 	/** The executable component pulled a piece of data.
@@ -88,7 +95,19 @@ implements Probe {
 	 * @param odata The data being pulled
 	 * @param ts The time stamp
 	 */
-	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts) {
+	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts, boolean bSerializeState, boolean bSerializedData) {
+		
+	}
+	
+	/** The executable component was fired.
+	 * 
+	 * @param sECID The unique executable component ID
+	 * @param owc The wrapped component done with the disposing call
+	 * @param ts The time stamp
+	 * @param bSerializeState The wrapped component is serialized
+	 */
+	public void probeExecutableComponentFired(String sECID, Object owc, Date ts, boolean bSerializeState) {
+		
 	}
 
 	/** The executable component was fired.
@@ -96,17 +115,10 @@ implements Probe {
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the disposing call
 	 * @param ts The time stamp
+	 * @param bSerializeState The wrapped component is serialized
 	 */
-	public void probeExecutableComponentFired(String sECID, Object owc, Date ts) {
-	}
-
-	/** The executable component was fired.
-	 * 
-	 * @param sECID The unique executable component ID
-	 * @param owc The wrapped component done with the disposing call
-	 * @param ts The time stamp
-	 */
-	public void probeExecutableComponentCoolingDown(String sECID, Object owc, Date ts) {
+	public void probeExecutableComponentCoolingDown(String sECID, Object owc, Date ts, boolean bSerializeState) {
+		
 	}
 
 	/** The executable component requested a property value.
@@ -117,7 +129,9 @@ implements Probe {
 	 * @param ts The time stamp
 	 */
 	public void probeExecutableComponentGetProperty(String sECID, String sPropertyName, String sPropertyValue, Date ts) {
+		
 	}
+
 
 
 }

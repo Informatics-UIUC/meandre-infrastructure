@@ -1,5 +1,10 @@
 1.2vcli Panellet:
 
+* Provenance and Python components
+	- Modified the dispose method of JythonExecutableComponentAdapter (removed the nullification of the interpreter to allow MrProbe to clearly clean up)
+	- The state serializations store the string representation of the locals() call
+	- Functions are missing the code, but that code is already available on the embedded component context
+	
 * Meandre provenance infrastructure.
 	- Added MeandreProbingVocabulary (native Meandre provenance dialect)
 	- Implemented the MeandreRDFDialectProbeImpl
@@ -7,7 +12,7 @@
 	
 * MrProbe merge against the Conductor, Executor, WrappedComponent, and ComponentContext
 	- Modification to allow them to be probed
-	- All the present engine tests passed
+	- All the present engine tests passed for java only flows
 	
 * Added MrProbe class. This thread stands during the execution to gather information of the run
 	- New class added MrProbe

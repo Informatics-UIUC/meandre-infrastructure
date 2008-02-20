@@ -109,8 +109,9 @@ implements Probe {
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the initialization
 	 * @param ts The time stamp
+	 * @param bSerializeState The state has been serialized
 	 */
-	public void probeExecutableComponentInitialized(String sECID, Object owc, Date ts){
+	public void probeExecutableComponentInitialized(String sECID, Object owc, Date ts, boolean bSerializeState){
 		Statement stm = modProbe.createStatement(
 				modProbe.createResource(sECID),
 				MeandreProbingVocabulary.executable_component_instance_initialized,
@@ -120,7 +121,7 @@ implements Probe {
 		reifstm.addProperty(DC.date, modProbe.createTypedLiteral(ts));
 		
 		// The state
-		if ( owc.getClass().getName().equals(String.class.getName()) )
+		if ( bSerializeState )
 			reifstm.addProperty(MeandreProbingVocabulary.state, modProbe.createTypedLiteral((String)owc));
 		
 		modProbe.add(stm);
@@ -131,8 +132,9 @@ implements Probe {
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the initialization
 	 * @param ts The time stamp
+	 * @param bSerializeState The state has been serialized
 	 */
-	public void probeExecutableComponentAbort(String sECID, Object owc, Date ts){
+	public void probeExecutableComponentAbort(String sECID, Object owc, Date ts, boolean bSerializeState){
 		Statement stm = modProbe.createStatement(
 				modProbe.createResource(sECID),
 				MeandreProbingVocabulary.executable_component_instance_aborted,
@@ -142,7 +144,7 @@ implements Probe {
 		reifstm.addProperty(DC.date, modProbe.createTypedLiteral(ts));
 		
 		// The state
-		if ( owc.getClass().getName().equals(String.class.getName()) )
+		if ( bSerializeState )
 			reifstm.addProperty(MeandreProbingVocabulary.state, modProbe.createTypedLiteral((String)owc));
 		
 		modProbe.add(stm);
@@ -153,8 +155,9 @@ implements Probe {
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the disposing call
 	 * @param ts The time stamp
+	 * @param bSerializeState The state has been serialized
 	 */
-	public void probeExecutableComponentDisposed(String sECID, Object owc, Date ts){
+	public void probeExecutableComponentDisposed(String sECID, Object owc, Date ts, boolean bSerializeState){
 		Statement stm = modProbe.createStatement(
 				modProbe.createResource(sECID),
 				MeandreProbingVocabulary.executable_component_instance_disposed,
@@ -164,7 +167,7 @@ implements Probe {
 		reifstm.addProperty(DC.date, modProbe.createTypedLiteral(ts));
 		
 		// The state
-		if ( owc.getClass().getName().equals(String.class.getName()) )
+		if ( bSerializeState )
 			reifstm.addProperty(MeandreProbingVocabulary.state, modProbe.createTypedLiteral((String)owc));
 		
 		modProbe.add(stm);
@@ -177,8 +180,10 @@ implements Probe {
 	 * @param owc The wrapped component done with the disposing call
 	 * @param odata The data being pushed
 	 * @param ts The time stamp
+	 * @param bSerializeState The state has been serialized
+	 * @param bSerializedData The serialized data
 	 */
-	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts) {
+	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts, boolean bSerializeState, boolean bSerializedData) {
 		Statement stm = modProbe.createStatement(
 				modProbe.createResource(sECID),
 				MeandreProbingVocabulary.executable_component_instance_pushed_data,
@@ -186,10 +191,13 @@ implements Probe {
 			);
 		ReifiedStatement reifstm = modProbe.createReifiedStatement(stm);
 		reifstm.addProperty(DC.date, modProbe.createTypedLiteral(ts));
-		reifstm.addProperty(MeandreProbingVocabulary.data_piece, modProbe.createTypedLiteral((String)odata));
+		
+		// The data
+		if ( bSerializedData )
+			reifstm.addProperty(MeandreProbingVocabulary.data_piece, modProbe.createTypedLiteral((String)odata));
 		
 		// The state
-		if ( owc.getClass().getName().equals(String.class.getName()) )
+		if ( bSerializeState )
 			reifstm.addProperty(MeandreProbingVocabulary.state, modProbe.createTypedLiteral((String)owc));
 		
 		modProbe.add(stm);
@@ -201,8 +209,10 @@ implements Probe {
 	 * @param owc The wrapped component done with the disposing call
 	 * @param odata The data being pulled
 	 * @param ts The time stamp
+	 * @param bSerializeState The state has been serialized
+	 * @param bSerializedData The serialized data
 	 */
-	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts) {
+	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts, boolean bSerializeState, boolean bSerializedData) {
 		Statement stm = modProbe.createStatement(
 				modProbe.createResource(sECID),
 				MeandreProbingVocabulary.executable_component_instance_pulled_data,
@@ -210,10 +220,13 @@ implements Probe {
 			);
 		ReifiedStatement reifstm = modProbe.createReifiedStatement(stm);
 		reifstm.addProperty(DC.date, modProbe.createTypedLiteral(ts));
-		reifstm.addProperty(MeandreProbingVocabulary.data_piece, modProbe.createTypedLiteral((String)odata));
+		
+		// The data
+		if ( bSerializedData )
+			reifstm.addProperty(MeandreProbingVocabulary.data_piece, modProbe.createTypedLiteral((String)odata));
 		
 		// The state
-		if ( owc.getClass().getName().equals(String.class.getName()) )
+		if ( bSerializeState )
 			reifstm.addProperty(MeandreProbingVocabulary.state, modProbe.createTypedLiteral((String)owc));
 		
 		modProbe.add(stm);
@@ -224,8 +237,9 @@ implements Probe {
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the disposing call
 	 * @param ts The time stamp
+	 * @param bSerializeState The state has been serialized
 	 */
-	public void probeExecutableComponentFired(String sECID, Object owc, Date ts) {
+	public void probeExecutableComponentFired(String sECID, Object owc, Date ts, boolean bSerializeState) {
 		Statement stm = modProbe.createStatement(
 				modProbe.createResource(sECID),
 				MeandreProbingVocabulary.executable_component_instance_fired,
@@ -235,7 +249,7 @@ implements Probe {
 		reifstm.addProperty(DC.date, modProbe.createTypedLiteral(ts));
 		
 		// The state
-		if ( owc.getClass().getName().equals(String.class.getName()) )
+		if ( bSerializeState )
 			reifstm.addProperty(MeandreProbingVocabulary.state, modProbe.createTypedLiteral((String)owc));
 		
 		modProbe.add(stm);
@@ -246,8 +260,9 @@ implements Probe {
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the disposing call
 	 * @param ts The time stamp
+	 * @param bSerializeState The state has been serialized
 	 */
-	public void probeExecutableComponentCoolingDown(String sECID, Object owc, Date ts) {
+	public void probeExecutableComponentCoolingDown(String sECID, Object owc, Date ts, boolean bSerializeState) {
 		Statement stm = modProbe.createStatement(
 				modProbe.createResource(sECID),
 				MeandreProbingVocabulary.executable_component_instance_cooling_down,
@@ -257,11 +272,12 @@ implements Probe {
 		reifstm.addProperty(DC.date, modProbe.createTypedLiteral(ts));
 		
 		// The state
-		if ( owc.getClass().getName().equals(String.class.getName()) )
+		if ( bSerializeState )
 			reifstm.addProperty(MeandreProbingVocabulary.state, modProbe.createTypedLiteral((String)owc));
 		
 		modProbe.add(stm);
 	}
+
 
 	/** The executable component requested a property value.
 	 * 

@@ -1,6 +1,7 @@
 package org.meandre.core.engine;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
@@ -85,12 +86,83 @@ public class MrProbeTest {
 			
 			// Dump the results
 			Model modProbe = mmrdpi.getModel();
-			modProbe.write(System.out,"TTL",null);
-			System.out.println(modProbe.size());
+			assertEquals(581,modProbe.size());
 		}
 		catch ( Exception e ) {
 			fail("Unexpected exception: "+e.toString());
 		}
+	}
+	
+	/** Runs the Hello World example flow in all possible provenance configurations.
+	 * 
+	 */
+	@Test
+	public void meandreHelloWorldProvenanceTest () {
+		try {
+			Model model = DemoRepositoryGenerator.getTestHelloWorldHetereogenousRepository();
+			QueryableRepository qr = new RepositoryImpl(model);
+			
+			// Basic test running the NullProbeImpl
+			Conductor conductor = new Conductor(10);
+			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next());
+			runExecutor(exec);
+
+			// Basic test running basic provenance to an RDF model
+			MeandreRDFDialectProbeImpl rdfModProbe = new MeandreRDFDialectProbeImpl();
+			MrProbe mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,false,false);
+			conductor = new Conductor(10);
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
+			runExecutor(exec);
+
+			// Basic test running basic provenance and data serialization to an RDF model
+			rdfModProbe = new MeandreRDFDialectProbeImpl();
+			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,true,false);
+			conductor = new Conductor(10);
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
+			runExecutor(exec);
+
+			// Basic test running state storage provenance to an RDF model
+			rdfModProbe = new MeandreRDFDialectProbeImpl();
+			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,false,true);
+			conductor = new Conductor(10);
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
+			System.out.println(mrProbe.serializeWrappedComponent(exec.getWrappedComponents().iterator().next()));
+			runExecutor(exec);
+			
+//			Model mod = rdfModProbe.getModel();
+//			mod.write(System.out,"TTL",null);
+//			System.out.println(mod.size());
+		}
+		catch ( Exception e ) {
+			e.printStackTrace();
+			fail("This exception should have not been thrown "+e);
+		}
+	}
+
+	/** Runs an executor for the demo hello world example.
+	 * 
+	 * @param exec The executor to use
+	 * @return
+	 */
+	private void runExecutor(Executor exec) {
+		PrintStream psOut = System.out;
+		PrintStream psErr = System.err;
+		ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
+		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
+		System.setOut(new PrintStream(baosOut));
+		System.setErr(new PrintStream(baosErr));
+		exec.execute();
+		System.setOut(psOut);
+		System.setErr(psErr);
+		// Restore the output
+		assertTrue(exec.hadGracefullTermination());
+		assertEquals(0,exec.getAbortMessage().size());
+		System.out.println(baosErr);
+		assertEquals(0,baosErr.size());
+		
+		String sResult = "HELLO WORLD!!! HAPPY MEANDRING!!!HELLO WORLD!!! HAPPY MEANDRING!!!\n";
+		assertEquals(sResult.length(),baosOut.size());
+		assertEquals(sResult,baosOut.toString());
 	}
 
 	/** Creates a MrProbe thread for the given probe, runs a battery of probe calls
@@ -101,7 +173,7 @@ public class MrProbeTest {
 	 * @param stateSerialization Force state serialization
 	 */
 	private void runMrProbeTestWithProvidedProbe(Probe probe, boolean dataSerialization, boolean stateSerialization) {
-		MrProbe mp = new MrProbe(TestLoggerFactory.getDemoLogger(),probe,false,false);
+		MrProbe mp = new MrProbe(TestLoggerFactory.getTestLogger(),probe,false,false);
 		// Start the probe execution
 		mp.start();
 		// Runs a battery of probe calls

@@ -174,7 +174,6 @@ public class Conductor {
 					thdMrProbe.done();
 					throw new ConductorException(e);
 				}
-				jeca.prepare();
 				for ( RDFNode rdfn:setScripts )
 					if ( rdfn.isLiteral() )
 						jeca.process(((Literal)rdfn).getLexicalForm());

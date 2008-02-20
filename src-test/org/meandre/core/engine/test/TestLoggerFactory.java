@@ -48,7 +48,7 @@ public class TestLoggerFactory {
 	 * 
 	 * @return The core logger 
 	 */
-	public static Logger getDemoLogger() {
+	public static Logger getTestLogger() {
 		return logDemo;
 	}
 	

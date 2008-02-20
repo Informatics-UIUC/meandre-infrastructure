@@ -7,6 +7,7 @@ import org.meandre.core.ComponentContextException;
 import org.meandre.core.ComponentContextProperties;
 import org.meandre.core.ComponentExecutionException;
 import org.meandre.core.ExecutableComponent;
+import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 
 /** This class is the adapter that wraps Jython executable components.
@@ -29,12 +30,6 @@ public class JythonExecutableComponentAdapter implements ExecutableComponent {
 	 *
 	 */
 	public JythonExecutableComponentAdapter ( ) {
-	}
-
-	/** Prepares the interpreter and runs the provided scripts containing the
-	 * executable component function calls
-	 */
-	public void prepare () {
 		// Setup the interpreter
 		pi = new PythonInterpreter();
 		pi.setOut(baosOut=new ByteArrayOutputStream());
@@ -87,9 +82,8 @@ public class JythonExecutableComponentAdapter implements ExecutableComponent {
 		pi.set("ccp", ccp);
 		pi.exec("dispose(ccp)");
 
-		// Get rid of the interpreter
+		// Clean up the interpreter
 		pi.cleanup();
-		pi = null;
 	}
 
 	/** Returns the interpreter output stream.
@@ -106,5 +100,13 @@ public class JythonExecutableComponentAdapter implements ExecutableComponent {
 	 */
 	public ByteArrayOutputStream getError() {
 		return baosErr;
+	}
+
+	/** Returns the locals of the Python Interpreter.
+	 * 
+	 * @return The local variables
+	 */
+	public PyObject getLocals() {
+		return pi.getLocals();
 	}
 }

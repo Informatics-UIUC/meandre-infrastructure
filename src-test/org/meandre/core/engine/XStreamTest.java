@@ -1,10 +1,15 @@
 package org.meandre.core.engine;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
+import org.meandre.core.environments.python.jython.JythonExecutableComponentAdapter;
 import org.meandre.core.store.repository.QueryableRepository;
 import org.meandre.core.store.repository.RepositoryImpl;
+import org.meandre.demo.repository.DemoRepositoryGenerator;
+import org.python.core.PyObject;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -51,6 +56,46 @@ public class XStreamTest {
 				qr.getAvailableFlowDecriptions().size(),
 				qr2.getAvailableFlowDecriptions().size()
 			);
+	}
+	
+	/** Test the serialization library against the core main objects.
+	 * 
+	 */
+	@Test
+	public void coreSerializationTest() {
+		try {
+			// Preparing serialization objects
+			XStream xstream = new XStream();
+			
+			// Objects to serialize
+			Model model = DemoRepositoryGenerator.getTestHelloWorldHetereogenousRepository();
+			QueryableRepository qr = new RepositoryImpl(model);
+			Conductor conductor = new Conductor(10);
+			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next());
+
+			// Starting serialization tests
+			assertTrue(0<xstream.toXML(model).length());
+			assertTrue(0<xstream.toXML(qr).length());
+			assertTrue(0<xstream.toXML(conductor).length());
+			
+			assertTrue(0<xstream.toXML(conductor).length());
+			
+			//assertTrue(0<xstream.toXML(exec).length());
+			for ( WrappedComponent wc:exec.getWrappedComponents())
+				if ( wc.getExecutableComponentImplementation().getClass()==JythonExecutableComponentAdapter.class ) {
+					JythonExecutableComponentAdapter jeca = (JythonExecutableComponentAdapter)wc.getExecutableComponentImplementation();
+					PyObject pyobj = jeca.getLocals();
+					String sDict = pyobj.toString();
+					assertTrue(0<sDict.length());
+				}
+				else
+					assertTrue(0<xstream.toXML(wc.getExecutableComponentImplementation()).length());
+			
+		}
+		catch ( Exception e ) {
+			e.printStackTrace();
+			fail("This exeception should have not been thrown:"+e);
+		}
 	}
 	
 }

@@ -55,24 +55,28 @@ public interface Probe {
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the initialization
 	 * @param ts The time stamp
+	 * @param bSerializeState The wrapped component is serialized
 	 */
-	public void probeExecutableComponentInitialized(String sECID, Object owc, Date ts);
+	public void probeExecutableComponentInitialized(String sECID, Object owc, Date ts, boolean bSerializeState);
 
 	/** The executable component requested execution abortion.
 	 * 
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the initialization
 	 * @param ts The time stamp
+	 * @param bSerializeState The wrapped component is serialized
 	 */
-	public void probeExecutableComponentAbort(String sECID, Object owc, Date ts);
+	public void probeExecutableComponentAbort(String sECID, Object owc, Date ts, boolean bSerializeState);
 
 	/** The executable component finished disposing itself.
 	 * 
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the disposing call
 	 * @param ts The time stamp
+	 * @param bSerializeState The wrapped component is serialized
+	 * @param bSerializedData The data provided has been serialized
 	 */
-	public void probeExecutableComponentDisposed(String sECID, Object owc, Date ts);
+	public void probeExecutableComponentDisposed(String sECID, Object owc, Date ts, boolean bSerializeState);
 
 	/** The executable component pushed a piece of data.
 	 * 
@@ -80,8 +84,10 @@ public interface Probe {
 	 * @param owc The wrapped component done with the disposing call
 	 * @param odata The data being pushed
 	 * @param ts The time stamp
+	 * @param bSerializeState The wrapped component is serialized
+	 * @param bSerializedData The data provided has been serialized
 	 */
-	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts);
+	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts, boolean bSerializeState, boolean bSerializedData);
 
 	/** The executable component pulled a piece of data.
 	 * 
@@ -90,23 +96,25 @@ public interface Probe {
 	 * @param odata The data being pulled
 	 * @param ts The time stamp
 	 */
-	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts);
+	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts, boolean bSerializeState, boolean bSerializedData);
 	
 	/** The executable component was fired.
 	 * 
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the disposing call
 	 * @param ts The time stamp
+	 * @param bSerializeState The wrapped component is serialized
 	 */
-	public void probeExecutableComponentFired(String sECID, Object owc, Date ts);
+	public void probeExecutableComponentFired(String sECID, Object owc, Date ts, boolean bSerializeState);
 
 	/** The executable component was fired.
 	 * 
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the disposing call
 	 * @param ts The time stamp
+	 * @param bSerializeState The wrapped component is serialized
 	 */
-	public void probeExecutableComponentCoolingDown(String sECID, Object owc, Date ts);
+	public void probeExecutableComponentCoolingDown(String sECID, Object owc, Date ts, boolean bSerializeState);
 
 	/** The executable component requested a property value.
 	 * 

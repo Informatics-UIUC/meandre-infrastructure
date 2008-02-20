@@ -36,45 +36,45 @@ extends Thread {
 	protected static final int TERMINATION = 3;
 
 	/** The core root logger */
-	protected static Logger log = LoggerFactory.getCoreLogger();
+	protected transient static Logger log = LoggerFactory.getCoreLogger();
 
 	/** The last updated input buffer */
 	@SuppressWarnings("unchecked")
-	private Queue qUpdatedActiveBuffer = null;
+	private transient Queue qUpdatedActiveBuffer = null;
 
 	/** Wrapped component status flags */
-	protected boolean [] baStatusFlags = null;
+	protected transient boolean [] baStatusFlags = null;
 
 	/** The semaphore use to control execution flow */
-	protected Semaphore semBlocking = null;
+	protected transient Semaphore semBlocking = null;
 
 	/** The input active buffers */
-	private Hashtable<String,ActiveBuffer> htInputs = null;
+	private transient Hashtable<String,ActiveBuffer> htInputs = null;
 
 	/** The output active buffers */
-	private Hashtable<String,ActiveBuffer> htOutputs = null;
+	private transient Hashtable<String,ActiveBuffer> htOutputs = null;
 
 	/** The map of output names to the real active buffer name */
 	@SuppressWarnings("unused")
-	private Hashtable<String, String> htOutputMap = null;
+	private transient Hashtable<String, String> htOutputMap = null;
 
 	/** The executable component wrapped */
 	protected ExecutableComponent ec = null;
 
 	/** The component context object */
-	protected ComponentContextImpl cc = null;
+	protected transient ComponentContextImpl cc = null;
 
 	/** The MrProper instance for this guy */
-	protected MrProper thdMrProper = null;
+	protected transient MrProper thdMrProper = null;
 
 	/** Has the component inputs? */
-	protected int hasNInputs = -1;
+	protected transient int hasNInputs = -1;
 
 	/** Abortion message thrown */
-	protected String sAbortMessage = null;
+	protected transient String sAbortMessage = null;
 
 	/** MrProbe instance */
-	protected MrProbe thdMrProbe;
+	protected transient MrProbe thdMrProbe;
 
 	/** Builds a runnable component wrapper given the abstracted EcecutableComponent.
 	 *
@@ -359,4 +359,11 @@ extends Thread {
 		return cc.getExecutionInstanceID();
 	}
 
+	/** Returns the executable component wrapped.
+	 * 
+	 * @return The executable component
+	 */
+	public ExecutableComponent getExecutableComponentImplementation() {
+		return ec;
+	}
 }

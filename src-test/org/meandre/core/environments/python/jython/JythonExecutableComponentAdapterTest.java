@@ -52,7 +52,6 @@ public class JythonExecutableComponentAdapterTest {
 	@Test
 	public void testSimpleAdapter () {
 		JythonExecutableComponentAdapter jeca =  new JythonExecutableComponentAdapter();
-		jeca.prepare();
 		jeca.process(sSimpleScript);
 		String sRes = jeca.getOutput().toString();
 		assertEquals("Hello World!\n",sRes);
@@ -65,11 +64,10 @@ public class JythonExecutableComponentAdapterTest {
 	@Test
 	public void testInitializeAndDispose() {
 		String sRes = null;
-		MrProbe thdMrProbe = new MrProbe(TestLoggerFactory.getDemoLogger(), new NullProbeImpl(), false, false);
+		MrProbe thdMrProbe = new MrProbe(TestLoggerFactory.getTestLogger(), new NullProbeImpl(), false, false);
 		thdMrProbe.start();
 		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,null);
 		JythonExecutableComponentAdapter jeca = new JythonExecutableComponentAdapter();
-		jeca.prepare();
 		jeca.process(sSimpleExecutableComponent);
 		jeca.initialize(cc);
 		sRes = jeca.getOutput().toString();
@@ -87,11 +85,10 @@ public class JythonExecutableComponentAdapterTest {
 	public void testExecute() {
 		System.out.println(sSimpleExecutableComponent);
 		String sRes = null;
-		MrProbe thdMrProbe = new MrProbe(TestLoggerFactory.getDemoLogger(), new NullProbeImpl(), false, false);
+		MrProbe thdMrProbe = new MrProbe(TestLoggerFactory.getTestLogger(), new NullProbeImpl(), false, false);
 		thdMrProbe.start();
 		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,null);
 		JythonExecutableComponentAdapter jeca = new JythonExecutableComponentAdapter();
-		jeca.prepare();
 		jeca.process(sSimpleExecutableComponent);
 		try {
 			jeca.execute(cc);

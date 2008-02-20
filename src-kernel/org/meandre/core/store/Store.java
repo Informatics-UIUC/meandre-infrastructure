@@ -77,7 +77,7 @@ public class Store {
 	protected static Logger log = LoggerFactory.getCoreLogger();
 
 	/** The default Model Maker */
-	private static ModelMaker makerJenaModel = null;
+	private static transient ModelMaker makerJenaModel = null;
 	
 	/** The public repository URL */
 	private static String PUBLIC_REPOSITORY_URL = BASE_STORAGE_URL+"public/repository";
