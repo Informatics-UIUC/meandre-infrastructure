@@ -126,12 +126,19 @@ public class MrProbeTest {
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,false,true);
 			conductor = new Conductor(10);
 			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
-			System.out.println(mrProbe.serializeWrappedComponent(exec.getWrappedComponents().iterator().next()));
+			runExecutor(exec);
+
+			// Basic test running state storage provenance to an RDF model
+			rdfModProbe = new MeandreRDFDialectProbeImpl();
+			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,true,true);
+			conductor = new Conductor(10);
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
 			runExecutor(exec);
 			
-//			Model mod = rdfModProbe.getModel();
-//			mod.write(System.out,"TTL",null);
-//			System.out.println(mod.size());
+
+			Model mod = rdfModProbe.getModel();
+			mod.write(System.out,"TTL",null);
+			System.out.println(mod.size());
 		}
 		catch ( Exception e ) {
 			e.printStackTrace();
