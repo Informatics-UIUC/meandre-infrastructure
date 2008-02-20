@@ -124,7 +124,7 @@ implements Probe {
 	}
 	
 
-	/** The executable component was fired.
+	/** The executable component is cooling down.
 	 * 
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the disposing call

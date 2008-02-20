@@ -36,7 +36,7 @@ extends Thread {
 	private Logger log = null;
 	
 	/** The probe implementation object */
-	private Probe probe = null;
+	private Probe [] probea = null;
 	
 	/** The finalization flag */
 	private boolean bDone = false;
@@ -58,9 +58,34 @@ extends Thread {
 	 * @param bStateSerialization Serializes the component state in the Probe calls
 	 */
 	public MrProbe(Logger logger, Probe probe, boolean bDataSerialization, boolean bStateSerialization) {
+		Probe [] probes =  { probe };
+		initializeMrProbeData(logger, probes, bDataSerialization, bStateSerialization);
+	}
+
+
+	/** Initialize MrProper with multiple probes.
+	 * 
+	 * @param logger The logger to use 
+	 * @param probes The array of probes to use
+	 * @param bDataSerialization Serializes the data in the Probe calls
+	 * @param bStateSerialization Serializes the component state in the Probe calls
+	 */
+	public MrProbe(Logger logger, Probe [] probes, boolean bDataSerialization, boolean bStateSerialization) {
+		initializeMrProbeData(logger, probes, bDataSerialization, bStateSerialization);
+	}
+
+
+	/** Setup MrProper with multiple probes.
+	 * @param logger
+	 * @param probes
+	 * @param bDataSerialization
+	 * @param bStateSerialization
+	 */
+	private void initializeMrProbeData(Logger logger, Probe[] probes,
+			boolean bDataSerialization, boolean bStateSerialization) {
 		this.bDone = false;
 		this.log = logger;
-		this.probe = probe;
+		this.probea = probes;
 		this.bDataSerialization = bDataSerialization;
 		this.bStateSerialization = bStateSerialization;
 		this.semWorkAvailable = new Semaphore(1,true);
@@ -74,6 +99,7 @@ extends Thread {
 		}
 	}
 	
+
 	/** The main thread run method.
 	 * 
 	 */
@@ -315,37 +341,48 @@ extends Thread {
 	protected void processProbeCommand(Object[] oa) {
 		switch((Probe.ProbeCommands)oa[0]) {
 			case FLOW_STARTED:
-				probe.probeFlowStart((String)oa[1], (Date)oa[2]);
+				for ( Probe probe:this.probea)
+					probe.probeFlowStart((String)oa[1], (Date)oa[2]);
 				break;
 			case FLOW_FINISHED:
-				probe.probeFlowFinish((String)oa[1], (Date)oa[2]);
+				for ( Probe probe:this.probea)
+					probe.probeFlowFinish((String)oa[1], (Date)oa[2]);
 				break;
 			case FLOW_ABORTED:
-				probe.probeFlowAbort((String)oa[1], (Date)oa[2]);
+				for ( Probe probe:this.probea)
+					probe.probeFlowAbort((String)oa[1], (Date)oa[2]);
 				break;
 			case EXECUTABLE_COMPONENT_INITIALIZED:
-				probe.probeExecutableComponentInitialized((String)oa[1],oa[2],(Date)oa[3],bStateSerialization);
+				for ( Probe probe:this.probea)
+					probe.probeExecutableComponentInitialized((String)oa[1],oa[2],(Date)oa[3],bStateSerialization);
 				break;
 			case EXECUTABLE_COMPONENT_ABORTED:
-				probe.probeExecutableComponentAbort((String)oa[1],oa[2],(Date)oa[3],bStateSerialization);
+				for ( Probe probe:this.probea)
+					probe.probeExecutableComponentAbort((String)oa[1],oa[2],(Date)oa[3],bStateSerialization);
 				break;
 			case EXECUTABLE_COMPONENT_DISPOSED:
-				probe.probeExecutableComponentDisposed((String)oa[1],oa[2],(Date)oa[3],bStateSerialization);
+				for ( Probe probe:this.probea)
+					probe.probeExecutableComponentDisposed((String)oa[1],oa[2],(Date)oa[3],bStateSerialization);
 				break;
 			case EXECUTABLE_COMPONENT_PUSH_DATA:
-				probe.probeExecutableComponentPushData((String)oa[1],oa[2],oa[3],(Date)oa[4],bStateSerialization,bDataSerialization);
+				for ( Probe probe:this.probea)
+					probe.probeExecutableComponentPushData((String)oa[1],oa[2],oa[3],(Date)oa[4],bStateSerialization,bDataSerialization);
 				break;
 			case EXECUTABLE_COMPONENT_PULL_DATA:
-				probe.probeExecutableComponentPullData((String)oa[1],oa[2],oa[3],(Date)oa[4],bStateSerialization,bDataSerialization);
+				for ( Probe probe:this.probea)
+					probe.probeExecutableComponentPullData((String)oa[1],oa[2],oa[3],(Date)oa[4],bStateSerialization,bDataSerialization);
 				break;
 			case EXECUTABLE_COMPONENT_GET_PROPERTY:
-				probe.probeExecutableComponentGetProperty((String)oa[1],(String)oa[2],(String)oa[3],(Date)oa[4]);
+				for ( Probe probe:this.probea)
+					probe.probeExecutableComponentGetProperty((String)oa[1],(String)oa[2],(String)oa[3],(Date)oa[4]);
 				break;
 			case EXECUTABLE_COMPONENT_FIRED:
-				probe.probeExecutableComponentFired((String)oa[1],oa[2],(Date)oa[3],bStateSerialization);
+				for ( Probe probe:this.probea)
+					probe.probeExecutableComponentFired((String)oa[1],oa[2],(Date)oa[3],bStateSerialization);
 				break;
 			case EXECUTABLE_COMPONENT_COOLING_DOWN:
-				probe.probeExecutableComponentCoolingDown((String)oa[1],oa[2],(Date)oa[3],bStateSerialization);
+				for ( Probe probe:this.probea)
+					probe.probeExecutableComponentCoolingDown((String)oa[1],oa[2],(Date)oa[3],bStateSerialization);
 				break;
 			default:
 				log.warning("Unknown probe command "+oa[0]);

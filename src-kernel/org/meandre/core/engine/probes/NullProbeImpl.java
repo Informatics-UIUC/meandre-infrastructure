@@ -4,8 +4,7 @@ import java.util.Date;
 
 import org.meandre.core.engine.Probe;
 
-/** This class implements a probe for the engine that just dumps the information
- * to the provided PrintStream.
+/** This class implements a probe for the engine that just does nothing.
  * 
  * @author Xavier Llor&agrave;
  *
@@ -110,7 +109,7 @@ implements Probe {
 		
 	}
 
-	/** The executable component was fired.
+	/** The executable component is cooling down.
 	 * 
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the disposing call

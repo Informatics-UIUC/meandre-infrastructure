@@ -1,5 +1,11 @@
 1.2vcli Panellet:
 
+* Created StatisticProbeImpl to gather general statistics about the flow execution
+	- Store the basic statistics
+	- Provides the results in JSON object
+
+* Modified MrProbe to allow installing multiple probes
+
 * Provenance and Python components
 	- Modified the dispose method of JythonExecutableComponentAdapter (removed the nullification of the interpreter to allow MrProbe to clearly clean up)
 	- The state serializations store the string representation of the locals() call

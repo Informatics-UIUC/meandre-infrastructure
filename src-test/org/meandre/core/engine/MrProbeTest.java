@@ -10,6 +10,7 @@ import java.io.PrintStream;
 import org.junit.Test;
 import org.meandre.core.engine.probes.MeandreRDFDialectProbeImpl;
 import org.meandre.core.engine.probes.NullProbeImpl;
+import org.meandre.core.engine.probes.StatisticsProbeImpl;
 import org.meandre.core.engine.probes.ToPrintStreamProbeImpl;
 import org.meandre.core.engine.test.TestLoggerFactory;
 import org.meandre.core.store.repository.QueryableRepository;
@@ -135,10 +136,31 @@ public class MrProbeTest {
 			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
 			runExecutor(exec);
 			
+			// Model mod = rdfModProbe.getModel();
+			// mod.write(System.out,"TTL",null);
+			// System.out.println(mod.size());
+		}
+		catch ( Exception e ) {
+			e.printStackTrace();
+			fail("This exception should have not been thrown "+e);
+		}
+	}
+	
 
-			Model mod = rdfModProbe.getModel();
-			mod.write(System.out,"TTL",null);
-			System.out.println(mod.size());
+	/** Runs the Hello World example flow with the statics probe.
+	 * 
+	 */
+	@Test
+	public void meandreHelloWorldStatisticsTest () {
+		try {
+			Model model = DemoRepositoryGenerator.getTestHelloWorldHetereogenousRepository();
+			QueryableRepository qr = new RepositoryImpl(model);
+			Conductor conductor = new Conductor(10);
+			StatisticsProbeImpl spi = new StatisticsProbeImpl();
+			MrProbe mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),spi,false,false);
+			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
+			runExecutor(exec);
+			System.out.println(spi.getSerializedStatistics().toString(3));
 		}
 		catch ( Exception e ) {
 			e.printStackTrace();

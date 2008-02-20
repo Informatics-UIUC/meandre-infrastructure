@@ -186,7 +186,7 @@ public class WSRepositoryLogic {
 				jo.put("meandre_uri", res.toString());
 				ja.put(jo);
 			}
-			joRes.put("meandre_flow_componet",ja);
+			joRes.put("meandre_flow_component",ja);
 
 		}
 		catch ( Exception e ) {
