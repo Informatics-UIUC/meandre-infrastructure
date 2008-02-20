@@ -1,5 +1,9 @@
 1.2vcli Panellet:
 
+* To the verbose flow execution WS:
+	- Added parameter statistics
+	- If true it dumps the flow execution statistics at the end of the run
+	
 * Created StatisticProbeImpl to gather general statistics about the flow execution
 	- Store the basic statistics
 	- Provides the results in JSON object

@@ -1,12 +1,15 @@
 package org.meandre.core.engine;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.meandre.core.engine.probes.MeandreRDFDialectProbeImpl;
 import org.meandre.core.engine.probes.NullProbeImpl;
@@ -160,7 +163,27 @@ public class MrProbeTest {
 			MrProbe mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),spi,false,false);
 			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
 			runExecutor(exec);
-			System.out.println(spi.getSerializedStatistics().toString(3));
+			
+			// Test the stats are there
+			JSONObject jsonStats = spi.getSerializedStatistics();
+			assertNotNull(jsonStats.get("flow_unique_id"));
+			assertNotNull(jsonStats.get("flow_state"));
+			assertNotNull(jsonStats.get("started_at"));
+			assertNotNull(jsonStats.get("latest_probe_at"));
+			assertNotNull(jsonStats.get("runtime"));
+			
+			JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
+			assertNotNull(jaEXIS);
+			for ( int i=0,iMax=jaEXIS.length() ; i<iMax ; i++ ) {
+				JSONObject joEXIS = (JSONObject) jaEXIS.get(i);
+				assertNotNull(joEXIS.get("executable_component_instance_id"));
+				assertNotNull(joEXIS.get("executable_component_state"));
+				assertNotNull(joEXIS.get("times_fired"));
+				assertNotNull(joEXIS.get("accumulated_runtime"));
+				assertNotNull(joEXIS.get("pieces_of_data_in"));
+				assertNotNull(joEXIS.get("pieces_of_data_out"));
+				assertNotNull(joEXIS.get("number_of_read_properties"));
+			}
 		}
 		catch ( Exception e ) {
 			e.printStackTrace();
