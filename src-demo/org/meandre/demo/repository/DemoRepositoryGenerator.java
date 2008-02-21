@@ -1142,5 +1142,137 @@ public class DemoRepositoryGenerator {
                                .add(fd.getModel());
 	}
 
+
+	/** Generates a 4 component flow that pushes a string, concatenates it twice
+	 * and it finally prints it to the standard out.
+	 * 
+	 * @return The model with the 3 component descriptors and the flow
+	 */
+	public static Model getTestHelloWorldPartialDanglingRepository() {
+		return getTestHelloWorldPartialDanglingRepository(sTestBaseURL);
+	}
+	
+	/** Generates a unique 4 component flow that pushes a string, concatenates it twice
+	 * and it finally prints it to the standard out.
+	 * 
+	 * @return The model with the 3 component descriptors and the flow
+	 * @throws InterruptedException Failed to get the new unique ID
+	 */
+	public static Model getNextTestHelloWorldPartialDanglingRepository() throws InterruptedException {
+		long l = -1;
+		semUniqueID.acquire();
+		l = lUniqueID++;
+		semUniqueID.release();
+		return getTestHelloWorldPartialDanglingRepository(sTestBaseURL+"/id/"+l+"/");
+	}
+	
+	/** Generates a 3 component partial flow that pushes a string, concatenates it twice
+	 * and it finally prints it to the standard out. The flow is partially defined, and 
+	 * should hang if tried to run.
+	 * 
+	 * @param sBaseURL The base URL
+	 * @return The model with the 3 component descriptors and the flow
+	 */
+	public static Model getTestHelloWorldPartialDanglingRepository(String sBaseURL) {
+		
+		///
+		// Create the components
+		//
+		ExecutableComponentDescription ecdPS = getPushStringComponent(sBaseURL); 
+		ExecutableComponentDescription ecdCS = getConcatenateStringsComponent(sBaseURL); 
+		ExecutableComponentDescription ecdPO = getPrintObjectComponent(sBaseURL); 
+		
+		sBaseURL += "/flow/test-hello-world";
+		
+		//
+		// Assemble the flow
+		//
+		Resource resFlowComponent = ModelFactory.createDefaultModel().createResource(sBaseURL);
+		
+		//
+		// Flow properties
+		//
+		String sName = "Hello World!!!";
+		String sDescription = "A simple hello world test";
+		String sRights = "University of Illinois/NCSA open source license";
+		String sCreator = "Xavier Llor&agrave;";
+		Date dateCreation = new Date();
+		
+		//
+		// Create the instances
+		//
+		Set<ExecutableComponentInstanceDescription> setExecutableComponentInstances = new HashSet<ExecutableComponentInstanceDescription>();
+
+		Resource resInsPS0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push_string/0");
+		Resource resInsPS0Component = ecdPS.getExecutableComponent();
+		String sInsPS0Name = "Push String 0";
+		String sInsPS0Desc = "Push hello world";
+		PropertiesDescription pdPInsPS0Properties = new PropertiesDescription();
+		ExecutableComponentInstanceDescription ecidPS0 = new ExecutableComponentInstanceDescription(resInsPS0,resInsPS0Component,sInsPS0Name,sInsPS0Desc,pdPInsPS0Properties);
+
+		Resource resInsCS0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/concatenate_string/2");
+		Resource resInsCS0Component = ecdCS.getExecutableComponent();
+		String sInsCS0Name = "Concatenate String 0";
+		String sInsCS0Desc = "Concatenates two strings";
+		PropertiesDescription pdPInsCS0Properties = new PropertiesDescription();
+		ExecutableComponentInstanceDescription ecidCS0 = new ExecutableComponentInstanceDescription(resInsCS0,resInsCS0Component,sInsCS0Name,sInsCS0Desc,pdPInsCS0Properties);
+
+		Resource resInsPO0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/print-object/3");
+		Resource resInsPO0Component = ecdPO.getExecutableComponent();
+		String sInsPO0Name = "Print Object 0";
+		String sInsPO0Desc = "Prints the concatenated object";
+		PropertiesDescription pdPInsPO0Properties = new PropertiesDescription();
+		ExecutableComponentInstanceDescription ecidPO0 = new ExecutableComponentInstanceDescription(resInsPO0,resInsPO0Component,sInsPO0Name,sInsPO0Desc,pdPInsPO0Properties);
+
+		setExecutableComponentInstances.add(ecidPS0);
+		setExecutableComponentInstances.add(ecidCS0);
+		setExecutableComponentInstances.add(ecidPO0);
+		
+		//
+		// Connecting the instances
+		//
+		Set<ConnectorDescription> setConnectorDescription = new HashSet<ConnectorDescription>();
+		
+		Iterator<DataPortDescription> iter = ecdCS.getInputs().iterator();
+		Resource resOne = iter.next().getResource();
+		//Resource resTwo = iter.next().getResource();
+		
+		ConnectorDescription cdPS0 = new ConnectorDescription(
+				ModelFactory.createDefaultModel().createResource(sBaseURL+"connector/0"),
+				ecidPS0.getExecutableComponentInstance(), ecdPS.getOutputs().iterator().next().getResource(),
+				ecidCS0.getExecutableComponentInstance(), resOne);
+
+		ConnectorDescription cdPO0 = new ConnectorDescription(
+				ModelFactory.createDefaultModel().createResource(sBaseURL+"connector/2"),
+				ecidCS0.getExecutableComponentInstance(), ecdCS.getOutputs().iterator().next().getResource(),
+				ecidPO0.getExecutableComponentInstance(), ecdPO.getInputs().iterator().next().getResource());
+
+		setConnectorDescription.add(cdPS0);
+		setConnectorDescription.add(cdPO0);
+		
+		//
+		// Tags
+		//
+		HashSet<String> hsTags = new HashSet<String>();
+		hsTags.add("demo");
+		hsTags.add("hello_world");
+ 		TagsDescription tagsDesc = new TagsDescription(hsTags);
+		
+ 		//
+ 		// Create the flow
+ 		//
+		FlowDescription fd = new FlowDescription(resFlowComponent, sName,
+				sDescription, sRights, sCreator, dateCreation,
+				setExecutableComponentInstances, setConnectorDescription,
+				tagsDesc);
+		
+		//
+		// Return the aggregated model
+		//
+		return ecdPS.getModel().add(ecdCS.getModel())
+                               .add(ecdPO.getModel())
+                               .add(fd.getModel());
+	}
+
 	
 }

@@ -124,7 +124,8 @@ implements ComponentContext {
 		this.htProperties = htProperties;
 		// Create the proper input set
 		this.setInputs = htInputLogicNameMap.keySet();
-		this.saInputNames = new String[setInputs.size()];
+		//this.saInputNames = new String[setInputs.size()];
+		this.saInputNames = new String[this.setInputs.size()];
 		this.htInputLogicNameMapReverse = new Hashtable<String,String>();
 		int iCnt = 0;
 		if ( setInputs.size()>0 ){

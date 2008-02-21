@@ -55,72 +55,6 @@ public class ConductorTest {
 		assertEquals(sResult,baosOut.toString());
 	}
 
-	/** Run the basic hello world test.
-	 * 
-	 * @param conductor The conductor to use
-	 * @param qr The query repository
-	 * @throws CorruptedDescriptionException A corrupted description  was found
-	 * @throws ConductorException The conductor could not build the flow
-	 */
-	private void runHelloWorldFlowWidthDanglingComponents(Conductor conductor,
-			QueryableRepository qr) throws CorruptedDescriptionException,
-			ConductorException {	
-	
-		// Create the execution
-		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next());
-		// Redirect the output
-		PrintStream psOut = System.out;
-		PrintStream psErr = System.err;
-		ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
-		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
-		System.setOut(new PrintStream(baosOut));
-		System.setErr(new PrintStream(baosErr));
-		exec.execute();
-		System.setOut(psOut);
-		System.setErr(psErr);
-		// Restore the output
-		assertTrue(exec.hadGracefullTermination());
-		assertEquals(0,exec.getAbortMessage().size());
-		assertEquals(0,baosErr.size());
-		
-		String sResult = "Hello World!!! Happy Meandring!!!Hello World!!! Happy Meandring!!!\n";
-		assertEquals(sResult.length(),baosOut.size());
-		assertEquals(sResult,baosOut.toString());
-	}
-
-	/** Run the basic hello world test with dangling instances and fork.
-	 * 
-	 * @param conductor The conductor to use
-	 * @param qr The query repository
-	 * @throws CorruptedDescriptionException A corrupted description  was found
-	 * @throws ConductorException The conductor could not build the flow
-	 */ 
-	private void runHelloWorldFlowWidthDanglingComponentsAndFork(Conductor conductor,
-			QueryableRepository qr) throws CorruptedDescriptionException,
-			ConductorException {	
-		// Create the execution
-		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next());
-		// Redirect the output
-		PrintStream psOut = System.out;
-		PrintStream psErr = System.err;
-		ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
-		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
-		System.setOut(new PrintStream(baosOut));
-		System.setErr(new PrintStream(baosErr));
-		exec.execute();
-		System.setOut(psOut);
-		System.setErr(psErr);
-		// Restore the output
-		assertTrue(exec.hadGracefullTermination());
-		assertEquals(0,exec.getAbortMessage().size());
-		assertEquals(0,baosErr.size());
-		
-		String sResult = "Hello World!!! Happy Meandring!!!Hello World!!! Happy Meandring!!!\n";
-		sResult += sResult;
-		assertEquals(sResult.length(),baosOut.size());
-		assertEquals(sResult,baosOut.toString());
-	}
-
 	/** Run the basic hello world test with dangling outputs.
 	 * 
 	 * @param conductor The conductor to use
@@ -157,7 +91,7 @@ public class ConductorTest {
 	 * Test method for {@link org.meandre.core.engine.Conductor#buildExecutor(org.meandre.core.store.repository.QueryableRepository, com.hp.hpl.jena.rdf.model.Resource)}.
 	 */
 	@Test
-	public void testBuildExecutor() {
+	public void testBuildExecutorHelloWorld() {
 		Conductor conductor = new Conductor(10);
 		
 		try {
@@ -168,30 +102,96 @@ public class ConductorTest {
 			// Run the basic test
 			runHelloWorldFlow(conductor, qr);
 			
+		} catch (CorruptedDescriptionException e) {
+			fail("Corrupted description encounterd: "+e);
+		} catch (ConductorException e) {
+			fail("Conductor exception: "+e);
+		}
+	}
+
+	/**
+	 * Test method for {@link org.meandre.core.engine.Conductor#buildExecutor(org.meandre.core.store.repository.QueryableRepository, com.hp.hpl.jena.rdf.model.Resource)}.
+	 */
+	@Test
+	public void testBuildExecutorHetereogenous() {
+		Conductor conductor = new Conductor(10);
+		
+		try {
 			// Run simple hetereogenous hello world (Java+Python)
-			model = DemoRepositoryGenerator.getTestHelloWorldHetereogenousRepository();
-			qr = new RepositoryImpl(model);
+			Model model = DemoRepositoryGenerator.getTestHelloWorldHetereogenousRepository();
+			RepositoryImpl qr = new RepositoryImpl(model);
 			//for ( Resource res:qr.getAvailableExecutableComponents())
 			//	System.out.println(res);
 			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/to-uppercase")));
 			// Run the basic test
 			runHelloWorldHetereogenousFlow(conductor, qr);
+			
+		} catch (CorruptedDescriptionException e) {
+			fail("Corrupted description encounterd: "+e);
+		} catch (ConductorException e) {
+			fail("Conductor exception: "+e);
+		}
+	}
 
-			
+	/**
+	 * Test method for {@link org.meandre.core.engine.Conductor#buildExecutor(org.meandre.core.store.repository.QueryableRepository, com.hp.hpl.jena.rdf.model.Resource)}.
+	 */
+	@Test
+	public void testBuildExecutorHelloWorldWithDanglingComponents() {
+		Conductor conductor = new Conductor(10);
+		
+		try {
 			// Run simple hello world dangling input/outputs
-			model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsRepository();
-			qr = new RepositoryImpl(model);
+			Model model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsRepository();
+			RepositoryImpl qr = new RepositoryImpl(model);
 			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
-			// Run the basic text
-			runHelloWorldFlowWidthDanglingComponents(conductor, qr);
-			
+			// Create the execution
+			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next()));
+					
+		} catch (CorruptedDescriptionException e) {
+			fail("Corrupted description encounterd: "+e);
+		} catch (ConductorException e) {
+			fail("Conductor exception: "+e);
+		}
+	}
+
+	/**
+	 * Test method for {@link org.meandre.core.engine.Conductor#buildExecutor(org.meandre.core.store.repository.QueryableRepository, com.hp.hpl.jena.rdf.model.Resource)}.
+	 */
+	@Test
+	public void testBuildExecutorWithDanglingComponentsAndInAndOutForks() {
+		Conductor conductor = new Conductor(10);
+		
+		try {
 			// Run simple hello world dangling input/outputs + fork
-			model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
-			qr = new RepositoryImpl(model);
+			Model model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
+			RepositoryImpl qr = new RepositoryImpl(model);
 			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
-			// Run the basic text
-			runHelloWorldFlowWidthDanglingComponentsAndFork(conductor, qr);
+			// Create the execution
+			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next()));
 			
+		} catch (CorruptedDescriptionException e) {
+			fail("Corrupted description encounterd: "+e);
+		} catch (ConductorException e) {
+			fail("Conductor exception: "+e);
+		}
+	}
+
+	/**
+	 * Test method for {@link org.meandre.core.engine.Conductor#buildExecutor(org.meandre.core.store.repository.QueryableRepository, com.hp.hpl.jena.rdf.model.Resource)}.
+	 */
+	@Test
+	public void testDanglingPartiallyConnectedWitExecutor() {
+		Conductor conductor = new Conductor(10);
+		
+		try {
+			// Run simple hello world
+			Model model = DemoRepositoryGenerator.getTestHelloWorldPartialDanglingRepository();
+			QueryableRepository qr = new RepositoryImpl(model);
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
+			// Create the execution
+			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next()));
+				
 		} catch (CorruptedDescriptionException e) {
 			fail("Corrupted description encounterd: "+e);
 		} catch (ConductorException e) {
