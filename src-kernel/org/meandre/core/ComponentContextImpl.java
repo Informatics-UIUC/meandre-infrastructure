@@ -214,7 +214,7 @@ implements ComponentContext {
 	public void pushDataComponentToOutput ( String sOutputBuffer, Object obj ) throws ComponentContextException {
 		thdMrProbe.probeWrappedComponentPushData(wcParent, sOutputBuffer, obj);
 		if ( obj==null )
-			throw new ComponentContextException("Null cannot be pushe to "+sOutputBuffer);
+			throw new ComponentContextException("Null cannot be pushe to "+sOutputBuffer+" in component instance "+sComponentInstanceID);
 		
 		if ( !setOutputs.contains(sOutputBuffer) )
 			throw new ComponentContextException("The requested output "+sOutputBuffer+" does not exist.");

@@ -1,6 +1,8 @@
 1.2vcli Panellet:
 
-* Fix the conductor to avoid crashing in the presence of dangling inputs
+* Bug fixing:
+	- Fix the conductor to avoid crashing in the presence of dangling inputs
+	- Forbid pushing nulls
 
 * To the verbose flow execution WS:
 	- Added parameter statistics
