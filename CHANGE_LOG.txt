@@ -1,5 +1,7 @@
 1.2vcli Panellet:
 
+* Fix the conductor to avoid crashing in the presence of dangling inputs
+
 * To the verbose flow execution WS:
 	- Added parameter statistics
 	- If true it dumps the flow execution statistics at the end of the run

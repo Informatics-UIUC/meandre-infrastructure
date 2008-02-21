@@ -213,8 +213,11 @@ implements ComponentContext {
 	 */
 	public void pushDataComponentToOutput ( String sOutputBuffer, Object obj ) throws ComponentContextException {
 		thdMrProbe.probeWrappedComponentPushData(wcParent, sOutputBuffer, obj);
+		if ( obj==null )
+			throw new ComponentContextException("Null cannot be pushe to "+sOutputBuffer);
+		
 		if ( !setOutputs.contains(sOutputBuffer) )
-			throw new ComponentContextException("The requested input "+sOutputBuffer+" does not exist.");
+			throw new ComponentContextException("The requested output "+sOutputBuffer+" does not exist.");
 		try {
 			ActiveBuffer ab = htActiveBufferOuputs.get(htOutputLogicNameMap.get(sOutputBuffer));
 			if ( ab!=null )
