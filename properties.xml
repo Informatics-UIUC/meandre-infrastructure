@@ -66,6 +66,10 @@
     <!-- =================================================================== -->
     <path id="meandre.test.classpath">
         <pathelement location="${meandre.core.classpath}"/>
+        <fileset dir="${httpunit.dir}" includes="*.jar"/>
+    	 <fileset dir="${rhino.dir}" includes="*.jar"/>
+    	 <fileset dir="${nekohtml.dir}" includes="*.jar"/>
+    	 <fileset dir="${jtidy.dir}" includes="*.jar"/>
         <pathelement location="${junit.jar}"/>
         <pathelement location="${build.dir}"/>
     </path>

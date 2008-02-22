@@ -64,5 +64,8 @@
 	<classpathentry kind="lib" path="lib/XStream/xpp3_min-1.1.3.4.O.jar"/>
 	<classpathentry kind="lib" path="lib/XStream/xstream-1.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/XStream/xstream-benchmark-1.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/plugins-0.1-ducttape/meandre-plugins.jar"/>
+	<classpathentry kind="lib" path="lib/plugins-0.1-ducttape/monk.jar"/>
+	<classpathentry kind="lib" path="lib/plugins-0.1-ducttape/mysql-connector-java-3.1.12-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
