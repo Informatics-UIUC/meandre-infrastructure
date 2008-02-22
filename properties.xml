@@ -57,7 +57,11 @@
         <fileset dir="${svnant.dir}" includes="*.jar"/>
         <fileset dir="${plugins.dir}" includes="*.jar"/>
         <fileset dir="${xstream.dir}" includes="*.jar"/>
-        <pathelement location="${junit.jar}"/>
+    	<fileset dir="${httpunit.dir}" includes="*.jar"/>
+    	<fileset dir="${rhino.dir}" includes="*.jar"/>
+    	<fileset dir="${nekohtml.dir}" includes="*.jar"/>
+    	<fileset dir="${jtidy.dir}" includes="*.jar"/>
+    	<pathelement location="${junit.jar}"/>
 		<pathelement location="${jython.jar}"/>
     </path>
 

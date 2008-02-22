@@ -67,5 +67,9 @@
 	<classpathentry kind="lib" path="lib/plugins-0.1-ducttape/meandre-plugins.jar"/>
 	<classpathentry kind="lib" path="lib/plugins-0.1-ducttape/monk.jar"/>
 	<classpathentry kind="lib" path="lib/plugins-0.1-ducttape/mysql-connector-java-3.1.12-bin.jar"/>
+	<classpathentry kind="lib" path="lib/httpunit-1.6.2/httpunit-1.6.2.jar"/>
+	<classpathentry kind="lib" path="lib/jtidy-04aug2007r7/Tidy.jar"/>
+	<classpathentry kind="lib" path="lib/nekohtml-0.9.1/nekohtml.jar"/>
+	<classpathentry kind="lib" path="lib/rhino-1.5R4.1/js.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
