@@ -207,7 +207,7 @@ public class WSAboutTest {
 			e.printStackTrace();
 		}
 		try {
-			assertEquals(response.getContentType(), "text/xml");
+			//assertEquals(response.getContentType(), "text/xml");
 			assertEquals(response.getDOM().getElementsByTagName(USER_ROLES_TEST_STRING_XML_TAG_1).getLength(),1);
 			assertTrue("The user roles == 0",response.getDOM().getElementsByTagName(USER_ROLES_TEST_STRING_XML_TAG_2).getLength()>0);
 		} catch (SAXException e) {
