@@ -61,7 +61,7 @@ public class WSAboutTest {
 
 	@Before
 	public void setUp() throws Exception {
-		URL url =WSAboutTest.class.getResource("../webservices.test.properties");
+		URL url =WSAboutTest.class.getResource("../webservices.properties");
 		Properties properties =  new Properties();
 		properties.load(url.openStream());
 		meandreHostURL = properties.getProperty("meandreHostURL", "http://127.0.0.1:1714/");
