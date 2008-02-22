@@ -16,7 +16,7 @@ import org.meandre.core.store.security.Action;
 import org.meandre.webservices.utils.WSLoggerFactory;
 
 /** A basic handler to display basic information.
- * 
+ *
  * @author Xavier Llor&agrave;
  *
  */
@@ -24,13 +24,13 @@ public class WSAbout extends HttpServlet {
 
     /** A default serial ID */
 	private static final long serialVersionUID = 1L;
-	
+
 	/** The logger for the WebServices */
 	private static Logger log = WSLoggerFactory.getWSLogger();
-	
+
 	/**
 	 * Dispatches web requests for Meandre web services.
-	 * 
+	 *
 	 * @param sTarget
 	 *            The target path
 	 * @param request
@@ -44,9 +44,9 @@ public class WSAbout extends HttpServlet {
 	 * @throws ServletException
 	 *             The servlet could not complete the request
 	 */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-    	
+
     	String [] saParts = new URL(request.getRequestURL().toString()).getPath().split("\\.");
    		String sTarget = saParts[0];
 		String sExtension = "";
@@ -54,8 +54,8 @@ public class WSAbout extends HttpServlet {
     	if ( saParts.length==2 ) {
     		sExtension = saParts[1];
     	}
-    	
-    	
+
+
     	if ( sTarget.endsWith("/installation") ) {
     		if ( Store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Admin", request.getRemoteUser()) ) {
 				if ( sExtension.equals("txt") ) {
@@ -71,7 +71,7 @@ public class WSAbout extends HttpServlet {
 					WSAboutLogic.dumpUsingNT(request,response);
 				}
 				else  {
-					// 
+					//
 					// Invalid format
 					//
 					log.info("Invalid format "+sExtension+" for requested "+sTarget);
@@ -84,7 +84,7 @@ public class WSAbout extends HttpServlet {
     			//
     			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
     		}
-    	} 
+    	}
     	else if ( sTarget.endsWith("/user_roles") ) {
     		if ( sExtension.equals("txt") ) {
 				WSAboutLogic.rolesInText(request,response);
@@ -94,6 +94,7 @@ public class WSAbout extends HttpServlet {
 			}
     		else if ( sExtension.equals("xml") ) {
     			try {
+    				response.setContentType("text/xml");
 					response.getWriter().println(XML.toString(WSAboutLogic.rolesInJSON(request,response),"meandre_security"));
 				} catch (JSONException e) {
 					log.warning("XML serialization failure for request "+request.getRequestURL());
@@ -101,22 +102,22 @@ public class WSAbout extends HttpServlet {
 				}
 			}
 			else  {
-				// 
+				//
 				// Invalid format
 				//
 				log.info("Invalid format "+sExtension+" for requested "+sTarget);
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
-			}	
+			}
     	}
     	else  {
-			// 
+			//
 			// Invalid request found
 			//
 			log.info("Uknown about service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		}	
-		
-		
+		}
+
+
 	}
 
 }
