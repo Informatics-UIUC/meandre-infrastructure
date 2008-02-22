@@ -11,6 +11,8 @@ package org.meandre.webservices.about;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -61,9 +63,8 @@ public class WSAboutTest {
 
 	@Before
 	public void setUp() throws Exception {
-		URL url =WSAboutTest.class.getResource("../webservices.properties");
 		Properties properties =  new Properties();
-		properties.load(url.openStream());
+		properties.load(new FileInputStream(new File("test-data/webservices.properties")));
 		meandreHostURL = properties.getProperty("meandreHostURL", "http://127.0.0.1:1714/");
 		user = properties.getProperty("user", "admin");
 		password = properties.getProperty("password", "admin");
