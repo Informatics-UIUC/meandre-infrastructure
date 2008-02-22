@@ -1,12 +1,3 @@
-/*
- * @(#) WSAboutTest.java @VERSION@
- *
- * Copyright (c) 2008+ Amit Kumar
- *
- * The software is released under ASL 2.0, Please
- * read License.txt
- *
- */
 package org.meandre.webservices.about;
 
 import static org.junit.Assert.assertEquals;
@@ -34,6 +25,7 @@ import com.meterware.httpunit.WebResponse;
  *
  * @author Amit Kumar
  * Created on Feb 22, 2008 3:50:22 AM
+ * Modified by Xavier Llor&agrave;
  *
  */
 
@@ -86,21 +78,17 @@ public class WSAboutTest {
 		try {
 			response = wc.getResponse(request);
 		} catch (MalformedURLException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		} catch (IOException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		} catch (SAXException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		}
 		try {
 			assertEquals(response.getText().startsWith(
 					INSTALLATION_TEST_STRING_TXT), Boolean.TRUE);
 		} catch (IOException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		}
 	}
 
@@ -113,21 +101,17 @@ public class WSAboutTest {
 		try {
 			response = wc.getResponse(request);
 		} catch (MalformedURLException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		} catch (IOException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		} catch (SAXException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		}
 		try {
 			assertEquals(response.getText().startsWith(
 					INSTALLATION_TEST_STRING_TTL), Boolean.TRUE);
 		} catch (IOException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		}
 
 	}
@@ -141,21 +125,17 @@ public class WSAboutTest {
 		try {
 			response = wc.getResponse(request);
 		} catch (MalformedURLException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		} catch (IOException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		} catch (SAXException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		}
 		try {
 			assertEquals(response.getText().startsWith(
 					INSTALLATION_TEST_STRING_NT), Boolean.TRUE);
 		} catch (IOException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		}
 	}
 
@@ -168,14 +148,11 @@ public class WSAboutTest {
 		try {
 			response = wc.getResponse(request);
 		} catch (MalformedURLException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		} catch (IOException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		} catch (SAXException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		}
 		System.out.println(response.getContentType());
 		try {
@@ -183,8 +160,7 @@ public class WSAboutTest {
 			assertEquals(response.getText().startsWith(
 					INSTALLATION_TEST_STRING_RDF), Boolean.TRUE);
 		} catch (IOException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		}
 	}
 
@@ -198,22 +174,18 @@ public class WSAboutTest {
 		try {
 			response = wc.getResponse(request);
 		} catch (MalformedURLException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		} catch (IOException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		} catch (SAXException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		}
 		try {
 			//assertEquals(response.getContentType(), "text/xml");
 			assertEquals(response.getDOM().getElementsByTagName(USER_ROLES_TEST_STRING_XML_TAG_1).getLength(),1);
 			assertTrue("The user roles == 0",response.getDOM().getElementsByTagName(USER_ROLES_TEST_STRING_XML_TAG_2).getLength()>0);
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			fail(e.toString());
 		}
 	}
 
@@ -229,21 +201,17 @@ public class WSAboutTest {
 		try {
 			response = wc.getResponse(request);
 		} catch (MalformedURLException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		} catch (IOException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		} catch (SAXException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		}
 		try {
 			assertEquals(response.getContentType(), "text/plain");
 			assertTrue("Error: in user_roles.txt",response.getText().startsWith(USER_ROLES_TEST_STRING_TXT));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			fail(e.toString());
 		}
 	}
 
@@ -257,21 +225,17 @@ public class WSAboutTest {
 		try {
 			response = wc.getResponse(request);
 		} catch (MalformedURLException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		} catch (IOException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		} catch (SAXException e) {
-			fail();
-			e.printStackTrace();
+			fail(e.toString());
 		}
 		try {
 			assertEquals(response.getContentType(), "text/html");
 			assertTrue("Error: in user_roles.json",response.getText().startsWith(USER_ROLES_TEST_STRING_JSON));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			fail(e.toString());
 		}
 	}
 
