@@ -1,4 +1,4 @@
-package org.meandre.webservices.repository;
+package org.meandre.webservices.controllers;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

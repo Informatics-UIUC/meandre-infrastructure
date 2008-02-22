@@ -1,4 +1,4 @@
-package org.meandre.webservices.execute;
+package org.meandre.webservices.servlets;
 
 import java.io.IOException;
 import java.net.URL;
@@ -15,6 +15,7 @@ import org.meandre.core.engine.ConductorException;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.repository.CorruptedDescriptionException;
 import org.meandre.core.store.security.Action;
+import org.meandre.webservices.controllers.WSExecuteLogic;
 import org.meandre.webservices.utils.WSLoggerFactory;
 
 /** A basic handler to execute flows.

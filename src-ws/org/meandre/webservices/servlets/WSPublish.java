@@ -1,4 +1,4 @@
-package org.meandre.webservices.publish;
+package org.meandre.webservices.servlets;
 
 import java.io.IOException;
 import java.net.URL;
@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.meandre.core.store.Store;
 import org.meandre.core.store.security.Action;
+import org.meandre.webservices.controllers.WSPublishLogic;
 import org.meandre.webservices.utils.WSLoggerFactory;
 
 /** A basic handler to handle the publishing facility.

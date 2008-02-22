@@ -1,4 +1,4 @@
-package org.meandre.webservices.locations;
+package org.meandre.webservices.controllers;
 
 import java.io.IOException;
 import java.net.URL;
@@ -36,7 +36,7 @@ public class WSLocationsLogic {
      * @return The JSON object
      * @throws JSONException The location could not be created
      */
-	static JSONObject locationDescriptionToJSON ( String sLocation, String sDescription ) throws JSONException {
+	public static JSONObject locationDescriptionToJSON ( String sLocation, String sDescription ) throws JSONException {
 		JSONObject jo = new JSONObject();
 
 		try {
@@ -56,7 +56,7 @@ public class WSLocationsLogic {
 	 * @throws IOException
 	 * @throws JSONException 
 	 */
-	static JSONObject listLocationsAsJSONObject ( String sUser )
+	public static JSONObject listLocationsAsJSONObject ( String sUser )
 			throws IOException, JSONException {
 		
 		SystemStore ss = Store.getSystemStore(sUser);
@@ -82,7 +82,7 @@ public class WSLocationsLogic {
 	 * @param sDescription
 	 * @return True if the location could be successfully added
 	 */
-	static boolean addLocation(String sUser, String sLocation, String sDescription) {
+	public static boolean addLocation(String sUser, String sLocation, String sDescription) {
 		
 		boolean bRes = true;
 		
@@ -171,7 +171,7 @@ public class WSLocationsLogic {
 	 * @param sLocation The location to remove
 	 * @return True if the location could be successfully removed
 	 */
-	static boolean removeLocation(String sUser, String sLocation) {
+	public static boolean removeLocation(String sUser, String sLocation) {
 		boolean bRes = true;
 		
 		// Retrieve system store

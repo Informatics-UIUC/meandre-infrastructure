@@ -1,4 +1,4 @@
-package org.meandre.webservices.about;
+package org.meandre.webservices.servlets;
 
 import java.io.IOException;
 import java.net.URL;
@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.XML;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.security.Action;
+import org.meandre.webservices.controllers.WSAboutLogic;
 import org.meandre.webservices.utils.WSLoggerFactory;
 
 /** A basic handler to display basic information.

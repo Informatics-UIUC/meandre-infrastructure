@@ -1,4 +1,4 @@
-package org.meandre.webservices.locations;
+package org.meandre.webservices.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import org.json.XML;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.security.Action;
+import org.meandre.webservices.controllers.WSLocationsLogic;
 import org.meandre.webservices.utils.WSLoggerFactory;
 	
 /** The class handling the locations interactions.

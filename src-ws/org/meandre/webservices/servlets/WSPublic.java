@@ -1,4 +1,4 @@
-package org.meandre.webservices.pub;
+package org.meandre.webservices.servlets;
 
 import java.io.IOException;
 import java.net.URL;

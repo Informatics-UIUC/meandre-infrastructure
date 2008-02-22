@@ -1,4 +1,4 @@
-package org.meandre.webservices.publish;
+package org.meandre.webservices.controllers;
 
 import java.io.IOException;
 import java.io.PrintWriter;
