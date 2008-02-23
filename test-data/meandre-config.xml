@@ -4,7 +4,7 @@
 <properties>
    <comment>Meandre TEST  configuration file (1.2vcli (Panellet))</comment>
    <entry key="DB_PASSWD"></entry>
-   <entry key="MEANDRE_BASE_PORT">1814</entry>
+   <entry key="MEANDRE_BASE_PORT">1711</entry>
    <entry key="DB_USER"></entry>
    <entry key="DB">Derby</entry>
    <entry key="MEANDRE_AUTHENTICATION_REALM_FILENAME">meandre-realm.properties</entry>
