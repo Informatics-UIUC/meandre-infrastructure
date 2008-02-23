@@ -145,7 +145,7 @@ public class WSAboutTest {
 	public void setUp() throws Exception {
 		Properties properties =  new Properties();
 		properties.load(new FileInputStream(new File("test-data/webservices.properties")));
-		meandreHostURL = properties.getProperty("meandreHostURL", "http://127.0.0.1:1714/");
+		meandreHostURL = properties.getProperty("meandreHostURL", "http://127.0.0.1:1711/");
 		user = properties.getProperty("user", "admin");
 		password = properties.getProperty("password", "admin");
 		wc.setAuthorization(user, password);
