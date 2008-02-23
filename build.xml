@@ -113,9 +113,6 @@
     <!-- dist -->
     <target name="dist" depends="compile" description="Creates jar distribution">
 
-    	   <antcall target="create-distribution">
-    	    </antcall>
-
         <!-- Create jar distribution -->
         <jar destfile="${dist.dir}/${app.name}-core.jar">
             <manifest>
