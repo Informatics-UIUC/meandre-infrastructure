@@ -24,12 +24,12 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 
 /** This class provides the basic configuration for the Meandre store.
- * 
+ *
  * @author Xavier Llor&agrave;
  *
  */
 public class Store {
-	
+
 	/** The base storage URL */
 	private static final String BASE_STORAGE_URL = "http://meandre.org/metadata/store/";
 
@@ -44,10 +44,10 @@ public class Store {
 
 	/** The directory containing the public resources */
 	private static final String MEANDRE_PUBLIC_RESOURCE_DIRECTORY = "MEANDRE_PUBLIC_RESOURCE_DIRECTORY";
-	
+
 	/** The directory containing the private resources for a run */
 	private static final String MEANDRE_PRIVATE_RUN_DIRECTORY = "MEANDRE_PRIVATE_RUN_DIRECTORY";
-	
+
 	/** The Jena database backend name constant */
 	private static final String JENA_DB = "DB";
 
@@ -64,21 +64,21 @@ public class Store {
 	private static final String JENA_DB_DRIVER_CLASS_NAME = "DB_DRIVER_CLASS";
 
 	/** The default configuration path to the file name */
-	private final static String sConfigPath = ".";
-	
+	public static String sConfigPath = ".";
+
 	/** The default configuration file name */
 	private final static String sConfigFile = "meandre-config.xml";
 
-	
+
 	/** Contains the basic properties of storage mechanism */
 	private static Properties propStoreConfig = null;
-	
+
 	/** The core root logger */
 	protected static Logger log = LoggerFactory.getCoreLogger();
 
 	/** The default Model Maker */
 	private static transient ModelMaker makerJenaModel = null;
-	
+
 	/** The public repository URL */
 	private static String PUBLIC_REPOSITORY_URL = BASE_STORAGE_URL+"public/repository";
 
@@ -87,10 +87,10 @@ public class Store {
 
 	/** The base system store URL */
 	public static String MEANDRE_ONTOLOGY_BASE_URL = "http://www.meandre.org/ontology/";
-	
+
 	/** The base system store URL */
 	public static String BASE_SYSTEM_STORE_URL = BASE_STORAGE_URL+"system/";
-	
+
 	/** The base repository store URL */
 	public static String BASE_REPSITORY_STORE_URL = BASE_STORAGE_URL+"repository/";
 
@@ -103,17 +103,17 @@ public class Store {
 
 	/** The repository cache entry */
 	private static Hashtable<String,RepositoryImpl> htMapRepImpl = new Hashtable<String,RepositoryImpl>();
-	
+
 	/** The default initialization based on properties. */
-	static {
-		
+	public static void init() {
+
 		// Try to open the config file
 		propStoreConfig = new Properties();
 	    FileInputStream fis;
 		try {
 			//
 			// Load the properties from the default location
-			// 
+			//
 			fis = new FileInputStream(sConfigPath+File.separator+sConfigFile);
 			propStoreConfig.loadFromXML(fis);
 			fis.close();
@@ -125,7 +125,7 @@ public class Store {
 			log.warning("Meandre configuration file "+
 					    sConfigPath+File.separator+sConfigFile+
 					    " could not be loaded. Creating a default one.");
-			
+
 			initializeDefaultProperties();
 			FileOutputStream fos;
 			try {
@@ -136,42 +136,42 @@ public class Store {
 				log.warning("Meandre configuration file "+
 					    sConfigPath+File.separator+sConfigFile+
 					    " could not be written to disk!");
-			
-			}	
+
+			}
 		}
-		
+
 		// Create the run file
-		new File("."+File.separator+Store.getRunResourcesDirectory()).mkdir();
-		
+		new File(sConfigPath+File.separator+Store.getRunResourcesDirectory()).mkdir();
+
 		// Report the current configuration to the log file
 		log.info("JENA RBM driver: "+getDriverClassName());
 		log.info("JENA RBM database: "+getDBName());
 		log.info("JENA RBM user: "+getUserName());
 		log.info("JENA RBM password: "+getPassword());
 		log.info("JENA RBM URL: "+getURL());
-		
+
 		// Loads the default database driver for Jena storage
 		try {
 			log.info("Loading connection driver "+getDriverClassName());
 			Class.forName(getDriverClassName());
 		} catch (ClassNotFoundException e) {
 			log.info("Driver "+getDriverClassName()+" could not be loaded");
-		} 
-		
+		}
+
 		// Initializes the model maker
 		log.info("Initializing JENA RDBModelMaker");
-		
+
 		// Create database connection
 		IDBConnection conn = new DBConnection(getURL(),getUserName(),getPassword(),getDBName());
 		makerJenaModel = ModelFactory.createModelRDBMaker(conn) ;
-		
+
 		log.info("Initialization of JENA RDBModelMaker done");
 		initializeStore();
-		
+
 	}
 
 	/** Creates the default properties for Meandre.
-	 * 
+	 *
 	 */
 	protected static void initializeDefaultProperties() {
 		//
@@ -182,7 +182,7 @@ public class Store {
 		propStoreConfig.setProperty(MEANDRE_PUBLIC_RESOURCE_DIRECTORY, "."+File.separator+"published_resources");
 		propStoreConfig.setProperty(MEANDRE_PRIVATE_RUN_DIRECTORY,"."+File.separator+"run");
 		propStoreConfig.setProperty(MEANDRE_ADMIN_USER,"admin");
-	
+
 		//
 		// Jena DB relational background properties
 		//
@@ -190,68 +190,68 @@ public class Store {
 		propStoreConfig.setProperty(JENA_DB_URL,"jdbc:derby:MeandreStore;create=true");
 		propStoreConfig.setProperty(JENA_DB_USER_NAME,"");
 		propStoreConfig.setProperty(JENA_DB_PASSWD,"");
-		propStoreConfig.setProperty(JENA_DB,"Derby"); 
+		propStoreConfig.setProperty(JENA_DB,"Derby");
 	}
 
 	/** Populates the store with the default metadata.
-	 * 
+	 *
 	 */
 	protected static void initializeStore() {
-		
+
 		try {
 			ssSecurityStore  = new SecurityStoreImpl(getMaker().createModel(SECURITY_STORE_URL));
 		} catch (SecurityStoreException e) {
 			log.severe("Security store could not be initialized. Aborting Meandre execution!\n"+e);
 			System.exit(-1);
 		}
-		
+
 	}
 
 	/** Gets the driver class name used.
-	 * 
+	 *
 	 * @return The class name
 	 */
 	protected static String getDriverClassName() {
 		return propStoreConfig.getProperty(JENA_DB_DRIVER_CLASS_NAME);
 	}
-	
+
 
 	/** Gets the password.
-	 * 
+	 *
 	 * @return The password
 	 */
 	protected static String getPassword() {
 		return propStoreConfig.getProperty(JENA_DB_PASSWD);
 	}
-	
+
 	/** Gets the user name.
-	 * 
+	 *
 	 * @return The user name
 	 */
 	protected static String getUserName() {
 		return propStoreConfig.getProperty(JENA_DB_USER_NAME);
 	}
-	
-	
+
+
 	/** Gets the database URL.
-	 * 
+	 *
 	 * @return The database URL
 	 */
 	protected static String getURL() {
 		return propStoreConfig.getProperty(JENA_DB_URL);
 	}
-	
-	
+
+
 	/** Gets the database name.
-	 * 
+	 *
 	 * @return The database name
 	 */
 	protected static String getDBName() {
 		return propStoreConfig.getProperty(JENA_DB);
 	}
-	
+
 	/** Gets the Model Maker to use.
-	 * 
+	 *
 	 * @return The model maker
 	 */
 	protected static ModelMaker getMaker() {
@@ -259,24 +259,24 @@ public class Store {
 	}
 
 	/** Return the security store for the given Meandre instance.
-	 * 
+	 *
 	 * @return The security store
 	 */
 	public static SecurityStore getSecurityStore() {
 		return ssSecurityStore;
 	}
-	
+
 	/** Returns the a system store for the given user.
-	 * 
+	 *
 	 * @param sNickName The user nickname
 	 * @return The system store for the given user
 	 */
 	public static SystemStore getSystemStore ( String sNickName ) {
 		return new SystemStoreImpl(getMaker().createModel(BASE_SYSTEM_STORE_URL+sNickName));
 	}
-	
+
 	/** Returns the persistent repository for a given user.
-	 * 
+	 *
 	 * @param sNickName The user nickname
 	 * @return The repository store for the given user
 	 */
@@ -289,9 +289,9 @@ public class Store {
 			return new RepositoryImpl(getMaker().createModel(BASE_REPSITORY_STORE_URL+sNickName));
 		}
 	}
-	
+
 	/** Returns the persistent public repository.
-	 * 
+	 *
 	 * @return The public repository store for the given user
 	 */
 	public static Model getPublicRepositoryStore () {
@@ -299,15 +299,15 @@ public class Store {
 	}
 
 	/** Returns the base port for Meandre
-	 * 
+	 *
 	 * @return The base port
 	 */
 	public static int getBasePort () {
 		return Integer.parseInt(propStoreConfig.getProperty(MEANDRE_BASE_PORT));
 	}
-	
+
 	/** Returns the base authentication realm file for Meandre
-	 * 
+	 *
 	 * @return The base port
 	 */
 	public static String getRealmFilename () {
@@ -315,7 +315,7 @@ public class Store {
 	}
 
 	/** Returns the admin user nick name for Meandre
-	 * 
+	 *
 	 * @return The base port
 	 */
 	public static String getAdminUserNickName () {
@@ -323,7 +323,7 @@ public class Store {
 	}
 
 	/** Returns the location of public resources for Meandre
-	 * 
+	 *
 	 * @return The resource directory
 	 */
 	public static String getPublicResourcesDirectory() {
@@ -331,7 +331,7 @@ public class Store {
 	}
 
 	/** Returns the location of run resources directory for Meandre
-	 * 
+	 *
 	 * @return The resource directory
 	 */
 	public static String getRunResourcesDirectory() {
@@ -339,10 +339,24 @@ public class Store {
 	}
 
 	/** Returns all the store properties.
-	 * 
+	 *
 	 * @return All the properties
 	 */
 	public static Properties getAllProperties () {
 		return propStoreConfig;
+	}
+
+	/**
+	 * @return the sConfigPath
+	 */
+	public static String getSConfigPath() {
+		return sConfigPath;
+	}
+
+	/**
+	 * @return the sConfigPath
+	 */
+	public static void setSConfigPath(String configPath) {
+		sConfigPath = configPath;
 	}
 }

@@ -33,10 +33,10 @@ import org.mortbay.jetty.servlet.ServletHolder;
 
 /**
  * Bootstraps a Meandre execution engine.
- * 
+ *
  * @author Xavier Llor&agrave;
- * @modified Amit Kumar: Added Security Manager 
- * 
+ * @modified Amit Kumar: Added Security Manager
+ *
  */
 public class WSCoreBootstrapper {
 
@@ -45,16 +45,16 @@ public class WSCoreBootstrapper {
 
 	/** The base directory for Jetty */
 	public static final String JETTY_HOME = ".";
-	
+
 	/** The logger for the WebServices */
 	private static Logger log = WSLoggerFactory.getWSLogger();
-	
+
 	/** The basic handler for all the loggers */
 	public static Handler handler = null;
-		
+
 	/**
 	 * Boostraps the Meandre execution engine.
-	 * 
+	 *
 	 * @param args
 	 *            Command line arguments
 	 * @throws Exception
@@ -64,39 +64,43 @@ public class WSCoreBootstrapper {
 		log.config("Bootstrapping Menadre Workflow Engine");
 
 		log.config("Installing MeandreSecurityManager");
-		if( System.getSecurityManager() == null ) 
+		if( System.getSecurityManager() == null )
 		    System.setSecurityManager( new MeandreSecurityManager() );
-		
+
 		log.config("Starting Jetty server");
 		startEmbeddedJetty();
-		
-		
+
+
 	}
 
 	/**
 	 * Run the embedded Jetty server.
-	 * 
+	 *
 	 * @throws Exception
 	 *             Jetty could not be started
 	 */
 	private static void startEmbeddedJetty() throws Exception {
-		
+
+		Store.setSConfigPath(".");
+		// initialize store -reads properties file
+		Store.init();
+
 		Server server = new Server(Store.getBasePort());
-		
+
 		// Initialize global file server
 		initilizePublicFileServer(server);
-		
+
 		// Initialize the web services
 		initializeTheWebServices(server);
-				 
+
 		// Launch the server
 		server.start();
 		server.join();
-		
+
 	}
 
 	/** Initialize the webservices
-	 * 
+	 *
 	 * @param server The server object
 	 * @throws IOException Something went really wrong
 	 */
@@ -104,37 +108,37 @@ public class WSCoreBootstrapper {
 			throws IOException {
 		//
 		// Initializing the web services
-		// 
+		//
 		Context contextWS = new Context(server,"/",Context.SESSIONS);
-		
+
 		Constraint constraint = new Constraint();
 		constraint.setName(Constraint.__BASIC_AUTH);
 		//constraint.setRoles(new String[]{"user","admin","moderator"});
 		constraint.setRoles(Action.ALL_BASIC_ACTION_URLS);
 		constraint.setAuthenticate(true);
-			
+
 		ConstraintMapping cm = new ConstraintMapping();
 		cm.setConstraint(constraint);
 		cm.setPathSpec("/services/*");
-					
+
 		String sJettyHome = System.getProperty("jetty.home");
 		sJettyHome = (sJettyHome==null)?JETTY_HOME:sJettyHome;
-				
+
 		SecurityHandler sh = new SecurityHandler();
 		sh.setUserRealm(new HashUserRealm("Meandre Flow Execution Engine",sJettyHome+File.separator+Store.getRunResourcesDirectory()+File.separator+Store.getRealmFilename()));
 		sh.setConstraintMappings(new ConstraintMapping[]{cm});
-		
+
 		contextWS.addHandler(sh);
-		
+
 		//
 		// Initializing the implementations repository
 		//
-		
+
 		//
 		// Adding the publicly provided services
 		//
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublic()), "/public/services/*");
-		
+
 		//
 		// Adding restrictedly provided services
 		//
@@ -146,7 +150,7 @@ public class WSCoreBootstrapper {
 	}
 
 	/** Initialize the public file server for shared resources
-	 * 
+	 *
 	 * @param server The server to user
 	 */
 	private static void initilizePublicFileServer(Server server) {
@@ -154,9 +158,9 @@ public class WSCoreBootstrapper {
 		// Initializing the public file server
 		//
 		Context contextResources = new Context(server,"/public/resources",Context.NO_SESSIONS);
-		
+
 		File file = new File(Store.getPublicResourcesDirectory());
-		
+
 		if ( file.mkdir() ) {
 			try {
 				PrintStream ps = new PrintStream(new FileOutputStream(file.getAbsolutePath()+File.separator+"readme.txt"));
@@ -171,15 +175,15 @@ public class WSCoreBootstrapper {
 				log.warning("Resource directory not existing. Initializing a new one.");
 			} catch (FileNotFoundException e) {
 				log.warning("Could not initialize the resource directory");
-			}			
+			}
 		}
-		
+
 		ResourceHandler resource_handler = new ResourceHandler();
 		resource_handler.setCacheControl("no-cache");
 		resource_handler.setResourceBase(file.getAbsolutePath());
 		contextResources.setHandler(resource_handler);
 	}
-	
+
 
 
 }
