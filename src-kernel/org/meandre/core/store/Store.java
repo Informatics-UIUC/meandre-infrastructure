@@ -105,6 +105,10 @@ public class Store {
 	private static Hashtable<String,RepositoryImpl> htMapRepImpl = new Hashtable<String,RepositoryImpl>();
 
 	/** The default initialization based on properties. */
+	static {
+		init();
+	}
+	
 	public static void init() {
 
 		// Try to open the config file
