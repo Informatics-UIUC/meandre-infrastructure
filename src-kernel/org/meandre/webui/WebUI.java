@@ -6,6 +6,7 @@ import javax.servlet.Servlet;
 
 import org.meandre.core.store.Store;
 import org.meandre.plugins.proxy.HttpProxyServlet;
+import org.meandre.plugins.vfs.VFSServlet;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
@@ -47,6 +48,16 @@ public class WebUI {
 		Connector connector = new SocketConnector();
 		connector.setPort(this.iPort);
 		this.server.setConnectors(new Connector[] { connector });
+
+		Context contextFlow = new Context(this.server,"/plugins",Context.SESSIONS);
+		contextFlow.addServlet(new ServletHolder((Servlet) new HttpProxyServlet()),		"/proxy");
+		contextFlow.addServlet(new ServletHolder((Servlet) new VFSServlet()),		"/plugins/vfs/*");
+		Context contextResources = new Context(server,"/public/resources",Context.NO_SESSIONS);
+		ResourceHandler resource_handler = new ResourceHandler();
+		resource_handler.setCacheControl("no-cache");
+		File file = new File(Store.getPublicResourcesDirectory());
+		resource_handler.setResourceBase(file.getAbsolutePath());
+		contextResources.setHandler(resource_handler);
 
 
 		// Add the default WebUI dispatcher handler
