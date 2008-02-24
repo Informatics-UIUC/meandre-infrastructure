@@ -1,17 +1,22 @@
 package org.meandre.webservices;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Date;
+import java.util.Properties;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import javax.servlet.Servlet;
 
-import org.meandre.core.engine.MeandreSecurityManager;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.security.Action;
 import org.meandre.core.utils.Constants;
@@ -23,6 +28,15 @@ import org.meandre.webservices.servlets.WSPublish;
 import org.meandre.webservices.servlets.WSRepository;
 import org.meandre.webservices.utils.WSLoggerFactory;
 import org.mortbay.jetty.Server;
+/*
+ * @(#) BaseServletTest.java @VERSION@
+ *
+ * Copyright (c) 2008+ Amit Kumar
+ *
+ * The software is released under ASL 2.0, Please
+ * read License.txt
+ *
+ */
 import org.mortbay.jetty.handler.ResourceHandler;
 import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
@@ -31,25 +45,25 @@ import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 
-import org.meandre.plugins.monk.DataStoreInitializeServlet;
-import org.meandre.plugins.monk.ResultReaderServlet;
-import org.meandre.plugins.proxy.HttpProxyServlet;
+import com.meterware.httpunit.WebConversation;
 
-/**
- * Bootstraps a Meandre execution engine.
+/** This class needs to be extended in order to test the Servlets.
  *
- * @author Xavier Llor&agrave;
- * @modified Amit Kumar: Added Security Manager
- * @modified Amit Kumar: Added plugins.
+ * @author Amit Kumar
+ * Created on Feb 23, 2008 7:22:21 PM
  *
  */
-public class WSCoreBootstrapper {
-
-	/** The base URL for Meandre WS */
-	public final static String WS_BASE_URL = "http://meandre.org/services/";
+public abstract class BaseServletTest {
 
 	/** The base directory for Jetty */
 	public static final String JETTY_HOME = ".";
+
+	String meandreHostURL=null;
+	String user =null;
+	String password =null;
+	WebConversation wc = new WebConversation();
+
+
 
 	/** The logger for the WebServices */
 	private static Logger log = WSLoggerFactory.getWSLogger();
@@ -57,52 +71,50 @@ public class WSCoreBootstrapper {
 	/** The basic handler for all the loggers */
 	public static Handler handler = null;
 
-	/**
-	 * Boostraps the Meandre execution engine.
-	 *
-	 * @param args
-	 *            Command line arguments
-	 * @throws Exception
-	 *             Something went wrong, really wrong.
-	 */
-	public static void main(String[] args) throws Exception {
-		log.config("Bootstrapping Menadre Workflow Engine");
 
-		log.config("Installing MeandreSecurityManager");
-		if( System.getSecurityManager() == null )
-		    System.setSecurityManager( new MeandreSecurityManager() );
 
-		log.config("Starting Jetty server");
-		startEmbeddedJetty();
+	 @BeforeClass
+     public static void oneTimeSetUp() {
+		try {
+			startJettyServer();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+     }
 
+     private static void startJettyServer() throws Exception {
+    	 Store.setSConfigPath("test-data");
+ 		// initialize store -reads properties file
+ 		Store.init();
+
+ 		Server server = new Server(Store.getBasePort());
+
+ 		// Initialize global file server
+ 		initilizePublicFileServer(server);
+
+ 		// Initialize the web services
+ 		initializeTheWebServices(server);
+
+ 		// Launch the server
+ 		server.start();
+
+	}
+
+	@AfterClass
+     public static void oneTimeTearDown() {
+    	 stopJettyServer();
+     }
+
+	private static void stopJettyServer() {
+		// TODO Auto-generated method stub
 
 	}
 
-	/**
-	 * Run the embedded Jetty server.
-	 *
-	 * @throws Exception
-	 *             Jetty could not be started
-	 */
-	private static void startEmbeddedJetty() throws Exception {
 
-		Store.setSConfigPath(".");
-		// initialize store -reads properties file
-		Store.init();
-
-		Server server = new Server(Store.getBasePort());
-
-		// Initialize global file server
-		initilizePublicFileServer(server);
-
-		// Initialize the web services
-		initializeTheWebServices(server);
-
-		// Launch the server
-		server.start();
-		server.join();
-
-	}
 
 	/** Initialize the webservices
 	 *
@@ -152,15 +164,6 @@ public class WSCoreBootstrapper {
 		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository()),	"/services/repository/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSExecute()),		"/services/execute/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublish()),		"/services/publish/*");
-
-		// plugins
-		ServletHolder servletHolder = new ServletHolder(new DataStoreInitializeServlet());
-		servletHolder.setInitOrder(0);
-		contextWS.addServlet(new ServletHolder((Servlet) new HttpProxyServlet()),		"/plugins/proxy");
-		contextWS.addServlet(servletHolder,"/plugins/null");
-		contextWS.addServlet(new ServletHolder((Servlet) new ResultReaderServlet()),		"/plugins/reader");
-
-
 	}
 
 	/** Initialize the public file server for shared resources
@@ -186,9 +189,9 @@ public class WSCoreBootstrapper {
 				ps.println("This directory contains all the publicly available implementations for the Meandre components.");
 				ps.println();
 				ps.println("Created on "+new Date());
-				log.warning("Resource directory not existing. Initializing a new one.");
+				System.out.println("Resource directory not existing. Initializing a new one.");
 			} catch (FileNotFoundException e) {
-				log.warning("Could not initialize the resource directory");
+				System.out.println("Could not initialize the resource directory");
 			}
 		}
 
@@ -199,5 +202,50 @@ public class WSCoreBootstrapper {
 	}
 
 
+
+
+	@Before
+	public void setUp() throws Exception {
+		Properties properties =  new Properties();
+		properties.load(new FileInputStream(new File("test-data/webservices.properties")));
+		meandreHostURL = properties.getProperty("meandreHostURL", "http://127.0.0.1:1711/");
+		user = properties.getProperty("user", "admin");
+		password = properties.getProperty("password", "admin");
+		wc.setAuthorization(user, password);
+
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		wc.clearContents();
+	}
+
+
+
+	/**
+	 *
+	 * @returns WebConversation
+	 */
+	public WebConversation getWebConversation(){
+		return wc;
+	}
+
+
+	/**Returns the meandre host url
+	 *
+	 * @return
+	 */
+	public String getMeandreHostUrl(){
+		return this.meandreHostURL;
+	}
+
+
+	/**Return the Logger object
+	 *
+	 * @return
+	 */
+	public Logger getLogger(){
+		return log;
+	}
 
 }
