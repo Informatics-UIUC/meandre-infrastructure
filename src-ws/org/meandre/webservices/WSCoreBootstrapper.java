@@ -31,6 +31,13 @@ import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 
+
+import org.meandre.plugins.monk.DataStoreInitializeServlet;
+import org.meandre.plugins.monk.ResultReaderServlet;
+import org.meandre.plugins.proxy.HttpProxyServlet;
+import org.meandre.plugins.vfs.VFSServlet;
+
+
 /**
  * Bootstraps a Meandre execution engine.
  *
@@ -148,6 +155,11 @@ public class WSCoreBootstrapper {
 		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository()),	"/services/repository/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSExecute()),		"/services/execute/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublish()),		"/services/publish/*");
+
+		// plugin
+		contextWS.addServlet(new ServletHolder((Servlet) new VFSServlet()),	 "/plugins/vfs/*");
+
+
 
 	}
 

@@ -48,6 +48,7 @@ public class WebUI {
 		connector.setPort(this.iPort);
 		this.server.setConnectors(new Connector[] { connector });
 
+
 		// Add the default WebUI dispatcher handler
 		webUIDispatcher = new WebUIDispatcher(this);
 		this.server.addHandler(webUIDispatcher);
