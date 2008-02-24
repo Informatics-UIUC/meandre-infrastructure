@@ -17,6 +17,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.security.Action;
 import org.meandre.core.utils.Constants;
@@ -71,6 +72,8 @@ public abstract class BaseServletTest {
 	/** The basic handler for all the loggers */
 	public static Handler handler = null;
 
+	private static Server server;
+
 
 
 	 @BeforeClass
@@ -91,7 +94,7 @@ public abstract class BaseServletTest {
  		// initialize store -reads properties file
  		Store.init();
 
- 		Server server = new Server(Store.getBasePort());
+ 		server = new Server(Store.getBasePort());
 
  		// Initialize global file server
  		initilizePublicFileServer(server);
@@ -102,6 +105,7 @@ public abstract class BaseServletTest {
  		// Launch the server
  		server.start();
 
+
 	}
 
 	@AfterClass
@@ -110,11 +114,20 @@ public abstract class BaseServletTest {
      }
 
 	private static void stopJettyServer() {
-		// TODO Auto-generated method stub
+		try {
+			server.stop();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
 
+	@Test
+	public void testMe(){
+
+	}
 
 	/** Initialize the webservices
 	 *
