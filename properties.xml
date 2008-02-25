@@ -55,7 +55,7 @@
         <fileset dir="${jena.dir}" includes="*.jar"/>
         <fileset dir="${saxon.dir}" includes="*.jar"/>
         <fileset dir="${svnant.dir}" includes="*.jar"/>
-        <fileset dir="${plugins.dir}" includes="*.jar"/>
+        <fileset dir="${truezip.dir}" includes="*.jar"/>
         <fileset dir="${xstream.dir}" includes="*.jar"/>
     	<fileset dir="${httpunit.dir}" includes="*.jar"/>
     	<fileset dir="${rhino.dir}" includes="*.jar"/>
