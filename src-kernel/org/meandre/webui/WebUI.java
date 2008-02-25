@@ -1,18 +1,11 @@
 package org.meandre.webui;
 
-import java.io.File;
+import java.util.logging.Logger;
 
-import javax.servlet.Servlet;
-
-import org.meandre.core.store.Store;
-import org.meandre.plugins.proxy.HttpProxyServlet;
-import org.meandre.plugins.vfs.VFSServlet;
+import org.meandre.plugins.PluginFactory;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
-import org.mortbay.jetty.handler.ResourceHandler;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
 
 /** This class implements the basic machinery of a flow web-based UI.
  *
@@ -37,9 +30,10 @@ public class WebUI {
 	 *
 	 * @param flowUniqueID Unique flow execution ID
 	 * @param iPort The execution port
+	 * @param log The logger
 	 * @throws WebUIException The server could not be started
 	 */
-	public WebUI(String flowUniqueID, int iPort) throws WebUIException {
+	public WebUI(String flowUniqueID, int iPort, Logger log) throws WebUIException {
 		// Storing config values
 		this.sFlowUniqueID = flowUniqueID;
 		this.iPort = iPort;
@@ -49,16 +43,9 @@ public class WebUI {
 		connector.setPort(this.iPort);
 		this.server.setConnectors(new Connector[] { connector });
 
-		Context contextFlow = new Context(this.server,"/plugins",Context.SESSIONS);
-		contextFlow.addServlet(new ServletHolder((Servlet) new HttpProxyServlet()),		"/proxy");
-		contextFlow.addServlet(new ServletHolder((Servlet) new VFSServlet()),		"/plugins/vfs/*");
-		Context contextResources = new Context(server,"/public/resources",Context.NO_SESSIONS);
-		ResourceHandler resource_handler = new ResourceHandler();
-		resource_handler.setCacheControl("no-cache");
-		File file = new File(Store.getPublicResourcesDirectory());
-		resource_handler.setResourceBase(file.getAbsolutePath());
-		contextResources.setHandler(resource_handler);
-
+		// Initialize the plugins
+		PluginFactory.initilizeGlobalPublicFileServer(server, log);
+		PluginFactory.initializeGlobalCorePlugins(server, log);
 
 		// Add the default WebUI dispatcher handler
 		webUIDispatcher = new WebUIDispatcher(this);

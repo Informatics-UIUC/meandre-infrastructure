@@ -1,11 +1,7 @@
 package org.meandre.webservices;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Date;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
@@ -14,7 +10,7 @@ import javax.servlet.Servlet;
 import org.meandre.core.engine.MeandreSecurityManager;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.security.Action;
-import org.meandre.core.utils.Constants;
+import org.meandre.plugins.PluginFactory;
 import org.meandre.webservices.servlets.WSAbout;
 import org.meandre.webservices.servlets.WSExecute;
 import org.meandre.webservices.servlets.WSLocations;
@@ -23,19 +19,12 @@ import org.meandre.webservices.servlets.WSPublish;
 import org.meandre.webservices.servlets.WSRepository;
 import org.meandre.webservices.utils.WSLoggerFactory;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.ResourceHandler;
 import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
 import org.mortbay.jetty.security.HashUserRealm;
 import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
-
-
-import org.meandre.plugins.monk.DataStoreInitializeServlet;
-import org.meandre.plugins.monk.ResultReaderServlet;
-import org.meandre.plugins.proxy.HttpProxyServlet;
-import org.meandre.plugins.vfs.VFSServlet;
 
 
 /**
@@ -78,7 +67,6 @@ public class WSCoreBootstrapper {
 		log.config("Starting Jetty server");
 		startEmbeddedJetty();
 
-
 	}
 
 	/**
@@ -96,10 +84,13 @@ public class WSCoreBootstrapper {
 		Server server = new Server(Store.getBasePort());
 
 		// Initialize global file server
-		initilizePublicFileServer(server);
+		PluginFactory.initilizeGlobalPublicFileServer(server,log);
 
 		// Initialize the web services
 		initializeTheWebServices(server);
+		
+		// Initialize the plugins
+		PluginFactory.initializeGlobalCorePlugins(server,log);
 
 		// Launch the server
 		server.start();
@@ -155,47 +146,6 @@ public class WSCoreBootstrapper {
 		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository()),	"/services/repository/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSExecute()),		"/services/execute/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublish()),		"/services/publish/*");
-
-		// plugin
-		contextWS.addServlet(new ServletHolder((Servlet) new VFSServlet()),	 "/plugins/vfs/*");
-
-
-
-	}
-
-	/** Initialize the public file server for shared resources
-	 *
-	 * @param server The server to user
-	 */
-	private static void initilizePublicFileServer(Server server) {
-		//
-		// Initializing the public file server
-		//
-		Context contextResources = new Context(server,"/public/resources",Context.NO_SESSIONS);
-
-		File file = new File(Store.getPublicResourcesDirectory());
-
-		if ( file.mkdir() ) {
-			try {
-				PrintStream ps = new PrintStream(new FileOutputStream(file.getAbsolutePath()+File.separator+"readme.txt"));
-				ps.println("Meandre Execution Engine version "+Constants.MEANDRE_VERSION);
-				ps.println("All rigths reserved by DITA, NCSA, UofI (2007).");
-				ps.println("2007. All rigths reserved by DITA, NCSA, UofI.");
-				ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
-				ps.println();
-				ps.println("This directory contains all the publicly available implementations for the Meandre components.");
-				ps.println();
-				ps.println("Created on "+new Date());
-				log.warning("Resource directory not existing. Initializing a new one.");
-			} catch (FileNotFoundException e) {
-				log.warning("Could not initialize the resource directory");
-			}
-		}
-
-		ResourceHandler resource_handler = new ResourceHandler();
-		resource_handler.setCacheControl("no-cache");
-		resource_handler.setResourceBase(file.getAbsolutePath());
-		contextResources.setHandler(resource_handler);
 	}
 
 

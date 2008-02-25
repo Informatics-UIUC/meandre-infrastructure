@@ -44,7 +44,7 @@ public class WebUIFactory {
 				semMutEX.acquire();
 				int iNewPort = ++iPortScroller;
 				semMutEX.release();		
-				webui = new WebUI(sFlowUniqueID,iNewPort);
+				webui = new WebUI(sFlowUniqueID,iNewPort,log);
 				htActiveWebUI.put(sFlowUniqueID, webui);
 			} catch (InterruptedException e) {
 				throw new WebUIException(e);

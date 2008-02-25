@@ -64,7 +64,7 @@ public class Store {
 	private static final String JENA_DB_DRIVER_CLASS_NAME = "DB_DRIVER_CLASS";
 
 	/** The default configuration path to the file name */
-	public static String sConfigPath = ".";
+	private static String sConfigPath = ".";
 
 	/** The default configuration file name */
 	private final static String sConfigFile = "meandre-config.xml";
@@ -109,6 +109,7 @@ public class Store {
 		init();
 	}
 	
+	/** The default initialization based on properties. */
 	public static void init() {
 
 		// Try to open the config file
