@@ -129,24 +129,24 @@ public class PluginFactory {
 		//
 		// Initializing the public file server
 		//
-//		Context contextPlugins = new Context(server,"/plugins",Context.NO_SESSIONS);
-//		
-//		for ( Object oKey:propPluginFactoryConfig.keySet()) {
-//			try {
-//				String sClassName = propPluginFactoryConfig.getProperty(oKey.toString());
-//				MeandrePlugin mpPlugin = (MeandrePlugin) Class.forName(sClassName).newInstance();
-//				if ( mpPlugin.isServlet() ) {
-//					contextPlugins.addServlet(new ServletHolder((Servlet)mpPlugin), mpPlugin.getAlias());
-//				}
-//			} catch (InstantiationException e) {
-//				log.warning("Pluggin "+oKey+" could not be initialized\n"+e);
-//			} catch (IllegalAccessException e) {
-//				log.warning("Pluggin "+oKey+" could not be initialized\n"+e);
-//			} catch (ClassNotFoundException e) {
-//				log.warning("Pluggin "+oKey+" could not be initialized\n"+e);
-//			}
-//			
-//		}
+		Context contextPlugins = new Context(server,"/",Context.NO_SESSIONS);
+		
+		for ( Object oKey:propPluginFactoryConfig.keySet()) {
+			try {
+				String sClassName = propPluginFactoryConfig.getProperty(oKey.toString());
+				MeandrePlugin mpPlugin = (MeandrePlugin) Class.forName(sClassName).newInstance();
+				if ( mpPlugin.isServlet() ) {
+					contextPlugins.addServlet(new ServletHolder((Servlet)mpPlugin), mpPlugin.getAlias());
+				}
+			} catch (InstantiationException e) {
+				log.warning("Pluggin "+oKey+" could not be initialized\n"+e);
+			} catch (IllegalAccessException e) {
+				log.warning("Pluggin "+oKey+" could not be initialized\n"+e);
+			} catch (ClassNotFoundException e) {
+				log.warning("Pluggin "+oKey+" could not be initialized\n"+e);
+			}
+			
+		}
 	}
 
 }

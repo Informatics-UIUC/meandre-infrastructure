@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.io.InputStream; 
 import java.io.OutputStream;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.meandre.core.logger.LoggerFactory;
 import org.meandre.plugins.MeandrePlugin;
 
 import de.schlichtherle.io.File;
@@ -47,6 +49,8 @@ implements MeandrePlugin{
 	/** The plugin properties */
 	protected Properties vfsProperties;
 
+	/** Get the plugin logger */
+	protected Logger log = LoggerFactory.getPluginsLogger();
 
 	/**Initialize the property file
 	 *
@@ -56,29 +60,29 @@ implements MeandrePlugin{
 		    try {
 		    	mimeProperties.load(getClass().getResourceAsStream("mime-types.properties"));
 		    } catch (IOException e) {
-		    	System.out.println("Could not read mime-types.properties " );
+		    	log.warning("Could not read mime-types.properties " );
 		    }
 
 		    vfsProperties = new Properties();
 		    try {
 		    	vfsProperties.load(getClass().getResourceAsStream("vfs.properties"));
 		    } catch (IOException e) {
-		    	System.out.println("Could not read mime-types.properties " );
+		    	log.warning("Could not read mime-types.properties " );
 		    }
 		    PUBLIC_RESOURCES_DIR = vfsProperties.getProperty("mount_dir", "mnt");
 
-		    System.out.println("Mounting the folder: " + PUBLIC_RESOURCES_DIR );
+		    log.info("Mounting the folder: " + PUBLIC_RESOURCES_DIR );
 		    File file = new File( PUBLIC_RESOURCES_DIR);
 
 		    if(!file.exists()){
-		    	System.out.println("Creating the folder... "+ file.getAbsolutePath());
+		    	log.info("Creating the folder... "+ file.getAbsolutePath());
 		    	file.mkdirs();
 		    }
 
 		    String[] fileName = file.list();
-		    System.out.println("The files available in the mnt are: ");
+		    log.info("The files available in the mnt are: ");
 		    for(int i=0; i < fileName.length; i++){
-		    	System.out.println(fileName[i]);
+		    	log.info(fileName[i]);
 		    }
 
 	}
@@ -156,17 +160,17 @@ implements MeandrePlugin{
 	private java.io.File getFile(File file, String sFileName) {
 		// check of jar file exists
 		File compressedFileSystem = new File(file,sFileName+".jar");
-		System.out.println("Checking: "+ compressedFileSystem.getAbsolutePath());
+		log.info("Checking: "+ compressedFileSystem.getAbsolutePath());
 		if(compressedFileSystem.exists()){
 			return compressedFileSystem;
 		}
 
-		System.out.println("Checking: "+ compressedFileSystem.getAbsolutePath());
+		log.info("Checking: "+ compressedFileSystem.getAbsolutePath());
 		compressedFileSystem = new File(file,sFileName+".zip");
 		if(compressedFileSystem.exists()){
 			return compressedFileSystem;
 		}
-		System.out.println("Not found returning... null");
+		log.info("Not found returning... null");
 		return null;
 	}
 
