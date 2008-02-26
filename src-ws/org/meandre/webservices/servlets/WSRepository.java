@@ -342,7 +342,9 @@ public class WSRepository extends HttpServlet {
 		
 		try {
 			Model modelFlow = WSRepositoryLogic.addFlowsToRepository(request,sExtension);
-			boolean bDump = request.getParameter("dump").equals("true");
+			boolean bDump = false;
+			if ( request.getParameter("dump")!=null )
+				bDump = request.getParameter("dump").equals("true");
 			
 			if ( modelFlow == null ) {
 				log.warning("No flow provided");
