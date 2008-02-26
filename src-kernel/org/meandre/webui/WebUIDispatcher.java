@@ -72,7 +72,7 @@ public class WebUIDispatcher extends AbstractHandler {
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/html");
 			
-			// response.getWriter().println(getHeader());
+			response.getWriter().println(getHeader());
 			
 			boolean bHasParams = !request.getParameterMap().isEmpty();
 
@@ -103,7 +103,7 @@ public class WebUIDispatcher extends AbstractHandler {
 					throw new ServletException(e);
 				}
 			}
-			// response.getWriter().println(getFooter());
+			response.getWriter().println(getFooter());
 			
 		} else {
 			hdlDefault.handle(target, request, response, dispatch);
