@@ -35,6 +35,50 @@
                classpathref="meandre.core.classpath">
             <include name="**/*.java"/>
         </javac>
+    	
+    	  <copy todir="${build.dir}" includeEmptyDirs="no">
+    	       <fileset dir="src-demo">
+    	         <include name="**/*.properties"/>
+    	         <include name="**/*.xml"/>                                     
+    	         <include name="**/*.vm"/>                                      
+    	         <include name="**/*.list"/>                                    
+    	       </fileset>                                                       
+    	     </copy>
+    	
+   	  <copy todir="${build.dir}" includeEmptyDirs="no">
+      	       <fileset dir="src-kernel">
+      	         <include name="**/*.properties"/>
+      	         <include name="**/*.xml"/>                                     
+      	         <include name="**/*.vm"/>                                      
+      	         <include name="**/*.list"/>                                    
+      	       </fileset>                                                       
+      	     </copy>
+   	  <copy todir="${build.dir}" includeEmptyDirs="no">
+      	       <fileset dir="src-plugins/vfs">
+      	         <include name="**/*.properties"/>
+      	         <include name="**/*.xml"/>                                     
+      	         <include name="**/*.vm"/>                                      
+      	         <include name="**/*.list"/>                                    
+      	       </fileset>                                                       
+      	     </copy>
+    	
+   	  <copy todir="${build.dir}" includeEmptyDirs="no">
+      	       <fileset dir="src-demo">
+      	         <include name="**/*.properties"/>
+      	         <include name="**/*.xml"/>                                     
+      	         <include name="**/*.vm"/>                                      
+      	         <include name="**/*.list"/>                                    
+      	       </fileset>                                                       
+      	     </copy>
+    	
+   	  <copy todir="${build.dir}" includeEmptyDirs="no">
+      	       <fileset dir="src-ws">
+      	         <include name="**/*.properties"/>
+      	         <include name="**/*.xml"/>                                     
+      	         <include name="**/*.vm"/>                                      
+      	         <include name="**/*.list"/>                                    
+      	       </fileset>                                                       
+      	     </copy>
     </target>
 
 	<target name="check-if-svn">
