@@ -1,5 +1,18 @@
 package org.meandre.core.engine;
 
+import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import org.meandre.core.ExecutableComponent;
+import org.meandre.core.engine.policies.component.availability.WrappedComponentAllInputsRequired;
+import org.meandre.core.engine.policies.component.availability.WrappedComponentAnyInputRequired;
+import org.meandre.core.engine.probes.NullProbeImpl;
+import org.meandre.core.environments.python.jython.JythonExecutableComponentAdapter;
+import org.meandre.core.logger.LoggerFactory;
+import org.meandre.core.store.Store;
+import org.meandre.core.store.repository.*;
+import org.meandre.core.utils.HexConverter;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -12,28 +25,6 @@ import java.util.Hashtable;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
-
-import org.meandre.core.ExecutableComponent;
-import org.meandre.core.engine.policies.component.availability.WrappedComponentAllInputsRequired;
-import org.meandre.core.engine.policies.component.availability.WrappedComponentAnyInputRequired;
-import org.meandre.core.engine.probes.NullProbeImpl;
-import org.meandre.core.environments.python.jython.JythonExecutableComponentAdapter;
-import org.meandre.core.logger.LoggerFactory;
-import org.meandre.core.store.Store;
-import org.meandre.core.store.repository.ConnectorDescription;
-import org.meandre.core.store.repository.CorruptedDescriptionException;
-import org.meandre.core.store.repository.DataPortDescription;
-import org.meandre.core.store.repository.ExecutableComponentDescription;
-import org.meandre.core.store.repository.ExecutableComponentInstanceDescription;
-import org.meandre.core.store.repository.FlowDescription;
-import org.meandre.core.store.repository.PropertiesDescription;
-import org.meandre.core.store.repository.PropertiesDescriptionDefinition;
-import org.meandre.core.store.repository.QueryableRepository;
-import org.meandre.core.utils.HexConverter;
-
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
 
 /** This class is devoted to the arrengement required to execute a given
  * flow description. The basic input the conductor is in charge of generate
@@ -93,7 +84,7 @@ public class Conductor {
 	/** Creates an execution object for the given flow description.
 	 *
 	 * @param qr The queryable repository containing component descriptions
-	 * @param resFlow The resource identifying the flow to prepare for execution
+	 * @param res The resource identifying the flow to prepare for execution
 	 * @return The executor object
 	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
 	 * @throws ConductorException The counductor could not create an executable flow
@@ -108,7 +99,7 @@ public class Conductor {
 	/** Creates an execution object for the given flow description.
 	 *
 	 * @param qr The queryable repository containing component descriptions
-	 * @param resFlow The resource identifying the flow to prepare for execution
+	 * @param res The resource identifying the flow to prepare for execution
 	 * @param thdMrProbe The MrProbe to use
 	 * @return The executor object
 	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
