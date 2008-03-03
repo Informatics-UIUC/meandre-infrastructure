@@ -2,7 +2,6 @@ package org.meandre.webui;
 
 import java.util.logging.Logger;
 
-import org.meandre.plugins.PluginFactory;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
