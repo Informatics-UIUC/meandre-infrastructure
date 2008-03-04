@@ -372,4 +372,12 @@ public class FlowDescription {
 
 		return model;
 	}
+	
+	/** Returns a readable name for the flow.
+	 * 
+	 * @return A simple text description
+	 */
+	public String toString() {
+		return sName+" ("+resFlowComponent+")";
+	}
 }
