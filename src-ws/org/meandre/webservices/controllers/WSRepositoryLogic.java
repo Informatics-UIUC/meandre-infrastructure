@@ -400,6 +400,8 @@ public class WSRepositoryLogic {
 		if ( ecd!=null ) {
 			modelRes.add(ecd.getModel());
 		}
+		else
+			modelRes = null;
 
 		return modelRes;
 	}
@@ -429,6 +431,8 @@ public class WSRepositoryLogic {
 		if ( fd!=null ) {
 			modelRes.add(fd.getModel());
 		}
+		else 
+			modelRes = null;
 
 		return modelRes;
 	}

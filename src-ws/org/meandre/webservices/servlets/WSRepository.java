@@ -582,13 +582,25 @@ public class WSRepository extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		else if ( sExtension.endsWith("rdf") ) {
-			dumpModel(request,response,WSRepositoryLogic.getFlowDesciption(request.getRemoteUser(),sComponent),"RDF/XML-ABBREV");
+			Model mod = WSRepositoryLogic.getFlowDesciption(request.getRemoteUser(),sComponent);
+			if ( mod == null )
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			else
+				dumpModel(request,response,mod,"RDF/XML-ABBREV");
 		}
 		else if ( sExtension.endsWith("ttl") ) {
-			dumpModel(request,response,WSRepositoryLogic.getFlowDesciption(request.getRemoteUser(),sComponent),"TTL");
+			Model mod = WSRepositoryLogic.getFlowDesciption(request.getRemoteUser(),sComponent);
+			if ( mod == null )
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			else
+				dumpModel(request,response,mod,"TTL");
 		}
 		else if ( sExtension.endsWith("nt") ) {
-			dumpModel(request,response,WSRepositoryLogic.getFlowDesciption(request.getRemoteUser(),sComponent),"N-TRIPLE");
+			Model mod = WSRepositoryLogic.getFlowDesciption(request.getRemoteUser(),sComponent);
+			if ( mod == null )
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			else
+				dumpModel(request,response,mod,"N-TRIPLE");
 		}
 		else  {
 			// 
@@ -617,13 +629,25 @@ public class WSRepository extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		else if ( sExtension.endsWith("rdf") ) {
-			dumpModel(request,response,WSRepositoryLogic.getComponentDesciption(request.getRemoteUser(),sComponent),"RDF/XML-ABBREV");
+			Model mod = WSRepositoryLogic.getComponentDesciption(request.getRemoteUser(),sComponent);
+			if ( mod == null)
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			else
+				dumpModel(request,response,mod,"RDF/XML-ABBREV");
 		}
 		else if ( sExtension.endsWith("ttl") ) {
-			dumpModel(request,response,WSRepositoryLogic.getComponentDesciption(request.getRemoteUser(),sComponent),"TTL");
+			Model mod = WSRepositoryLogic.getComponentDesciption(request.getRemoteUser(),sComponent);
+			if ( mod == null)
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			else
+				dumpModel(request,response,mod,"TTL");
 		}
 		else if ( sExtension.endsWith("nt") ) {
-			dumpModel(request,response,WSRepositoryLogic.getComponentDesciption(request.getRemoteUser(),sComponent),"N-TRIPLE");
+			Model mod = WSRepositoryLogic.getComponentDesciption(request.getRemoteUser(),sComponent);
+			if ( mod == null)
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			else
+				dumpModel(request,response,mod,"N-TRIPLE");
 		}
 		else  {
 			// 
