@@ -153,7 +153,7 @@ implements ComponentContext {
 		}
 
 		try {
-			 webui = WebUIFactory.getWebUI(sFlowUniqueExecutionID);
+			 webui = WebUIFactory.getWebUI(sFlowUniqueExecutionID,wcParent.getMrProper(),wcParent.getMrProbe());
 		} catch (WebUIException e) {
 			log.warning("WebUI could not be retrieved: "+e.getMessage());
 		}

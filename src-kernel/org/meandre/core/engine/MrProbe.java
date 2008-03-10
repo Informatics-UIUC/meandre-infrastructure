@@ -390,5 +390,13 @@ extends Thread {
 		}
 		
 	}
+	
+	/** Returns the current probes used by Mr Probe.
+	 * 
+	 * @return The array of probes
+	 */
+	public Probe[] getProbes () {
+		return probea;
+	}
 
 }

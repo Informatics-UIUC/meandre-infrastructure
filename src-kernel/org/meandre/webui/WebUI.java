@@ -2,6 +2,8 @@ package org.meandre.webui;
 
 import java.util.logging.Logger;
 
+import org.meandre.core.engine.MrProbe;
+import org.meandre.core.engine.MrProper;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
@@ -25,16 +27,26 @@ public class WebUI {
 	/** The dispatcher for this WebUI */
 	private WebUIDispatcher webUIDispatcher = null;
 
+	/** The flow Mr Proper */
+	private MrProper mrProper = null;
+
+	/** The flow Mr Probe */
+	private MrProbe mrProbe = null;
+
 	/** Creates a WebUI for the given flow on the specified port.
 	 *
 	 * @param flowUniqueID Unique flow execution ID
+	 * @param mrProper The flow Mr Proper
+	 * @param mrProbe The flow Mr Probe
 	 * @param iPort The execution port
 	 * @param log The logger
 	 * @throws WebUIException The server could not be started
 	 */
-	public WebUI(String flowUniqueID, int iPort, Logger log) throws WebUIException {
+	public WebUI(String flowUniqueID, MrProper mrProper, MrProbe mrProbe, int iPort, Logger log) throws WebUIException {
 		// Storing config values
 		this.sFlowUniqueID = flowUniqueID;
+		this.mrProper = mrProper;
+		this.mrProbe = mrProbe;
 		this.iPort = iPort;
 		// Creating the server and the connector
 		this.server = new Server();
@@ -95,5 +107,21 @@ public class WebUI {
 	 */
 	public void removeFragment ( WebUIFragment wuif ) {
 		this.webUIDispatcher.remove(wuif);
+	}
+	
+	/** Returns Mr Proper
+	 * 
+	 * @return Mr Proper
+	 */
+	public MrProper getMrProper() {
+		return mrProper;
+	}
+	
+	/** Returns Mr Probe.
+	 * 
+	 * @return Mr Probe
+	 */
+	public MrProbe getMrProbe() {
+		return mrProbe;
 	}
 }

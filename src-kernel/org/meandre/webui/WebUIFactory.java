@@ -5,6 +5,8 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Logger;
 
+import org.meandre.core.engine.MrProbe;
+import org.meandre.core.engine.MrProper;
 import org.meandre.core.logger.LoggerFactory;
 import org.meandre.core.store.Store;
 
@@ -36,7 +38,7 @@ public class WebUIFactory {
 	 * @return The webui object
 	 * @throws WebUIException An exception occurred while initializing a web
 	 */
-	static public WebUI getWebUI ( String sFlowUniqueID ) throws WebUIException {
+	static public WebUI getWebUI ( String sFlowUniqueID, MrProper mrProper, MrProbe mrProbe ) throws WebUIException {
 		WebUI webui = htActiveWebUI.get(sFlowUniqueID);
 		
 		if ( webui==null ) {
@@ -44,7 +46,7 @@ public class WebUIFactory {
 				semMutEX.acquire();
 				int iNewPort = ++iPortScroller;
 				semMutEX.release();		
-				webui = new WebUI(sFlowUniqueID,iNewPort,log);
+				webui = new WebUI(sFlowUniqueID,mrProper,mrProbe,iNewPort,log);
 				htActiveWebUI.put(sFlowUniqueID, webui);
 			} catch (InterruptedException e) {
 				throw new WebUIException(e);

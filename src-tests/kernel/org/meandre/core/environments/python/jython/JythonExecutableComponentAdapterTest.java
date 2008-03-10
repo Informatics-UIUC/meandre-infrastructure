@@ -6,14 +6,18 @@ import static org.junit.Assert.fail;
 
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 
 import org.junit.Test;
 import org.meandre.core.ComponentContext;
 import org.meandre.core.ComponentContextException;
 import org.meandre.core.ComponentContextImpl;
 import org.meandre.core.ComponentExecutionException;
+import org.meandre.core.ExecutableComponent;
 import org.meandre.core.engine.ActiveBuffer;
 import org.meandre.core.engine.MrProbe;
+import org.meandre.core.engine.WrappedComponent;
+import org.meandre.core.engine.policies.component.availability.WrappedComponentAllInputsRequired;
 import org.meandre.core.engine.probes.NullProbeImpl;
 import org.meandre.core.engine.test.TestLoggerFactory;
 
@@ -59,37 +63,56 @@ public class JythonExecutableComponentAdapterTest {
 	}
 
 	/** Test the initialize method.
+	 * @throws InterruptedException Something went wrong
 	 *
 	 */
 	@Test
-	public void testInitializeAndDispose() {
+	public void testInitializeAndDispose() throws InterruptedException {
 		String sRes = null;
 		MrProbe thdMrProbe = new MrProbe(TestLoggerFactory.getTestLogger(), new NullProbeImpl(), false, false);
 		thdMrProbe.start();
-		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,null);
 		JythonExecutableComponentAdapter jeca = new JythonExecutableComponentAdapter();
 		jeca.process(sSimpleExecutableComponent);
+		WrappedComponent wc = new WrappedComponentAllInputsRequired(
+				"http://noting.org/","http://noting.org/",
+				"http://noting.org/", jeca,
+				new HashSet<ActiveBuffer> (), new HashSet<ActiveBuffer> (),
+				new Hashtable<String, String> (),
+				new Hashtable<String, String> (),
+				new Hashtable<String, String> (), null,
+				"nothing", new Hashtable<String, String> (), thdMrProbe);
+				
+		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc);
 		jeca.initialize(cc);
 		sRes = jeca.getOutput().toString();
-		assertEquals("Initilize called\n",sRes);
+		assertEquals("Initilize called\nInitilize called\n",sRes);
 		jeca.dispose(cc);
 		sRes = jeca.getOutput().toString();
-		assertEquals("Initilize called\nDispose called\n",sRes);
+		assertEquals("Initilize called\nInitilize called\nDispose called\n",sRes);
 		thdMrProbe.done();
 	}
 
 	/** Test the execute method.
+	 * @throws InterruptedException 
 	 *
 	 */
 	@Test
-	public void testExecute() {
+	public void testExecute() throws InterruptedException {
 		System.out.println(sSimpleExecutableComponent);
 		String sRes = null;
 		MrProbe thdMrProbe = new MrProbe(TestLoggerFactory.getTestLogger(), new NullProbeImpl(), false, false);
 		thdMrProbe.start();
-		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,null);
 		JythonExecutableComponentAdapter jeca = new JythonExecutableComponentAdapter();
 		jeca.process(sSimpleExecutableComponent);
+		WrappedComponent wc = new WrappedComponentAllInputsRequired(
+				"http://noting.org/","http://noting.org/",
+				"http://noting.org/", jeca,
+				new HashSet<ActiveBuffer> (), new HashSet<ActiveBuffer> (),
+				new Hashtable<String, String> (),
+				new Hashtable<String, String> (),
+				new Hashtable<String, String> (), null,
+				"nothing", new Hashtable<String, String> (), thdMrProbe);
+		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc);
 		try {
 			jeca.execute(cc);
 		} catch (ComponentExecutionException e) {
@@ -100,7 +123,7 @@ public class JythonExecutableComponentAdapterTest {
 		sRes = jeca.getOutput().toString();
 		System.out.println(sSimpleExecutableComponent);
 		System.out.println(sRes);
-		assertTrue(sRes.startsWith("Execute called"));
+		assertTrue(sRes.indexOf("Execute called")>0);
 		thdMrProbe.done();
 	}
 

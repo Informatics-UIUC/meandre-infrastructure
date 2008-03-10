@@ -366,4 +366,21 @@ extends Thread {
 	public ExecutableComponent getExecutableComponentImplementation() {
 		return ec;
 	}
+	
+	
+	/** Returns the MrProper for this wraped component.
+	 * 
+	 * @return MrProbe
+	 */
+	public MrProper getMrProper() {
+		return thdMrProper;
+	}
+	
+	/** Returns the MrProbe for this wraped component.
+	 * 
+	 * @return MrProbe
+	 */
+	public MrProbe getMrProbe() {
+		return thdMrProbe;
+	}
 }

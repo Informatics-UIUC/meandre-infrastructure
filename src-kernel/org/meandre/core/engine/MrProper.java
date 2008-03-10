@@ -141,4 +141,18 @@ public class MrProper extends Thread {
 		semBlocking.release();
 	}
 
+	/** Request abort termination to the components.
+	 * 
+	 */
+	public void abort() {
+		log.info("Abort execution requested" );
+		for ( WrappedComponent wc:setWC ) {
+			synchronized (wc.baStatusFlags) {
+				wc.baStatusFlags[WrappedComponent.TERMINATION] = true;
+			}
+			wc.awake();
+		}
+		log.info("Abort execution requested propagated to the executable components." );
+	}
+
 }

@@ -63,7 +63,7 @@ public class Executor {
 		
 		WebUI webui = null;
 		try {
-			 webui = WebUIFactory.getWebUI(sFlowUniqueExecutionID);
+			 webui = WebUIFactory.getWebUI(sFlowUniqueExecutionID,thdMrPropper,thdMrProbe);
 		} catch (WebUIException e) {
 			log.warning("WebUI could not be started: "+e.getMessage());
 		}
