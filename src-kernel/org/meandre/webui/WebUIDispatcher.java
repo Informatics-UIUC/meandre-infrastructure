@@ -147,7 +147,7 @@ public class WebUIDispatcher extends AbstractHandler {
     		sExtension = saParts[1];
     	}
     	
-    	if ( sTarget.endsWith("/admin/abort") ) {
+    	if ( sTarget.startsWith("/admin/abort") ) {
     		if ( sExtension.equals("txt") ) {
     			this.webUIParent.getMrProper().abort();
     			response.setStatus(HttpServletResponse.SC_OK);
@@ -158,7 +158,7 @@ public class WebUIDispatcher extends AbstractHandler {
     			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
     		}
     	}
-    	if ( sTarget.endsWith("/admin/statistics") ) {
+    	if ( sTarget.startsWith("/admin/statistics") ) {
     		Probe [] pa = this.webUIParent.getMrProbe().getProbes();
 			for ( Probe p:pa ) {
 				if ( p instanceof StatisticsProbeImpl ) {
@@ -204,7 +204,7 @@ public class WebUIDispatcher extends AbstractHandler {
 						pw.flush();
 		    			break;
 		    		}
-		    		else if ( sExtension.endsWith("json") ) {
+		    		else if ( sExtension.equals("json") ) {
 		    			response.setStatus(HttpServletResponse.SC_OK);
 		    			response.setContentType("text/plain");
 		    			pw.print(jsonStats);
