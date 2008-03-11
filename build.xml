@@ -3,14 +3,24 @@
     <!-- import properties (app settings, classpath, jar file locations) -->
     <import file="properties.xml"/>
 
-    <target name="init" description="Defines custom tasks">
-        <!-- Ensure that Ant 1.7+ is being used -->
-        <available classname="org.apache.tools.ant.DynamicAttribute" property="ant-1.7.0"/>
-        <fail unless="ant-1.7.0" message="Ant 1.7.0 for faster unit testing"/>
-    </target>
+    <!-- Make sure we're running a Java 5 or better. -->
+    <condition property="java.5.available">
+        <or>
+            <contains string="${java.version}" substring="1.5"/>
+            <contains string="${java.version}" substring="1.6"/>
+        </or>
+    </condition>
 
-    <!-- prepare -->
-    <target name="prepare" depends="init" description="Creates target directories">
+    <!-- Make sure we're running Ant 1.7 . -->
+    <condition property="ant.1.7.available">
+        <contains string="${ant.version}" substring="1.7"/>
+    </condition>
+
+    <target name="init" description="-> creates required folders">
+        <!-- Make sure we're running under the correct environment -->
+        <fail message="This package requires Ant 1.7." unless="ant.1.7.available"/>
+        <fail message="This package requires Java 5 or 6." unless="java.5.available"/>
+
         <!-- Check timestamp on files -->
         <tstamp/>
         <tstamp>
@@ -26,136 +36,128 @@
         <mkdir dir="${test.dir}/data"/>
     </target>
 
-
     <!-- compile -->
-    <target name="compile" depends="prepare" description="Compiles source code">
+    <target name="compile" depends="init" description="-> compiles source code">
         <echo>Compiling Core and Test...</echo>
         <javac srcdir="${basedir}" destdir="${build.dir}/" debug="${compile.debug}"
                deprecation="${compile.deprecation}" optimize="${compile.optimize}"
                classpathref="meandre.core.classpath">
             <include name="**/*.java"/>
         </javac>
-    	
-    	  <copy todir="${build.dir}" includeEmptyDirs="no">
-    	       <fileset dir="src-demo">
-    	         <include name="**/*.properties"/>
-    	         <include name="**/*.xml"/>                                     
-    	         <include name="**/*.vm"/>                                      
-    	         <include name="**/*.list"/>                                    
-    	       </fileset>                                                       
-    	     </copy>
-    	
-   	  <copy todir="${build.dir}" includeEmptyDirs="no">
-      	       <fileset dir="src-kernel">
-      	         <include name="**/*.properties"/>
-      	         <include name="**/*.xml"/>                                     
-      	         <include name="**/*.vm"/>                                      
-      	         <include name="**/*.list"/>                                    
-      	       </fileset>                                                       
-      	     </copy>
-   	  <copy todir="${build.dir}" includeEmptyDirs="no">
-      	       <fileset dir="src-plugins/vfs">
-      	         <include name="**/*.properties"/>
-      	         <include name="**/*.xml"/>                                     
-      	         <include name="**/*.vm"/>                                      
-      	         <include name="**/*.list"/>                                    
-      	       </fileset>                                                       
-      	     </copy>
-    	
-   	  <copy todir="${build.dir}" includeEmptyDirs="no">
-      	       <fileset dir="src-demo">
-      	         <include name="**/*.properties"/>
-      	         <include name="**/*.xml"/>                                     
-      	         <include name="**/*.vm"/>                                      
-      	         <include name="**/*.list"/>                                    
-      	       </fileset>                                                       
-      	     </copy>
-    	
-   	  <copy todir="${build.dir}" includeEmptyDirs="no">
-      	       <fileset dir="src-ws">
-      	         <include name="**/*.properties"/>
-      	         <include name="**/*.xml"/>                                     
-      	         <include name="**/*.vm"/>                                      
-      	         <include name="**/*.list"/>                                    
-      	       </fileset>                                                       
-      	     </copy>
+
+        <copy todir="${build.dir}" includeEmptyDirs="no">
+            <fileset dir="src-demo">
+                <include name="**/*.properties"/>
+                <include name="**/*.xml"/>
+                <include name="**/*.vm"/>
+                <include name="**/*.list"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${build.dir}" includeEmptyDirs="no">
+            <fileset dir="src-kernel">
+                <include name="**/*.properties"/>
+                <include name="**/*.xml"/>
+                <include name="**/*.vm"/>
+                <include name="**/*.list"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${build.dir}" includeEmptyDirs="no">
+            <fileset dir="src-plugins/vfs">
+                <include name="**/*.properties"/>
+                <include name="**/*.xml"/>
+                <include name="**/*.vm"/>
+                <include name="**/*.list"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${build.dir}" includeEmptyDirs="no">
+            <fileset dir="src-demo">
+                <include name="**/*.properties"/>
+                <include name="**/*.xml"/>
+                <include name="**/*.vm"/>
+                <include name="**/*.list"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${build.dir}" includeEmptyDirs="no">
+            <fileset dir="src-ws">
+                <include name="**/*.properties"/>
+                <include name="**/*.xml"/>
+                <include name="**/*.vm"/>
+                <include name="**/*.list"/>
+            </fileset>
+        </copy>
     </target>
 
-	<target name="check-if-svn">
-		   <typedef resource="org/tigris/subversion/svnant/svnantlib.xml"  classpathref="meandre.core.classpath" />
-		        <svn javahl="false">
-		        <status path="." textStatusProperty="testStatus.textStatus"
-		        	propStatusProperty="testStatus.propStatus"
-		        	lastChangedRevisionProperty="testStatus.lastCommitRevision"
-		        	revisionProperty="testStatus.revision"
-		        	lastCommitAuthorProperty="testStatus.lastCommitAuthor"/>
-		        </svn>
-		        <echo>${testStatus.revision}</echo>
+    <target name="check-if-svn">
+        <typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="meandre.core.classpath"/>
+        <svn javahl="false">
+            <status path="." textStatusProperty="testStatus.textStatus"
+                    propStatusProperty="testStatus.propStatus"
+                    lastChangedRevisionProperty="testStatus.lastCommitRevision"
+                    revisionProperty="testStatus.revision"
+                    lastCommitAuthorProperty="testStatus.lastCommitAuthor"/>
+        </svn>
+        <echo>${testStatus.revision}</echo>
 
-		    	  <condition property="isValidRevision">
-		    	  	<and>
-		    	   <equals arg1="${testStatus.textStatus}" arg2="normal" />
-		    	  	<isset property="testStatus.revision"/>
-		    	  		</and>
-		    	  </condition>
-		    	 <echo>${isValidRevision}</echo>
-	</target>
+        <condition property="isValidRevision">
+            <and>
+                <equals arg1="${testStatus.textStatus}" arg2="normal"/>
+                <isset property="testStatus.revision"/>
+            </and>
+        </condition>
+        <echo>${isValidRevision}</echo>
+    </target>
 
 
-	<!-- The distribution is created with a revision -->
-	<target name="create-distribution" depends="check-if-svn" if="isValidRevision">
+    <!-- The distribution is created with a revision -->
+    <target name="create-distribution" depends="check-if-svn" if="isValidRevision">
         <jar destfile="${dist.dir}/${app.name}-${testStatus.revision}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${testStatus.revision}"/>
-            	<attribute name="Last-Commit-Author" value="${testStatus.lastCommitAuthor}"/>
-            	<attribute name="Status" value="${testStatus.textStatus}"/>
+                <attribute name="Last-Commit-Author" value="${testStatus.lastCommitAuthor}"/>
+                <attribute name="Status" value="${testStatus.textStatus}"/>
             </manifest>
             <fileset dir="${build.dir}">
             </fileset>
         </jar>
-	</target>
+    </target>
 
 
-	<!-- The distribution is created with a revision it is tied to the trunk -->
-	<target name="lib-release" depends="create-distribution" if="isValidRevision"
-		description="-->Creates the distribution for maven/ivy"
-		>
-		<mkdir dir="${release.location}/trunk-${testStatus.revision}"/>
-		<copy file="${dist.dir}/${app.name}-${testStatus.revision}.jar"
-		todir="${release.location}/trunk-${testStatus.revision}"/>
-	</target>
+    <!-- The distribution is created with a revision it is tied to the trunk -->
+    <target name="lib-release" depends="create-distribution" if="isValidRevision"
+            description="-> creates the distribution for maven/ivy">
+        <mkdir dir="${release.location}/trunk-${testStatus.revision}"/>
+        <copy file="${dist.dir}/${app.name}-${testStatus.revision}.jar"
+              todir="${release.location}/trunk-${testStatus.revision}"/>
+    </target>
 
-	<target name="app-release" depends="create-distribution" if="isValidRevision"
-		description="-->Creates the distribution to run as an application"
-		>
-		<mkdir dir="${release.location.app}/trunk-${testStatus.revision}"/>
-		<copy file="${dist.dir}/${app.name}-${testStatus.revision}.jar"
-		todir="${release.location}/trunk-${testStatus.revision}"/>
+    <target name="app-release" depends="create-distribution" if="isValidRevision"
+            description="-> creates the distribution to run as an application">
+        <mkdir dir="${release.location.app}/trunk-${testStatus.revision}"/>
+        <copy file="${dist.dir}/${app.name}-${testStatus.revision}.jar"
+              todir="${release.location}/trunk-${testStatus.revision}"/>
 
-                  <delete>
-                  <fileset dir="." includes="dist/*.tar.gz"/>
-                  <fileset dir="." includes="dist/*.tar"/>
-                  </delete>
+        <delete>
+            <fileset dir="." includes="dist/*.tar.gz"/>
+            <fileset dir="." includes="dist/*.tar"/>
+        </delete>
 
+        <tar destfile="${dist.dir}/${app.name}-${testStatus.revision}.tar"
+             basedir="."
+             excludes="**/.svn,log/**,bin/**,MeandreStore/**,test/**,*.log"/>
 
+        <gzip zipfile="${dist.dir}/${app.name}-${testStatus.revision}.tar.gz"
+              src="${dist.dir}/${app.name}-${testStatus.revision}.tar"/>
 
-
-                <tar destfile="${dist.dir}/${app.name}-${testStatus.revision}.tar"
-                basedir="."
-                excludes="**/.svn,log/**,bin/**,MeandreStore/**,test/**,*.log">
-                </tar>
-                <gzip zipfile="${dist.dir}/${app.name}-${testStatus.revision}.tar.gz"
-                src="${dist.dir}/${app.name}-${testStatus.revision}.tar"/> 
-
-		<copy file="${dist.dir}/${app.name}-${testStatus.revision}.tar.gz"
-		todir="${release.location.app}/trunk-${testStatus.revision}"/>
-
-	</target>
-
-
+        <copy file="${dist.dir}/${app.name}-${testStatus.revision}.tar.gz"
+              todir="${release.location.app}/trunk-${testStatus.revision}"/>
+    </target>
 
     <!-- dist -->
-    <target name="dist" depends="compile" description="Creates jar distribution">
+    <target name="dist" depends="compile" description="-> creates jar distribution">
 
         <!-- Create jar distribution -->
         <jar destfile="${dist.dir}/${app.name}-core.jar">
@@ -216,22 +218,22 @@
                 <exclude name="**/webservices/**/*.class"/>
                 <exclude name="**/webservices/**/*.properties"/>
                 <exclude name="**/webservices/**/*.xml"/>
-                <exclude  name="**/core/**/*.class"/>
-                <exclude  name="**/core/**/*.properties"/>
-                <exclude  name="**/core/**/*.xml"/>
+                <exclude name="**/core/**/*.class"/>
+                <exclude name="**/core/**/*.properties"/>
+                <exclude name="**/core/**/*.xml"/>
             </fileset>
         </jar>
     </target>
 
     <!-- clean -->
-    <target name="clean" description="Removes build artifacts">
+    <target name="clean" description="-> removes build artifacts">
         <echo level="info">Cleaning build and distribution directories</echo>
         <delete dir="${build.dir}"/>
         <delete dir="${dist.dir}"/>
     </target>
 
     <!-- run-tests -->
-    <target name="run-tests" depends="dist" description="Runs tests">
+    <target name="run-tests" depends="dist" description="-> runs tests">
         <junit printsummary="yes" forkmode="once" errorProperty="test.failed"
                failureProperty="test.failed" fork="${junit.fork}" showoutput="${junit.showoutput}">
             <jvmarg value="-Duser.language=en"/>
@@ -255,7 +257,7 @@
     </target>
 
     <!-- test-reports -->
-    <target name="test-reports" description="Generates test reports">
+    <target name="test-reports" description="-> generates test reports">
         <mkdir dir="${test.dir}/reports"/>
         <junitreport todir="${test.dir}">
             <fileset dir="${test.dir}/data">
@@ -263,11 +265,11 @@
             </fileset>
             <report format="noframes" todir="${test.dir}/reports"/>
         </junitreport>
-        <echo level="info"> Test reports generated at ${test.dir}/reports </echo>
+        <echo level="info">Test reports generated at ${test.dir}/reports</echo>
     </target>
 
     <!-- run-core -->
-    <target name="run" depends="dist" description="Runs the default Meandre-Core server">
+    <target name="run" depends="dist" description="-> runs the default Meandre-Core server">
         <echo level="info">Run the default Meandre-Core server</echo>
         <java classname="org.meandre.webservices.WSCoreBootstrapper" fork="yes" maxmemory="1024m">
             <classpath refid="meandre.core.classpath"/>
@@ -281,9 +283,11 @@
         </java>
     </target>
 
-    <target name="run-silent" depends="dist" description="--> Runs the Meandre-Core server and return. This target provides 2gigs of memory to the server.">
+    <!-- run-silent -->
+    <target name="run-silent" depends="dist"
+            description="-> runs the Meandre-Core server with 2GB of memory as a separate process">
         <echo level="info">Run the default Meandre-Core server</echo>
-        <java classname="org.meandre.webservices.WSCoreBootstrapper" fork="yes"  spawn="yes" maxmemory="2048m">
+        <java classname="org.meandre.webservices.WSCoreBootstrapper" fork="yes" spawn="yes" maxmemory="2048m">
             <classpath refid="meandre.core.classpath"/>
             <classpath>
                 <pathelement location="${dist.dir}/${app.name}-core.jar"/>
@@ -295,24 +299,28 @@
         </java>
     </target>
 
-	<target name="clean-store"
-		depends=""
-		description="Deletes the MeandreStore directory, which contains the database of all installed (\'uploaded\') components and flows">
+    <!-- clean-store -->
+    <target name="clean-store"
+            description="-> deletes the MeandreStore directory, which contains the database of all installed ('uploaded') components and flows">
 
-		<delete dir="MeandreStore"/>
+        <delete dir="MeandreStore"/>
+    </target>
 
-	</target>
-	<!---        Documentation (Javadocs)       -->
-	<target name="javadoc"
-		description="build the documentation. (expect lots of warnings when run - don't worry about them)" >
+    <!--- Documentation (Javadocs) -->
+    <target name="javadoc"
+            description="-> generates the documentation (ignore all warnings)">
 
-		<javadoc
-			sourcepath="${src}/"
-			maxmemory="512m"
-			access="private"
-			windowtitle="Meandre Core API"
-			author="true"
-			use="true"
-			destdir="${doc.dir}/"/>
-	</target>
+        <javadoc
+                sourcepath="${src}/"
+                maxmemory="512m"
+                access="private"
+                windowtitle="Meandre Core API"
+                author="true"
+                use="true"
+                destdir="${doc.dir}/"/>
+    </target>
 </project>
+
+<!-- DO NOT EDIT BELOW THIS LINE PLEASE -->
+<!-- vim:sw=4:softtabstop=4:expandtab
+-->
