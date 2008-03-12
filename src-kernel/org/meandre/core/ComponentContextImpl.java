@@ -379,4 +379,12 @@ implements ComponentContext {
 	public String getFlowID() {
 		return this.flowID;
 	}
+	
+	/** Returns true if the flow has started a termination request.
+	 * 
+	 * @return True if the flow is aborting
+	 */
+	public boolean isFlowAborting() {
+		return this.wcParent.isTerminating();
+	}
 }

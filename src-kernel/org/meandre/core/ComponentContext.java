@@ -32,4 +32,9 @@ extends ComponentContextProperties {
 	 */
 	public boolean isInputAvailable ( String sInputBuffer ) throws ComponentContextException;
 
+	/** Returns true if the flow has started a termination request.
+	 * 
+	 * @return True if the flow is aborting
+	 */
+	public boolean isFlowAborting();
 }

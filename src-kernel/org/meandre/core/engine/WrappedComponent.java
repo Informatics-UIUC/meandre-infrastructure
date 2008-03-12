@@ -383,4 +383,12 @@ extends Thread {
 	public MrProbe getMrProbe() {
 		return thdMrProbe;
 	}
+
+	/** Returns true if termination flag is on.
+	 * 
+	 * @return The value of the termination flag
+	 */
+	public boolean isTerminating() {
+		return baStatusFlags[TERMINATION];
+	}
 }
