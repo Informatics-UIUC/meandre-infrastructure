@@ -1,44 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Meandre-Core" basedir="." default="compile">
-    <!-- import properties (app settings, classpath, jar file locations) -->
-    <import file="properties.xml"/>
-
-    <!-- Make sure we're running a Java 5 or better. -->
-    <condition property="java.5.available">
+    <!-- Check whether Java 1.5 is being used -->
+    <condition property="using.java.1.5">
         <or>
             <contains string="${java.version}" substring="1.5"/>
-            <contains string="${java.version}" substring="1.6"/>
         </or>
     </condition>
 
-    <!-- Make sure we're running Ant 1.7 . -->
-    <condition property="ant.1.7.available">
+    <!-- Check whether Ant 1.7 is being used -->
+    <condition property="using.ant.1.7">
         <contains string="${ant.version}" substring="1.7"/>
     </condition>
 
-    <target name="init" description="-> creates required folders">
-        <!-- Make sure we're running under the correct environment -->
-        <fail message="This package requires Ant 1.7." unless="ant.1.7.available"/>
-        <fail message="This package requires Java 5 or 6." unless="java.5.available"/>
+    <!-- Make sure we're running under the correct environment -->
+    <fail message="This package requires Ant 1.7." unless="using.ant.1.7"/>
+    <fail message="This package requires Java 5. Please set JAVA_HOME to point to where JDK 1.5 is installed."
+          unless="using.java.1.5"/>
 
-        <!-- Check timestamp on files -->
+    <!-- import properties (app settings, classpath, jar file locations) -->
+    <import file="properties.xml"/>
+
+    <target name="init" description="-> creates required folders">
         <tstamp/>
-        <tstamp>
-            <format property="copyright.year" pattern="yyyy"/>
-        </tstamp>
-        <echo message="Preparing build target '${build.dir}'"/>
         <mkdir dir="${build.dir}"/>
-        <echo message="Preparing target directory '${dist.dir}'"/>
         <mkdir dir="${dist.dir}"/>
-        <echo message="Preparing test directory '${test.dir}'"/>
         <mkdir dir="${test.dir}"/>
-        <echo message="Preparing test data directory '${test.dir}/data'"/>
         <mkdir dir="${test.dir}/data"/>
     </target>
 
     <!-- compile -->
     <target name="compile" depends="init" description="-> compiles source code">
-        <echo>Compiling Core and Test...</echo>
         <javac srcdir="${basedir}" destdir="${build.dir}/" debug="${compile.debug}"
                deprecation="${compile.deprecation}" optimize="${compile.optimize}"
                classpathref="meandre.core.classpath">
@@ -227,7 +218,6 @@
 
     <!-- clean -->
     <target name="clean" description="-> removes build artifacts">
-        <echo level="info">Cleaning build and distribution directories</echo>
         <delete dir="${build.dir}"/>
         <delete dir="${dist.dir}"/>
     </target>
@@ -270,7 +260,6 @@
 
     <!-- run-core -->
     <target name="run" depends="dist" description="-> runs the default Meandre-Core server">
-        <echo level="info">Run the default Meandre-Core server</echo>
         <java classname="org.meandre.webservices.WSCoreBootstrapper" fork="yes" maxmemory="1024m">
             <classpath refid="meandre.core.classpath"/>
             <classpath>
@@ -280,13 +269,13 @@
                 <pathelement location="${dist.dir}/${app.name}-componentdemo.jar"/>
                 <pathelement location="${dist.dir}/${app.name}-main.jar"/>
             </classpath>
+            <jvmarg value="-showversion"/>
         </java>
     </target>
 
     <!-- run-silent -->
     <target name="run-silent" depends="dist"
             description="-> runs the Meandre-Core server with 2GB of memory as a separate process">
-        <echo level="info">Run the default Meandre-Core server</echo>
         <java classname="org.meandre.webservices.WSCoreBootstrapper" fork="yes" spawn="yes" maxmemory="2048m">
             <classpath refid="meandre.core.classpath"/>
             <classpath>
@@ -296,6 +285,7 @@
                 <pathelement location="${dist.dir}/${app.name}-componentdemo.jar"/>
                 <pathelement location="${dist.dir}/${app.name}-main.jar"/>
             </classpath>
+            <jvmarg value="-showversion"/>
         </java>
     </target>
 
@@ -321,6 +311,6 @@
     </target>
 </project>
 
-<!-- DO NOT EDIT BELOW THIS LINE PLEASE -->
-<!-- vim:sw=4:softtabstop=4:expandtab
--->
+        <!-- DO NOT EDIT BELOW THIS LINE PLEASE -->
+        <!-- vim:sw=4:softtabstop=4:expandtab
+        -->
