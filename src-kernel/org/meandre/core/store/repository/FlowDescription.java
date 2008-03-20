@@ -129,7 +129,7 @@ public class FlowDescription {
 	public Resource getFlowComponent() {
 		return resFlowComponent;
 	}
-	
+
 	/** Returns the executable component resource as a string.
 	 *
 	 * @return The resource
@@ -225,11 +225,11 @@ public class FlowDescription {
 	 * @return The executable component instance description
 	 */
 	public Resource getExecutableComponentResourceForInstance ( Resource res ) {
-		
+
 		ExecutableComponentInstanceDescription ecd = htExecutableComponentInstances.get(res);
-		
+
 		return (ecd==null)?null:ecd.getExecutableComponent();
-		
+
 	}
 
 	/** Adds an executable component instance.
@@ -302,20 +302,20 @@ public class FlowDescription {
 
 		if ( resFlowComponent!=null ) {
 			Resource res = model.createResource(resFlowComponent.toString());
-	
+
 			// Plain properties
 			res.addProperty(RepositoryVocabulary.name,model.createTypedLiteral(sName))
 			   .addProperty(DC.description,model.createTypedLiteral(sDescription))
 			   .addProperty(DC.rights,model.createTypedLiteral(sRights))
 			   .addProperty(DC.creator,model.createTypedLiteral(sCreator))
-			   .addProperty(DC.date,model.createTypedLiteral(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(dateCreation),XSDDatatype.XSDdate))
+			   .addProperty(DC.date,model.createTypedLiteral(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(dateCreation),XSDDatatype.XSDdateTime))
 			   .addProperty(RDF.type,RepositoryVocabulary.flow_component);
 			   ;
-	
+
 			// Adding tags
 			for ( String sTag:tagDesc.getTags() )
 				res.addProperty(RepositoryVocabulary.tag,model.createTypedLiteral(sTag));
-	
+
 			// Adding connectors
 			Resource resCons = null;
 			if ( setConnectorDescription.size()>0 ) {
@@ -338,7 +338,7 @@ public class FlowDescription {
 	                      );
 				}
 			}
-	
+
 			// Adding instances
 			if ( setExecutableComponentInstances.size()>0 ) {
 				res.addProperty(RepositoryVocabulary.components_instances,
@@ -372,9 +372,9 @@ public class FlowDescription {
 
 		return model;
 	}
-	
+
 	/** Returns a readable name for the flow.
-	 * 
+	 *
 	 * @return A simple text description
 	 */
 	public String toString() {

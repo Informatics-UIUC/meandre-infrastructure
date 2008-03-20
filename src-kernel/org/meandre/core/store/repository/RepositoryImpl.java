@@ -30,7 +30,7 @@ import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 /** This class implements a basic component repository.
- * 
+ *
  * @author Xavier Llor&agrave;
  *
  */
@@ -38,47 +38,47 @@ public class RepositoryImpl implements QueryableRepository {
 
 	/** The available runnable types */
 	public final static Set<String> setRunnable = new HashSet<String>();
-	
+
 	/**  The available format types */
 	public final static Set<String> setFormat = new HashSet<String>();
-	
+
 	/** The available firing policies */
 	public final static Set<String> setFiringPolicy = new HashSet<String>();
-	
+
 	/** The core root logger */
 	protected static Logger log = LoggerFactory.getCoreLogger();
 
 	static {
-		
+
 		//
 		// Initialize the sets
 		//
-		
+
 		// Runnable
 		setRunnable.add("java");
 		setRunnable.add("python");
-		
+
 		// Format
 		setFormat.add("java/class");
 		setFormat.add("jython");
-		
+
 		// Firing policy
 		setFiringPolicy.add("any");
 		setFiringPolicy.add("all");
 	}
-	
+
 	/** The repository model */
 	private Model model = null;
-	
+
 	/** The set of executable components available */
 	protected Set<Resource> setComRes = null;
-	
+
 	/** The map from executable component resources to descriptions */
 	protected Hashtable<Resource,ExecutableComponentDescription> htComDescMap = null;
-	
+
 	/** The set of flow components available */
 	protected Set<Resource> setFlowRes = null;
-	
+
 	/** The map from flow component resources to descriptions */
 	protected Hashtable<Resource,FlowDescription> htFlowDescMap = null;
 
@@ -90,20 +90,20 @@ public class RepositoryImpl implements QueryableRepository {
 
 	/** The tag information for components */
 	protected Hashtable<String,Set<ExecutableComponentDescription>> htCompTags = null;
-	
+
 	/** The tag information for flows */
 	protected Hashtable<String,Set<FlowDescription>> htFlowTags = null;
-	
+
 	/** Creates a new repository given the provided model.
-	 * 
+	 *
 	 * @param mod The model containing the repository information
 	 */
 	public RepositoryImpl ( Model mod ) {
 		// Initializing the repository
 		log.info("Initializing the repository");
-		
+
 		this.model = mod;
-		
+
 		// Creating the basic caching mechanisms
 		this.htComDescMap  = new Hashtable<Resource,ExecutableComponentDescription>();
 		this.setComRes     = getAvailableExecutableComponentsFromModel();
@@ -112,13 +112,13 @@ public class RepositoryImpl implements QueryableRepository {
 
 		this.htCompTags    = new Hashtable<String,Set<ExecutableComponentDescription>>();
 		this.htFlowTags    = new Hashtable<String,Set<FlowDescription>>();
-		
+
 		// Refresh the cached descriptions
 		refreshCache();
 	}
-	
+
 	/** Refreshes the cache of component descriptions available.
-	 * 
+	 *
 	 */
 	public void refreshCache () {
 		// Flushing the cache
@@ -129,7 +129,7 @@ public class RepositoryImpl implements QueryableRepository {
 		setFlowRes.clear();
 		htCompTags.clear();
 		htFlowTags.clear();
-		
+
 		LARQ.removeDefaultIndex();
 
 		log.info("Refreshing cached descriptions");
@@ -173,50 +173,50 @@ public class RepositoryImpl implements QueryableRepository {
 				log.warning("Corrupted flow found "+res.toString()+"\n"+e.toString());
 			}
 		}
-		
+
 		if ( model.size()==0 ) {
 			model.createResource("http://www.meandre.org/ontology/")
 			     .addProperty(DC.description, model.createTypedLiteral("This is the current repository aggregated using Meandre"))
-			     .addProperty(DC.date, model.createTypedLiteral(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()),XSDDatatype.XSDdate));
+			     .addProperty(DC.date, model.createTypedLiteral(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()),XSDDatatype.XSDdateTime));
 		}
-		
+
 		// Read and index all literal strings.
 		// The non-working demo below shows how to divert the LARQ index to a file instead of memory based
 		// this.larqBuilder = new IndexBuilderString(new File(Store.getRunResourcesDirectory()+File.separator+Store.getRepositoryIndexFile()));
 		//
 		this.larqBuilder = new IndexBuilderString();
-	
+
 		// Create an index based on existing statements
 		larqBuilder.indexStatements(model.listStatements(null,DC.description,(RDFNode)null));
 		larqBuilder.indexStatements(model.listStatements(null,DC.rights,(RDFNode)null));
 		larqBuilder.indexStatements(model.listStatements(null,DC.creator,(RDFNode)null));
 		larqBuilder.indexStatements(model.listStatements(null,RepositoryVocabulary.name,(RDFNode)null));
 		larqBuilder.indexStatements(model.listStatements(null,RepositoryVocabulary.tag,(RDFNode)null));
-		
+
 		//larqBuilder.indexStatements(model.listStatements());
-		
+
 		// Finish indexing
 		larqBuilder.closeForWriting();
-		
-		// -- Create the access index  
+
+		// -- Create the access index
 		this.index = larqBuilder.getIndex() ;
 		// -- Make globally available
 		LARQ.setDefaultIndex(index);
-		
+
 	}
-	
+
 	/** Refreshes the cache of component descriptions available in the provided model.
-	 * 
+	 *
 	 * @param modNew The new model to use as reprository
 	 */
 	public void refreshCache ( Model modNew ) {
 		this.model = modNew;
-		
+
 		refreshCache();
 	}
 
 	/** Returns the current model used as a repository.
-	 * 
+	 *
 	 * @return The model used as reprository
 	 */
 	public Model getModel () {
@@ -224,40 +224,40 @@ public class RepositoryImpl implements QueryableRepository {
 	}
 
 	/** Returns the set of availabble exececutable components from the model.
-	 * 
+	 *
 	 * @return The set of resources describing the available components
 	 */
 	protected Set<Resource> getAvailableExecutableComponentsFromModel() {
 		Set<Resource> hsRes = new HashSet<Resource>();
 		ResIterator subjs = model.listSubjectsWithProperty(RDF.type,RepositoryVocabulary.executable_component);
-		
-		while ( subjs.hasNext() ) 
+
+		while ( subjs.hasNext() )
 			hsRes.add(subjs.nextResource());
-		
+
 		return hsRes;
-		
+
 		/* The original SPARQL version
-		 
-		private final static String QUERY_GET_ALL_EXECUTABLE_COMPONENTS = 
+
+		private final static String QUERY_GET_ALL_EXECUTABLE_COMPONENTS =
 		"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
 		"PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
 		"SELECT ?component  " +
 		"WHERE { ?component rdf:type meandre:executable_component }" ;
-		
+
 		Set<Resource> hsRes = new HashSet<Resource>();
 		Query query = QueryFactory.create(QUERY_GET_ALL_EXECUTABLE_COMPONENTS) ;
 		QueryExecution exec = QueryExecutionFactory.create(query, model, null);
 		ResultSet results = exec.execSelect();
-		
-		while ( results.hasNext() ) 
+
+		while ( results.hasNext() )
 			hsRes.add(results.nextSolution().getResource("component"));
-		
+
 		return hsRes;
 		*/
 	}
 
 	/** Returns the literals matching that particular subject/predicate combination.
-	 * 
+	 *
 	 * @param resSubj The subject resource
 	 * @param prop The predicate property
 	 * @param bCheckUnique Force a check for a unique value
@@ -265,17 +265,17 @@ public class RepositoryImpl implements QueryableRepository {
 	 * @throws CorruptedDescriptionException A unique check was placed and more than one value was found
 	 */
 	@SuppressWarnings("unchecked")
-	private List<Literal> getLiteralsFromModel ( Resource resSubj, Property prop, boolean bCheckUnique ) 
+	private List<Literal> getLiteralsFromModel ( Resource resSubj, Property prop, boolean bCheckUnique )
 	throws CorruptedDescriptionException {
 		List list = model.listObjectsOfProperty(resSubj, prop).toList();
-		if ( bCheckUnique && list.size()!=1 ) 
+		if ( bCheckUnique && list.size()!=1 )
 			throw new CorruptedDescriptionException("Not an unique value "+list);
 		return list;
 	}
-	
+
 
 	/** Returns the resources matching that particular subject/predicate combination.
-	 * 
+	 *
 	 * @param resSubj The subject resource
 	 * @param prop The predicate property
 	 * @param bCheckUnique Force a check for a unique value
@@ -283,17 +283,17 @@ public class RepositoryImpl implements QueryableRepository {
 	 * @throws CorruptedDescriptionException A unique check was placed and more than one value was found
 	 */
 	@SuppressWarnings("unchecked")
-	private List<Resource> getObjectResourcesFromModel ( Resource resSubj, Property prop, boolean bCheckUnique ) 
+	private List<Resource> getObjectResourcesFromModel ( Resource resSubj, Property prop, boolean bCheckUnique )
 	throws CorruptedDescriptionException {
 		List list = model.listObjectsOfProperty(resSubj, prop).toList();
-		if ( bCheckUnique && list.size()!=1 ) 
+		if ( bCheckUnique && list.size()!=1 )
 			throw new CorruptedDescriptionException("Not an unique value "+list);
 		return list;
 	}
-	
+
 
 	/** Returns the resources matching that particular subject/predicate combination as RDFNodes.
-	 * 
+	 *
 	 * @param resSubj The subject resource
 	 * @param prop The predicate property
 	 * @param bCheckUnique Force a check for a unique value
@@ -301,16 +301,16 @@ public class RepositoryImpl implements QueryableRepository {
 	 * @throws CorruptedDescriptionException A unique check was placed and more than one value was found
 	 */
 	@SuppressWarnings("unchecked")
-	private List<RDFNode> getObjectResourcesFromModelAsRDFNodes ( Resource resSubj, Property prop, boolean bCheckUnique ) 
+	private List<RDFNode> getObjectResourcesFromModelAsRDFNodes ( Resource resSubj, Property prop, boolean bCheckUnique )
 	throws CorruptedDescriptionException {
 		List list = model.listObjectsOfProperty(resSubj, prop).toList();
-		if ( bCheckUnique && list.size()!=1 ) 
+		if ( bCheckUnique && list.size()!=1 )
 			throw new CorruptedDescriptionException("Not an unique value "+list);
 		return list;
 	}
 
 	/** Returns the resources matching that particular predicate/object resource combination.
-	 * 
+	 *
 	 * @param prop The predicate property
 	 * @param resObj The object resource
 	 * @param bCheckUnique Force a check for a unique value
@@ -318,17 +318,17 @@ public class RepositoryImpl implements QueryableRepository {
 	 * @throws CorruptedDescriptionException A unique check was placed and more than one value was found
 	 */
 	@SuppressWarnings("unchecked")
-	private List<Resource> getSubjectResourcesFromModel ( Property prop, Resource resObj, boolean bCheckUnique ) 
+	private List<Resource> getSubjectResourcesFromModel ( Property prop, Resource resObj, boolean bCheckUnique )
 	throws CorruptedDescriptionException {
 		List list = model.listSubjectsWithProperty(prop,resObj).toList();
-		if ( bCheckUnique && list.size()!=1 ) 
+		if ( bCheckUnique && list.size()!=1 )
 			throw new CorruptedDescriptionException("Not an unique value "+list);
 		return list;
 	}
 
 
 	/** Returns the resources matching that particular predicate/object literal combination.
-	 * 
+	 *
 	 * @param prop The predicate property
 	 * @param litObj The object literal
 	 * @param bCheckUnique Force a check for a unique value
@@ -336,17 +336,17 @@ public class RepositoryImpl implements QueryableRepository {
 	 * @throws CorruptedDescriptionException A unique check was placed and more than one value was found
 	 */
 	@SuppressWarnings("unchecked")
-	private List<Resource> getSubjectResourcesFromModel ( Property prop, Literal litObj, boolean bCheckUnique ) 
+	private List<Resource> getSubjectResourcesFromModel ( Property prop, Literal litObj, boolean bCheckUnique )
 	throws CorruptedDescriptionException {
 		List list = model.listSubjectsWithProperty(prop,litObj).toList();
-		if ( bCheckUnique && list.size()!=1 ) 
+		if ( bCheckUnique && list.size()!=1 )
 			throw new CorruptedDescriptionException("Not an unique value "+list);
 		return list;
 	}
-	
+
 
 	/** Returns the executable component description for the given resource from the model.
-	 * 
+	 *
 	 * @param res The resource
 	 * @return The description
 	 * @throws CorruptedDescriptionException Corrupted description found
@@ -370,14 +370,14 @@ public class RepositoryImpl implements QueryableRepository {
 		// Check the resource is a component
 		if ( model.listStatements(res,RDF.type,RepositoryVocabulary.executable_component).toList().size()!=1 )
 			throw new CorruptedDescriptionException("Not a executable component: "+res);
-		
-		/* Original query set bindings for the SPARQL queries 
+
+		/* Original query set bindings for the SPARQL queries
 		QuerySolutionMap qsmBindings = new QuerySolutionMap();
 		qsmBindings.add("component", res);
 		*/
-		
-		/* The original SPARQL version 
-		private final static String QUERY_GET_EXECUTABLE_COMPONENT = 
+
+		/* The original SPARQL version
+		private final static String QUERY_GET_EXECUTABLE_COMPONENT =
 			"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
 			"PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
 			"PREFIX dc: <http://purl.org/dc/elements/1.1/>\n"+
@@ -394,19 +394,19 @@ public class RepositoryImpl implements QueryableRepository {
 			"	?component dc:format ?format . " +
 			"   ?component meandre:resource_location ?location " +
 			"}" ;
-		
+
 		// Query the basic properties
 		QuerySolutionMap qsmBindings = new QuerySolutionMap();
 		qsmBindings.add("component", res);
 
 		Query query = QueryFactory.create(QUERY_GET_EXECUTABLE_COMPONENT) ;
 		QueryExecution exec = QueryExecutionFactory.create(query, model, qsmBindings);
-		ResultSet results = exec.execSelect(); 
-		
+		ResultSet results = exec.execSelect();
+
 		QuerySolution resProps = results.nextSolution();
 		if ( results.getRowNumber()>1 )
 			throw new CorruptedDescriptionException("Executable component "+res+" appears to have multiple contradictory definitions");
-		
+
 		// ?component ?name ?creator ?date ?desc ?rights ?runnable ?format
 		resExecutableComponent = resProps.getResource("component");
 		sName = resProps.getLiteral("name").getLexicalForm();
@@ -422,7 +422,7 @@ public class RepositoryImpl implements QueryableRepository {
 			throw new CorruptedDescriptionException(e);
 		}
 		*/
-		
+
 		//
 		// Query the basic properties
 		//
@@ -442,7 +442,7 @@ public class RepositoryImpl implements QueryableRepository {
 
 
 		/* Original SPARQL version
-		private final static String QUERY_GET_EXECUTABLE_TAGS = 
+		private final static String QUERY_GET_EXECUTABLE_TAGS =
 			"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
 			"PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
 			"PREFIX dc: <http://purl.org/dc/elements/1.1/>\n"+
@@ -452,12 +452,12 @@ public class RepositoryImpl implements QueryableRepository {
 			"   ?component rdf:type meandre:executable_component . " +
 			"	?component meandre:tag ?tag  " +
 			"}" ;
-		
-		// Query tagging linked 
+
+		// Query tagging linked
 		Query queryTags = QueryFactory.create(QUERY_GET_EXECUTABLE_TAGS) ;
 		QueryExecution execTags = QueryExecutionFactory.create(queryTags, model, qsmBindings);
 		ResultSet resultsTags =  execTags.execSelect();
-		
+
 		Set<String> setTags = new HashSet<String>();
 		while ( resultsTags.hasNext() ) {
 			QuerySolution solTags = resultsTags.nextSolution();
@@ -466,18 +466,18 @@ public class RepositoryImpl implements QueryableRepository {
 		}
 		TagsDescription tagDesc = new TagsDescription(setTags);
 		*/
-		
+
 		//
 		// Get the component tags
 		//
 		Set<String> setTags = new HashSet<String>();
-		for ( Literal lit:getLiteralsFromModel(res, RepositoryVocabulary.tag, false) ) 
+		for ( Literal lit:getLiteralsFromModel(res, RepositoryVocabulary.tag, false) )
 			setTags.add(lit.getLexicalForm());
 		TagsDescription tagDesc = new TagsDescription(setTags);
 
-		
-		
-		/* Retrieve the properties for a given component. 
+
+
+		/* Retrieve the properties for a given component.
 		private final static String QUERY_GET_EXECUTABLE_PROPERTY_DEFINITIONS =
 			"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
 			"PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
@@ -493,14 +493,14 @@ public class RepositoryImpl implements QueryableRepository {
 			"	?pname dc:description ?desc ." +
 			"}" ;
 
-		
+
 		Query queryProperties = QueryFactory.create(QUERY_GET_EXECUTABLE_PROPERTY_DEFINITIONS) ;
 		QueryExecution execProperties = QueryExecutionFactory.create(queryProperties, model, qsmBindings);
 		ResultSet resultsProperties =  execProperties.execSelect();
-		
+
 		Hashtable<String,String> htValues = new Hashtable<String,String>();
 		Hashtable<String,String> htDescriptions = new Hashtable<String,String>();
-		// ?component ?pname ?key ?value ?desc 
+		// ?component ?pname ?key ?value ?desc
 		while ( resultsProperties.hasNext() ) {
 			QuerySolution sol = resultsProperties.nextSolution();
 			String sKey = sol.getLiteral("key").getLexicalForm();
@@ -509,7 +509,7 @@ public class RepositoryImpl implements QueryableRepository {
 		}
 		PropertiesDescriptionDefinition pddProperties = new PropertiesDescriptionDefinition(htValues,htDescriptions);
 		*/
-		
+
 		//
 		// Query for properties
 		//
@@ -521,10 +521,10 @@ public class RepositoryImpl implements QueryableRepository {
 			htDescriptions.put(sKey,getLiteralsFromModel(resProp, DC.description, true).iterator().next().getLexicalForm());
 		}
 		PropertiesDescriptionDefinition pddProperties = new PropertiesDescriptionDefinition(htValues,htDescriptions);
-		
-		
+
+
 		/* Original SPARQL version
-		private final static String QUERY_GET_EXECUTABLE_COMPONENT_EXECUTION_CONTEXT = 
+		private final static String QUERY_GET_EXECUTABLE_COMPONENT_EXECUTION_CONTEXT =
 			"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
 			"PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
 			"PREFIX dc: <http://purl.org/dc/elements/1.1/>\n"+
@@ -534,31 +534,31 @@ public class RepositoryImpl implements QueryableRepository {
 			"   ?component rdf:type meandre:executable_component . " +
 			"	?component meandre:execution_context ?context " +
 			"}" ;
-		
+
 		Query queryContext = QueryFactory.create(QUERY_GET_EXECUTABLE_COMPONENT_EXECUTION_CONTEXT) ;
 		QueryExecution execContext = QueryExecutionFactory.create(queryContext, model, qsmBindings);
 		ResultSet resultsContext =  execContext.execSelect();
-		
+
 		setContext = new HashSet<Resource>();
 		while ( resultsContext.hasNext() ) {
 			QuerySolution sol = resultsContext.nextSolution();
-			// ?component ?context 
+			// ?component ?context
 			setContext.add(sol.getResource("context"));
 		}
 		*/
-		
+
 		//
 		// Query for context locations
 		//
 		// TODO: This should be smarter to distinguish resources and literals
 		//
 		setContext = new HashSet<RDFNode>();
-		for ( RDFNode rdfnodeLoc:getObjectResourcesFromModelAsRDFNodes(res,RepositoryVocabulary.execution_context,false)) 
+		for ( RDFNode rdfnodeLoc:getObjectResourcesFromModelAsRDFNodes(res,RepositoryVocabulary.execution_context,false))
 			setContext.add(rdfnodeLoc);
-		
-		
+
+
 		/* The original SPARQL version
-		private final static String QUERY_GET_EXECUTABLE_COMPONENT_INPUTS = 
+		private final static String QUERY_GET_EXECUTABLE_COMPONENT_INPUTS =
 			"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
 			"PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
 			"PREFIX dc: <http://purl.org/dc/elements/1.1/>\n"+
@@ -575,7 +575,7 @@ public class RepositoryImpl implements QueryableRepository {
 		Query queryInputs = QueryFactory.create(QUERY_GET_EXECUTABLE_COMPONENT_INPUTS) ;
 		QueryExecution execInputs = QueryExecutionFactory.create(queryInputs, model, qsmBindings);
 		ResultSet resultsInputs = execInputs.execSelect();
-		
+
 		setInputs = new HashSet<DataPortDescription>();
 		while ( resultsInputs.hasNext() )  {
 			QuerySolution resIns = resultsInputs.nextSolution();
@@ -587,7 +587,7 @@ public class RepositoryImpl implements QueryableRepository {
 			setInputs.add(new DataPortDescription(resComp,sIdentifier,sInName,sDesc));
 		}
 		*/
-		
+
 		// Query for input data ports
 		setInputs = new HashSet<DataPortDescription>();
 		for ( Resource resPort:getObjectResourcesFromModel(res, RepositoryVocabulary.input_data_port, false) ) {
@@ -596,7 +596,7 @@ public class RepositoryImpl implements QueryableRepository {
 			String sDesc = getLiteralsFromModel(resPort, DC.description, true).iterator().next().getLexicalForm();
 			setInputs.add(new DataPortDescription(resPort,sIdentifier,sInName,sDesc));
 		}
-		
+
 		// If there is at least one input check for the firing criteria
 		if ( setInputs.size()>0 ) {
 
@@ -611,38 +611,38 @@ public class RepositoryImpl implements QueryableRepository {
 				"   ?component rdf:type meandre:executable_component . " +
 				"	?component meandre:firing_policy ?firing ." +
 				"}" ;
-			
+
 			QuerySolutionMap qsmBindingsFiring = new QuerySolutionMap();
 			qsmBindingsFiring.add("component", res);
 
 			Query queryFiring = QueryFactory.create(QUERY_GET_INPUT_FIRING) ;
 			QueryExecution execFiring = QueryExecutionFactory.create(queryFiring, model, qsmBindingsFiring);
 			ResultSet resultsFiring = execFiring.execSelect();
-			
-		
-			if ( !resultsFiring.hasNext() ) 
+
+
+			if ( !resultsFiring.hasNext() )
 				log.info("Component "+res.toString()+" has not firing policy, assuming all" );
 			else {
 				QuerySolution qsFP = resultsFiring.nextSolution();
-				if ( resultsFiring.getRowNumber()!=1 ) 
-					throw new CorruptedDescriptionException("Multiple firing policies found for component "+res.toString()); 
-				else	
+				if ( resultsFiring.getRowNumber()!=1 )
+					throw new CorruptedDescriptionException("Multiple firing policies found for component "+res.toString());
+				else
 					sFiringPolicy = qsFP.getLiteral("firing").getLexicalForm();
 			}
 			*/
-			
+
 			List<Literal> lstLit = getLiteralsFromModel(res, RepositoryVocabulary.firing_policy, true);
-			if ( lstLit.size()==0 ) 
+			if ( lstLit.size()==0 )
 				log.info("Component "+res.toString()+" has not firing policy, assuming all" );
-			else 
+			else
 				sFiringPolicy = lstLit.iterator().next().getLexicalForm();
-			
+
 		}
-		
-			
+
+
 		/* Original SPARQL version
-	
-		private final static String QUERY_GET_EXECUTABLE_COMPONENT_OUTPUTS = 
+
+		private final static String QUERY_GET_EXECUTABLE_COMPONENT_OUTPUTS =
 			"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
 			"PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
 			"PREFIX dc: <http://purl.org/dc/elements/1.1/>\n"+
@@ -655,11 +655,11 @@ public class RepositoryImpl implements QueryableRepository {
 			"	?port dc:description ?desc ." +
 			"	?port meandre:name ?name . " +
 			"}" ;
-		
+
 		Query queryOutputs = QueryFactory.create(QUERY_GET_EXECUTABLE_COMPONENT_OUTPUTS) ;
 		QueryExecution execOutputs = QueryExecutionFactory.create(queryOutputs, model, qsmBindings);
 		ResultSet resultsOutputs = execOutputs.execSelect();
-		
+
 		setOutputs = new HashSet<DataPortDescription>();
 		while ( resultsOutputs.hasNext() )  {
 			QuerySolution resIns = resultsOutputs.nextSolution();
@@ -671,7 +671,7 @@ public class RepositoryImpl implements QueryableRepository {
 			setOutputs.add(new DataPortDescription(resComp,sIdentifier,sInName,sDesc));
 		}
 		*/
-		
+
 		// Query for output data ports
 		setOutputs = new HashSet<DataPortDescription>();
 		for ( Resource resPort:getObjectResourcesFromModel(res, RepositoryVocabulary.output_data_port, false) ) {
@@ -680,7 +680,7 @@ public class RepositoryImpl implements QueryableRepository {
 			String sDesc = getLiteralsFromModel(resPort, DC.description, true).iterator().next().getLexicalForm();
 			setOutputs.add(new DataPortDescription(resPort,sIdentifier,sOutName,sDesc));
 		}
-		
+
 		return new ExecutableComponentDescription(
 				    resExecutableComponent,
 					sName,
@@ -699,47 +699,47 @@ public class RepositoryImpl implements QueryableRepository {
 					tagDesc
 				);
 	}
-	
+
 
 	/** Returns the set of availabble flows in the repository from the model.
-	 * 
+	 *
 	 * @return The set of resources describing the available flows
 	 */
 	protected Set<Resource> getAvailableFlowsFromModel() {
 		Set<Resource> hsRes = new HashSet<Resource>();
 		ResIterator subjs = model.listSubjectsWithProperty(RDF.type,RepositoryVocabulary.flow_component);
-		
-		while ( subjs.hasNext() ) 
+
+		while ( subjs.hasNext() )
 			hsRes.add(subjs.nextResource());
-		
+
 		return hsRes;
-		
+
 		/* The original SPARQL version
-		
-		private final static String QUERY_GET_ALL_FLOWS = 
+
+		private final static String QUERY_GET_ALL_FLOWS =
 			"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
 			"PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
 			"SELECT ?flow  " +
 			"WHERE { " +
 			"   ?flow rdf:type meandre:flow_component " +
 			"}" ;
- 
+
 		Set<Resource> hsRes = new HashSet<Resource>();
-		
+
 		Query query = QueryFactory.create(QUERY_GET_ALL_FLOWS) ;
 		QueryExecution exec = QueryExecutionFactory.create(query, model, null);
 		ResultSet results = exec.execSelect();
-		
-		while ( results.hasNext() ) 
+
+		while ( results.hasNext() )
 			hsRes.add(results.nextSolution().getResource("flow"));
-		
-		return hsRes; 
-		
+
+		return hsRes;
+
 		*/
 	}
-	
+
 	/** Returns a description of the given resource from the model.
-	 * 
+	 *
 	 * @param res The flow description to retrieve to retrieve
 	 * @return The flow description
 	 * @throws CorruptedDescriptionException The desctiption is corrupted
@@ -749,17 +749,17 @@ public class RepositoryImpl implements QueryableRepository {
 		// Check the resource is a component
 		if ( model.listStatements(res,RDF.type,RepositoryVocabulary.flow_component).toList().size()!=1 )
 			throw new CorruptedDescriptionException("Not a flow: "+res);
-		
+
 		/* The original SPARQL version
-		 
+
 		// Query the basic properties
 		QuerySolutionMap qsmBindings = new QuerySolutionMap();
 		qsmBindings.add("flow", res);
 		*/
 
 		/* The original SPARQL version
-		 
-		private final static String QUERY_GET_FLOW_PROPERTIES = 
+
+		private final static String QUERY_GET_FLOW_PROPERTIES =
 			"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
 			"PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
 			"PREFIX dc: <http://purl.org/dc/elements/1.1/>\n"+
@@ -773,16 +773,16 @@ public class RepositoryImpl implements QueryableRepository {
 			" 	?flow dc:description ?desc . " +
 			"	?flow dc:rights ?rights " +
 			"}" ;
-		
+
 
 		Query query = QueryFactory.create(QUERY_GET_FLOW_PROPERTIES) ;
 		QueryExecution exec = QueryExecutionFactory.create(query, model, qsmBindings);
 		ResultSet results = exec.execSelect();
-		
+
 		QuerySolution resProps = results.nextSolution();
 		if ( results.getRowNumber()>1 )
 			throw new CorruptedDescriptionException("Executable component "+res+" appears to have multiple contradictory definitions");
-		
+
 		Resource resFlow = resProps.getResource("flow");
 		String sName = resProps.getLiteral("name").getLexicalForm();
 		String sCreator = resProps.getLiteral("creator").getLexicalForm();
@@ -795,7 +795,7 @@ public class RepositoryImpl implements QueryableRepository {
 			throw new CorruptedDescriptionException(e);
 		}
 		*/
-		
+
 		//
 		// Query the basic properties
 		//
@@ -811,10 +811,10 @@ public class RepositoryImpl implements QueryableRepository {
 			throw new CorruptedDescriptionException(e);
 		}
 
-		
+
 		/* The original SPARQL version
-		
-		private final static String QUERY_GET_FLOW_TAGS = 
+
+		private final static String QUERY_GET_FLOW_TAGS =
 			"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
 			"PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
 			"PREFIX dc: <http://purl.org/dc/elements/1.1/>\n"+
@@ -824,13 +824,13 @@ public class RepositoryImpl implements QueryableRepository {
 			"   ?flow rdf:type meandre:flow_component . " +
 			"	?flow meandre:tag ?tag " +
 			"}" ;
-	
+
 
 		// Retrieve the tags linked to the flow
 		Query queryTags = QueryFactory.create(QUERY_GET_FLOW_TAGS) ;
 		QueryExecution execTags = QueryExecutionFactory.create(queryTags, model, qsmBindings);
 		ResultSet resultsTags = execTags.execSelect();
-		
+
 		Set<String> setTags = new HashSet<String>();
 		while ( resultsTags.hasNext() ) {
 			QuerySolution solTags = resultsTags.nextSolution();
@@ -839,20 +839,20 @@ public class RepositoryImpl implements QueryableRepository {
 		}
 		TagsDescription tagsDesc = new TagsDescription(setTags);
 		*/
-		
+
 		//
 		// Get the flow tags
 		//
 		Set<String> setTags = new HashSet<String>();
-		for ( Literal lit:getLiteralsFromModel(res, RepositoryVocabulary.tag, false) ) 
+		for ( Literal lit:getLiteralsFromModel(res, RepositoryVocabulary.tag, false) )
 			setTags.add(lit.getLexicalForm());
 		TagsDescription tagsDesc = new TagsDescription(setTags);
 
-		
+
 		/* The original SPARQL version
-		
-		// The query retrieving all the components instaces required to execute the flow 
-		private static final String  QUERY_GET_FLOW_INSTANCES = 
+
+		// The query retrieving all the components instaces required to execute the flow
+		private static final String  QUERY_GET_FLOW_INSTANCES =
 			"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
 			"PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
 			"PREFIX dc: <http://purl.org/dc/elements/1.1/>\n"+
@@ -867,9 +867,9 @@ public class RepositoryImpl implements QueryableRepository {
 	        "   ?eci meandre:instance_resource ?resComp . " +
 	        "   ?eci dc:description ?desc " +
 			"}" ;
-			
-		// Retrieve the main instance properties of a flow 
-		private final static String  QUERY_GET_FLOW_INSTANCE_PROPERTIES = 
+
+		// Retrieve the main instance properties of a flow
+		private final static String  QUERY_GET_FLOW_INSTANCE_PROPERTIES =
 			"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
 			"PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
 			"PREFIX dc: <http://purl.org/dc/elements/1.1/>\n"+
@@ -881,13 +881,13 @@ public class RepositoryImpl implements QueryableRepository {
 	        "   ?ps meandre:key ?key . " +
 	        "   ?ps meandre:value ?value  " +
 			"}" ;
-		
-		
+
+
 		// Retireve the instance list
 		Query queryInstances = QueryFactory.create(QUERY_GET_FLOW_INSTANCES) ;
 		QueryExecution execInstance = QueryExecutionFactory.create(queryInstances, model, qsmBindings);
 		ResultSet resultsInstances = execInstance.execSelect();
-		
+
 		Set<ExecutableComponentInstanceDescription> setExecutableComponentInstances = new HashSet<ExecutableComponentInstanceDescription>();
 		while ( resultsInstances.hasNext() ) {
 			QuerySolution sol = resultsInstances.nextSolution();
@@ -895,7 +895,7 @@ public class RepositoryImpl implements QueryableRepository {
 			String sInstanceName = sol.getLiteral("name").getLexicalForm();
 			Resource resComponent = sol.getResource("resComp");
 			String sInstanceDescription = sol.getLiteral("desc").getLexicalForm();
-			
+
 			// For each of them we need to get the properties
 			// Crete the instance binding
 			QuerySolutionMap qsmInstanceBindings = new QuerySolutionMap();
@@ -905,19 +905,19 @@ public class RepositoryImpl implements QueryableRepository {
 			Query queryInstanceProperties = QueryFactory.create(QUERY_GET_FLOW_INSTANCE_PROPERTIES) ;
 			QueryExecution execInstanceProperties = QueryExecutionFactory.create(queryInstanceProperties, model, qsmInstanceBindings);
 			ResultSet resultsInstanceProperties = execInstanceProperties.execSelect();
-			
+
 			Hashtable<String,String> htInsProp = new  Hashtable<String,String>();
 			while ( resultsInstanceProperties.hasNext() ) {
 				QuerySolution solProp = resultsInstanceProperties.nextSolution();
 				// ?eci ?key ?value
 				htInsProp.put(solProp.getLiteral("key").getLexicalForm(), solProp.getLiteral("value").getLexicalForm());
 			}
-			
+
 			// Creating the instance of the executable component
-			setExecutableComponentInstances.add(new ExecutableComponentInstanceDescription(resECI,resComponent,sInstanceName,sInstanceDescription,new PropertiesDescription(htInsProp)));	
+			setExecutableComponentInstances.add(new ExecutableComponentInstanceDescription(resECI,resComponent,sInstanceName,sInstanceDescription,new PropertiesDescription(htInsProp)));
 		}
 		*/
-		
+
 		//
 		// Retireve the instance list
 		//
@@ -929,12 +929,12 @@ public class RepositoryImpl implements QueryableRepository {
 				String sInstanceName = getLiteralsFromModel(resECI, RepositoryVocabulary.instance_name, true).iterator().next().getLexicalForm();
 				Resource resComponent = getObjectResourcesFromModel(resECI, RepositoryVocabulary.instance_resource, true).iterator().next();
 				String sInstanceDescription = getLiteralsFromModel(resECI, DC.description, true).iterator().next().getLexicalForm();
-				
+
 				// For each of them we need to get the properties
 				// Crete the instance binding
 				QuerySolutionMap qsmInstanceBindings = new QuerySolutionMap();
 				qsmInstanceBindings.add("eci", resECI);
-	
+
 				// Retrieve the instance's properties
 				Hashtable<String,String> htInsProp = new  Hashtable<String,String>();
 		        for ( Resource resProp:getObjectResourcesFromModel(resECI, RepositoryVocabulary.property_set, false) ) {
@@ -942,14 +942,14 @@ public class RepositoryImpl implements QueryableRepository {
 		        	String sValue = getLiteralsFromModel(resProp, RepositoryVocabulary.value, true).iterator().next().getLexicalForm();
 		        	htInsProp.put(sKey,sValue);
 		        }
-				
+
 				// Creating the instance of the executable component
-				setExecutableComponentInstances.add(new ExecutableComponentInstanceDescription(resECI,resComponent,sInstanceName,sInstanceDescription,new PropertiesDescription(htInsProp)));	
+				setExecutableComponentInstances.add(new ExecutableComponentInstanceDescription(resECI,resComponent,sInstanceName,sInstanceDescription,new PropertiesDescription(htInsProp)));
 			}
 		}
-		
+
 		/* The original SPARQL version
-	
+
 		private final static String QUERY_GET_FLOW_CONNECTORS =
 			  "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n"+
 			  "PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
@@ -967,7 +967,7 @@ public class RepositoryImpl implements QueryableRepository {
 			  "    ?dataCon meandre:connector_instance_target ?cit ."+
 			  "    ?dataCon meandre:connector_instance_data_port_target ?cidpt"+
 			  "}";
-		
+
 
 		// Retrieve the data port connector desciption
 		Query queryConnectors = QueryFactory.create(QUERY_GET_FLOW_CONNECTORS) ;
@@ -985,7 +985,7 @@ public class RepositoryImpl implements QueryableRepository {
 			setConnectorDescription.add(new ConnectorDescription(resDataCon,resComponentInstanceSource,resComponentInstaceDataPortSource,resComponentInstanceTarget,resComponentInstaceDataPortTarget));
 		}
 		*/
-		
+
 		//
 		// Retrieve the data port connector desciption
 		//
@@ -1005,61 +1005,61 @@ public class RepositoryImpl implements QueryableRepository {
 				}
 			}
 		}
-			
+
 		return new FlowDescription(resFlow,sName,sDescription,sRights,sCreator,dateCreation,setExecutableComponentInstances,setConnectorDescription,tagsDesc);
 	}
 
 
 	/** Returns the set of available executable components stored
 	 * in the repository.
-	 * 
+	 *
 	 * @return The set of executable components
 	 */
 	public Set<Resource> getAvailableExecutableComponents () {
 		return setComRes;
 	}
-	
+
 	/** Returns the set of available executable components stored
 	 * in the repository.
-	 * 
+	 *
 	 * @return The set of executable components
 	 */
 	public Set<ExecutableComponentDescription> getAvailableExecutableComponentDescriptions () {
 		Set<ExecutableComponentDescription> setFD = new HashSet<ExecutableComponentDescription>();
-		
+
 		for ( Resource res:getAvailableExecutableComponents() )
 			setFD.add(getExecutableComponentDescription(res));
-		
+
 		return setFD;
 	}
-	
+
 	/** Returns the map of available executable components descriptions stored
 	 * in the repository.
-	 * 
+	 *
 	 * @return The set of executable component descriptions
 	 */
 	public Map<String,ExecutableComponentDescription> getAvailableExecutableComponentDescriptionsMap () {
 		Map<String,ExecutableComponentDescription> mapECD = new HashMap<String,ExecutableComponentDescription>();
-		
+
 		for ( Resource res:getAvailableExecutableComponents() )
 			mapECD.put(res.toString(),getExecutableComponentDescription(res));
-		
+
 		return mapECD;
 	}
 
-	
+
 	/** Returns the set of available executable components stored
 	 * in the repository that match the search criteria.
-	 * 
+	 *
 	 * @param sQuery The string to search
 	 * @return The set of executable components
 	 */
 	public Set<Resource> getAvailableExecutableComponents ( String sQuery ) {
-		
+
 		/* Old SPARQL version
 		HashSet<Resource> setRes = new HashSet<Resource>();
-		
-		String QUERY_GET_ALL_SEARCHED_EXECUTABLE_COMPONENTS = 
+
+		String QUERY_GET_ALL_SEARCHED_EXECUTABLE_COMPONENTS =
 			"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
 			"PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
 			"PREFIX dc: <http://purl.org/dc/elements/1.1/>\n"+
@@ -1094,7 +1094,7 @@ public class RepositoryImpl implements QueryableRepository {
 			"      ?creator pf:textMatch '"+sQuery+"' " +
 			"   }" +
 			"}" ;
-		
+
 		// Retrieve the data port desciption
 		Query query = QueryFactory.create(QUERY_GET_ALL_SEARCHED_EXECUTABLE_COMPONENTS) ;
 		QueryExecution exec = QueryExecutionFactory.create(query, model, null);
@@ -1104,14 +1104,14 @@ public class RepositoryImpl implements QueryableRepository {
 			QuerySolution sol = results.nextSolution();
 			setRes.add(sol.getResource("component"));
 		}
-		
+
 		return setRes;
-	    */	
-	
+	    */
+
 		HashSet<Resource> setRes = new HashSet<Resource>();
-		
+
 		NodeIterator ni = index.searchModelByIndex(sQuery);
-		
+
 		while ( ni.hasNext() ) {
 			Literal lit = (Literal) ni.nextNode();
 			try {
@@ -1123,13 +1123,13 @@ public class RepositoryImpl implements QueryableRepository {
 				// No execption will be thrown because of the false flag
 			}
 		}
-		
+
 		return setRes;
 	}
-	
+
 
 	/** Returns the executable component description for the given resource.
-	 * 
+	 *
 	 * @param res The resource
 	 * @return The description
 	 * @throws CorruptedDescriptionException Corrupted description found
@@ -1137,57 +1137,57 @@ public class RepositoryImpl implements QueryableRepository {
 	public ExecutableComponentDescription getExecutableComponentDescription ( Resource res ) {
 		return htComDescMap.get(res);
 	}
-	
-	
-		
+
+
+
 	/** Returns the set of availabble flows in the repository.
-	 * 
+	 *
 	 * @return The set of resources describing the available flows
 	 */
 	public Set<Resource> getAvailableFlows() {
 		return setFlowRes;
 	}
-	
-	
+
+
 	/** Returns the set of available flows descriptions in the repository.
-	 * 
+	 *
 	 * @return The set of resources describing the available flows
 	 */
 	public Set<FlowDescription> getAvailableFlowDecriptions() {
 		Set<FlowDescription> setFD = new HashSet<FlowDescription>();
-		
+
 		for ( Resource res:getAvailableFlows() )
 			setFD.add(getFlowDescription(res));
-		
+
 		return setFD;
 	}
-	
+
 
 	/** Returns the map of available flows descriptions in the repository.
-	 * 
+	 *
 	 * @return The set of resources describing the available flows
 	 */
 	public Map<String,FlowDescription> getAvailableFlowDecriptionsMap() {
 		Map<String,FlowDescription> mapFD = new HashMap<String,FlowDescription>();
-		
+
 		for ( Resource res:getAvailableFlows() )
 			mapFD.put(res.toString(),getFlowDescription(res));
-		
+
 		return mapFD;
 	}
-	
+
 	/** Returns the set of availabble flows in the repository that match the search criteria. The queries
 	 * are based on Lucene syntax.
-	 * 
+	 *
 	 * @param sQuery The query string
 	 * @return The set of resources describing the available flows
 	 */
 	public Set<Resource> getAvailableFlows ( String sQuery ) {
 		/* Original SPARQL version
-		
+
 		HashSet<Resource> setRes = new HashSet<Resource>();
-		
-		String QUERY_GET_ALL_SEARCHED_FLOWS = 
+
+		String QUERY_GET_ALL_SEARCHED_FLOWS =
 			"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
 			"PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
 			"PREFIX dc: <http://purl.org/dc/elements/1.1/>\n"+
@@ -1222,7 +1222,7 @@ public class RepositoryImpl implements QueryableRepository {
 			"      ?creator pf:textMatch '"+sQuery+"' " +
 			"   }" +
 			"}" ;
-		
+
 		// Retrieve the data port desciption
 		Query query = QueryFactory.create(QUERY_GET_ALL_SEARCHED_FLOWS) ;
 		QueryExecution exec = QueryExecutionFactory.create(query, model, null);
@@ -1232,14 +1232,14 @@ public class RepositoryImpl implements QueryableRepository {
 			QuerySolution sol = results.nextSolution();
 			setRes.add(sol.getResource("flow"));
 		}
-		
+
 		return setRes;
 		*/
-		
+
 		HashSet<Resource> setRes = new HashSet<Resource>();
-		
+
 		NodeIterator ni = index.searchModelByIndex(sQuery);
-		
+
 		while ( ni.hasNext() ) {
 			Literal lit = (Literal) ni.nextNode();
 			try {
@@ -1251,12 +1251,12 @@ public class RepositoryImpl implements QueryableRepository {
 				// No execption will be thrown because of the false flag
 			}
 		}
-		
+
 		return setRes;
 	}
-	
+
 	/** Returns a description of the given resource.
-	 * 
+	 *
 	 * @param res The flow description to retrieve to retrieve
 	 * @return The flow description
 	 * @throws CorruptedDescriptionException The desctiption is corrupted
@@ -1264,9 +1264,9 @@ public class RepositoryImpl implements QueryableRepository {
 	public FlowDescription getFlowDescription(Resource res) {
 		return htFlowDescMap.get(res);
 	}
-	
+
 	/** Returns the list of available tags in the repository.
-	 * 
+	 *
 	 * @return The set of available tags.
 	 */
 	public Set<String> getTags () {
@@ -1274,12 +1274,12 @@ public class RepositoryImpl implements QueryableRepository {
 
 		set.addAll(htCompTags.keySet());
 		set.addAll(htFlowTags.keySet());
-		
+
 		return set;
 	}
-	
+
 	/** Returns the list of available component tags in the repository.
-	 * 
+	 *
 	 * @return The set of available component tags.
 	 */
 	public Set<String> getComponentTags () {
@@ -1287,49 +1287,49 @@ public class RepositoryImpl implements QueryableRepository {
 	}
 
 	/** Returns the map of available component tags in the repository.
-	 * 
+	 *
 	 * @return The set of available component tags.
 	 */
 	public Map<String,Set<ExecutableComponentDescription>> getComponentTagsMap () {
 		Map<String,Set<ExecutableComponentDescription>> mapRes = new HashMap<String,Set<ExecutableComponentDescription>> ();
-		
+
 		for ( String sTag:htCompTags.keySet() ) {
 			HashSet<ExecutableComponentDescription> hs = new HashSet<ExecutableComponentDescription>();
 			for ( ExecutableComponentDescription ecd:getComponentsByTag(sTag) )
 				hs.add(ecd);
 			mapRes.put(sTag, hs);
 		}
-		
+
 		return mapRes;
 	}
 
-	
+
 	/** Returns the list of available flow tags in the repository.
-	 * 
+	 *
 	 * @return The set of available flow tags.
 	 */
 	public Set<String> getFlowTags (){
 		return htFlowTags.keySet();
 	}
-	
+
 	/** Returns the map of available flow tags in the repository.
-	 * 
+	 *
 	 * @return The map of available flow tags.
 	 */
 	public Map<String,Set<FlowDescription>> getFlowTagsMap (){
 		Map<String,Set<FlowDescription>> mapRes = new HashMap<String,Set<FlowDescription>> ();
-		
+
 		for ( String sTag:htFlowTags.keySet() ) {
 			HashSet<FlowDescription> hs = new HashSet<FlowDescription>();
 			for ( FlowDescription fd:getFlowsByTag(sTag) )
 				hs.add(fd);
 			mapRes.put(sTag, hs);
 		}
-		
+
 		return mapRes;
 	}
 	/** Returns the set of executable components associated with this tag.
-	 * 
+	 *
 	 * @param sTag The tag
 	 * @return The set of components
 	 */
@@ -1338,7 +1338,7 @@ public class RepositoryImpl implements QueryableRepository {
 	}
 
 	/** Returns the set of flows associated with this tag.
-	 * 
+	 *
 	 * @param sTag The tag
 	 * @return The set of flows
 	 */

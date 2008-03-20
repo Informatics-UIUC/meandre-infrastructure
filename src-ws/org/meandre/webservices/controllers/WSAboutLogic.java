@@ -30,7 +30,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 
 /** The about services logic
- * 
+ *
  * @author Xavier Llor&agrave;
  *
  */
@@ -38,21 +38,21 @@ public class WSAboutLogic {
 
 	/** The logger for the WebServices */
 	private static Logger log = WSLoggerFactory.getWSLogger();
-	
+
 	/** Prints the list of user roles.
-	 * 
+	 *
 	 * @param request The request object
 	 * @param response The response object
 	 * @throws IOException A problem while printing
 	 */
 	public static void rolesInText(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
-		
+
 		PrintWriter pw = response.getWriter();
-		
+
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("text/plain");
-		
+
 		try {
 			SecurityStore ss = Store.getSecurityStore();
 			for ( String sRole:(ss.getUser(request.getRemoteUser()).getGrantedActionRoles()) )
@@ -61,22 +61,22 @@ public class WSAboutLogic {
 			log.warning("Security exception "+e.toString());
 			throw new IOException(e.toString());
 		}
-		
+
 	}
-	
+
 	/** Returns the list of roles as a JSON object.
-	 *  
+	 *
 	 * @param request The request object
 	 * @param response The response object
-	 * @return 
+	 * @return
 	 * @throws IOException Something when wrong
 	 */
 	public static JSONObject rolesInJSON (HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
-		
+
 		JSONObject joRes = new JSONObject();
 		JSONArray ja = new JSONArray();
-		
+
 		try {
 			SecurityStore ss = Store.getSecurityStore();
 			for ( String sRole:(ss.getUser(request.getRemoteUser()).getGrantedActionRoles()) ) {
@@ -85,35 +85,35 @@ public class WSAboutLogic {
 				ja.put(jo);
 			}
 			joRes.put("meandre_user_role",ja);
-			
+
 		}
 		catch ( Exception e ) {
 			throw new IOException(e.toString());
-		}		
-		
+		}
+
 		return joRes;
-		
+
 	}
-	
+
 
 	/** Dump the information in plain text
-	 * 
+	 *
 	 * @param request The request object
 	 * @param response The response object
 	 * @throws IOException Response exception
 	 */
 	public static void dumpUsingTxt(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		PrintWriter pw = response.getWriter();
-		
+
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("text/plain");
-		
+
 		pw.println("Meandre Execution Engine version "+Constants.MEANDRE_VERSION);
 		pw.println("All rigths reserved by DITA, NCSA, UofI (2007).");
 		pw.println("2007. All rigths reserved by DITA, NCSA, UofI.");
 		pw.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		pw.println();
-		
+
 		Properties prop = Store.getAllProperties();
 
 		//
@@ -125,7 +125,7 @@ public class WSAboutLogic {
 		pw.println("CURRENT_SESSION_ID = "+request.getSession().getId());
 		pw.println("CURRENT_TIME = "+new Date());
 		pw.println();
-		
+
 		//
 		// Print Meandre properties
 		//
@@ -139,7 +139,7 @@ public class WSAboutLogic {
 				pw.println(sKey.toString()+" = "+sValue);
 			}
 		}
-		
+
 		//
 		// Print DB storage properties
 		//
@@ -156,73 +156,73 @@ public class WSAboutLogic {
 	}
 
 	/** Dump the information in RDF
-	 * 
+	 *
 	 * @param request The request object
 	 * @param response The response object
 	 * @throws IOException Response exception
 	 */
 	public static void dumpUsingRDF(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ServletOutputStream resOutputStream = response.getOutputStream();
-		
+
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("application/xml");
-		
+
 		Model model = getPropertyModel(request);
-		
+
 		model.write(resOutputStream,"RDF/XML-ABBREV");
-		
+
 	}
 
 
 	/** Dump the information in RDF
-	 * 
+	 *
 	 * @param request The request object
 	 * @param response The response object
 	 * @throws IOException Response exception
 	 */
 	public static void dumpUsingTTL(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ServletOutputStream resOutputStream = response.getOutputStream();
-		
+
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("text/plain");
-		
+
 		Model model = getPropertyModel(request);
-		
+
 		model.write(resOutputStream,"TTL");
-		
+
 	}
 
 
 	/** Dump the information in RDF
-	 * 
+	 *
 	 * @param request The request object
 	 * @param response The response object
 	 * @throws IOException Response exception
 	 */
 	public static void dumpUsingNT(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ServletOutputStream resOutputStream = response.getOutputStream();
-		
+
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("text/plain");
-		
+
 		Model model = getPropertyModel(request);
-		
+
 		model.write(resOutputStream,"N-TRIPLE");
-		
+
 	}
 
 	/**  Creates a property model
-	 * 
+	 *
 	 * @param request The request object
 	 * @return The model containing the properties
 	 */
 	public static Model getPropertyModel(HttpServletRequest request) {
-		
+
 		Properties prop = Store.getAllProperties();
 
 		Model model;
 		model = ModelFactory.createDefaultModel();
-		
+
 		// Setting the name spaces
 		model.setNsPrefix("meandreWS", WSCoreBootstrapper.WS_BASE_URL);
 		model.setNsPrefix("meandreSC", Store.BASE_REPSITORY_STORE_CONFIG_URL );
@@ -232,12 +232,12 @@ public class WSAboutLogic {
 		model.setNsPrefix("dc",DC.getURI());
 
 		Resource resRoot = model.createResource(WSCoreBootstrapper.WS_BASE_URL);
-		
+
 		// Meandre WS ones
-		resRoot.addProperty(ResourceFactory.createProperty(DC.date.getURI()), model.createTypedLiteral(new Date(),XSDDatatype.XSDdate));
+		resRoot.addProperty(ResourceFactory.createProperty(DC.date.getURI()), model.createTypedLiteral(new Date(),XSDDatatype.XSDdateTime));
 		resRoot.addProperty(ResourceFactory.createProperty(DC.creator.getURI()), model.createTypedLiteral(request.getRemoteUser()));
 		resRoot.addProperty(ResourceFactory.createProperty(WSCoreBootstrapper.WS_BASE_URL+"sessionID"), model.createTypedLiteral(request.getSession().getId()));
-			
+
 		// Meandre ones
 		resRoot.addProperty(ResourceFactory.createProperty(WSCoreBootstrapper.WS_BASE_URL+"version"), model.createTypedLiteral(Constants.MEANDRE_VERSION));
 		for ( Object oKey:prop.keySet() ) {
@@ -247,7 +247,7 @@ public class WSAboutLogic {
 				resRoot.addProperty(ResourceFactory.createProperty(WSCoreBootstrapper.WS_BASE_URL+sKey.toString().toLowerCase()), model.createTypedLiteral(sValue));
 			}
 		}
-		
+
 		// Database back end ones
 		//
 		// Print DB storage properties
