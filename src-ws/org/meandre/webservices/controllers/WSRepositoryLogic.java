@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -30,6 +32,11 @@ import org.meandre.core.store.system.SystemStore;
 import org.meandre.webservices.utils.WSLoggerFactory;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -45,7 +52,7 @@ public class WSRepositoryLogic {
 
 	/** The logger for the WebServices */
 	private static Logger log = WSLoggerFactory.getWSLogger();
-	
+
     /** Regenerates a user repository using the current locations for the user.
 	 *
 	 * @param sUser The system store user
@@ -110,26 +117,34 @@ public class WSRepositoryLogic {
 		}
 
 		qr.refreshCache();
-		
+
 		return bRes;
 	}
 
 	/** Returns a JSON object containing the list of components.
 	 *
 	 * @param sUser The user making the request
+     * @param sOrder The sorting order ("date" or "name" for now) - or null if no sorting required
+     * @param sLimit The maximum number of values to be returned (or -1 if no limit)
 	 * @return The JSON object with the list
 	 * @throws IOException A problem arised
 	 */
-	public static JSONObject getListOfComponents ( String sUser )
+	public static JSONObject getListOfComponents ( String sUser, String sOrder, int limit )
 	throws IOException {
 
 		QueryableRepository qr = Store.getRepositoryStore(sUser);
+        Collection<Resource> lstComponents;
+
+        if ( sOrder != null || limit > 0 )
+            lstComponents = getComponentsOrderedBy(qr.getModel(), sOrder, limit);
+        else
+            lstComponents = qr.getAvailableExecutableComponents();
 
 		JSONObject joRes = new JSONObject();
 		JSONArray ja = new JSONArray();
 
 		try {
-			for ( Resource res:qr.getAvailableExecutableComponents() ) {
+			for ( Resource res:lstComponents ) {
 				JSONObject jo = new JSONObject();
 				jo.put("meandre_uri", res.toString());
 				ja.put(jo);
@@ -142,46 +157,102 @@ public class WSRepositoryLogic {
 		}
 
 		return joRes;
-
 	}
 
 
 	/** Returns a string containing the list of components.
 	 *
 	 * @param sUser The user making the request
+     * @param sOrder The sorting order ("date" or "name" for now) - or null if no sorting required
+     * @param sLimit The maximum number of values to be returned (or -1 if no limit)
 	 * @return The string list
 	 * @throws IOException A problem arised
 	 */
-	public static String getListOfComponentsAsTxt ( String sUser )
+	public static String getListOfComponentsAsTxt ( String sUser, String sOrder, int limit )
 	throws IOException {
 
 		StringBuffer sbRes = new StringBuffer();
 
 		QueryableRepository qr = Store.getRepositoryStore(sUser);
+        Collection<Resource> lstComponents;
 
-		for ( Resource res:qr.getAvailableExecutableComponents() )
+        if ( sOrder != null || limit > 0 )
+            lstComponents = getComponentsOrderedBy(qr.getModel(), sOrder, limit);
+        else
+            lstComponents = qr.getAvailableExecutableComponents();
+
+		for ( Resource res:lstComponents )
 			sbRes.append(res.toString()+"\n");
 
 		return sbRes.toString();
 
 	}
 
+    /**
+     * Creates a list of components sorted by either date or name and returns the first N (='limit') values
+     * @param model  The model containing the components
+     * @param sOrder The sorting order ("date" or "name" for now) - or null if no sorting required
+     * @param limit  The maximum number of values to be returned (or -1 if no limit)
+     * @return The list of components
+     */
+    private static Collection<Resource> getComponentsOrderedBy(Model model, String sOrder, int limit) {
+        String sOrderBy = "";
+        if ( sOrder != null ) {
+            if ( sOrder.equals("date") )
+                sOrderBy = "DESC(?date) ?name";
+            else if ( sOrder.equals("name") )
+                sOrderBy = "?name DESC(?date)";
+        }
+
+        final String QUERY =
+            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
+            "PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
+            "PREFIX dc: <http://purl.org/dc/elements/1.1/>\n" +
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
+            "SELECT DISTINCT ?component " +
+            "WHERE {" +
+            "   ?component rdf:type meandre:executable_component ." +
+            "   ?component meandre:name ?name ." +
+            "   ?component dc:date ?date " +
+            "} " +
+            (sOrder != null ? "ORDER BY " + sOrderBy + " " : "") +
+            (limit > 0 ? "LIMIT " + limit : "");
+
+        Query query = QueryFactory.create(QUERY) ;
+        QueryExecution exec = QueryExecutionFactory.create(query, model, null);
+        ResultSet results = exec.execSelect();
+
+        Collection<Resource> lstComponents = new ArrayList<Resource>();
+        while ( results.hasNext() )
+            lstComponents.add(results.nextSolution().getResource("component"));
+
+        return lstComponents;
+    }
+
 	/** Returns a JSON object containing the list of flows.
 	 *
 	 * @param sUser The user making the request
+     * @param sOrder The sorting order ("date" or "name" for now) - or null if no sorting required
+     * @param sLimit The maximum number of values to be returned (or -1 if no limit)
 	 * @return The JSON object with the list
 	 * @throws IOException A problem arised
 	 */
-	public static JSONObject getListOfFlows ( String sUser )
+	public static JSONObject getListOfFlows ( String sUser, String sOrder, int limit )
 	throws IOException {
 
 		QueryableRepository qr = Store.getRepositoryStore(sUser);
+        Collection<Resource> lstFlows;
+
+        if ( sOrder != null || limit > 0 )
+            lstFlows = getFlowsOrderedBy(qr.getModel(), sOrder, limit);
+        else
+            lstFlows = qr.getAvailableFlows();
 
 		JSONObject joRes = new JSONObject();
 		JSONArray ja = new JSONArray();
 
 		try {
-			for ( Resource res:qr.getAvailableFlows() ) {
+			for ( Resource res:lstFlows ) {
 				JSONObject jo = new JSONObject();
 				jo.put("meandre_uri", res.toString());
 				ja.put(jo);
@@ -200,22 +271,69 @@ public class WSRepositoryLogic {
 	/** Returns a string containing the list of flows.
 	 *
 	 * @param sUser The user making the request
+	 * @param sOrder The sorting order ("date" or "name" for now) - or null if no sorting required
+	 * @param sLimit The maximum number of values to be returned (or -1 if no limit)
 	 * @return The string list
 	 * @throws IOException A problem arised
 	 */
-	public static String getListOfFlowsAsTxt ( String sUser )
+	public static String getListOfFlowsAsTxt ( String sUser, String sOrder, int limit )
 	throws IOException {
 
 		StringBuffer sbRes = new StringBuffer();
-
 		QueryableRepository qr = Store.getRepositoryStore(sUser);
+        Collection<Resource> lstFlows;
 
-		for ( Resource res:qr.getAvailableFlows() )
-			sbRes.append(res.toString()+"\n");
+        if ( sOrder != null || limit > 0 )
+            lstFlows = getFlowsOrderedBy(qr.getModel(), sOrder, limit);
+        else
+            lstFlows = qr.getAvailableFlows();
+
+    	for ( Resource res:lstFlows )
+    	    sbRes.append(res.toString()+"\n");
 
 		return sbRes.toString();
-
 	}
+
+    /**
+     * Creates a list of flows sorted by either date or name and returns the first N (='limit') values
+     * @param model  The model containing the flows
+     * @param sOrder The sorting order ("date" or "name" for now) - or null if no sorting required
+     * @param limit  The maximum number of values to be returned (or -1 if no limit)
+     * @return The list of flows
+     */
+    private static Collection<Resource> getFlowsOrderedBy(Model model, String sOrder, int limit) {
+        String sOrderBy = "";
+        if ( sOrder != null ) {
+            if ( sOrder.equals("date") )
+                sOrderBy = "DESC(?date) ?name";
+            else if ( sOrder.equals("name") )
+                sOrderBy = "?name DESC(?date)";
+        }
+
+        final String QUERY =
+            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
+            "PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
+            "PREFIX dc: <http://purl.org/dc/elements/1.1/>\n" +
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
+            "SELECT DISTINCT ?flow " +
+            "WHERE {" +
+            "   ?flow rdf:type meandre:flow_component ." +
+            "   ?flow meandre:name ?name ." +
+            "   ?flow dc:date ?date " +
+            "} " +
+            (sOrder != null ? "ORDER BY " + sOrderBy + " " : "") +
+            (limit > 0 ? "LIMIT " + limit : "");
+
+        Query query = QueryFactory.create(QUERY) ;
+        QueryExecution exec = QueryExecutionFactory.create(query, model, null);
+        ResultSet results = exec.execSelect();
+
+        Collection<Resource> lstFlows = new ArrayList<Resource>();
+        while ( results.hasNext() )
+            lstFlows.add(results.nextSolution().getResource("flow"));
+
+        return lstFlows;
+    }
 
 
 	/** Returns a JSON object containing the list of tags in the user repository.
@@ -382,7 +500,7 @@ public class WSRepositoryLogic {
 	 * @param sComponent The component URI requested
 	 * @return The model
 	 */
-	public static Model getComponentDesciption(String sUser,
+	public static Model getComponentDescription(String sUser,
 			String sComponent) {
 
 		Model modelRes = ModelFactory.createDefaultModel();
@@ -413,7 +531,7 @@ public class WSRepositoryLogic {
 	 * @param sComponent The component URI requested
 	 * @return The model
 	 */
-	public static Model getFlowDesciption(String sUser,
+	public static Model getFlowDescription(String sUser,
 			String sComponent) {
 
 		Model modelRes = ModelFactory.createDefaultModel();
@@ -431,7 +549,7 @@ public class WSRepositoryLogic {
 		if ( fd!=null ) {
 			modelRes.add(fd.getModel());
 		}
-		else 
+		else
 			modelRes = null;
 
 		return modelRes;
@@ -441,16 +559,30 @@ public class WSRepositoryLogic {
 	 *
 	 * @param sUser The requesting user
 	 * @param sQuery The query
+     * @param sOrder The sort critera (date | name)
+     * @param limit The max number or results to return
 	 * @return The results
 	 */
-	public static String getSearchComponentsAsTxt(String sUser, String sQuery) {
+	public static String getSearchComponentsAsTxt(String sUser, String sQuery, String sOrder, int limit) {
 		StringBuffer sbRes = new StringBuffer();
 
 		QueryableRepository qr = Store.getRepositoryStore(sUser);
 		Set<Resource> setRes = qr.getAvailableExecutableComponents(sQuery);
+        Collection<Resource> lstComponents;
 
-		for ( Resource res:setRes )
-			sbRes.append(res.toString()+"\n");
+        if ( sOrder != null || limit > 0 ) {
+            Model model = ModelFactory.createDefaultModel();
+
+            for ( Resource res:setRes )
+                model.add(qr.getExecutableComponentDescription(res).getModel());
+
+            lstComponents = getComponentsOrderedBy(model, sOrder, limit);
+        }
+        else
+            lstComponents = setRes;
+
+        for ( Resource res:lstComponents )
+            sbRes.append(res.toString()+"\n");
 
 		return sbRes.toString();
 	}
@@ -459,19 +591,34 @@ public class WSRepositoryLogic {
 	 *
 	 * @param sUser The user making the request
 	 * @param sQuery The query
+     * @param sOrder The sort critera (date | name)
+     * @param limit The max number or results to return
 	 * @return The JSON object with the list
 	 * @throws IOException A problem arised
 	 */
-	public static JSONObject getSearchComponentsAsJSON ( String sUser, String sQuery )
+	public static JSONObject getSearchComponentsAsJSON ( String sUser, String sQuery, String sOrder, int limit )
 	throws IOException {
 
 		QueryableRepository qr = Store.getRepositoryStore(sUser);
+		Set<Resource> setRes = qr.getAvailableFlows(sQuery);
+        Collection<Resource> lstComponents;
+
+        if ( sOrder != null || limit > 0 ) {
+            Model model = ModelFactory.createDefaultModel();
+
+            for ( Resource res:setRes )
+                model.add(qr.getExecutableComponentDescription(res).getModel());
+
+            lstComponents = getComponentsOrderedBy(model, sOrder, limit);
+        }
+        else
+            lstComponents = setRes;
 
 		JSONObject joRes = new JSONObject();
 		JSONArray ja = new JSONArray();
 
 		try {
-			for ( Resource res:qr.getAvailableExecutableComponents(sQuery) ) {
+			for ( Resource res:lstComponents ) {
 				JSONObject jo = new JSONObject();
 				jo.put("meandre_uri", res.toString());
 				ja.put(jo);
@@ -484,7 +631,6 @@ public class WSRepositoryLogic {
 		}
 
 		return joRes;
-
 	}
 
 
@@ -492,37 +638,66 @@ public class WSRepositoryLogic {
 	 *
 	 * @param sUser The requesting user
 	 * @param sQuery The query
-	 * @return The results
+	 * @param sOrder The sort critera (date | name)
+     * @param limit The max number or results to return
+     * @return The results
 	 */
-	public static String getSearchFlowsAsTxt(String sUser, String sQuery) {
+	public static String getSearchFlowsAsTxt(String sUser, String sQuery, String sOrder, int limit) {
 		StringBuffer sbRes = new StringBuffer();
 
 		QueryableRepository qr = Store.getRepositoryStore(sUser);
 		Set<Resource> setRes = qr.getAvailableFlows(sQuery);
+        Collection<Resource> lstFlows;
 
-		for ( Resource res:setRes )
-			sbRes.append(res.toString()+"\n");
+        if ( sOrder != null || limit > 0 ) {
+            Model model = ModelFactory.createDefaultModel();
+
+            for ( Resource res:setRes )
+                model.add(qr.getFlowDescription(res).getModel());
+
+            lstFlows = getFlowsOrderedBy(model, sOrder, limit);
+        }
+        else
+            lstFlows = setRes;
+
+        for ( Resource res:lstFlows )
+            sbRes.append(res.toString()+"\n");
 
 		return sbRes.toString();
 	}
 
-	/** Returns a JSON object containing the list of flows searched.
+    /** Returns a JSON object containing the list of flows searched.
 	 *
 	 * @param sUser The user making the request
 	 * @param sQuery The query
-	 * @return The JSON object with the list
+	 * @param sOrder The sort critera (date | name)
+     * @param limit The max number or results to return
+     * @return The JSON object with the list
 	 * @throws IOException A problem arised
 	 */
-	public static JSONObject getSearchFlowsAsJSON ( String sUser, String sQuery )
+	public static JSONObject getSearchFlowsAsJSON(String sUser, String sQuery, String sOrder, int limit)
 	throws IOException {
 
 		QueryableRepository qr = Store.getRepositoryStore(sUser);
+        Set<Resource> setRes = qr.getAvailableFlows(sQuery);
+        Collection<Resource> lstFlows;
+
+        if ( sOrder != null || limit > 0 ) {
+            Model model = ModelFactory.createDefaultModel();
+
+            for ( Resource res:setRes )
+                model.add(qr.getFlowDescription(res).getModel());
+
+            lstFlows = getFlowsOrderedBy(model, sOrder, limit);
+        }
+        else
+            lstFlows = setRes;
 
 		JSONObject joRes = new JSONObject();
 		JSONArray ja = new JSONArray();
 
 		try {
-			for ( Resource res:qr.getAvailableFlows(sQuery) ) {
+			for ( Resource res:lstFlows ) {
 				JSONObject jo = new JSONObject();
 				jo.put("meandre_uri", res.toString());
 				ja.put(jo);
@@ -672,7 +847,7 @@ public class WSRepositoryLogic {
 
 		// The user repository
 		QueryableRepository qr = Store.getRepositoryStore(request.getRemoteUser());
-		
+
 		while(itr.hasNext()) {
 			FileItem item = itr.next();
 		    // Get the name of the field
@@ -764,7 +939,7 @@ public class WSRepositoryLogic {
 					log.warning("Flow "+resFlow+" already exist in "+request.getRemoteUser()+" repository. Discarding it. No overwrite flag provided.");
 			}
 		}
-		
+
 		// Adding the components after adding the contexts
 		URL urlRequest = new URL(request.getRequestURL().toString());
 		Set<String> setFiles = htContextBytes.keySet();
@@ -784,7 +959,7 @@ public class WSRepositoryLogic {
 				}
 			}
 			else {
-				if ( (bEmbed && ecd.getRunnable().equals("java") && ecd.getFormat().equals("java/class") ) || 
+				if ( (bEmbed && ecd.getRunnable().equals("java") && ecd.getFormat().equals("java/class") ) ||
 					 (ecd.getRunnable().equals("python") && ecd.getFormat().equals("jython")) ) {
 					//
 					// Embed all the context per descriptor
@@ -797,7 +972,7 @@ public class WSRepositoryLogic {
 				else if ( bWriteOnce ) {
 					//
 					// Dump the context file to the disc only once
-					// 
+					//
 					for ( String sFile:setFiles) {
 						// Dump the files to disk
 						new File(Store.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator).mkdirs();
@@ -818,7 +993,7 @@ public class WSRepositoryLogic {
 					// Avoid dumping them multiple times
 					bWriteOnce = false;
 				}
-				
+
 				if ( qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent()) ) {
 					if ( bOverwrite ) {
 						modUser.remove(qr.getExecutableComponentDescription(ecd.getExecutableComponent()).getModel());
@@ -838,7 +1013,7 @@ public class WSRepositoryLogic {
 
 		// Regenerate the cache after adding
 		qr.refreshCache();
-		
+
 		return modUser;
 	}
 
@@ -860,7 +1035,7 @@ public class WSRepositoryLogic {
 		String sReq = request.getParameter("overwrite");
 		if ( sReq!=null )
 				bOverwrite = sReq.equals("true");
-		
+
 		Model modNew = ModelFactory.createDefaultModel();
 
 		modNew.setNsPrefix("", "http://www.meandre.org/ontology/");
@@ -919,7 +1094,7 @@ public class WSRepositoryLogic {
 
 		// Regenerate the cache after adding
 		qr.refreshCache();
-		
+
 		return modResult;
 	}
 
@@ -956,7 +1131,7 @@ public class WSRepositoryLogic {
 
 	 	// Regenerate the cache after adding
 		qr.refreshCache();
-		
+
 		return sRes;
 	}
 
@@ -997,7 +1172,7 @@ public class WSRepositoryLogic {
 
 		 	// Regenerate the cache after adding
 			qr.refreshCache();
-			
+
 		}
 		catch ( Exception e ) {
 			throw new IOException(e.toString());

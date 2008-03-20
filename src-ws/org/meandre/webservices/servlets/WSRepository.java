@@ -24,7 +24,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 
 /** A basic handler to display public Meandre information.
- * 
+ *
  * @author Xavier Llor&agrave;
  *
  */
@@ -32,13 +32,13 @@ public class WSRepository extends HttpServlet {
 
     /** A default serial ID */
 	private static final long serialVersionUID = 1L;
-	
+
 	/** The logger for the WebServices */
 	private static Logger log = WSLoggerFactory.getWSLogger();
-	
+
 	/**
 	 * Dispatches POST web requests for Meandre web services.
-	 * 
+	 *
 	 * @param sTarget
 	 *            The target path
 	 * @param request
@@ -52,9 +52,9 @@ public class WSRepository extends HttpServlet {
 	 * @throws ServletException
 	 *             The servlet could not complete the request
 	 */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-    	
+
     	String [] saParts = new URL(request.getRequestURL().toString()).getPath().split("\\.");
    		String sTarget = saParts[0];
 		String sExtension = "";
@@ -62,7 +62,7 @@ public class WSRepository extends HttpServlet {
     	if ( saParts.length==2 ) {
     		sExtension = saParts[1];
     	}
-    	
+
     	if ( sTarget.endsWith("/add") ) {
     		if ( Store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Flows", request.getRemoteUser()) &&
           		 Store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Components", request.getRemoteUser()) ) {
@@ -70,7 +70,7 @@ public class WSRepository extends HttpServlet {
     		}
     		else {
     			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-    		}	
+    		}
     	}
     	else if ( sTarget.endsWith("/add_flow_descriptors") ) {
     		if ( Store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Flows", request.getRemoteUser())  ) {
@@ -78,20 +78,20 @@ public class WSRepository extends HttpServlet {
        		}
        		else {
        			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-       		}	
+       		}
        	}
     	else {
-    		// 
+    		//
 			// Invalid request found
 			//
 			log.info("Uknown repository service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
     	}
     }
-    
+
 	/**
 	 * Dispatches GET web requests for Meandre web services.
-	 * 
+	 *
 	 * @param sTarget
 	 *            The target path
 	 * @param request
@@ -105,9 +105,9 @@ public class WSRepository extends HttpServlet {
 	 * @throws ServletException
 	 *             The servlet could not complete the request
 	 */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-    	
+
     	String [] saParts = new URL(request.getRequestURL().toString()).getPath().split("\\.");
    		String sTarget = saParts[0];
 		String sExtension = "";
@@ -115,22 +115,22 @@ public class WSRepository extends HttpServlet {
     	if ( saParts.length==2 ) {
     		sExtension = saParts[1];
     	}
-    	
+
     	if ( sTarget.endsWith("/dump") ) {
     		if ( Store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Repository", request.getRemoteUser()) ) {
                 dumpAction(request, response, sTarget, sExtension);
     		}
     		else {
     			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-    		}	
+    		}
     	}
     	else if ( sTarget.endsWith("/regenerate") ) {
     		if ( Store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Repository", request.getRemoteUser()) ) {
-                regenerateAction(request, response, sTarget, sExtension);  
+                regenerateAction(request, response, sTarget, sExtension);
     		}
     		else {
     			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-    		}	
+    		}
     	}
     	else if ( sTarget.endsWith("/list_components") ) {
     		if ( Store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Components", request.getRemoteUser()) ) {
@@ -142,11 +142,11 @@ public class WSRepository extends HttpServlet {
     	}
     	else if ( sTarget.endsWith("/list_flows") ) {
     		if ( Store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Flows", request.getRemoteUser()) ) {
-                llistFlowAction(request, response, sTarget, sExtension);
+                listFlowsAction(request, response, sTarget, sExtension);
     		}
     		else {
     			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-    		}	
+    		}
     	}
     	else if ( sTarget.endsWith("/tags") ) {
     		if ( Store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Flows", request.getRemoteUser()) &&
@@ -155,7 +155,7 @@ public class WSRepository extends HttpServlet {
     		}
     		else {
     			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-    		}	
+    		}
     	}
     	else if ( sTarget.endsWith("/tags_components") ) {
     		if ( Store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Components", request.getRemoteUser()) ) {
@@ -231,18 +231,18 @@ public class WSRepository extends HttpServlet {
     		}
     	}
     	else {
-    		// 
+    		//
 			// Invalid request found
 			//
 			log.info("Uknown repository service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
     	}
-		
-		
+
+
 	}
 
     /** Remove the component/flow from the reprosity.
-	 * 
+	 *
 	 * @param request The request object
 	 * @param response The response object
 	 * @param sTarget The target string
@@ -251,9 +251,9 @@ public class WSRepository extends HttpServlet {
 	 */
 	private void removeAction(HttpServletRequest request,
 			HttpServletResponse response, String sTarget, String sExtension) throws IOException{
-		
+
 		String sURI = request.getParameter("uri");
-		
+
 		if ( sURI==null ) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
@@ -274,13 +274,13 @@ public class WSRepository extends HttpServlet {
 		else if ( sExtension.endsWith("json") ) {
 			//
 			// Dump the list of components
-			// 
+			//
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/plain");
 			response.getWriter().println(WSRepositoryLogic.removeURIAsJSON(request.getRemoteUser(),sURI));
 		}
 		else  {
-			// 
+			//
 			// Invalid request found
 			//
 			log.info("Uknown repository service requested "+sTarget);
@@ -290,7 +290,7 @@ public class WSRepository extends HttpServlet {
 
 
 	/** Add a repository descriptor to the repository.
-     * 
+     *
      * @param request The request object
      * @param response The response object
      * @param sTarget The target string
@@ -299,25 +299,25 @@ public class WSRepository extends HttpServlet {
 	 */
 	private void addRepositoryAction(HttpServletRequest request,
 			HttpServletResponse response, String sTarget, String sExtension) throws IOException{
-		
+
 		try {
 			boolean [] baDump = {false};
 			Model modelFlow = WSRepositoryLogic.addToRepository(request,sExtension,baDump);
-			
+
 			if ( modelFlow == null ) {
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			}
 			else if ( sExtension.endsWith("rdf") && baDump[0] ) {
-				dumpModel(request,response,modelFlow,"RDF/XML-ABBREV"); 
+				dumpModel(request,response,modelFlow,"RDF/XML-ABBREV");
 			}
 			else if ( sExtension.endsWith("ttl") && baDump[0] ) {
-				dumpModel(request,response,modelFlow,"TTL"); 
+				dumpModel(request,response,modelFlow,"TTL");
 			}
 			else if ( sExtension.endsWith("nt") && baDump[0] ) {
-				dumpModel(request,response,modelFlow,"N-TRIPLE"); 
+				dumpModel(request,response,modelFlow,"N-TRIPLE");
 			}
 			else if ( baDump[0]) {
-				// 
+				//
 				// Invalid request found
 				//
 				log.info("Uknown repository service requested "+sTarget);
@@ -326,11 +326,11 @@ public class WSRepository extends HttpServlet {
 		} catch (FileUploadException e) {
 			throw new IOException(e.toString());
 		}
-		
+
 	}
-	
+
 	/** Add a flow to the repository.
-     * 
+     *
      * @param request The request object
      * @param response The response object
      * @param sTarget The target string
@@ -339,31 +339,31 @@ public class WSRepository extends HttpServlet {
 	 */
 	private void addFlowsAction(HttpServletRequest request,
 			HttpServletResponse response, String sTarget, String sExtension) throws IOException{
-		
+
 		try {
 			Model modelFlow = WSRepositoryLogic.addFlowsToRepository(request,sExtension);
 			boolean bDump = false;
 			if ( request.getParameter("dump")!=null )
 				bDump = request.getParameter("dump").equals("true");
-			
+
 			if ( modelFlow == null ) {
 				log.warning("No flow provided");
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			}
 			else if ( sExtension.endsWith("rdf") && bDump ) {
 				log.info("Dumping the uploaded flow");
-				dumpModel(request,response,modelFlow,"RDF/XML-ABBREV"); 
+				dumpModel(request,response,modelFlow,"RDF/XML-ABBREV");
 			}
 			else if ( sExtension.endsWith("ttl") && bDump ) {
 				log.info("Dumping the uploaded flow");
-				dumpModel(request,response,modelFlow,"TTL"); 
+				dumpModel(request,response,modelFlow,"TTL");
 			}
 			else if ( sExtension.endsWith("nt") && bDump ) {
 				log.info("Dumping the uploaded flow");
-				dumpModel(request,response,modelFlow,"N-TRIPLE"); 
+				dumpModel(request,response,modelFlow,"N-TRIPLE");
 			}
 			else  if ( bDump ){
-				// 
+				//
 				// Invalid request found
 				//
 				log.info("Uknown repository service requested "+sTarget);
@@ -372,11 +372,11 @@ public class WSRepository extends HttpServlet {
 		} catch (FileUploadException e) {
 			throw new IOException(e.toString());
 		}
-		
+
 	}
 
     /** Returns all the components for the given tag.
-	 * 
+	 *
 	 * @param request The request object
 	 * @param response The response object
 	 * @param sTarget The target string
@@ -385,9 +385,9 @@ public class WSRepository extends HttpServlet {
 	 */
 	private void flowsByTagAction(HttpServletRequest request,
 			HttpServletResponse response, String sTarget, String sExtension) throws IOException{
-		
+
 		String sQuery = request.getParameter("q");
-		
+
 		if ( sQuery==null ) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
@@ -408,13 +408,13 @@ public class WSRepository extends HttpServlet {
 		else if ( sExtension.endsWith("json") ) {
 			//
 			// Dump the list of components
-			// 
+			//
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/plain");
 			response.getWriter().println(WSRepositoryLogic.getFlowsByTagAsJSON(request.getRemoteUser(),sQuery));
 		}
 		else  {
-			// 
+			//
 			// Invalid request found
 			//
 			log.info("Uknown repository service requested "+sTarget);
@@ -423,7 +423,7 @@ public class WSRepository extends HttpServlet {
 	}
 
 	/** Returns all the components for the given tag.
-     * 
+     *
      * @param request The request object
      * @param response The response object
      * @param sTarget The target string
@@ -432,9 +432,9 @@ public class WSRepository extends HttpServlet {
 	 */
 	private void componentsByTagAction(HttpServletRequest request,
 			HttpServletResponse response, String sTarget, String sExtension) throws IOException{
-		
+
 		String sQuery = request.getParameter("q");
-		
+
 		if ( sQuery==null ) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
@@ -455,13 +455,13 @@ public class WSRepository extends HttpServlet {
 		else if ( sExtension.endsWith("json") ) {
 			//
 			// Dump the list of components
-			// 
+			//
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/plain");
 			response.getWriter().println(WSRepositoryLogic.getComponentsByTagAsJSON(request.getRemoteUser(),sQuery));
 		}
 		else  {
-			// 
+			//
 			// Invalid request found
 			//
 			log.info("Uknown repository service requested "+sTarget);
@@ -470,45 +470,65 @@ public class WSRepository extends HttpServlet {
 	}
 
     /** Search for flows matching the given criteria.
-     * 
+     *
      * @param request The request object
-     * @param response The response object
+     * @param response The response objectlistFlowAction
      * @param sTarget The target string
      * @param sExtension The extension string
      * @throws IOException A problem arised
 	 */
 	private void searchFlowAction(HttpServletRequest request,
 			HttpServletResponse response, String sTarget, String sExtension) throws IOException{
-		
+
 		String sQuery = request.getParameter("q");
-		
-		if ( sQuery==null ) {
+        String sOrder = request.getParameter("order");  // string - can be "date", "name"
+        String sLimit = request.getParameter("limit");  // integer
+
+        // validate sOrder
+        boolean bOrderValid = true;
+        if ( sOrder != null )
+            bOrderValid = sOrder.matches("^date$|^name$");
+
+        // validate sLimit
+        boolean bLimitValid = true;
+        int limit = -1;
+        if ( sLimit != null ) {
+            try {
+                limit = Integer.valueOf(sLimit);
+                if ( limit <= 0 ) bLimitValid = false;
+            }
+            catch (NumberFormatException e) {
+                bLimitValid = false;
+            }
+        }
+
+        if ( sQuery==null || !bOrderValid || !bLimitValid ) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		else if ( sExtension.endsWith("txt") ) {
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/plain");
-			response.getWriter().println(WSRepositoryLogic.getSearchFlowsAsTxt(request.getRemoteUser(),sQuery));
+			response.getWriter().println(WSRepositoryLogic.getSearchFlowsAsTxt(request.getRemoteUser(),sQuery,sOrder,limit));
 		}
 		else if ( sExtension.endsWith("xml") ) {
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("application/xml");
 			try {
-				response.getWriter().println(XML.toString(WSRepositoryLogic.getSearchFlowsAsJSON(request.getRemoteUser(),sQuery),"meandre_repository"));
+				response.getWriter().println(XML.toString(WSRepositoryLogic.getSearchFlowsAsJSON(request.getRemoteUser(),sQuery,sOrder,limit),"meandre_repository"));
 			} catch (JSONException e) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
 		}
 		else if ( sExtension.endsWith("json") ) {
 			//
-			// Dump the list of components
-			// 
+			// Dump the list of flows
+			//
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/plain");
-			response.getWriter().println(WSRepositoryLogic.getSearchFlowsAsJSON(request.getRemoteUser(),sQuery));
+			response.getWriter().println(WSRepositoryLogic.getSearchFlowsAsJSON(request.getRemoteUser(),sQuery,sOrder,limit));
 		}
 		else  {
-			// 
+			//
 			// Invalid request found
 			//
 			log.info("Uknown repository service requested "+sTarget);
@@ -518,7 +538,7 @@ public class WSRepository extends HttpServlet {
 
 
     /** Search for components matching the given criteria.
-     * 
+     *
      * @param request The request object
      * @param response The response object
      * @param sTarget The target string
@@ -527,22 +547,42 @@ public class WSRepository extends HttpServlet {
 	 */
 	private void searchComponentAction(HttpServletRequest request,
 			HttpServletResponse response, String sTarget, String sExtension) throws IOException{
-		
+
 		String sQuery = request.getParameter("q");
-		
-		if ( sQuery==null ) {
+        String sOrder = request.getParameter("order");  // string - can be "date", "name"
+        String sLimit = request.getParameter("limit");  // integer
+
+        // validate sOrder
+        boolean bOrderValid = true;
+        if ( sOrder != null )
+            bOrderValid = sOrder.matches("^date$|^name$");
+
+        // validate sLimit
+        boolean bLimitValid = true;
+        int limit = -1;
+        if ( sLimit != null ) {
+            try {
+                limit = Integer.valueOf(sLimit);
+                if ( limit <= 0 ) bLimitValid = false;
+            }
+            catch (NumberFormatException e) {
+                bLimitValid = false;
+            }
+        }
+
+		if ( sQuery==null || !bOrderValid || !bLimitValid ) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		else if ( sExtension.endsWith("txt") ) {
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/plain");
-			response.getWriter().println(WSRepositoryLogic.getSearchComponentsAsTxt(request.getRemoteUser(),sQuery));
+			response.getWriter().println(WSRepositoryLogic.getSearchComponentsAsTxt(request.getRemoteUser(),sQuery,sOrder,limit));
 		}
 		else if ( sExtension.endsWith("xml") ) {
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("application/xml");
 			try {
-				response.getWriter().println(XML.toString(WSRepositoryLogic.getSearchComponentsAsJSON(request.getRemoteUser(),sQuery),"meandre_repository"));
+				response.getWriter().println(XML.toString(WSRepositoryLogic.getSearchComponentsAsJSON(request.getRemoteUser(),sQuery,sOrder,limit),"meandre_repository"));
 			} catch (JSONException e) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
@@ -550,13 +590,13 @@ public class WSRepository extends HttpServlet {
 		else if ( sExtension.endsWith("json") ) {
 			//
 			// Dump the list of components
-			// 
+			//
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/plain");
-			response.getWriter().println(WSRepositoryLogic.getSearchComponentsAsJSON(request.getRemoteUser(),sQuery));
+			response.getWriter().println(WSRepositoryLogic.getSearchComponentsAsJSON(request.getRemoteUser(),sQuery,sOrder,limit));
 		}
 		else  {
-			// 
+			//
 			// Invalid request found
 			//
 			log.info("Uknown repository service requested "+sTarget);
@@ -566,7 +606,7 @@ public class WSRepository extends HttpServlet {
 
 
     /** Describes the requested flow.
-     * 
+     *
      * @param request The request object
      * @param response The response object
      * @param sTarget The target string
@@ -575,35 +615,35 @@ public class WSRepository extends HttpServlet {
 	 */
 	private void describeFlowAction(HttpServletRequest request,
 			HttpServletResponse response, String sTarget, String sExtension) throws IOException{
-		
+
 		String sComponent = request.getParameter("uri");
-		
+
 		if ( sComponent==null ) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		else if ( sExtension.endsWith("rdf") ) {
-			Model mod = WSRepositoryLogic.getFlowDesciption(request.getRemoteUser(),sComponent);
+			Model mod = WSRepositoryLogic.getFlowDescription(request.getRemoteUser(),sComponent);
 			if ( mod == null )
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			else
 				dumpModel(request,response,mod,"RDF/XML-ABBREV");
 		}
 		else if ( sExtension.endsWith("ttl") ) {
-			Model mod = WSRepositoryLogic.getFlowDesciption(request.getRemoteUser(),sComponent);
+			Model mod = WSRepositoryLogic.getFlowDescription(request.getRemoteUser(),sComponent);
 			if ( mod == null )
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			else
 				dumpModel(request,response,mod,"TTL");
 		}
 		else if ( sExtension.endsWith("nt") ) {
-			Model mod = WSRepositoryLogic.getFlowDesciption(request.getRemoteUser(),sComponent);
+			Model mod = WSRepositoryLogic.getFlowDescription(request.getRemoteUser(),sComponent);
 			if ( mod == null )
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			else
 				dumpModel(request,response,mod,"N-TRIPLE");
 		}
 		else  {
-			// 
+			//
 			// Invalid request found
 			//
 			log.info("Uknown repository service requested "+sTarget);
@@ -613,7 +653,7 @@ public class WSRepository extends HttpServlet {
 
 
     /** Describes the requested component.
-     * 
+     *
      * @param request The request object
      * @param response The response object
      * @param sTarget The target string
@@ -622,35 +662,35 @@ public class WSRepository extends HttpServlet {
 	 */
 	private void describeComponentAction(HttpServletRequest request,
 			HttpServletResponse response, String sTarget, String sExtension) throws IOException{
-		
+
 		String sComponent = request.getParameter("uri");
-		
+
 		if ( sComponent==null ) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		else if ( sExtension.endsWith("rdf") ) {
-			Model mod = WSRepositoryLogic.getComponentDesciption(request.getRemoteUser(),sComponent);
+			Model mod = WSRepositoryLogic.getComponentDescription(request.getRemoteUser(),sComponent);
 			if ( mod == null)
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			else
 				dumpModel(request,response,mod,"RDF/XML-ABBREV");
 		}
 		else if ( sExtension.endsWith("ttl") ) {
-			Model mod = WSRepositoryLogic.getComponentDesciption(request.getRemoteUser(),sComponent);
+			Model mod = WSRepositoryLogic.getComponentDescription(request.getRemoteUser(),sComponent);
 			if ( mod == null)
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			else
 				dumpModel(request,response,mod,"TTL");
 		}
 		else if ( sExtension.endsWith("nt") ) {
-			Model mod = WSRepositoryLogic.getComponentDesciption(request.getRemoteUser(),sComponent);
+			Model mod = WSRepositoryLogic.getComponentDescription(request.getRemoteUser(),sComponent);
 			if ( mod == null)
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			else
 				dumpModel(request,response,mod,"N-TRIPLE");
 		}
 		else  {
-			// 
+			//
 			// Invalid request found
 			//
 			log.info("Uknown about service requested "+sTarget);
@@ -659,7 +699,7 @@ public class WSRepository extends HttpServlet {
 	}
 
 	/** The tag flow action.
-	 * 
+	 *
 	 * @param request The request object
 	 * @param response The response object
 	 * @param sTarget The target
@@ -686,13 +726,13 @@ public class WSRepository extends HttpServlet {
 		else if ( sExtension.endsWith("json") ) {
 			//
 			// Dump the list of components
-			// 
+			//
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/plain");
 			response.getWriter().println(WSRepositoryLogic.getListOfFlowTags(request.getRemoteUser()));
 		}
 		else  {
-			// 
+			//
 			// Invalid request found
 			//
 			log.info("Uknown repository service requested "+sTarget);
@@ -701,7 +741,7 @@ public class WSRepository extends HttpServlet {
 	}
 
 	/** The tags components action.
-	 * 
+	 *
 	 * @param request The request object
 	 * @param response The response object
 	 * @param sTarget The target
@@ -728,13 +768,13 @@ public class WSRepository extends HttpServlet {
 		else if ( sExtension.endsWith("json") ) {
 			//
 			// Dump the list of components
-			// 
+			//
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/plain");
 			response.getWriter().println(WSRepositoryLogic.getListOfComponentTags(request.getRemoteUser()));
 		}
 		else  {
-			// 
+			//
 			// Invalid request found
 			//
 			log.info("Uknown repository service requested "+sTarget);
@@ -743,7 +783,7 @@ public class WSRepository extends HttpServlet {
 	}
 
 	/** The tags action
-	 * 
+	 *
 	 * @param request The request object
 	 * @param response The response object
 	 * @param sTarget The target
@@ -770,13 +810,13 @@ public class WSRepository extends HttpServlet {
 		else if ( sExtension.endsWith("json") ) {
 			//
 			// Dump the list of components
-			// 
+			//
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/plain");
 			response.getWriter().println(WSRepositoryLogic.getListOfTags(request.getRemoteUser()));
 		}
 		else  {
-			// 
+			//
 			// Invalid request found
 			//
 			log.info("Uknown repository service requested "+sTarget);
@@ -784,41 +824,66 @@ public class WSRepository extends HttpServlet {
 		}
 	}
 
-	/** The list flow action
-	 * 
+	/** The list flows action
+	 *
 	 * @param request The request object
 	 * @param response The response object
 	 * @param sTarget The target
 	 * @param sExtension The extension
 	 * @throws IOException A problem arised
 	 */
-	private void llistFlowAction(HttpServletRequest request,
+	private void listFlowsAction(HttpServletRequest request,
 			HttpServletResponse response, String sTarget, String sExtension)
 			throws IOException {
-		if ( sExtension.endsWith("txt") ) {
+
+        String sOrder = request.getParameter("order");  // string - can be "date", "name"
+        String sLimit = request.getParameter("limit");  // integer
+
+        // validate sOrder
+        boolean bOrderValid = true;
+        if ( sOrder != null )
+            bOrderValid = sOrder.matches("^date$|^name$");
+
+        // validate sLimit
+        boolean bLimitValid = true;
+        int limit = -1;
+        if ( sLimit != null ) {
+            try {
+                limit = Integer.valueOf(sLimit);
+                if ( limit <= 0 ) bLimitValid = false;
+            }
+            catch (NumberFormatException e) {
+                bLimitValid = false;
+            }
+        }
+
+        if (!(bOrderValid & bLimitValid)) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }
+        else if ( sExtension.endsWith("txt") ) {
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/plain");
-			response.getWriter().println(WSRepositoryLogic.getListOfFlowsAsTxt(request.getRemoteUser()));
+			response.getWriter().println(WSRepositoryLogic.getListOfFlowsAsTxt(request.getRemoteUser(),sOrder,limit));
 		}
 		else if ( sExtension.endsWith("xml") ) {
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("application/xml");
 			try {
-				response.getWriter().println(XML.toString(WSRepositoryLogic.getListOfFlows(request.getRemoteUser()),"meandre_repository"));
+				response.getWriter().println(XML.toString(WSRepositoryLogic.getListOfFlows(request.getRemoteUser(),sOrder,limit),"meandre_repository"));
 			} catch (JSONException e) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
 		}
 		else if ( sExtension.endsWith("json") ) {
 			//
-			// Dump the list of components
-			// 
+			// Dump the list of flows
+			//
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/plain");
-			response.getWriter().println(WSRepositoryLogic.getListOfFlows(request.getRemoteUser()));
+			response.getWriter().println(WSRepositoryLogic.getListOfFlows(request.getRemoteUser(),sOrder,limit));
 		}
 		else  {
-			// 
+			//
 			// Invalid request found
 			//
 			log.info("Uknown repository service requested "+sTarget);
@@ -827,7 +892,7 @@ public class WSRepository extends HttpServlet {
 	}
 
 	/** The list components action
-	 * 
+	 *
 	 * @param request The request object
 	 * @param response The response object
 	 * @param sTarget The target
@@ -837,16 +902,41 @@ public class WSRepository extends HttpServlet {
 	private void listComponentsAction(HttpServletRequest request,
 			HttpServletResponse response, String sTarget, String sExtension)
 			throws IOException {
-		if ( sExtension.endsWith("txt") ) {
+
+        String sOrder = request.getParameter("order");  // string - can be "date", "name"
+        String sLimit = request.getParameter("limit");  // integer
+
+        // validate sOrder
+        boolean bOrderValid = true;
+        if ( sOrder != null )
+            bOrderValid = sOrder.matches("^date$|^name$");
+
+        // validate sLimit
+        boolean bLimitValid = true;
+        int limit = -1;
+        if ( sLimit != null ) {
+            try {
+                limit = Integer.valueOf(sLimit);
+                if ( limit <= 0 ) bLimitValid = false;
+            }
+            catch (NumberFormatException e) {
+                bLimitValid = false;
+            }
+        }
+
+        if (!(bOrderValid & bLimitValid)) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }
+        else if ( sExtension.endsWith("txt") ) {
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/plain");
-			response.getWriter().println(WSRepositoryLogic.getListOfComponentsAsTxt(request.getRemoteUser()));
+			response.getWriter().println(WSRepositoryLogic.getListOfComponentsAsTxt(request.getRemoteUser(),sOrder,limit));
 		}
 		else if ( sExtension.endsWith("xml") ) {
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("application/xml");
 			try {
-				response.getWriter().println(XML.toString(WSRepositoryLogic.getListOfComponents(request.getRemoteUser()),"meandre_repository"));
+				response.getWriter().println(XML.toString(WSRepositoryLogic.getListOfComponents(request.getRemoteUser(),sOrder,limit),"meandre_repository"));
 			} catch (JSONException e) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
@@ -854,13 +944,13 @@ public class WSRepository extends HttpServlet {
 		else if ( sExtension.endsWith("json") ) {
 			//
 			// Dump the list of components
-			// 
+			//
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/plain");
-			response.getWriter().println(WSRepositoryLogic.getListOfComponents(request.getRemoteUser()));
+			response.getWriter().println(WSRepositoryLogic.getListOfComponents(request.getRemoteUser(),sOrder,limit));
 		}
 		else  {
-			// 
+			//
 			// Invalid request found
 			//
 			log.info("Uknown repository service requested "+sTarget);
@@ -869,18 +959,18 @@ public class WSRepository extends HttpServlet {
 	}
 
 	/** The regenerate action
-	 * 
+	 *
 	 * @param request The request object
 	 * @param response The response object
-	 * @param extension 
-	 * @param target 
+	 * @param extension
+	 * @param target
 	 * @param sTarget The target
 	 * @param sExtension The extension
 	 * @throws IOException A problem arised
 	 */
 	private void regenerateAction(HttpServletRequest request,
 			HttpServletResponse response, String sTarget, String sExtension) throws IOException {
-		
+
 		if ( sExtension.endsWith("txt") ) {
 			if ( WSRepositoryLogic.regenerateRepository(request.getRemoteUser()) ) {
 				//
@@ -898,17 +988,17 @@ public class WSRepository extends HttpServlet {
 			}
 		}
 		else  {
-			// 
+			//
 			// Invalid request found
 			//
 			log.info("Uknown repository service requested "+sTarget);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		}		
-		
+		}
+
 	}
 
 	/** The dump action.
-     * 
+     *
 	 * @param request The request object
 	 * @param response The response object
 	 * @param sTarget The target
@@ -928,7 +1018,7 @@ public class WSRepository extends HttpServlet {
 			dumpModel(request,response,Store.getRepositoryStore(request.getRemoteUser()).getModel(),"N-TRIPLE");
 		}
 		else  {
-			// 
+			//
 			// Invalid request found
 			//
 			log.info("Uknown repository service requested "+sTarget);
@@ -937,7 +1027,7 @@ public class WSRepository extends HttpServlet {
 	}
 
     /** Dumps the public repository.
-     * 
+     *
      * @param request The request object
      * @param response The response object
      * @param sFormat The format
@@ -945,7 +1035,7 @@ public class WSRepository extends HttpServlet {
      */
 	private void dumpModel(HttpServletRequest request,
 			HttpServletResponse response, Model model, String sFormat) throws IOException {
-		
+
 		model.setNsPrefix("meandre", Store.MEANDRE_ONTOLOGY_BASE_URL );
 		model.setNsPrefix("xsd", XSD.getURI());
 		model.setNsPrefix("rdf", RDF.getURI());
@@ -953,15 +1043,15 @@ public class WSRepository extends HttpServlet {
 		model.setNsPrefix("dc",DC.getURI());
 
 		response.setStatus(HttpServletResponse.SC_OK);
-		
-		if ( sFormat.equals("RDF/XML-ABBREV") ) 
+
+		if ( sFormat.equals("RDF/XML-ABBREV") )
 			response.setContentType("application/xml");
 		else
 			response.setContentType("text/plain");
-			
+
 		model.write(response.getOutputStream(),sFormat);
-		
+
 	}
 
-	
+
 }

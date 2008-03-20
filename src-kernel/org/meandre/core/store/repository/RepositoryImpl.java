@@ -740,7 +740,7 @@ public class RepositoryImpl implements QueryableRepository {
 
 	/** Returns a description of the given resource from the model.
 	 *
-	 * @param res The flow description to retrieve to retrieve
+	 * @param res The flow description to retrieve
 	 * @return The flow description
 	 * @throws CorruptedDescriptionException The desctiption is corrupted
 	 */
@@ -1257,7 +1257,7 @@ public class RepositoryImpl implements QueryableRepository {
 
 	/** Returns a description of the given resource.
 	 *
-	 * @param res The flow description to retrieve to retrieve
+	 * @param res The flow description to retrieve
 	 * @return The flow description
 	 * @throws CorruptedDescriptionException The desctiption is corrupted
 	 */
