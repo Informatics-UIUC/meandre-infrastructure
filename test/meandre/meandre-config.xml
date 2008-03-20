@@ -9,7 +9,7 @@
    <entry key="DB">Derby</entry>
    <entry key="MEANDRE_AUTHENTICATION_REALM_FILENAME">meandre-realm.properties</entry>
    <entry key="MEANDRE_ADMIN_USER">admin</entry>
-   <entry key="DB_URL">jdbc:derby:test-data/tmp/MeandreStore;create=true</entry>
+   <entry key="DB_URL">jdbc:derby:test/meandre/tmp/MeandreStore;create=true</entry>
    <entry key="MEANDRE_PUBLIC_RESOURCE_DIRECTORY">./published_resources</entry>
    <entry key="MEANDRE_PRIVATE_RUN_DIRECTORY">./run</entry>
    <entry key="DB_DRIVER_CLASS">org.apache.derby.jdbc.EmbeddedDriver</entry>

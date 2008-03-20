@@ -24,8 +24,6 @@
         <tstamp/>
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${dist.dir}"/>
-        <mkdir dir="${test.dir}"/>
-        <mkdir dir="${test.dir}/data"/>
     </target>
 
     <!-- compile -->
@@ -33,11 +31,14 @@
         <javac srcdir="${basedir}" destdir="${build.dir}/" debug="${compile.debug}"
                deprecation="${compile.deprecation}" optimize="${compile.optimize}"
                classpathref="meandre.core.classpath">
-            <include name="**/*.java"/>
+            <include name="${kernel.src}/**/*.java"/>
+            <include name="${plugins.src}/**/*.java"/>
+            <include name="${demo.src}/**/*.java"/>
+            <include name="${ws.src}/**/*.java"/>
         </javac>
 
         <copy todir="${build.dir}" includeEmptyDirs="no">
-            <fileset dir="src-demo">
+            <fileset dir="${demo.src}">
                 <include name="**/*.properties"/>
                 <include name="**/*.xml"/>
                 <include name="**/*.vm"/>
@@ -46,7 +47,7 @@
         </copy>
 
         <copy todir="${build.dir}" includeEmptyDirs="no">
-            <fileset dir="src-kernel">
+            <fileset dir="${kernel.src}">
                 <include name="**/*.properties"/>
                 <include name="**/*.xml"/>
                 <include name="**/*.vm"/>
@@ -55,7 +56,7 @@
         </copy>
 
         <copy todir="${build.dir}" includeEmptyDirs="no">
-            <fileset dir="src-plugins/vfs">
+            <fileset dir="${plugins.src}/vfs">
                 <include name="**/*.properties"/>
                 <include name="**/*.xml"/>
                 <include name="**/*.vm"/>
@@ -64,7 +65,7 @@
         </copy>
 
         <copy todir="${build.dir}" includeEmptyDirs="no">
-            <fileset dir="src-demo">
+            <fileset dir="${demo.src}">
                 <include name="**/*.properties"/>
                 <include name="**/*.xml"/>
                 <include name="**/*.vm"/>
@@ -73,7 +74,7 @@
         </copy>
 
         <copy todir="${build.dir}" includeEmptyDirs="no">
-            <fileset dir="src-ws">
+            <fileset dir="${ws.src}">
                 <include name="**/*.properties"/>
                 <include name="**/*.xml"/>
                 <include name="**/*.vm"/>
@@ -82,6 +83,14 @@
         </copy>
     </target>
 
+    <!-- compile-tests -->
+    <target name="compile-tests" depends="compile" description="-> compiles test code">
+        <javac srcdir="${test.src}/demo" destdir="${build.dir}" classpathref="meandre.test.classpath"/>
+        <javac srcdir="${test.src}/kernel" destdir="${build.dir}" classpathref="meandre.test.classpath"/>
+        <javac srcdir="${test.src}/ws" destdir="${build.dir}" classpathref="meandre.test.classpath"/>
+    </target>
+
+    <!-- check-if-svn -->
     <target name="check-if-svn">
         <typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="meandre.core.classpath"/>
         <svn javahl="false">
@@ -102,7 +111,6 @@
         <echo>${isValidRevision}</echo>
     </target>
 
-
     <!-- The distribution is created with a revision -->
     <target name="create-distribution" depends="check-if-svn" if="isValidRevision">
         <jar destfile="${dist.dir}/${app.name}-${testStatus.revision}.jar">
@@ -115,7 +123,6 @@
             </fileset>
         </jar>
     </target>
-
 
     <!-- The distribution is created with a revision it is tied to the trunk -->
     <target name="lib-release" depends="create-distribution" if="isValidRevision"
@@ -222,40 +229,59 @@
         <delete dir="${dist.dir}"/>
     </target>
 
+    <target name="clean-test-data" description="-> removes test artifacts">
+        <delete includeemptydirs="true">
+            <fileset dir="${test.dir}">
+            	<include name="**/*"/>
+            	<exclude name="meandre/meandre-config.xml"/>
+            	<exclude name="meandre/webservices.properties"/>
+            </fileset>
+        </delete>
+    </target>
+
     <!-- run-tests -->
-    <target name="run-tests" depends="dist" description="-> runs tests">
-        <junit printsummary="yes" forkmode="once" errorProperty="test.failed"
+    <target name="run-tests" depends="compile-tests, clean-test-data" description="-> runs tests">
+    	<mkdir dir="${test.dir}/xml"/>
+        <junit printsummary="yes" forkmode="once" errorProperty="test.error"
                failureProperty="test.failed" fork="${junit.fork}" showoutput="${junit.showoutput}">
             <jvmarg value="-Duser.language=en"/>
 
             <classpath>
-                <path refid="meandre.core.classpath"/>
+                <path refid="meandre.test.classpath"/>
                 <pathelement location="${build.dir}"/>
                 <pathelement path="${java.class.path}"/>
-                <!-- For .properties and .xml files -->
-                <pathelement path="src"/>
             </classpath>
 
             <formatter type="xml"/>
             <formatter type="brief" usefile="false"/>
-            <batchtest todir="${test.dir}/data">
-                <fileset dir="${test.src}">
+
+            <batchtest todir="${test.dir}/xml">
+                <fileset dir="${test.src}/demo">
                     <include name="**/*Test.java"/>
+                </fileset>
+
+                <fileset dir="${test.src}/kernel">
+                    <include name="**/*Test.java"/>
+                </fileset>
+
+                <fileset dir="${test.src}/ws">
+                    <include name="**/*Test.java"/>
+                    <exclude name="org/meandre/webservices/BaseServletTest.java"/>
                 </fileset>
             </batchtest>
         </junit>
     </target>
 
     <!-- test-reports -->
-    <target name="test-reports" description="-> generates test reports">
+    <target name="test-reports" depends="run-tests" description="-> generates test reports">
         <mkdir dir="${test.dir}/reports"/>
-        <junitreport todir="${test.dir}">
-            <fileset dir="${test.dir}/data">
+        <junitreport todir="${test.dir}/xml">
+            <fileset dir="${test.dir}/xml">
                 <include name="TEST-*.xml"/>
             </fileset>
             <report format="noframes" todir="${test.dir}/reports"/>
         </junitreport>
-        <echo level="info">Test reports generated at ${test.dir}/reports</echo>
+        <echo message="Report generated at: file://${test.dir}/reports/junit-noframes.html"/>
     </target>
 
     <!-- run-core -->
@@ -296,6 +322,17 @@
         <delete dir="MeandreStore"/>
     </target>
 
+	<target name="clean-all" depends="clean, clean-test-data, clean-store"
+		description="-> removes all auto-generated files and folders, including MeandreStore/ published_resources/ and mnt/">
+		<delete dir="published_resources"/>
+		<delete dir="log"/>
+		<delete dir="mnt"/>
+		<delete dir="run"/>
+		<delete file="derby.log"/>
+		<delete file="meandre-config.xml"/>
+		<delete file="meandre-plugins.xml"/>
+	</target>
+
     <!--- Documentation (Javadocs) -->
     <target name="javadoc"
             description="-> generates the documentation (ignore all warnings)">
@@ -311,6 +348,6 @@
     </target>
 </project>
 
-        <!-- DO NOT EDIT BELOW THIS LINE PLEASE -->
-        <!-- vim:sw=4:softtabstop=4:expandtab
-        -->
+<!-- DO NOT EDIT BELOW THIS LINE PLEASE -->
+<!-- vim:sw=4:softtabstop=4:expandtab
+-->

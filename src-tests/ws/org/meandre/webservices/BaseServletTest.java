@@ -90,7 +90,7 @@ public abstract class BaseServletTest {
      }
 
      private static void startJettyServer() throws Exception {
-    	 Store.setSConfigPath("test-data");
+    	 Store.setSConfigPath("test/meandre");
  		// initialize store -reads properties file
  		Store.init();
 
@@ -220,7 +220,7 @@ public abstract class BaseServletTest {
 	@Before
 	public void setUp() throws Exception {
 		Properties properties =  new Properties();
-		properties.load(new FileInputStream(new File("test-data/webservices.properties")));
+		properties.load(new FileInputStream(new File("test/meandre/webservices.properties")));
 		meandreHostURL = properties.getProperty("meandreHostURL", "http://127.0.0.1:1711/");
 		user = properties.getProperty("user", "admin");
 		password = properties.getProperty("password", "admin");
