@@ -17,6 +17,9 @@ public class PrintObjectComponent implements ExecutableComponent {
 	/** The number of objects printed */
 	long lObjectsPrinted;
 	
+	/** The should the count be printed */
+	boolean bPrintCount;
+	
 	/** This method is invoked when the Meandre Flow is being prepared for 
 	 * getting run.
 	 *
@@ -24,6 +27,12 @@ public class PrintObjectComponent implements ExecutableComponent {
 	 */
 	public void initialize ( ComponentContextProperties ccp ) {
 		this.lObjectsPrinted = 0;
+		this.bPrintCount = false;
+		
+		String sCount = ""+ccp.getProperty("count");
+		sCount = sCount.trim();
+		if ( sCount.equalsIgnoreCase("true") )
+			this.bPrintCount = true;
 	}
 
 	/** This method just pushes a concatenated version of the entry to the
@@ -53,6 +62,7 @@ public class PrintObjectComponent implements ExecutableComponent {
 	 */
 	public void dispose ( ComponentContextProperties ccp ) {
 		this.lObjectsPrinted = 0;
+		this.bPrintCount = false;
 	}
 
 }
