@@ -440,8 +440,8 @@ public class DemoRepositoryGenerator {
 		// Properties
 		Hashtable<String,String> htValues = new Hashtable<String,String>();
 		Hashtable<String,String> htDescriptions = new Hashtable<String,String>();
-		htValues.put("count", "true");
-		htValues.put("count", "If set to true prints the count of printed objects");
+		htValues.put("count", "true"); 
+		htDescriptions.put("count", "If set to true prints the count of printed objects");
 		PropertiesDescriptionDefinition pddProperties = new PropertiesDescriptionDefinition(htValues,htDescriptions);
 		
 		// Tags
