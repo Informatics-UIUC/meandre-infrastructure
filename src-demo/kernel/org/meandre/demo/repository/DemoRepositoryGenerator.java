@@ -120,6 +120,96 @@ public class DemoRepositoryGenerator {
 		return ecdRes;
 	}
 
+	/** Create the description for org.meandre.demo.components.ForkByReferenceComponent.
+	 * 
+	 * @param sBaseURL The base URL
+	 * @return The executable component description
+	 */
+	private static ExecutableComponentDescription getForkComponent(String sBaseURL) {
+		
+		sBaseURL += "/component/";
+		
+		ExecutableComponentDescription ecdRes = null;
+		
+		Resource resExecutableComponent =  ModelFactory.createDefaultModel().createResource(sBaseURL+"fork_2_by_reference");
+		
+		// General properties
+		String sName = "Fork 2 by reference";
+		String sDescription = "Pushes the string stored into the properties to the output";
+		String sRights = "University of Illinois/NCSA open source license";
+		String sCreator = "Xavier Llor&agrave;";
+		Date dateCreation = new Date();
+		
+		// Context
+		Set<RDFNode> setContext = new HashSet<RDFNode>();
+		setContext.add(ModelFactory.createDefaultModel().createResource(sBaseURL));
+		
+		// Location
+		Resource resLocation = ModelFactory.createDefaultModel().createResource(sBaseURL+ForkByReference.class.getName());
+		
+		// Empty input ports
+		Set<DataPortDescription> setInputs = new HashSet<DataPortDescription>();
+		Resource resDPDInput1 = ModelFactory.createDefaultModel().createResource(resExecutableComponent.toString()+"/input/object");
+		String sDPDIn1Ident = resDPDInput1.toString(); 
+		String sDPDIn1Name = "object";
+		String sDPDIn1Desc = "The object to fork";
+		try {
+			setInputs.add(new DataPortDescription(resDPDInput1,sDPDIn1Ident,sDPDIn1Name,sDPDIn1Desc));
+		} catch (CorruptedDescriptionException e) {
+			log.severe("An exception should have not been trown: "+e);
+		}
+		
+		// One output port
+		Set<DataPortDescription> setOutputs = new HashSet<DataPortDescription>();
+		Resource resDPDOutput1 = ModelFactory.createDefaultModel().createResource(resExecutableComponent.toString()+"/output/object-ref-one");
+		String sDPDIdent1 = resDPDOutput1.toString(); 
+		String sDPDName1 = "object_ref_one";
+		String sDPDDesc1 = "The first object";
+		try {
+			setOutputs.add(new DataPortDescription(resDPDOutput1,sDPDIdent1,sDPDName1,sDPDDesc1));
+		} catch (CorruptedDescriptionException e) {
+			log.severe("An exception should have not been trown: "+e);
+		}
+		
+		Resource resDPDOutput2 = ModelFactory.createDefaultModel().createResource(resExecutableComponent.toString()+"/output/object-ref-two");
+		String sDPDIdent2 = resDPDOutput2.toString(); 
+		String sDPDName2 = "object_ref_two";
+		String sDPDDesc2 = "The first object";
+		try {
+			setOutputs.add(new DataPortDescription(resDPDOutput2,sDPDIdent2,sDPDName2,sDPDDesc2));
+		} catch (CorruptedDescriptionException e) {
+			log.severe("An exception should have not been trown: "+e);
+		}
+		
+		// Properties
+		Hashtable<String,String> htValues = new Hashtable<String,String>();
+		Hashtable<String,String> htDescriptions = new Hashtable<String,String>();
+		PropertiesDescriptionDefinition pddProperties = new PropertiesDescriptionDefinition(htValues,htDescriptions);
+		
+		// Tags
+		HashSet<String> hsTags = new HashSet<String>();
+		hsTags.add("demo");
+		hsTags.add("string");
+		hsTags.add("hello_world");
+ 		TagsDescription tagDesc = new TagsDescription(hsTags);
+		
+		String sRunnable = "java";
+		String sFiringPolicy = "all";
+		String sFormat = "java/class";
+		
+		try {
+			ecdRes = new ExecutableComponentDescription(resExecutableComponent,
+					sName, sDescription, sRights, sCreator, dateCreation,
+					sRunnable, sFiringPolicy, sFormat, setContext, resLocation,
+					setInputs, setOutputs, pddProperties, tagDesc);
+			
+		} catch (CorruptedDescriptionException e) {
+			log.severe("An exception should have not been trown: "+e);
+		}
+		
+		return ecdRes;
+	}
+
 	/** Create the description for org.meandre.demo.components.ConcatenateStringsComponent.
 	 * 
 	 * @param sBaseURL The base URL
@@ -1020,6 +1110,8 @@ public class DemoRepositoryGenerator {
 		ExecutableComponentDescription ecdCS = getConcatenateStringsComponent(sBaseURL); 
 		ExecutableComponentDescription ecdPO = getPrintObjectComponent(sBaseURL); 
 		ExecutableComponentDescription ecdUP = getToUpperComponent(sBaseURL);
+
+		ExecutableComponentDescription ecdFR = getForkComponent(sBaseURL);
 		
 		sBaseURL += "/flow/test-hello-world-with-python/";
 		
@@ -1139,6 +1231,7 @@ public class DemoRepositoryGenerator {
 		return ecdPS.getModel().add(ecdCS.getModel())
                                .add(ecdPO.getModel())
                                .add(ecdUP.getModel())
+                               .add(ecdFR.getModel())
                                .add(fd.getModel());
 	}
 
