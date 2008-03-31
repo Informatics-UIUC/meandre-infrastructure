@@ -14,13 +14,16 @@ import org.meandre.core.ExecutableComponent;
  */
 public class PrintObjectComponent implements ExecutableComponent {
 
+	/** The number of objects printed */
+	long lObjectsPrinted;
+	
 	/** This method is invoked when the Meandre Flow is being prepared for 
 	 * getting run.
 	 *
 	 * @param ccp The properties associated to a component context
 	 */
 	public void initialize ( ComponentContextProperties ccp ) {
-
+		this.lObjectsPrinted = 0;
 	}
 
 	/** This method just pushes a concatenated version of the entry to the
@@ -35,7 +38,12 @@ public class PrintObjectComponent implements ExecutableComponent {
 	 */
 	public void execute(ComponentContext cc) throws ComponentExecutionException, ComponentContextException {
 		
-		System.out.println(cc.getDataComponentFromInput("object").toString());
+		String sObject = cc.getDataComponentFromInput("object").toString();
+		
+		++lObjectsPrinted;
+		
+		System.out.print("P"+lObjectsPrinted+"\t");
+		System.out.println(sObject);
 		
 	}
 
@@ -44,7 +52,7 @@ public class PrintObjectComponent implements ExecutableComponent {
 	 * @param ccp The properties associated to a component context
 	 */
 	public void dispose ( ComponentContextProperties ccp ) {
-
+		this.lObjectsPrinted = 0;
 	}
 
 }

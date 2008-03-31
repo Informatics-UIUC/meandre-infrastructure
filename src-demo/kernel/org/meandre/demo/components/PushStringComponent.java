@@ -33,9 +33,11 @@ public class PushStringComponent implements ExecutableComponent {
 	 */
 	public void execute(ComponentContext cc) throws ComponentExecutionException, ComponentContextException {
 		
-		String sRes = cc.getProperty("message");
+		String sMsg = cc.getProperty("message");
+		long lTimes = Long.parseLong(cc.getProperty("times"));
 
-		cc.pushDataComponentToOutput("string",sRes);
+		for ( long l=0 ; l<lTimes ; l++ )
+			cc.pushDataComponentToOutput("string",sMsg);
 		
 	}
 

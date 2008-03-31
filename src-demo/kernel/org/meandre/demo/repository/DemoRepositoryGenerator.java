@@ -94,6 +94,8 @@ public class DemoRepositoryGenerator {
 		Hashtable<String,String> htDescriptions = new Hashtable<String,String>();
 		htValues.put("message", "Hello World!!! Happy Meandring!!!");
 		htDescriptions.put("message", "The string message to be pushed trough the output port");
+		htValues.put("times", "1");
+		htDescriptions.put("times", "Number of time to push the string");
 		PropertiesDescriptionDefinition pddProperties = new PropertiesDescriptionDefinition(htValues,htDescriptions);
 		
 		// Tags
@@ -189,8 +191,8 @@ public class DemoRepositoryGenerator {
 		// Tags
 		HashSet<String> hsTags = new HashSet<String>();
 		hsTags.add("demo");
-		hsTags.add("string");
-		hsTags.add("hello_world");
+		hsTags.add("fork");
+		hsTags.add("reference");
  		TagsDescription tagDesc = new TagsDescription(hsTags);
 		
 		String sRunnable = "java";
