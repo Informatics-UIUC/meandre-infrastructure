@@ -6,14 +6,12 @@ import static org.junit.Assert.fail;
 
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Set;
 
 import org.junit.Test;
 import org.meandre.core.ComponentContext;
 import org.meandre.core.ComponentContextException;
 import org.meandre.core.ComponentContextImpl;
 import org.meandre.core.ComponentExecutionException;
-import org.meandre.core.ExecutableComponent;
 import org.meandre.core.engine.ActiveBuffer;
 import org.meandre.core.engine.MrProbe;
 import org.meandre.core.engine.WrappedComponent;
