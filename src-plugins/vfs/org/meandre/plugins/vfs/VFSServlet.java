@@ -1,7 +1,7 @@
 package org.meandre.plugins.vfs;
 
 import java.io.IOException;
-import java.io.InputStream; 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.meandre.core.logger.LoggerFactory;
 import org.meandre.plugins.MeandrePlugin;
 
 import de.schlichtherle.io.File;
@@ -50,8 +49,16 @@ implements MeandrePlugin{
 	protected Properties vfsProperties;
 
 	/** Get the plugin logger */
-	protected Logger log = LoggerFactory.getPluginsLogger();
+	protected Logger log;
 
+	/** Sets the pluggin logger 
+	 * 
+	 * @param log The logger
+	 */
+	public void setLogger ( Logger log ) {
+		this.log = log;
+	}
+	
 	/**Initialize the property file
 	 *
 	 */

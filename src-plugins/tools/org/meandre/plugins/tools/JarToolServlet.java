@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.meandre.core.logger.LoggerFactory;
 import org.meandre.plugins.MeandrePlugin;
 
 /**This plugin reads the jar file and returns attributes for
@@ -58,10 +57,14 @@ implements MeandrePlugin{
 	private String aliasPath = "/plugins/jar/*";
 
 	/** Get the plugin logger */
-	protected Logger log = LoggerFactory.getPluginsLogger();
+	protected Logger log;
 	
 	public void init() throws ServletException{
 		log.info("Initing the JarToolServlet...");
+	}
+	
+	public void setLogger ( Logger log ) {
+		this.log = log;
 	}
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
@@ -101,6 +104,7 @@ implements MeandrePlugin{
 	
 	}
 
+	@SuppressWarnings("unchecked")
 	private void processRequest(String command, String fileName,
 			HttpServletResponse res) throws IOException, JSONException {
 		log.info("the command is " + command);
@@ -234,6 +238,8 @@ implements MeandrePlugin{
 		fis.close();
 		return complete.digest();
 }
+
+
 
 
 }

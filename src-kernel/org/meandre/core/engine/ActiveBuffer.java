@@ -88,7 +88,7 @@ public class ActiveBuffer {
 	 * @throws ActiveBufferException An exception ocurred while aquiring the capacity semaphore
 	 */
 	@SuppressWarnings("unchecked")
-	public synchronized void pushDataComponent ( Object obj) throws ActiveBufferException{
+	public synchronized void pushDataComponent ( Object obj ) throws ActiveBufferException{
 		try {
 			semCapacity.acquire();
 			queueBuffer.offer(obj);

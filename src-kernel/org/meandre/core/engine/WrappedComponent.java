@@ -31,7 +31,7 @@ extends Thread {
 
 	/** The termination flag index */
 	protected static final int SLEEPING    = 2;
-
+	
 	/** The termination flag index */
 	protected static final int TERMINATION = 3;
 
@@ -156,7 +156,7 @@ extends Thread {
 		while ( baStatusFlags[RUNNING] && !baStatusFlags[TERMINATION]) {
 			if ( isExecutable() ) {
 				// The executable component is ready for execution
-				log.finest("Component "+ec.toString()+" ready for execution");
+				//log.finest("Component "+ec.toString()+" ready for execution");
 				try {
 					// Execute
 					this.thdMrProbe.probeWrappedComponentFired(this);
@@ -177,12 +177,11 @@ extends Thread {
 					}
 					this.thdMrProbe.probeWrappedComponentCoolingDown(this);
 					
-					log.finest("Component "+ec.toString()+" executed");
-
-					log.finest("Component "+ec.toString()+" outputs pushed");
+					//log.finest("Component "+ec.toString()+" executed");
+					
 					// Clean the data proxy
-					updateComponentContext();
-					log.finest("Component "+ec.toString()+" outputs pushed");
+					resetAndUpdateComponentContext();
+					//log.finest("Component "+ec.toString()+" context updated");
 				} catch (ComponentExecutionException e) {
 					synchronized (baStatusFlags) {
 						baStatusFlags[TERMINATION] = true;
@@ -209,11 +208,11 @@ extends Thread {
 			}
 			else {
 				// The executable component is not ready for execution
-				log.finest("Component "+ec.toString()+" not ready for execution");
+				//log.finest("Component "+ec.toString()+" not ready for execution");
 				try {
 					// Should we proceed?
 					synchronized (baStatusFlags) {
-						baStatusFlags[SLEEPING] = true;
+						baStatusFlags[SLEEPING]  = true;
 					}
 					thdMrProper.awake();
 					semBlocking.acquire();
@@ -224,14 +223,11 @@ extends Thread {
 					// Check if termination is requested
 					if ( baStatusFlags[TERMINATION] || !baStatusFlags[RUNNING] )
 						continue;
-					log.finest("Component "+ec.toString()+" awakened by data push");
-					// Retrieve the added element to the data proxy
-					String sLastUpdated = qUpdatedActiveBuffer.poll().toString();
-					cc.setDataComponentToInput(
-							sLastUpdated,
-							htInputs.get(sLastUpdated).popDataComponent()
-						);
-					log.finest("Component "+ec.toString()+" populated input "+qUpdatedActiveBuffer);
+					//log.finest("Component "+ec.toString()+" awakened by data push");
+					
+					String sLastUpdated = partialUpdateComponentContext();
+						
+					//log.finest("Component "+ec.toString()+" populated input "+qUpdatedActiveBuffer);
 				} catch (InterruptedException e) {
 					synchronized (baStatusFlags) {
 						baStatusFlags[TERMINATION] = true;
@@ -239,7 +235,8 @@ extends Thread {
 						this.thdMrProbe.probeWrappedComponentAbort(this);
 					}
 					log.warning("The blocking sempahore for "+ec.toString()+" was interrupted!");
-				} catch (ComponentContextException e) {
+				} 
+				catch (ComponentContextException e) {
 					synchronized (baStatusFlags) {
 						baStatusFlags[TERMINATION] = true;
 						sAbortMessage = e.toString();
@@ -259,11 +256,13 @@ extends Thread {
 
 	}
 
+
+
 	/** After flushing the outputed data components, this method rebuilds the
 	 * component content, populating available inputs.
 	 *
 	 */
-	private void updateComponentContext() {
+	private void resetAndUpdateComponentContext() {
 		// Reset the data proxy
 		cc.resetDataProxy();
 
@@ -282,6 +281,23 @@ extends Thread {
 		}
 	}
 
+	/** Keeps updating a partially populatated component context.
+	 * 
+	 * @return The latest update buffer input
+	 * @throws ComponentContextException
+	 */
+	private String partialUpdateComponentContext()
+			throws ComponentContextException {
+		// Retrieve the added element to the data proxy
+		String sLastUpdated = qUpdatedActiveBuffer.poll().toString();
+		
+		cc.setDataComponentToInput(
+				sLastUpdated,
+				htInputs.get(sLastUpdated).popDataComponent()
+			);
+		return sLastUpdated;
+	}
+	
 	/** Awakes the modules to the arrival of a new data.
 	 *
 	 * @param sInput The updated input active buffer
@@ -307,7 +323,7 @@ extends Thread {
 	 */
 	public boolean emptyInputs () {
 		for ( String sInput:htInputs.keySet() )
-			if ( !htInputs.get(sInput).isEmpty() )
+			if ( !htInputs.get(sInput).isEmpty()  )
 				return false;
 
 		return true;

@@ -35,9 +35,9 @@ public class LoggerFactory {
 	// Initializing the logger and its handlers
 	static {
 		logCore = Logger.getLogger(LoggerFactory.class.getName());
-		logCore.setLevel(Level.FINEST);
+		logCore.setLevel(Level.INFO);
 		logPlugins = Logger.getLogger(LoggerFactory.class.getName());
-		logPlugins.setLevel(Level.FINEST);
+		logPlugins.setLevel(Level.INFO);
 		try {
 			new File("."+File.separator+"log").mkdir();
 			logCore.addHandler(handlerCore = new FileHandler("."+File.separator+"log"+File.separator+"meandre-kernel.log",LOG_FILE_SIZE,LOG_NUM_ROTATING_FILES));
@@ -57,8 +57,8 @@ public class LoggerFactory {
 			System.err.println("Could not initialize "+"."+File.separator+"log"+File.separator+"meandre-plugins.log");
 			System.exit(1);
 		}
-		handlerCore.setLevel(Level.FINEST);
-		handlerPlugins.setLevel(Level.FINEST);
+		handlerCore.setLevel(Level.INFO);
+		handlerPlugins.setLevel(Level.INFO);
 	}
 	
 	/** Returns the core main logger.

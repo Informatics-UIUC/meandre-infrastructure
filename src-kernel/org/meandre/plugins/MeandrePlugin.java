@@ -1,6 +1,7 @@
 package org.meandre.plugins;
 
 import java.util.Properties;
+import java.util.logging.Logger;
 
 /**Interface implemented by the plugins
  *
@@ -46,4 +47,10 @@ public interface MeandrePlugin {
 	 * @return The properties of the plugin
 	 */
 	public Properties getProperties();
+
+	/** Sets the logger to use
+	 * 
+	 * @param log The logger
+	 */
+	public void setLogger(Logger log);
 }

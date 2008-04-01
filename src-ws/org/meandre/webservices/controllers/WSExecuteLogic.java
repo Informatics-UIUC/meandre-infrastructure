@@ -180,24 +180,24 @@ public class WSExecuteLogic {
 						pw.println();
 						pw.println("Flow execution statistics");
 						pw.println();
-						pw.println("Flow unique execution ID :"+jsonStats.get("flow_unique_id"));
-						pw.println("Flow state               :"+jsonStats.get("flow_state"));
-						pw.println("Started at               :"+jsonStats.get("started_at"));
-						pw.println("Last update              :"+jsonStats.get("latest_probe_at"));
-						pw.println("Total run time (ms)      :"+jsonStats.get("runtime"));
+						pw.println("Flow unique execution ID : "+jsonStats.get("flow_unique_id"));
+						pw.println("Flow state               : "+jsonStats.get("flow_state"));
+						pw.println("Started at               : "+jsonStats.get("started_at"));
+						pw.println("Last update              : "+jsonStats.get("latest_probe_at"));
+						pw.println("Total run time (ms)      : "+jsonStats.get("runtime"));
 						pw.println();
 						pw.flush();
 						
 						JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
 						for ( int i=0,iMax=jaEXIS.length() ; i<iMax ; i++ ) {
 							JSONObject joEXIS = (JSONObject) jaEXIS.get(i);
-							pw.println("\tExecutable components instance ID          :"+joEXIS.get("executable_component_instance_id"));
-							pw.println("\tExecutable components state                :"+joEXIS.get("executable_component_state"));
-							pw.println("\tTimes the executable components fired      :"+joEXIS.get("times_fired"));
-							pw.println("\tAccumulated executable components run time :"+joEXIS.get("accumulated_runtime"));
-							pw.println("\tPieces of data pulled                      :"+joEXIS.get("pieces_of_data_in"));
-							pw.println("\tPieces of data pushed                      :"+joEXIS.get("pieces_of_data_out"));
-							pw.println("\tNumber of properties read                  :"+joEXIS.get("number_of_read_properties"));
+							pw.println("\tExecutable components instance ID          : "+joEXIS.get("executable_component_instance_id"));
+							pw.println("\tExecutable components state                : "+joEXIS.get("executable_component_state"));
+							pw.println("\tTimes the executable components fired      : "+joEXIS.get("times_fired"));
+							pw.println("\tAccumulated executable components run time : "+joEXIS.get("accumulated_runtime"));
+							pw.println("\tPieces of data pulled                      : "+joEXIS.get("pieces_of_data_in"));
+							pw.println("\tPieces of data pushed                      : "+joEXIS.get("pieces_of_data_out"));
+							pw.println("\tNumber of properties read                  : "+joEXIS.get("number_of_read_properties"));
 							pw.println();
 						}
 						pw.flush();

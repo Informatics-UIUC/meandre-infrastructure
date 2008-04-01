@@ -139,7 +139,6 @@ implements Probe {
 		this.htExecutableComponentsFiredTimeStamp.put(sECID,0L);
 		this.htExecutableComponentsExecutionDataIn.put(sECID,0L);
 		this.htExecutableComponentsExecutionDataOut.put(sECID,0L);
-		this.htExecutableComponentsExecutionReadProperties.put(sECID,0L);
 	}
 
 	/** The executable component requested execution abortion.
@@ -256,10 +255,13 @@ implements Probe {
 		// Update the timestamp
 		this.dateLatestDate = ts;
 		
-		this.htExecutableComponentsExecutionReadProperties.put(
-				sECID,
-				this.htExecutableComponentsExecutionReadProperties.get(sECID)
-			);
+		if ( this.htExecutableComponentsExecutionReadProperties.get(sECID)==null ) 
+			this.htExecutableComponentsExecutionReadProperties.put(sECID,1L);
+		else
+			this.htExecutableComponentsExecutionReadProperties.put(
+					sECID,
+					this.htExecutableComponentsExecutionReadProperties.get(sECID)+1
+				);
 	}
 
 	/** Returns the current statistics.
@@ -288,7 +290,12 @@ implements Probe {
 				joExecComp.put("accumulated_runtime", htExecutableComponentsExecutionTime.get(sKey));
 				joExecComp.put("pieces_of_data_in", htExecutableComponentsExecutionDataIn.get(sKey));
 				joExecComp.put("pieces_of_data_out", htExecutableComponentsExecutionDataOut.get(sKey));
-				joExecComp.put("number_of_read_properties", htExecutableComponentsExecutionReadProperties.get(sKey));
+				Long lNumRP;
+				if ( htExecutableComponentsExecutionReadProperties.get(sKey)==null )
+					lNumRP = 0L;
+				else 
+					lNumRP = htExecutableComponentsExecutionReadProperties.get(sKey);
+				joExecComp.put("number_of_read_properties", lNumRP);
 				jaExecCompStats.put(joExecComp);
 			}
 			

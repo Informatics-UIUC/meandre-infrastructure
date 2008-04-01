@@ -136,6 +136,7 @@ public class PluginFactory {
 				String sClassName = propPluginFactoryConfig.getProperty(oKey.toString());
 				MeandrePlugin mpPlugin = (MeandrePlugin) Class.forName(sClassName).newInstance();
 				if ( mpPlugin.isServlet() ) {
+					mpPlugin.setLogger(log);
 					contextPlugins.addServlet(new ServletHolder((Servlet)mpPlugin), mpPlugin.getAlias());
 				}
 			} catch (InstantiationException e) {
