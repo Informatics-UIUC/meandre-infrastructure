@@ -87,10 +87,10 @@ public class WSCoreBootstrapper {
 		PluginFactory.initilizeGlobalPublicFileServer(server,log);
 
 		// Initialize the web services
-		initializeTheWebServices(server);
+		Context cntxGlobal = initializeTheWebServices(server);
 		
 		// Initialize the plugins
-		PluginFactory.initializeGlobalCorePlugins(server,log);
+		PluginFactory.initializeGlobalCorePlugins(server,cntxGlobal,log);
 
 		// Launch the server
 		server.start();
@@ -101,9 +101,10 @@ public class WSCoreBootstrapper {
 	/** Initialize the webservices
 	 *
 	 * @param server The server object
+	 * @return The contexts created
 	 * @throws IOException Something went really wrong
 	 */
-	private static void initializeTheWebServices(Server server)
+	private static Context initializeTheWebServices(Server server)
 			throws IOException {
 		//
 		// Initializing the web services
@@ -146,6 +147,8 @@ public class WSCoreBootstrapper {
 		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository()),	"/services/repository/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSExecute()),		"/services/execute/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublish()),		"/services/publish/*");
+	
+		return contextWS;
 	}
 
 

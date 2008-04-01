@@ -78,7 +78,7 @@ implements MeandrePlugin{
 		    }
 		    PUBLIC_RESOURCES_DIR = vfsProperties.getProperty("mount_dir", "mnt");
 
-		    log.info("Mounting the folder: " + PUBLIC_RESOURCES_DIR );
+		    log.info("Mounting from folder: " + PUBLIC_RESOURCES_DIR );
 		    File file = new File( PUBLIC_RESOURCES_DIR);
 
 		    if(!file.exists()){
@@ -87,9 +87,8 @@ implements MeandrePlugin{
 		    }
 
 		    String[] fileName = file.list();
-		    log.info("The files available in the mnt are: ");
 		    for(int i=0; i < fileName.length; i++){
-		    	log.info(fileName[i]);
+		    	log.info("Mounting file: "+fileName[i]);
 		    }
 
 	}
@@ -101,6 +100,7 @@ implements MeandrePlugin{
 	 */
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, IOException {
+		
 		OutputStream os = res.getOutputStream();
 		String path = req.getPathInfo();
 		if (path == null) {

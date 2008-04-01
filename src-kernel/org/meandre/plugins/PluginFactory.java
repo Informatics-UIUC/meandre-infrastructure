@@ -16,6 +16,7 @@ import org.meandre.core.store.Store;
 import org.meandre.core.utils.Constants;
 import org.meandre.plugins.vfs.VFSServlet;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.handler.ResourceHandler;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
@@ -123,13 +124,14 @@ public class PluginFactory {
 	/** Initialize the engine plugins to use.
 	 * 
 	 * @param server The server where the engine plugins run
+	 * @param cntxGlobal The global context for the web services
 	 * @param log The logger to use
 	 */
-	public static void initializeGlobalCorePlugins(Server server, Logger log) {
+	public static void initializeGlobalCorePlugins(Server server, Context cntxGlobal, Logger log) {
 		//
 		// Initializing the public file server
 		//
-		Context contextPlugins = new Context(server,"/",Context.NO_SESSIONS);
+		//Context contextPlugins = new Context(server,"/plugins/",Context.NO_SESSIONS);
 		
 		for ( Object oKey:propPluginFactoryConfig.keySet()) {
 			try {
@@ -137,7 +139,7 @@ public class PluginFactory {
 				MeandrePlugin mpPlugin = (MeandrePlugin) Class.forName(sClassName).newInstance();
 				if ( mpPlugin.isServlet() ) {
 					mpPlugin.setLogger(log);
-					contextPlugins.addServlet(new ServletHolder((Servlet)mpPlugin), mpPlugin.getAlias());
+					cntxGlobal.addServlet(new ServletHolder((Servlet)mpPlugin), mpPlugin.getAlias());
 				}
 			} catch (InstantiationException e) {
 				log.warning("Pluggin "+oKey+" could not be initialized\n"+e);
