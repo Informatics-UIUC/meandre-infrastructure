@@ -1,5 +1,7 @@
 package org.meandre.core.engine;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.Hashtable;
 import java.util.Queue;
 import java.util.Set;
@@ -40,7 +42,7 @@ extends Thread {
 
 	/** The last updated input buffer */
 	@SuppressWarnings("unchecked")
-	private transient Queue qUpdatedActiveBuffer = null;
+	private transient Hashtable<String,Long> htUpdatedActiveBuffer = new Hashtable<String,Long>();
 
 	/** Wrapped component status flags */
 	protected transient boolean [] baStatusFlags = null;
@@ -136,7 +138,9 @@ extends Thread {
 		this.htOutputMap = htOutputMap;
 
 		// Clean the last updated active buffer
-		this.qUpdatedActiveBuffer = new ConcurrentLinkedQueue();
+		this.htUpdatedActiveBuffer = new Hashtable<String,Long>();
+		for ( String sKey:htInputs.keySet() )
+			this.htUpdatedActiveBuffer.put(sKey, 0L);
 
 		// Waste the only ticket to the blocking semaphore
 		this.semBlocking.acquire();
@@ -154,7 +158,11 @@ extends Thread {
 		log.info("Initializing a the wrapping component "+ec.toString());
 
 		while ( baStatusFlags[RUNNING] && !baStatusFlags[TERMINATION]) {
+			log.info("***** testing "+cc.getExecutionInstanceID());
+
 			if ( isExecutable() ) {
+				log.info("***** ready "+cc.getExecutionInstanceID());
+
 				// The executable component is ready for execution
 				//log.finest("Component "+ec.toString()+" ready for execution");
 				try {
@@ -207,6 +215,8 @@ extends Thread {
 				}
 			}
 			else {
+				log.info("***** not ready "+cc.getExecutionInstanceID());
+
 				// The executable component is not ready for execution
 				//log.finest("Component "+ec.toString()+" not ready for execution");
 				try {
@@ -225,8 +235,9 @@ extends Thread {
 						continue;
 					//log.finest("Component "+ec.toString()+" awakened by data push");
 					
-					String sLastUpdated = partialUpdateComponentContext();
-						
+					//String sLastUpdated = partialUpdateComponentContext();
+					partialUpdateComponentContext();
+					
 					//log.finest("Component "+ec.toString()+" populated input "+qUpdatedActiveBuffer);
 				} catch (InterruptedException e) {
 					synchronized (baStatusFlags) {
@@ -281,21 +292,45 @@ extends Thread {
 		}
 	}
 
-	/** Keeps updating a partially populatated component context.
+	/** Keeps updating a partially populated component context.
 	 * 
-	 * @return The latest update buffer input
-	 * @throws ComponentContextException
+	 * @throws ComponentContextException Something went really wrong
 	 */
-	private String partialUpdateComponentContext()
+	private void partialUpdateComponentContext()
 			throws ComponentContextException {
 		// Retrieve the added element to the data proxy
-		String sLastUpdated = qUpdatedActiveBuffer.poll().toString();
+		try {
+			boolean bNotDone = true;
+			String[] saIN =  new String[htInputs.size()];
+			saIN = htInputs.keySet().toArray(saIN);
+			Hashtable<String, String> htInputLogicNameMapReverse = cc.getInputLogicNameMapReverse();
+			for ( int i=0,iMax=saIN.length ; bNotDone && i<iMax ; i++ ) {
+				String sIN = saIN[i];
+				if ( cc.getDataComponentFromInput(htInputLogicNameMapReverse.get(sIN))==null ) 
+					if ( !this.htInputs.get(sIN).isEmpty() ) {
+						cc.setDataComponentToInput(
+								sIN,
+								htInputs.get(sIN).popDataComponent()
+							);
+						bNotDone = false;
+					}
+			}
+		}
+		catch ( Exception e ) {
+			log.warning("***** ----- " +e.toString());
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.warning("***** ----- " +baos.toString());
+		}
 		
-		cc.setDataComponentToInput(
-				sLastUpdated,
-				htInputs.get(sLastUpdated).popDataComponent()
-			);
-		return sLastUpdated;
+
+//		String sLastUpdated = qUpdatedActiveBuffer.poll().toString();
+//		
+//		cc.setDataComponentToInput(
+//				sLastUpdated,
+//				htInputs.get(sLastUpdated).popDataComponent()
+//			);
+		
 	}
 	
 	/** Awakes the modules to the arrival of a new data.
@@ -305,7 +340,9 @@ extends Thread {
 	@SuppressWarnings("unchecked")
 	public void awake(String sInput) {
 		if ( sInput != null )
-			qUpdatedActiveBuffer.offer(sInput);
+			synchronized ( this.htUpdatedActiveBuffer ) {
+				this.htUpdatedActiveBuffer.put(sInput,this.htUpdatedActiveBuffer.get(sInput)+1);
+			}
 		semBlocking.release();
 	}
 

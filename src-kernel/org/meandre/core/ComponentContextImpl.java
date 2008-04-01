@@ -387,4 +387,12 @@ implements ComponentContext {
 	public boolean isFlowAborting() {
 		return this.wcParent.isTerminating();
 	}
+	
+	/** Returns the reverse name active buffer relation.
+	 * 
+	 * @return The reverse map
+	 */
+	public Hashtable<String, String> getInputLogicNameMapReverse() {
+		return htInputLogicNameMapReverse;
+	}
 }
