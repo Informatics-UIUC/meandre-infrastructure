@@ -50,9 +50,8 @@ public class ConductorTest {
 		assertEquals(0,exec.getAbortMessage().size());
 		assertEquals(0,baosErr.size());
 		
-		String sResult = "Hello World!!! Happy Meandring!!!Hello World!!! Happy Meandring!!!\n";
+		String sResult = "P1 Hello World!!! Happy Meandring!!! (P1,C0123456) Hello World!!! Happy Meandring!!! (P1,C0123456) \n";
 		assertEquals(sResult.length(),baosOut.size());
-		assertEquals(sResult,baosOut.toString());
 	}
 
 	/** Run the basic hello world test with dangling outputs.
@@ -82,9 +81,8 @@ public class ConductorTest {
 		assertEquals(0,exec.getAbortMessage().size());
 		assertEquals(0,baosErr.size());
 		
-		String sResult = "HELLO WORLD!!! HAPPY MEANDRING!!!HELLO WORLD!!! HAPPY MEANDRING!!!\n";
+		String sResult = "HELLO WORLD!!! HAPPY MEANDRING!!!  (P1,C0123456)  HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C0123456)  \n";
 		assertEquals(sResult.length(),baosOut.size());
-		assertEquals(sResult,baosOut.toString());
 	}
 	
 	/**

@@ -16,7 +16,7 @@ import org.meandre.core.ExecutableComponent;
 public class PushStringComponent implements ExecutableComponent {
 
 	/** A random number */
-	private int iRandom;
+	private String sRandom;
 	
 	/** This method is invoked when the Meandre Flow is being prepared for 
 	 * getting run.
@@ -24,7 +24,7 @@ public class PushStringComponent implements ExecutableComponent {
 	 * @param ccp The properties associated to a component context
 	 */
 	public void initialize ( ComponentContextProperties ccp ) {
-		iRandom = new Random().nextInt();
+		sRandom = (""+new Random().nextFloat()).substring(0,7);
 	}
 
 	/** This method just pushes a string  to the output.
@@ -42,7 +42,7 @@ public class PushStringComponent implements ExecutableComponent {
 		long lTimes = Long.parseLong(cc.getProperty("times"));
 
 		for ( long l=0 ; l<lTimes ; l++ )
-			cc.pushDataComponentToOutput("string",sMsg+" (P"+l+",C"+iRandom+") ");
+			cc.pushDataComponentToOutput("string",sMsg+" (P"+l+",C"+sRandom+") ");
 	}
 
 	/** This method is called when the Menadre Flow execution is completed.

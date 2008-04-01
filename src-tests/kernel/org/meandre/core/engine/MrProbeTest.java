@@ -212,9 +212,8 @@ public class MrProbeTest {
 		System.out.println(baosErr);
 		assertEquals(0,baosErr.size());
 		
-		String sResult = "HELLO WORLD!!! HAPPY MEANDRING!!!HELLO WORLD!!! HAPPY MEANDRING!!!\n";
+		String sResult = "HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C01234567) HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C01234567)  \n";
 		assertEquals(sResult.length(),baosOut.size());
-		assertEquals(sResult,baosOut.toString());
 	}
 
 	/** Creates a MrProbe thread for the given probe, runs a battery of probe calls
