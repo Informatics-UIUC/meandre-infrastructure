@@ -222,8 +222,10 @@ implements ComponentContext {
 			ActiveBuffer ab = htActiveBufferOuputs.get(htOutputLogicNameMap.get(sOutputBuffer));
 			if ( ab!=null )
 				ab.pushDataComponent(obj);
+			/* The dangling output log
 			else
 				log.info("Dangling output has received data in a push. Discarding the data.");
+			*/
 		} catch (ActiveBufferException e) {
 			throw new ComponentContextException(e);
 		}

@@ -156,11 +156,9 @@ extends Thread {
 		log.info("Initializing a the wrapping component "+ec.toString());
 
 		while ( baStatusFlags[RUNNING] && !baStatusFlags[TERMINATION]) {
-			log.info("***** testing "+cc.getExecutionInstanceID());
-
+			
 			if ( isExecutable() ) {
-				log.info("***** ready "+cc.getExecutionInstanceID());
-
+				
 				// The executable component is ready for execution
 				//log.finest("Component "+ec.toString()+" ready for execution");
 				try {
@@ -213,8 +211,7 @@ extends Thread {
 				}
 			}
 			else {
-				log.info("***** not ready "+cc.getExecutionInstanceID());
-
+				
 				// The executable component is not ready for execution
 				//log.finest("Component "+ec.toString()+" not ready for execution");
 				try {
@@ -315,10 +312,9 @@ extends Thread {
 			}
 		}
 		catch ( Exception e ) {
-			log.warning("***** ----- " +e.toString());
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
-			log.warning("***** ----- " +baos.toString());
+			log.warning("Something went really wrong\n" +baos.toString());
 		}
 		
 
