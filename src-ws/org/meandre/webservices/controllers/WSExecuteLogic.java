@@ -80,7 +80,7 @@ public class WSExecuteLogic {
 				PrintStream pw = new PrintStream(outStream);
 				
 				pw.println("Meandre Execution Engine version "+Constants.MEANDRE_VERSION);
-				pw.println("All rigths reserved by DITA, NCSA, UofI (2007).");
+				pw.println("All rigths reserved by DITA, NCSA, UofI (2007-2008).");
 				pw.println("2007. All rigths reserved by DITA, NCSA, UofI.");
 				pw.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 				pw.println();
