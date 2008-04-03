@@ -42,7 +42,7 @@ public class PushStringComponent implements ExecutableComponent {
 		long lTimes = Long.parseLong(cc.getProperty("times"));
 
 		for ( long l=0 ; l<lTimes ; l++ )
-			cc.pushDataComponentToOutput("string",sMsg+" (P"+l+",C"+sRandom+") ");
+			cc.pushDataComponentToOutput("string",sMsg+" (P"+(l+1)+",C"+sRandom+") ");
 	}
 
 	/** This method is called when the Menadre Flow execution is completed.

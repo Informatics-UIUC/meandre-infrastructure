@@ -38,10 +38,6 @@ extends Thread {
 	/** The core root logger */
 	protected transient static Logger log = LoggerFactory.getCoreLogger();
 
-	/** The last updated input buffer */
-	@SuppressWarnings("unchecked")
-	private transient Hashtable<String,Long> htUpdatedActiveBuffer = new Hashtable<String,Long>();
-
 	/** Wrapped component status flags */
 	protected transient boolean [] baStatusFlags = null;
 
@@ -135,11 +131,7 @@ extends Thread {
 
 		this.htOutputMap = htOutputMap;
 
-		// Clean the last updated active buffer
-		this.htUpdatedActiveBuffer = new Hashtable<String,Long>();
-		for ( String sKey:htInputs.keySet() )
-			this.htUpdatedActiveBuffer.put(sKey, 0L);
-
+		
 		// Waste the only ticket to the blocking semaphore
 		this.semBlocking.acquire();
 
@@ -252,7 +244,7 @@ extends Thread {
 				}
 
 			}
-			thdMrProper.awake();
+			//thdMrProper.awake();
 		}
 		log.info("Disposing WebUI if any." );
 		cc.stopAllWebUIFragments();
@@ -333,10 +325,6 @@ extends Thread {
 	 */
 	@SuppressWarnings("unchecked")
 	public void awake(String sInput) {
-		if ( sInput != null )
-			synchronized ( this.htUpdatedActiveBuffer ) {
-				this.htUpdatedActiveBuffer.put(sInput,this.htUpdatedActiveBuffer.get(sInput)+1);
-			}
 		semBlocking.release();
 	}
 
