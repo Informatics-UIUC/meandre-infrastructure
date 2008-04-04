@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import org.meandre.core.engine.MrProbe;
 import org.meandre.core.engine.MrProper;
+import org.meandre.plugins.PluginFactory;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
@@ -55,8 +56,8 @@ public class WebUI {
 		this.server.setConnectors(new Connector[] { connector });
 
 		// Initialize the plugins
-//		PluginFactory.initilizeGlobalPublicFileServer(server, log);
-//		PluginFactory.initializeGlobalCorePlugins(server, log);
+		PluginFactory.initilizeGlobalPublicFileServer(server, log);
+		//PluginFactory.initializeGlobalCorePlugins(server, log);
 
 		// Add the default WebUI dispatcher handler
 		webUIDispatcher = new WebUIDispatcher(this);
