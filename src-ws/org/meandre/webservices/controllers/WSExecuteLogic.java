@@ -1,5 +1,6 @@
 package org.meandre.webservices.controllers;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -173,7 +174,7 @@ public class WSExecuteLogic {
 					pw.flush();
 				}
 				
-				if ( bStats ) {
+				if ( bStats ) { 
 					try {
 						JSONObject jsonStats = spi.getSerializedStatistics();
 						pw.println("----------------------------------------------------------------------------");
@@ -204,6 +205,9 @@ public class WSExecuteLogic {
 					}
 					catch ( Exception e ) {
 						WSLoggerFactory.getWSLogger().warning("This exception should have never been thrown\n"+e);
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						e.printStackTrace(new PrintStream(baos));
+						WSLoggerFactory.getWSLogger().warning(e.toString());
 					}
 				}
 				
