@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Logger;
 
-import org.meandre.core.logger.LoggerFactory;
+import org.meandre.core.logger.KernelLoggerFactory;
 
 
 /** This thread monitors finalization criteria of the wrapped component
@@ -15,7 +15,7 @@ import org.meandre.core.logger.LoggerFactory;
 public class MrProper extends Thread {
 	
 	/** The core root logger */
-	protected static Logger log = LoggerFactory.getCoreLogger();
+	protected static Logger log = KernelLoggerFactory.getCoreLogger();
 
 	/** The thread group of the components. */
 	private ThreadGroup tg = null;

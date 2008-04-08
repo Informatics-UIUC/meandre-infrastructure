@@ -8,7 +8,7 @@ import org.meandre.core.engine.policies.component.availability.WrappedComponentA
 import org.meandre.core.engine.policies.component.availability.WrappedComponentAnyInputRequired;
 import org.meandre.core.engine.probes.NullProbeImpl;
 import org.meandre.core.environments.python.jython.JythonExecutableComponentAdapter;
-import org.meandre.core.logger.LoggerFactory;
+import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.repository.*;
 import org.meandre.core.utils.HexConverter;
@@ -58,7 +58,7 @@ public class Conductor {
 	private int iActiveBufferSize;
 
 	/** The core root logger */
-	protected static Logger log = LoggerFactory.getCoreLogger();
+	protected static Logger log = KernelLoggerFactory.getCoreLogger();
 
 	/** Embeded context to file URI mapper */
 	private static Hashtable<Literal,String> htMapLiteralToFile = new Hashtable<Literal,String>();

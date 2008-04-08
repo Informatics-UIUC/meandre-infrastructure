@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.meandre.core.logger.LoggerFactory;
+import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.security.Action;
 import org.meandre.core.store.security.PasswordEncryptor;
@@ -94,7 +94,7 @@ public class SecurityStoreImpl implements SecurityStore {
     protected Model model = null;
 
     /** The core root logger */
-	protected static Logger log = LoggerFactory.getCoreLogger();
+	protected static Logger log = KernelLoggerFactory.getCoreLogger();
 
     /** The text search indexer */
 	private IndexBuilderString larqBuilder = null;

@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 
 import org.meandre.core.engine.MrProbe;
 import org.meandre.core.engine.MrProper;
-import org.meandre.core.logger.LoggerFactory;
+import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.store.Store;
 
 /** The web ui factory to manager allows modules to create, register,
@@ -19,7 +19,7 @@ import org.meandre.core.store.Store;
 public class WebUIFactory {
 	
 	/** The core root logger */
-	protected static Logger log = LoggerFactory.getCoreLogger();
+	protected static Logger log = KernelLoggerFactory.getCoreLogger();
 		
 	/** The semaphore to implement mutual exclusion */
 	private static Semaphore semMutEX = new Semaphore(1,true);

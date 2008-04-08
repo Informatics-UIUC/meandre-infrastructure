@@ -11,7 +11,7 @@ import org.meandre.core.ComponentContextException;
 import org.meandre.core.ComponentContextImpl;
 import org.meandre.core.ComponentExecutionException;
 import org.meandre.core.ExecutableComponent;
-import org.meandre.core.logger.LoggerFactory;
+import org.meandre.core.logger.KernelLoggerFactory;
 
 /** This class is the Meandre implementation wrapper of an
  * ExecutableComponent. This class implements the basic execution
@@ -36,7 +36,7 @@ extends Thread {
 	protected static final int TERMINATION = 3;
 
 	/** The core root logger */
-	protected transient static Logger log = LoggerFactory.getCoreLogger();
+	protected transient static Logger log = KernelLoggerFactory.getCoreLogger();
 
 	/** Wrapped component status flags */
 	protected transient boolean [] baStatusFlags = null;

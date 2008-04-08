@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.meandre.core.logger.LoggerFactory;
+import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.webui.WebUI;
 import org.meandre.webui.WebUIException;
 import org.meandre.webui.WebUIFactory;
@@ -18,7 +18,7 @@ import org.meandre.webui.WebUIFactory;
 public class Executor {
 	
 	/** The core root logger */
-	protected static Logger log = LoggerFactory.getCoreLogger();
+	protected static Logger log = KernelLoggerFactory.getCoreLogger();
 
 	/** The thread group of the components. */
 	private ThreadGroup tg = null;

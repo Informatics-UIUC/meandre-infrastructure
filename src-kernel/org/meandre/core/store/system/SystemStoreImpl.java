@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.meandre.core.logger.LoggerFactory;
+import org.meandre.core.logger.KernelLoggerFactory;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -70,7 +70,7 @@ public class SystemStoreImpl implements SystemStore {
     protected Model model = null;
 
     /** The core root logger */
-	protected static Logger log = LoggerFactory.getCoreLogger();
+	protected static Logger log = KernelLoggerFactory.getCoreLogger();
 
     /** Create a system store for properties and configuration related stuff.
      *

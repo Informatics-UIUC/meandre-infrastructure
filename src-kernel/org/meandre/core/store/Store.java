@@ -5,7 +5,7 @@ import com.hp.hpl.jena.db.IDBConnection;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
-import org.meandre.core.logger.LoggerFactory;
+import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.store.repository.QueryableRepository;
 import org.meandre.core.store.repository.RepositoryImpl;
 import org.meandre.core.store.security.SecurityStore;
@@ -103,7 +103,7 @@ public class Store {
     /**
      * The core root logger
      */
-    protected static Logger log = LoggerFactory.getCoreLogger();
+    protected static Logger log = KernelLoggerFactory.getCoreLogger();
 
     /**
      * The default Model Maker

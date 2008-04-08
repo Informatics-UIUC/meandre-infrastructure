@@ -11,12 +11,11 @@ import java.util.logging.Logger;
 
 import javax.servlet.Servlet;
 
-import org.meandre.core.logger.LoggerFactory;
+import org.meandre.core.logger.PluginsLoggerFactory;
 import org.meandre.core.store.Store;
 import org.meandre.core.utils.Constants;
 import org.meandre.plugins.vfs.VFSServlet;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.handler.ResourceHandler;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
@@ -35,7 +34,7 @@ public class PluginFactory {
 	private final static String sConfigFile = "meandre-plugins.xml";
 
 	/** The plugins logger */
-	private static Logger log = LoggerFactory.getPluginsLogger();
+	private static Logger log = PluginsLoggerFactory.getPluginsLogger();
 	
 	/** The plugin factory store */
 	private static Properties propPluginFactoryConfig;

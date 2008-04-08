@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.meandre.core.logger.LoggerFactory;
+import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.utils.vocabulary.RepositoryVocabulary;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
@@ -46,7 +46,7 @@ public class RepositoryImpl implements QueryableRepository {
 	public final static Set<String> setFiringPolicy = new HashSet<String>();
 
 	/** The core root logger */
-	protected static Logger log = LoggerFactory.getCoreLogger();
+	protected static Logger log = KernelLoggerFactory.getCoreLogger();
 
 	static {
 

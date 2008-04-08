@@ -14,7 +14,7 @@ import org.meandre.core.engine.ActiveBuffer;
 import org.meandre.core.engine.ActiveBufferException;
 import org.meandre.core.engine.MrProbe;
 import org.meandre.core.engine.WrappedComponent;
-import org.meandre.core.logger.LoggerFactory;
+import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.webui.WebUI;
 import org.meandre.webui.WebUIException;
 import org.meandre.webui.WebUIFactory;
@@ -33,7 +33,7 @@ public class ComponentContextImpl
 implements ComponentContext {
 
 	/** The core root logger */
-	protected static Logger log = LoggerFactory.getCoreLogger();
+	protected static Logger log = KernelLoggerFactory.getCoreLogger();
 
 	/** The unique flow execution ID */
 	protected String sFlowUniqueExecutionID = null;

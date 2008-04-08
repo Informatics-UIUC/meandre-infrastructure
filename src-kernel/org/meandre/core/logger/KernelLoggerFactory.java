@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  * @author Xavier Llor&agrave;
  *
  */
-public class LoggerFactory {
+public class KernelLoggerFactory {
 
 	/** Number of rotating files */
 	private static final int LOG_NUM_ROTATING_FILES = 10;
@@ -26,18 +26,10 @@ public class LoggerFactory {
 	/** The basic handler for the core logger */
 	public static Handler handlerCore = null;
 
-	/** The base logger for the plugins */
-	private static Logger logPlugins = null;
-	
-	/** The basic handler for the plugins */
-	public static Handler handlerPlugins = null;
-
 	// Initializing the logger and its handlers
 	static {
-		logCore = Logger.getLogger(LoggerFactory.class.getName());
+		logCore = Logger.getLogger(KernelLoggerFactory.class.getName());
 		logCore.setLevel(Level.INFO);
-		logPlugins = Logger.getLogger(LoggerFactory.class.getName());
-		logPlugins.setLevel(Level.INFO);
 		try {
 			new File("."+File.separator+"log").mkdir();
 			logCore.addHandler(handlerCore = new FileHandler("."+File.separator+"log"+File.separator+"meandre-kernel.log",LOG_FILE_SIZE,LOG_NUM_ROTATING_FILES));
@@ -48,17 +40,7 @@ public class LoggerFactory {
 			System.err.println("Could not initialize "+"."+File.separator+"log"+File.separator+"meandre-kernel.log");
 			System.exit(1);
 		}
-		try {
-			logPlugins.addHandler(handlerPlugins = new FileHandler("."+File.separator+"log"+File.separator+"meandre-plugins.log",LOG_FILE_SIZE,LOG_NUM_ROTATING_FILES));
-		} catch (SecurityException e) {
-			System.err.println("Could not initialize "+"."+File.separator+"log"+File.separator+"meandre-plugins.log");
-			System.exit(1);
-		} catch (IOException e) {
-			System.err.println("Could not initialize "+"."+File.separator+"log"+File.separator+"meandre-plugins.log");
-			System.exit(1);
-		}
 		handlerCore.setLevel(Level.INFO);
-		handlerPlugins.setLevel(Level.INFO);
 	}
 	
 	/** Returns the core main logger.
@@ -68,13 +50,5 @@ public class LoggerFactory {
 	public static Logger getCoreLogger() {
 		return logCore;
 	}
-	
-	/** Returns the plugins main logger.
-	 * 
-	 * @return The plugins logger
-	 */
-	public static Logger getPluginsLogger() {
-		return logPlugins;
-	}
-	
+		
 }
