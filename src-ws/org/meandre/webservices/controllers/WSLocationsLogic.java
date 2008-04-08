@@ -10,6 +10,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.meandre.core.store.Store;
+import org.meandre.core.store.repository.ExecutableComponentDescription;
+import org.meandre.core.store.repository.FlowDescription;
 import org.meandre.core.store.repository.QueryableRepository;
 import org.meandre.core.store.repository.RepositoryImpl;
 import org.meandre.core.store.system.SystemStore;
@@ -116,7 +118,7 @@ public class WSLocationsLogic {
 				//
 				// Test the location
 				//
-				new RepositoryImpl(modelTmp);
+				QueryableRepository qrNew = new RepositoryImpl(modelTmp);
 				
 				//
 				// If now exception was thrown, add the location to the list
@@ -124,8 +126,24 @@ public class WSLocationsLogic {
 				//
 				ss.setProperty(SystemStore.REPOSITORY_LOCATION, sLocation, sDescription);
 				QueryableRepository qr = Store.getRepositoryStore(sUser);
+				
+				// Modifying the repository
 				qr.getModel().begin();
-				qr.getModel().add(modelTmp);
+				 
+				// Adding components
+				for ( ExecutableComponentDescription ecd:qrNew.getAvailableExecutableComponentDescriptions())
+					if ( !qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent()))
+						qr.getModel().add(ecd.getModel());
+					else
+						log.warning("Component "+ecd.getExecutableComponent()+" already exist in the current repository. Discarding it.");
+				
+				// Adding flows
+				for ( FlowDescription fd:qrNew.getAvailableFlowDecriptions())
+					if ( !qr.getAvailableFlows().contains(fd.getFlowComponent()))
+						qr.getModel().add(fd.getModel());
+					else
+						log.warning("Flow "+fd.getFlowComponent()+" already exist in the current repository. Discarding it.");
+				
 				qr.getModel().commit();
 				qr.refreshCache();
 			}
