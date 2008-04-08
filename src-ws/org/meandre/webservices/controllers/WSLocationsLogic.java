@@ -245,14 +245,26 @@ public class WSLocationsLogic {
 					else
 						modelTmp.read(url.openStream(),null);
 					
-					new RepositoryImpl(modelTmp);
+					QueryableRepository qrNew = new RepositoryImpl(modelTmp);
 					
 					//
 					// If now exception was thrown, add the location to the list
 					// and update the user repository 
 					//
 					mod.begin();
-					mod.add(modelTmp);
+					// Adding components
+					for ( ExecutableComponentDescription ecd:qrNew.getAvailableExecutableComponentDescriptions())
+						if ( !qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent()))
+							qr.getModel().add(ecd.getModel());
+						else
+							log.warning("Component "+ecd.getExecutableComponent()+" already exist in the current repository. Discarding it.");
+					
+					// Adding flows
+					for ( FlowDescription fd:qrNew.getAvailableFlowDecriptions())
+						if ( !qr.getAvailableFlows().contains(fd.getFlowComponent()))
+							qr.getModel().add(fd.getModel());
+						else
+							log.warning("Flow "+fd.getFlowComponent()+" already exist in the current repository. Discarding it.");
 					mod.commit();
 					qr.refreshCache();
 				}
