@@ -1,0 +1,204 @@
+/**
+ * ZigZag javaCC parser definition.
+ * 
+ * This parser describes the grammer and the basic compilation mechanisms of  
+ * Meandre's ZigZag scripting language.
+ *
+ * @author Xavier Llora
+ */
+ 
+options {
+  JDK_VERSION = "1.5";
+  STATIC = false;
+}
+PARSER_BEGIN(ZigZag)
+package org.meandre.zigzag.parser;
+
+import java.io.*;
+
+public class ZigZag {
+  public static void main(String args[]) throws ParseException,FileNotFoundException {
+    //ZigZag parser = new ZigZag(System.in);
+    FileInputStream fis = new FileInputStream(new File(args[0]));
+    ZigZag parser = new ZigZag(fis);    
+    parser.start(); 
+  }
+}
+PARSER_END(ZigZag)
+
+SKIP :
+{
+ 	" "
+|	"\r"
+|	"\t"
+|	"\n"
+|	"\f"
+}
+
+SKIP :
+{
+  <"#" (~["\n","\r"])* ["\n","\r"]>
+}
+
+TOKEN : 
+{
+	< COMA: "," >
+|	< EQUAL: "=" >
+|	< LP: "(" >
+|	< RP: ")" >
+|	< DOT: "." >
+|	< COLON: ":" >
+|	< SEMICOLON: ";" >
+|	< AT: "@" >
+}
+TOKEN : 
+{
+	< IMPORT: "import">
+|   < FROM: "from"> 
+|   < ALIAS: "alias"> 
+|   < AS: "as">
+}
+TOKEN :
+{ 
+    < SYMBOL: ["a"-"z","A"-"Z"] ( ["a"-"z","A"-"Z","0"-"9","-","_"] )* >
+|	< URI: "<" (["a"-"z","A"-"Z"])+ "://"(["a"-"z","A"-"Z","0"-"9"," ","-","_",":","/","%","+","&","=","."])+ ">" >
+|	< VALUE: "\"" (~["\""])* "\"" >
+}
+void start() : 
+{
+} 
+{
+  (
+  	cda() 
+| 	<SYMBOL> (ci() | cm() | ii_call() ) 
+|	ii_assigment()
+  )*
+  <EOF>
+}
+
+void cda() : {} 
+{
+	( <IMPORT><URI> ) |
+	( <ALIAS><URI><AS><SYMBOL> ) |
+	( <FROM><URI><IMPORT><URI>(<AS><SYMBOL>)? )
+}
+
+void ci() : 
+{
+	int iLeftCount = 1;
+	int iRightCount = 1; 
+}
+{
+	( 
+		<COMA> 
+		<SYMBOL> 
+		{ iLeftCount++; }
+	)* 
+	<EQUAL> 
+	<SYMBOL> <LP><RP> 
+	(
+		<COMA>
+		<SYMBOL> <LP><RP>
+		{ iRightCount++; }
+	)*
+	{
+		if ( iLeftCount!=iRightCount )
+			throw new ParseException ( 
+				"Wrong number of elements in assigment, "+
+				iLeftCount+" on the left side and "+
+				iRightCount+" on the right side on line "+
+				(jj_input_stream.getLine()-1)
+			);
+	}
+}
+
+void cm() : 
+{
+	int iLeftCount = 1;
+	int iRightCount = 1; 
+}
+{
+	<DOT><SYMBOL>
+	( 
+		<COMA> 
+		<SYMBOL><DOT><SYMBOL>
+		{ iLeftCount++; }
+	)* 
+	<EQUAL> 
+	(
+		<VALUE> 
+		|
+		<SYMBOL><DOT><SYMBOL>
+	)
+	(
+		<COMA>
+		(
+			<VALUE> 
+			|
+			<SYMBOL><DOT><SYMBOL>
+		)
+		{ iRightCount++; }
+	)*
+	{
+		if ( iLeftCount!=iRightCount )
+			throw new ParseException ( 
+				"Wrong number of elements in component modification assigment, "+
+				iLeftCount+" on the left side and "+
+				iRightCount+" on the right side on line "+
+				(jj_input_stream.getLine()-1)
+			);
+	}
+}
+
+void ii_call() : {}
+{
+	<LP>
+		(port_binding()
+			(
+				<SEMICOLON>
+				port_binding()
+			)*
+		)*		
+	<RP>
+}
+
+void port_binding() : {}
+{
+	<SYMBOL>
+	<COLON>
+	<SYMBOL><DOT><SYMBOL>
+	(	
+		<COMA>
+		<SYMBOL><DOT><SYMBOL>
+	)*
+}
+
+void ii_assigment() : 
+{
+	int iLeftCount = 1;
+	int iRightCount = 1; 
+}
+{
+	<AT><SYMBOL>
+	(
+		<COMA>
+		<AT><SYMBOL>
+		{ iLeftCount++; }
+	)*
+	<EQUAL>
+	<SYMBOL> ii_call()
+	(
+		<COMA>
+		<SYMBOL> ii_call()
+		{ iRightCount++; }
+	)*
+	{
+		if ( iLeftCount!=iRightCount )
+			throw new ParseException ( 
+				"Wrong number of elements in component binding assigment, "+
+				iLeftCount+" on the left side and "+
+				iRightCount+" on the right side on line "+
+				(jj_input_stream.getLine()-1)
+			);
+	}	
+}

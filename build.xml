@@ -32,6 +32,7 @@
                deprecation="${compile.deprecation}" optimize="${compile.optimize}"
                classpathref="meandre.core.classpath">
             <include name="${kernel.src}/**/*.java"/>
+            <include name="${zigzag.src}/**/*.java"/>
             <include name="${plugins.src}/**/*.java"/>
             <include name="${demo.src}/**/*.java"/>
             <include name="${ws.src}/**/*.java"/>
@@ -48,6 +49,15 @@
 
         <copy todir="${build.dir}" includeEmptyDirs="no">
             <fileset dir="${kernel.src}">
+                <include name="**/*.properties"/>
+                <include name="**/*.xml"/>
+                <include name="**/*.vm"/>
+                <include name="**/*.list"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${zigzag.dir}" includeEmptyDirs="no">
+            <fileset dir="${zigzag.src}">
                 <include name="**/*.properties"/>
                 <include name="**/*.xml"/>
                 <include name="**/*.vm"/>

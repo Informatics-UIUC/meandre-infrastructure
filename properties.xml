@@ -10,8 +10,9 @@
     <property name="test.dir" value="${basedir}/test"/>
 
     <!-- Source code locations -->
-    <property name="demo.src" value="src-demo"/>
     <property name="kernel.src" value="src-kernel"/>
+    <property name="zigzag.src" value="src-zigzag"/>
+    <property name="demo.src" value="src-demo"/>
     <property name="plugins.src" value="src-plugins"/>
     <property name="ws.src" value="src-ws"/>
     <property name="test.src" value="src-tests"/>
