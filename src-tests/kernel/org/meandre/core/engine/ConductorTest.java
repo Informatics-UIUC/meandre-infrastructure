@@ -78,10 +78,46 @@ public class ConductorTest {
 		System.setErr(psErr);
 		// Restore the output
 		assertTrue(exec.hadGracefullTermination());
+		System.out.println(baosErr.toString());
 		assertEquals(0,exec.getAbortMessage().size());
+		System.out.println(baosErr.toString());
 		assertEquals(0,baosErr.size());
 		
 		String sResult = "HELLO WORLD!!! HAPPY MEANDRING!!!  (P1,C0123456)  HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C0123456)  \n";
+		System.out.println("***"+baosOut.toString());
+		assertEquals(sResult.length(),baosOut.size());
+	}
+
+	/** Run the basic hello world test with dangling outputs.
+	 * 
+	 * @param conductor The conductor to use
+	 * @param qr The query repository
+	 * @throws CorruptedDescriptionException A corrupted description  was found
+	 * @throws ConductorException The conductor could not build the flow
+	 */
+	private void runHelloWorldMoreHetereogenousFlow(Conductor conductor,
+			QueryableRepository qr) throws CorruptedDescriptionException,
+			ConductorException {
+		// Create the execution
+		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next());
+		// Redirect the output
+		PrintStream psOut = System.out;
+		PrintStream psErr = System.err;
+		ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
+		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
+		System.setOut(new PrintStream(baosOut));
+		System.setErr(new PrintStream(baosErr));
+		exec.execute();
+		System.setOut(psOut);
+		System.setErr(psErr);
+		// Restore the output
+		assertTrue(exec.hadGracefullTermination());
+		System.out.println(baosErr.toString());
+		assertEquals(0,exec.getAbortMessage().size());
+		System.out.println(baosErr.toString());
+		assertEquals(0,baosErr.size());
+		
+		String sResult = "Execute called from Lisp\nHELLO WORLD!!! HAPPY MEANDRING!!!  (P1,C0123456)  HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C0123456)  \nDispose called from Lisp\n";
 		assertEquals(sResult.length(),baosOut.size());
 	}
 	
@@ -131,6 +167,29 @@ public class ConductorTest {
 		}
 	}
 
+	/**
+	 * Test method for {@link org.meandre.core.engine.Conductor#buildExecutor(org.meandre.core.store.repository.QueryableRepository, com.hp.hpl.jena.rdf.model.Resource)}.
+	 */
+	@Test
+	public void testBuildExecutorMoreHetereogenous() {
+		Conductor conductor = new Conductor(10);
+		
+		try {
+			// Run simple hetereogenous hello world (Java+Python)
+			Model model = DemoRepositoryGenerator.getTestHelloWorldMoreHetereogenousRepository();
+			RepositoryImpl qr = new RepositoryImpl(model);
+			//for ( Resource res:qr.getAvailableExecutableComponents())
+			//	System.out.println(res);
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/to-uppercase")));
+			// Run the basic test
+			runHelloWorldMoreHetereogenousFlow(conductor, qr);
+			
+		} catch (CorruptedDescriptionException e) {
+			fail("Corrupted description encounterd: "+e);
+		} catch (ConductorException e) {
+			fail("Conductor exception: "+e);
+		}
+	}
 	/**
 	 * Test method for {@link org.meandre.core.engine.Conductor#buildExecutor(org.meandre.core.store.repository.QueryableRepository, com.hp.hpl.jena.rdf.model.Resource)}.
 	 */

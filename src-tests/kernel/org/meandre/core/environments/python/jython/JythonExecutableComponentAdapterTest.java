@@ -18,8 +18,9 @@ import org.meandre.core.engine.WrappedComponent;
 import org.meandre.core.engine.policies.component.availability.WrappedComponentAllInputsRequired;
 import org.meandre.core.engine.probes.NullProbeImpl;
 import org.meandre.core.engine.test.TestLoggerFactory;
+import org.meandre.core.environments.ScriptingEnvironmentAdapter;
 
-/** This class is used to test the Jython execution compoment adapter.
+/** This class is used to test the Jython execution component adapter.
  *
  * @author Xavier Llor&agrave;
  *
@@ -33,7 +34,7 @@ public class JythonExecutableComponentAdapterTest {
 	protected static String sSimpleExecutableComponent = "" +
 			"\n" +
 			"def initialize(ccp):\n" +
-			"   print \"Initilize called\"\n"+
+			"   print \"Initialize called\"\n"+
 			"\n" +
 			"def execute(cc):\n" +
 			"   print \"Execute called\", cc\n" +
@@ -52,9 +53,15 @@ public class JythonExecutableComponentAdapterTest {
 	 *
 	 */
 	@Test
-	public void testSimpleAdapter () {
-		JythonExecutableComponentAdapter jeca =  new JythonExecutableComponentAdapter();
-		jeca.process(sSimpleScript);
+	public void testSimpleAdapter ()  {
+		ScriptingEnvironmentAdapter jeca =  new JythonExecutableComponentAdapter();
+		jeca.trapOutputAndErrorStreams();
+		try {
+			jeca.process(sSimpleScript);
+		} catch (Exception e) {
+			fail("Something went wrong while processing the script");
+		}
+		jeca.untrapOutputAndErrorStreams();
 		String sRes = jeca.getOutput().toString();
 		assertEquals("Hello World!\n",sRes);
 		assertEquals(0, jeca.getError().size());
@@ -71,6 +78,7 @@ public class JythonExecutableComponentAdapterTest {
 		thdMrProbe.start();
 		JythonExecutableComponentAdapter jeca = new JythonExecutableComponentAdapter();
 		jeca.process(sSimpleExecutableComponent);
+		jeca.trapOutputAndErrorStreams();
 		WrappedComponent wc = new WrappedComponentAllInputsRequired(
 				"http://noting.org/","http://noting.org/",
 				"http://noting.org/", jeca,
@@ -82,11 +90,12 @@ public class JythonExecutableComponentAdapterTest {
 				
 		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc);
 		jeca.initialize(cc);
+		jeca.untrapOutputAndErrorStreams();
 		sRes = jeca.getOutput().toString();
-		assertEquals("Initilize called\nInitilize called\n",sRes);
+		assertEquals("Initialize called\nInitialize called\n",sRes);
 		jeca.dispose(cc);
 		sRes = jeca.getOutput().toString();
-		assertEquals("Initilize called\nInitilize called\nDispose called\n",sRes);
+		assertEquals("Initialize called\nInitialize called\nDispose called\n",sRes);
 		thdMrProbe.done();
 	}
 
@@ -101,6 +110,7 @@ public class JythonExecutableComponentAdapterTest {
 		MrProbe thdMrProbe = new MrProbe(TestLoggerFactory.getTestLogger(), new NullProbeImpl(), false, false);
 		thdMrProbe.start();
 		JythonExecutableComponentAdapter jeca = new JythonExecutableComponentAdapter();
+		jeca.trapOutputAndErrorStreams();
 		jeca.process(sSimpleExecutableComponent);
 		WrappedComponent wc = new WrappedComponentAllInputsRequired(
 				"http://noting.org/","http://noting.org/",
@@ -118,6 +128,7 @@ public class JythonExecutableComponentAdapterTest {
 		} catch (ComponentContextException e) {
 			fail("This execption should not be thrown "+e);
 		}
+		jeca.untrapOutputAndErrorStreams();
 		sRes = jeca.getOutput().toString();
 		System.out.println(sSimpleExecutableComponent);
 		System.out.println(sRes);

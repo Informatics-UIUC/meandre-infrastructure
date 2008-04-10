@@ -84,7 +84,7 @@ public class WSCoreBootstrapper {
 		Server server = new Server(Store.getBasePort());
 
 		// Initialize global file server
-		PluginFactory.initilizeGlobalPublicFileServer(server,log);
+		PluginFactory.initializeGlobalPublicFileServer(server,log);
 
 		// Initialize the web services
 		Context cntxGlobal = initializeTheWebServices(server);

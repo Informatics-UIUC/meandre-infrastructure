@@ -97,7 +97,7 @@ public abstract class BaseServletTest {
  		server = new Server(Store.getBasePort());
 
  		// Initialize global file server
- 		initilizePublicFileServer(server);
+ 		initializePublicFileServer(server);
 
  		// Initialize the web services
  		initializeTheWebServices(server);
@@ -183,7 +183,7 @@ public abstract class BaseServletTest {
 	 *
 	 * @param server The server to user
 	 */
-	private static void initilizePublicFileServer(Server server) {
+	private static void initializePublicFileServer(Server server) {
 		//
 		// Initializing the public file server
 		//

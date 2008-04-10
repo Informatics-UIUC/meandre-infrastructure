@@ -56,7 +56,7 @@ public class WebUI {
 		this.server.setConnectors(new Connector[] { connector });
 
 		// Initialize the plugins
-		PluginFactory.initilizeGlobalPublicFileServer(server, log);
+		PluginFactory.initializeGlobalPublicFileServer(server, log);
 		//PluginFactory.initializeGlobalCorePlugins(server, log);
 
 		// Add the default WebUI dispatcher handler

@@ -7,15 +7,17 @@ import org.meandre.core.ComponentContextException;
 import org.meandre.core.ComponentContextProperties;
 import org.meandre.core.ComponentExecutionException;
 import org.meandre.core.ExecutableComponent;
+import org.meandre.core.environments.ScriptingEnvironmentAdapter;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 
-/** This class is the adapter that wraps Jython executable components.
+/** This class is the adapter that wraps Jython executable components using Jython.
  *
  * @author Xavier Llor&agrave;
  *
  */
-public class JythonExecutableComponentAdapter implements ExecutableComponent {
+public class JythonExecutableComponentAdapter 
+implements ExecutableComponent, ScriptingEnvironmentAdapter {
 
 	/** The Jython interpreter that will use this executable component. */
 	protected PythonInterpreter pi = null;
@@ -32,8 +34,21 @@ public class JythonExecutableComponentAdapter implements ExecutableComponent {
 	public JythonExecutableComponentAdapter ( ) {
 		// Setup the interpreter
 		pi = new PythonInterpreter();
+	}
+
+	/** Traps the input and output error streams.
+	 * 
+	 */
+	public void trapOutputAndErrorStreams () {
 		pi.setOut(baosOut=new ByteArrayOutputStream());
 		pi.setErr(baosErr=new ByteArrayOutputStream());
+	}
+
+
+	/** Traps the input and output error streams.
+	 * 
+	 */
+	public void untrapOutputAndErrorStreams () {
 	}
 
 	/** Process the given script on an already prepared adapter.

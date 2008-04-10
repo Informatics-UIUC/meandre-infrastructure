@@ -7,6 +7,7 @@ import org.meandre.core.ExecutableComponent;
 import org.meandre.core.engine.policies.component.availability.WrappedComponentAllInputsRequired;
 import org.meandre.core.engine.policies.component.availability.WrappedComponentAnyInputRequired;
 import org.meandre.core.engine.probes.NullProbeImpl;
+import org.meandre.core.environments.lisp.clojure.ClojureExecutableComponentAdapter;
 import org.meandre.core.environments.python.jython.JythonExecutableComponentAdapter;
 import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.store.Store;
@@ -37,13 +38,13 @@ import java.util.logging.Logger;
 public class Conductor {
 
 	/** List of working implementations for executable components. */
-	static private final String [] saExecutableComponentLanguages = { "java", "python" };
+	static private final String [] saExecutableComponentLanguages = { "java", "python", "lisp" };
 
 	/** Set of loadable implementations */
 	private Set<String> setLoadableLanguages = null;
 
 	/** List of working implementations for executable components. */
-	static private final String [] saExecutableComponentTypes = { "java/class", "jython" };
+	static private final String [] saExecutableComponentTypes = { "java/class", "jython", "clojure" };
 
 	/** A simple separator character for URLs */
 	static private final String URL_SEAPARTOR = "##--##--##";
@@ -169,6 +170,31 @@ public class Conductor {
 					if ( rdfn.isLiteral() )
 						jeca.process(((Literal)rdfn).getLexicalForm());
 				htECInstances.put(ins,jeca);
+			}
+			else if ( ecd.getRunnable().equals("lisp") && ecd.getFormat().equals("clojure") ){
+				// Creates a jython wrapper and sources all the scripts
+				Set<RDFNode> setScripts = ecd.getContext();
+				ClojureExecutableComponentAdapter ceca;
+				try {
+					ceca = (ClojureExecutableComponentAdapter) urlFlowCL.loadClass(ClojureExecutableComponentAdapter.class.getName()).newInstance();
+				} catch (InstantiationException e) {
+					thdMrProbe.done();
+					throw new ConductorException(e);
+				} catch (IllegalAccessException e) {
+					thdMrProbe.done();
+					throw new ConductorException(e);
+				} catch (ClassNotFoundException e) {
+					thdMrProbe.done();
+					throw new ConductorException(e);
+				}
+				for ( RDFNode rdfn:setScripts )
+					if ( rdfn.isLiteral() )
+						try {
+							ceca.process(((Literal)rdfn).getLexicalForm());
+						} catch (Exception e) {
+							throw new ConductorException(e);
+						}
+				htECInstances.put(ins,ceca);
 			}
 		}
 

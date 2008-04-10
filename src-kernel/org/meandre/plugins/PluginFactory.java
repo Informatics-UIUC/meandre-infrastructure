@@ -88,7 +88,7 @@ public class PluginFactory {
 	 * @param server The server to user
 	 * @param log The logger to use
 	 */
-	public static void initilizeGlobalPublicFileServer(Server server, Logger log) {
+	public static void initializeGlobalPublicFileServer(Server server, Logger log) {
 		//
 		// Initializing the public file server
 		//

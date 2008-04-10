@@ -302,20 +302,20 @@ public class DemoRepositoryGenerator {
 		return ecdRes;
 	}
 
-	/** The Python code that does teh upper case conversion */
+	/** The Python code that does the upper case conversion */
 	private final static String sPythonToUpper = 
 		"def initialize(ccp):\n" +
-		"   print \"Initilize called\"\n"+
+		"   print \"Initialize called from Python\"\n"+
 		"\n" +
 		"def execute(cc):\n" +
-		"   print \"Execute called\", cc \n" +
+		"   print \"Execute called from Python\", cc \n" +
 		"   s = cc.getDataComponentFromInput(\"string\") \n" +
 		"   cc.pushDataComponentToOutput(\"string\",s.upper()) \n" +
 		"\n" +
 		"def dispose(ccp):\n" +
-		"   print \"Dispose called\"\n" +
+		"   print \"Dispose called from Python\"\n" +
 		"\n";
-		
+	
 	/** Create the description for a python to uppercase component.
 	 * 
 	 * @param sBaseURL The base URL
@@ -383,6 +383,100 @@ public class DemoRepositoryGenerator {
 		String sRunnable = "python";
 		String sFiringPolicy = "all";
 		String sFormat = "jython";
+		
+		try {
+			ecdRes = new ExecutableComponentDescription(resExecutableComponent,
+					sName, sDescription, sRights, sCreator, dateCreation,
+					sRunnable, sFiringPolicy, sFormat, setContext, resLocation,
+					setInputs, setOutputs, pddProperties, tagDesc);
+			
+		} catch (CorruptedDescriptionException e) {
+			log.severe("An exception should have not been trown: "+e);
+		}
+		
+		return ecdRes;
+	}
+
+	
+	/** The Lisp code that does the upper case conversion */
+	private final static String sLispPassThrough = 
+		"(defn initialize [x] (.(. System out) (println \"Initialize called from Lisp\")) )\n"+
+		"(defn execute [x] \n"+
+		"        (.(. System out) (println \"Execute called from Lisp\")) \n" +
+		"        (. x (pushDataComponentToOutput \n"+
+		"                 \"string\"\n"+
+		"                 (. x (getDataComponentFromInput \"string\")))) )\n"+
+		"(defn dispose [x] (.(. System out) (println \"Dispose called from Lisp\")) )" +
+		"\n";
+	
+	/** Create the description for a lisp that change Es for As component.
+	 * 
+	 * @param sBaseURL The base URL
+	 * @return The executable component description
+	 */
+	private static ExecutableComponentDescription getPassThroughComponent(String sBaseURL) {
+		
+		sBaseURL += "/component/";
+		
+		
+		ExecutableComponentDescription ecdRes = null;
+		
+		Resource resExecutableComponent =  ModelFactory.createDefaultModel().createResource(sBaseURL+"pass-through");
+		
+		// General properties
+		String sName = "Pass Through";
+		String sDescription = "Passes the input string to the output string with no modifications";
+		String sRights = "University of Illinois/NCSA open source license";
+		String sCreator = "Xavier Llor&agrave;";
+		Date dateCreation = new Date();
+		
+		// Context
+		Set<RDFNode> setContext = new HashSet<RDFNode>();
+		setContext.add(ModelFactory.createDefaultModel().createResource(sBaseURL));
+		setContext.add(ModelFactory.createDefaultModel().createTypedLiteral(sLispPassThrough));
+		
+		// Location
+		Resource resLocation = ModelFactory.createDefaultModel().createResource(sBaseURL);
+		
+		// Empty input ports
+		Set<DataPortDescription> setInputs = new HashSet<DataPortDescription>();
+		Resource resDPDInput1 = ModelFactory.createDefaultModel().createResource(resExecutableComponent.toString()+"/input/string");
+		String sDPDIn1Ident = resDPDInput1.toString(); 
+		String sDPDIn1Name = "string";
+		String sDPDIn1Desc = "The string to convert";
+		try {
+			setInputs.add(new DataPortDescription(resDPDInput1,sDPDIn1Ident,sDPDIn1Name,sDPDIn1Desc));
+		} catch (CorruptedDescriptionException e) {
+			log.severe("An exception should have not been trown: "+e);
+		}
+		
+		// One output port
+		Set<DataPortDescription> setOutputs = new HashSet<DataPortDescription>();
+		Resource resDPDOutput = ModelFactory.createDefaultModel().createResource(resExecutableComponent.toString()+"/output/string");
+		String sDPDIdent = resDPDOutput.toString(); 
+		String sDPDName = "string";
+		String sDPDDesc = "The converted string";
+		try {
+			setOutputs.add(new DataPortDescription(resDPDOutput,sDPDIdent,sDPDName,sDPDDesc));
+		} catch (CorruptedDescriptionException e) {
+			log.severe("An exception should have not been trown: "+e);
+		}
+		
+		// Properties
+		Hashtable<String,String> htValues = new Hashtable<String,String>();
+		Hashtable<String,String> htDescriptions = new Hashtable<String,String>();
+		PropertiesDescriptionDefinition pddProperties = new PropertiesDescriptionDefinition(htValues,htDescriptions);
+		
+		// Tags
+		HashSet<String> hsTags = new HashSet<String>();
+		hsTags.add("demo");
+		hsTags.add("string");
+		hsTags.add("pass through");
+ 		TagsDescription tagDesc = new TagsDescription(hsTags);
+		
+		String sRunnable = "lisp";
+		String sFiringPolicy = "all";
+		String sFormat = "clojure";
 		
 		try {
 			ecdRes = new ExecutableComponentDescription(resExecutableComponent,
@@ -1098,7 +1192,15 @@ public class DemoRepositoryGenerator {
 		return getTestHelloWorldHetereogenousRepository(sTestBaseURL);
 	}
 	
-	
+	/** Generates a 6 hetereogenous component flow that pushes a string, concatenates it twice,
+	 * turns it uppercase, and it finally prints it to the standard out.
+	 * 
+	 * @return The model with the 3 component descriptors and the flow
+	 */
+	public static Model getTestHelloWorldMoreHetereogenousRepository() {
+		return getTestHelloWorldMoreHetereogenousRepository(sTestBaseURL);
+	}
+
 	/**  Generates a 5 hetereogenous component flow that pushes a string, concatenates it twice,
 	 * turns it uppercase, and it finally prints it to the standard out.
 	 * 
@@ -1235,6 +1337,163 @@ public class DemoRepositoryGenerator {
 		return ecdPS.getModel().add(ecdCS.getModel())
                                .add(ecdPO.getModel())
                                .add(ecdUP.getModel())
+                               .add(ecdFR.getModel())
+                               .add(fd.getModel());
+	}
+
+
+	/**  Generates a 5 hetereogenous component flow that pushes a string, concatenates it twice,
+	 * turns it uppercase, and it finally prints it to the standard out.
+	 * 
+	 * @param sBaseURL The base URL
+	 * @return The model with the 3 component descriptors and the flow
+	 */
+	public static Model getTestHelloWorldMoreHetereogenousRepository(String sBaseURL) {
+		
+		///
+		// Create the components
+		//
+		ExecutableComponentDescription ecdPS = getPushStringComponent(sBaseURL); 
+		ExecutableComponentDescription ecdCS = getConcatenateStringsComponent(sBaseURL); 
+		ExecutableComponentDescription ecdPO = getPrintObjectComponent(sBaseURL); 
+		ExecutableComponentDescription ecdUP = getToUpperComponent(sBaseURL);
+		ExecutableComponentDescription ecdPT = getPassThroughComponent(sBaseURL);
+
+		ExecutableComponentDescription ecdFR = getForkComponent(sBaseURL);
+		
+		sBaseURL += "/flow/test-hello-world-with-python-and-lisp/";
+		
+		//
+		// Assemble the flow
+		//
+		Resource resFlowComponent = ModelFactory.createDefaultModel().createResource(sBaseURL);
+		
+		//
+		// Flow properties
+		//
+		String sName = "Hello World With Java, Python, and Lisp Components!!!";
+		String sDescription = "A simple hello world test";
+		String sRights = "University of Illinois/NCSA open source license";
+		String sCreator = "Xavier Llor&agrave;";
+		Date dateCreation = new Date();
+		
+		//
+		// Create the instances
+		//
+		Set<ExecutableComponentInstanceDescription> setExecutableComponentInstances = new HashSet<ExecutableComponentInstanceDescription>();
+
+		Resource resInsPS0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push_string/0");
+		Resource resInsPS0Component = ecdPS.getExecutableComponent();
+		String sInsPS0Name = "Push String 0";
+		String sInsPS0Desc = "Push hello world";
+		PropertiesDescription pdPInsPS0Properties = new PropertiesDescription();
+		ExecutableComponentInstanceDescription ecidPS0 = new ExecutableComponentInstanceDescription(resInsPS0,resInsPS0Component,sInsPS0Name,sInsPS0Desc,pdPInsPS0Properties);
+
+		Resource resInsPS1 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push_string/1");
+		Resource resInsPS1Component = ecdPS.getExecutableComponent();
+		String sInsPS1Name = "Push String 1";
+		String sInsPS1Desc = "Push hello world";
+		PropertiesDescription pdPInsPS1Properties = new PropertiesDescription();
+		ExecutableComponentInstanceDescription ecidPS1 = new ExecutableComponentInstanceDescription(resInsPS1,resInsPS1Component,sInsPS1Name,sInsPS1Desc,pdPInsPS1Properties);
+
+		Resource resInsCS0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/concatenate_string/2");
+		Resource resInsCS0Component = ecdCS.getExecutableComponent();
+		String sInsCS0Name = "Concatenate String 0";
+		String sInsCS0Desc = "Concatenates two strings";
+		PropertiesDescription pdPInsCS0Properties = new PropertiesDescription();
+		ExecutableComponentInstanceDescription ecidCS0 = new ExecutableComponentInstanceDescription(resInsCS0,resInsCS0Component,sInsCS0Name,sInsCS0Desc,pdPInsCS0Properties);
+
+		Resource resInsUP0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/to-uppercase/3");
+		Resource resInsUP0Component = ecdUP.getExecutableComponent();
+		String sInsUP0Name = "To Uppercasde 0";
+		String sInsUP0Desc = "Converts a strings to uppercase";
+		PropertiesDescription pdPInsUP0Properties = new PropertiesDescription();
+		ExecutableComponentInstanceDescription ecidUP0 = new ExecutableComponentInstanceDescription(resInsUP0,resInsUP0Component,sInsUP0Name,sInsUP0Desc,pdPInsUP0Properties);
+
+		Resource resInsPT0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/pass-through/4");
+		Resource resInsPT0Component = ecdPT.getExecutableComponent();
+		String sInsPT0Name = "Pass Through 0";
+		String sInsPT0Desc = "Prints the concatenated object";
+		PropertiesDescription pdPInsPT0Properties = new PropertiesDescription();
+		ExecutableComponentInstanceDescription ecidPT0 = new ExecutableComponentInstanceDescription(resInsPT0,resInsPT0Component,sInsPT0Name,sInsPT0Desc,pdPInsPT0Properties);
+
+		Resource resInsPO0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/print-object/5");
+		Resource resInsPO0Component = ecdPO.getExecutableComponent();
+		String sInsPO0Name = "Print Object 0";
+		String sInsPO0Desc = "Prints the concatenated object";
+		PropertiesDescription pdPInsPO0Properties = new PropertiesDescription();
+		ExecutableComponentInstanceDescription ecidPO0 = new ExecutableComponentInstanceDescription(resInsPO0,resInsPO0Component,sInsPO0Name,sInsPO0Desc,pdPInsPO0Properties);
+
+		setExecutableComponentInstances.add(ecidPS0);
+		setExecutableComponentInstances.add(ecidPS1);
+		setExecutableComponentInstances.add(ecidCS0);
+		setExecutableComponentInstances.add(ecidUP0);
+		setExecutableComponentInstances.add(ecidPO0);
+		setExecutableComponentInstances.add(ecidPT0);
+		
+		//
+		// Connecting the instances
+		//
+		Set<ConnectorDescription> setConnectorDescription = new HashSet<ConnectorDescription>();
+		
+		Iterator<DataPortDescription> iter = ecdCS.getInputs().iterator();
+		Resource resOne = iter.next().getResource();
+		Resource resTwo = iter.next().getResource();
+		
+		ConnectorDescription cdPS0 = new ConnectorDescription(
+				ModelFactory.createDefaultModel().createResource(sBaseURL+"connector/0"),
+				ecidPS0.getExecutableComponentInstance(), ecdPS.getOutputs().iterator().next().getResource(),
+				ecidCS0.getExecutableComponentInstance(), resOne);
+
+		ConnectorDescription cdPS1 = new ConnectorDescription(
+				ModelFactory.createDefaultModel().createResource(sBaseURL+"connector/1"),
+				ecidPS1.getExecutableComponentInstance(), ecdPS.getOutputs().iterator().next().getResource(),
+				ecidCS0.getExecutableComponentInstance(), resTwo);
+		
+		ConnectorDescription cdUP0 = new ConnectorDescription(
+				ModelFactory.createDefaultModel().createResource(sBaseURL+"connector/2"),
+				ecidCS0.getExecutableComponentInstance(), ecdCS.getOutputs().iterator().next().getResource(),
+				ecidUP0.getExecutableComponentInstance(), ecdUP.getInputs().iterator().next().getResource());
+
+		ConnectorDescription cdUPT = new ConnectorDescription(
+				ModelFactory.createDefaultModel().createResource(sBaseURL+"connector/3"),
+				ecidUP0.getExecutableComponentInstance(), ecdUP.getOutputs().iterator().next().getResource(),
+				ecidPT0.getExecutableComponentInstance(), ecdPT.getInputs().iterator().next().getResource());
+
+		ConnectorDescription cdPO0 = new ConnectorDescription(
+				ModelFactory.createDefaultModel().createResource(sBaseURL+"connector/4"),
+				ecidPT0.getExecutableComponentInstance(), ecdPT.getOutputs().iterator().next().getResource(),
+				ecidPO0.getExecutableComponentInstance(), ecdPO.getInputs().iterator().next().getResource());
+
+		setConnectorDescription.add(cdPS0);
+		setConnectorDescription.add(cdPS1);
+		setConnectorDescription.add(cdUP0);
+		setConnectorDescription.add(cdUPT);
+		setConnectorDescription.add(cdPO0);
+		
+		//
+		// Tags
+		//
+		HashSet<String> hsTags = new HashSet<String>();
+		hsTags.add("demo");
+		hsTags.add("hello_world");
+ 		TagsDescription tagsDesc = new TagsDescription(hsTags);
+		
+ 		//
+ 		// Create the flow
+ 		//
+		FlowDescription fd = new FlowDescription(resFlowComponent, sName,
+				sDescription, sRights, sCreator, dateCreation,
+				setExecutableComponentInstances, setConnectorDescription,
+				tagsDesc);
+		
+		//
+		// Return the aggregated model
+		//
+		return ecdPS.getModel().add(ecdCS.getModel())
+                               .add(ecdPO.getModel())
+                               .add(ecdUP.getModel())
+                               .add(ecdPT.getModel())
                                .add(ecdFR.getModel())
                                .add(fd.getModel());
 	}
