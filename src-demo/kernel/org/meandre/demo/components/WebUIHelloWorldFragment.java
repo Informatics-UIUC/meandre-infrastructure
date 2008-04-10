@@ -102,6 +102,7 @@ public class WebUIHelloWorldFragment implements ExecutableComponent, WebUIFragme
 			sem.acquire();
 			cc.startWebUIFragment(this);
 			sem.acquire();
+			sem.release();
 			
 			System.out.println(">>>Done");
 			cc.stopWebUIFragment(this);
