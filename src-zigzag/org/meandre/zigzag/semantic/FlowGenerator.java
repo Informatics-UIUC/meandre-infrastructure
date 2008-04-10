@@ -175,9 +175,14 @@ public class FlowGenerator {
 			// Not a componet a flow instead
 			throw new ParseException("The requested component "+resComp+" is a flow not a component (line: "+iLine+")");		
 		}
-		else 
+		else  {
 			// The component does not exist in this repository
-			throw new ParseException("The requested component "+resComp+" does not exist in repository "+urlComp+" (line: "+iLine+")");		
+			 StringBuffer sbEx = new StringBuffer();
+			 sbEx.append("The requested component "+resComp+" does not exist in repository (line: "+iLine+")\nAvailable components are:\n");
+			 for ( ExecutableComponentDescription ecdTmp:ri.getAvailableExecutableComponentDescriptions() )
+				 sbEx.append("\t"+ecdTmp.getExecutableComponent().toString()+"\n");
+			throw new ParseException(sbEx.toString());	
+		}
 	}
 
 	/** Instantiate the components.

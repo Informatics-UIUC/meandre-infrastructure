@@ -55,13 +55,13 @@ public abstract class Tools {
 		Model mod = ModelFactory.createDefaultModel();
 		try {
 			mod.read(url.openStream(),null);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			try {
 				mod.read(url.openStream(),null,"TTL");
-			} catch (IOException e1) {
+			} catch (Exception e1) {
 				try {
 					mod.read(url.openStream(),null,"N-TRIPLE");
-				} catch (IOException e2) {
+				} catch (Exception e2) {
 					throw new ParseException("Could not retrieve repository from "+url+" (line: "+iLine+")");
 				}
 			}
