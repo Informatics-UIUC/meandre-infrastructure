@@ -384,6 +384,7 @@ extends Thread {
 	 */
 	public void setMrPropper(MrProper thdMrPropper) {
 		this.thdMrProper = thdMrPropper;
+		this.cc.setMrPropper(thdMrPropper);
 	}
 	
 	/** Returns the unique ID of this executable instance.

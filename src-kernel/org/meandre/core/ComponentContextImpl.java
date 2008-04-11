@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import org.meandre.core.engine.ActiveBuffer;
 import org.meandre.core.engine.ActiveBufferException;
 import org.meandre.core.engine.MrProbe;
+import org.meandre.core.engine.MrProper;
 import org.meandre.core.engine.WrappedComponent;
 import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.webui.WebUI;
@@ -153,7 +154,7 @@ implements ComponentContext {
 		}
 
 		try {
-			 webui = WebUIFactory.getWebUI(sFlowUniqueExecutionID,wcParent.getMrProper(),wcParent.getMrProbe());
+			 webui = WebUIFactory.getWebUI(sFlowUniqueExecutionID,wcParent.getMrProper(),thdMrProbe);
 		} catch (WebUIException e) {
 			log.warning("WebUI could not be retrieved: "+e.getMessage());
 		}
@@ -396,5 +397,13 @@ implements ComponentContext {
 	 */
 	public Hashtable<String, String> getInputLogicNameMapReverse() {
 		return htInputLogicNameMapReverse;
+	}
+
+	/** Sets Mr Propper.
+	 * 
+	 * @param thdMrPropper The Mr Propper to be set.
+	 */
+	public void setMrPropper(MrProper thdMrPropper) {
+		this.webui.setMrPropper(thdMrPropper);	
 	}
 }

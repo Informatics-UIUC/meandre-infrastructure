@@ -75,51 +75,53 @@ public class WebUIDispatcher extends AbstractHandler {
 		
 		if ( target.startsWith("/admin/") )
 			processAdminRequest(target,request,response,dispatch);
+		else {
 		
-		if (lstHandlers.size() > 0) {
-			// Seting the request and response status
-			Request base_request = (request instanceof Request) ? (Request) request
-					: HttpConnection.getCurrentConnection().getRequest();
-			base_request.setHandled(true);
-			
-			response.setStatus(HttpServletResponse.SC_OK);
-			response.setContentType("text/html");
-			
-			//response.getWriter().println(getHeader());
-			
-			boolean bHasParams = !request.getParameterMap().isEmpty();
-
-			int iSize = lstHandlers.size();
-			int iCnt  = 0;
-			for ( ; iCnt<iSize ; iCnt++ ) {
-				WebUIFragment wuif = lstHandlers.get(iCnt);
-				try {
-					// Check if any paramater has been passed
-					if (bHasParams) {
-						// Only pass them them to the target
-						if (target.startsWith("/" + wuif.getFragmentID()))
-							wuif.handle(request, response);
-						else
+			if (lstHandlers.size() > 0) {
+				// Seting the request and response status
+				Request base_request = (request instanceof Request) ? (Request) request
+						: HttpConnection.getCurrentConnection().getRequest();
+				base_request.setHandled(true);
+				
+				response.setStatus(HttpServletResponse.SC_OK);
+				response.setContentType("text/html");
+				
+				//response.getWriter().println(getHeader());
+				
+				boolean bHasParams = !request.getParameterMap().isEmpty();
+	
+				int iSize = lstHandlers.size();
+				int iCnt  = 0;
+				for ( ; iCnt<iSize ; iCnt++ ) {
+					WebUIFragment wuif = lstHandlers.get(iCnt);
+					try {
+						// Check if any paramater has been passed
+						if (bHasParams) {
+							// Only pass them them to the target
+							if (target.startsWith("/" + wuif.getFragmentID()))
+								wuif.handle(request, response);
+							else
+								wuif.emptyRequest(response);
+						} else {
+							// Empty call updated all fragments
 							wuif.emptyRequest(response);
-					} else {
-						// Empty call updated all fragments
-						wuif.emptyRequest(response);
+						}
+						// This implementations avoid concurrent access to the
+						// list.
+						if ( iSize != lstHandlers.size() ) {
+							iSize--;
+							iCnt--;
+						}
+							
+					} catch (WebUIException e) {
+						throw new ServletException(e);
 					}
-					// This implementations avoid concurrent access to the
-					// list.
-					if ( iSize != lstHandlers.size() ) {
-						iSize--;
-						iCnt--;
-					}
-						
-				} catch (WebUIException e) {
-					throw new ServletException(e);
 				}
+				//response.getWriter().println(getFooter());
+				
+			} else {
+				hdlDefault.handle(target, request, response, dispatch);
 			}
-			//response.getWriter().println(getFooter());
-			
-		} else {
-			hdlDefault.handle(target, request, response, dispatch);
 		}
 	}
 
@@ -158,7 +160,7 @@ public class WebUIDispatcher extends AbstractHandler {
     			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
     		}
     	}
-    	if ( sTarget.startsWith("/admin/statistics") ) {
+    	else if ( sTarget.startsWith("/admin/statistics") ) {
     		Probe [] pa = this.webUIParent.getMrProbe().getProbes();
 			for ( Probe p:pa ) {
 				if ( p instanceof StatisticsProbeImpl ) {

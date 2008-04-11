@@ -56,7 +56,7 @@ public class WebUI {
 		this.server.setConnectors(new Connector[] { connector });
 
 		// Initialize the plugins
-		PluginFactory.initializeGlobalPublicFileServer(server, log);
+		//PluginFactory.initializeGlobalPublicFileServer(server, log);
 		//PluginFactory.initializeGlobalCorePlugins(server, log);
 
 		// Add the default WebUI dispatcher handler
@@ -124,5 +124,13 @@ public class WebUI {
 	 */
 	public MrProbe getMrProbe() {
 		return mrProbe;
+	}
+
+	/** Sets Mr Propper.
+	 * 
+	 * @param thdMrPropper The Mr Propper to set
+	 */
+	public void setMrPropper(MrProper thdMrPropper) {
+		this.mrProper = thdMrPropper;
 	}
 }
