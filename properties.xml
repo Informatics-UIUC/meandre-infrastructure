@@ -61,6 +61,7 @@
         <fileset dir="${rhino.dir}" includes="*.jar"/>
         <fileset dir="${nekohtml.dir}" includes="*.jar"/>
         <fileset dir="${jtidy.dir}" includes="*.jar"/>
+        <fileset dir="${clojure.dir}" includes="*.jar"/>
         <pathelement location="${truezip.jar}"/>
         <pathelement location="${apache-commons-upload.jar}"/>
         <pathelement location="${apache-commons-logging.jar}"/>
