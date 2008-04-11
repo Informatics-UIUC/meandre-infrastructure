@@ -15,7 +15,7 @@ public class ZigZag implements ZigZagConstants {
 
   public static void main(String args[]) throws ParseException,FileNotFoundException, IOException {
     if ( args.length<1 ) {
-        System.err.println("Wrong syntax!!!\nThe compiler requires at least on .zz file");
+        System.err.println("Wrong syntax!!!\nThe compiler requires at least one .zz file");
     }
     else
     {
