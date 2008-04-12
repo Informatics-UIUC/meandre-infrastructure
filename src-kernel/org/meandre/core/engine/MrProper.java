@@ -56,6 +56,8 @@ public class MrProper extends Thread {
 			try {
 				// Check if cleaning needed
 				semBlocking.acquire();
+				// Put it to sleep for a second to mitigate live cycling with data-intensive short computation flows
+				Thread.sleep(1000);
 				// Check for termination flag
 				bNotDone = !checkTerminationFlag();
 				// Check for components not running
@@ -153,6 +155,9 @@ public class MrProper extends Thread {
 			wc.awake();
 		}
 		log.info("Abort execution requested propagated to the executable components." );
+		// Set MrPropper to finish and release him if slept
+		bNotDone = false;
+		semBlocking.release();
 	}
 
 }
