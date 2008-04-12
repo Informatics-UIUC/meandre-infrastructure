@@ -1,5 +1,6 @@
 package org.meandre.webui;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
@@ -17,9 +18,12 @@ import org.json.XML;
 import org.meandre.core.engine.Probe;
 import org.meandre.core.engine.ProbeException;
 import org.meandre.core.engine.probes.StatisticsProbeImpl;
+import org.meandre.core.store.Store;
 import org.mortbay.jetty.HttpConnection;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
+import org.mortbay.jetty.handler.ResourceHandler;
+import org.mortbay.jetty.servlet.Context;
 
 /** This class dispatches the webui calls.
  * 
@@ -38,6 +42,9 @@ public class WebUIDispatcher extends AbstractHandler {
 	/** The default webUI handler */
 	private DefaultWebUIHandler hdlDefault = null;
 
+	/** The default resource handler */
+	private ResourceHandler resource_handler;
+
 	/**
 	 * Creates the default WebUI handler.
 	 * 
@@ -48,6 +55,14 @@ public class WebUIDispatcher extends AbstractHandler {
 		this.lstHandlers = new LinkedList<WebUIFragment>();
 		// Create the default handler
 		this.hdlDefault = new DefaultWebUIHandler(webUIParent);
+		
+		// The resouce file server
+		File file = new File(Store.getPublicResourcesDirectory());
+		resource_handler = new ResourceHandler();
+		resource_handler.setCacheControl("no-cache");
+		resource_handler.setResourceBase(file.getAbsolutePath());
+		Context contextResources = new Context(webUIParent.server,"/public/resources",Context.NO_SESSIONS);
+		contextResources.setHandler(resource_handler);
 	}
 
 	/**
@@ -75,6 +90,9 @@ public class WebUIDispatcher extends AbstractHandler {
 		
 		if ( target.startsWith("/admin/") )
 			processAdminRequest(target,request,response,dispatch);
+		else if ( target.startsWith("/public/resources") ) {
+			resource_handler.handle(target, request, response, dispatch);
+		}
 		else {
 		
 			if (lstHandlers.size() > 0) {

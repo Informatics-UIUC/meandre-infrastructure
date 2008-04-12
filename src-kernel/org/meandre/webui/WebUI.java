@@ -23,7 +23,7 @@ public class WebUI {
 	private int iPort = -1;
 
 	/** The embeded jetty server */
-	private Server server = null;
+	Server server = null;
 
 	/** The dispatcher for this WebUI */
 	private WebUIDispatcher webUIDispatcher = null;
