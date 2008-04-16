@@ -117,7 +117,7 @@ public class ConductorTest {
 		System.out.println(baosErr.toString());
 		assertEquals(0,baosErr.size());
 		
-		String sResult = "Execute called from Lisp\nHELLO WORLD!!! HAPPY MEANDRING!!!  (P1,C0123456)  HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C0123456)  \nDispose called from Lisp\n";
+		String sResult = "HELLO WORLD!!! HAPPY MEANDRING!!!  (P1,C0123456)  HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C0123456)  \n";
 		assertEquals(sResult.length(),baosOut.size());
 	}
 	

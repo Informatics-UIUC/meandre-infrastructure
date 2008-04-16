@@ -17,6 +17,8 @@ package org.meandre.zigzag.parser;
 import java.io.*;
 import java.util.*;
 import org.meandre.zigzag.semantic.*;
+import java.util.logging.*;
+import org.meandre.core.logger.KernelLoggerFactory;
 
 public class ZigZag {
 
@@ -27,6 +29,12 @@ public class ZigZag {
   protected FlowGenerator fg;
   
   public static void main(String args[]) throws ParseException,FileNotFoundException, IOException {
+    
+    // Tone down the logger
+	KernelLoggerFactory.getCoreLogger().setLevel(Level.WARNING);
+	for ( Handler h:KernelLoggerFactory.getCoreLogger().getHandlers() )
+		h.setLevel(Level.WARNING);
+		
     if ( args.length<1 ) {
     	System.err.println("Wrong syntax!!!\nThe compiler requires at least on .zz file");
     }
@@ -75,6 +83,10 @@ TOKEN :
 |	< COLON: ":" >
 |	< SEMICOLON: ";" >
 |	< AT: "@" >
+|	< LB: "[" >
+|	< RB: "]" >
+|	< PLUS: "+" > 
+|	< EXCL: "!" >
 }
 TOKEN : 
 {
@@ -82,6 +94,8 @@ TOKEN :
 |   < FROM: "from"> 
 |   < ALIAS: "alias"> 
 |   < AS: "as">
+|   < AUTO: "AUTO">
+|   < NUMBER: ["1"-"9"](["0"-"9"])* >
 }
 TOKEN :
 { 
@@ -219,7 +233,10 @@ void cm(Token t) :
 	}
 }
 
-void ii_call( Token tCall ) : {}
+void ii_call( Token tCall ) : 
+{
+	Token tParallel;
+}
 {
 	<LP>
 		(port_binding(tCall)
@@ -229,6 +246,20 @@ void ii_call( Token tCall ) : {}
 			)*
 		)*		
 	<RP>
+	(
+		<LB><PLUS>(
+		<AUTO>
+		{ fg.markParallel(tCall.image,0); }
+		|
+		tParallel = <NUMBER>
+		{ fg.markParallel(tCall.image,Integer.parseInt(tParallel.image)); }
+		)
+		(
+			<EXCL>
+			{ fg.forceOrderedParallel(tCall.image); }
+		)?
+		<RB>
+	)*
 }
  
 void port_binding( Token tTargetIns ) : 
@@ -253,6 +284,7 @@ void ii_assigment() :
 {
 	Token tBinding;
 	Token tTargetIns;
+		
 	Queue<String> qLeftIns = new LinkedList<String>();
 	
 	int iLeftCount = 1;
@@ -274,7 +306,7 @@ void ii_assigment() :
 		<COMA>
 		tTargetIns = <SYMBOL>  
 		{ fg.bindBindingPort(qLeftIns.poll(),tTargetIns.image,jj_input_stream.getBeginLine()-1); }
-		ii_call(tTargetIns)
+		ii_call(tTargetIns)	
 		{ iRightCount++; }
 	)*
 	{

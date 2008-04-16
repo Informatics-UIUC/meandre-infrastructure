@@ -239,7 +239,10 @@ implements ComponentContext {
 	 * @throws ComponentContextException A violation of the component context is detected
 	 */
 	public boolean isInputAvailable ( String sInputBuffer ) throws ComponentContextException {
-		if ( dp.getInput(htInputLogicNameMap.get(sInputBuffer))!=null )
+		if ( sInputBuffer==null )
+			// Unconnected input
+			return false;
+		else if ( dp.getInput(htInputLogicNameMap.get(sInputBuffer))!=null )
 			return true;
 		else
 			return false;

@@ -1,5 +1,34 @@
 1.2vcli Panellet:
 
+* Modified the Mau code generator of the ZigZag compiler to produce parallel component creation
+	- Supports AUTO parallelization
+	- Supports unforced and forced order maintenance 
+
+* Extension to the ZigZag grammar to allow parallelization of instances (ordered and unordered)
+
+* Fix to the add remove location WS (remove the corruption of descriptions problem identified by Boris)
+
+* Implemented the MAU executor
+
+* Integrated the semantic parser and MAU format generator
+
+* Implemented the ZigZag compiler and parser
+
+* Develop the ZigZag language
+
+* (!!) Cummulative updates to the core
+	- Better cleaning of webuis threads (a while ago Duane mention some apps with webuis were not finishing and this is the reason).
+    - Fix to /admin/abort.txt of a webui (was leaving behind mr propper and thus not letting the flow to be destroyed), and
+    -Webui now effectively also serve /public/resources (which will make AJAX easier so you can get the client pages form the webui /public/resources itself)
+
+* (!!) Bug fixing
+	- Fixed possible lost of data
+	- Fixed out of order data sorting (violation of fairness of the underlying FSM that runs the component)
+	- Toned down the login in the core
+	
+* WS additions
+	- Boris added extra functionally on the queries for components and flows
+	
 * Bug fixing:
 	- Fix the conductor to avoid crashing in the presence of dangling inputs
 	- Forbid pushing nulls
@@ -136,6 +165,6 @@
 * Plain all mixed together (engine, web app demo, and basic publishing services)
 
 ___
-Edited by Xavier.
--Last Updated: Amit Kumar on  Feb 16th 2008
+Edited by Xavier Llorˆ.
+	- Contributed update: Amit Kumar on Feb 16th 2008
 

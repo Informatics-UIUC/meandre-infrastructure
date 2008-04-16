@@ -303,17 +303,29 @@ public class DemoRepositoryGenerator {
 	}
 
 	/** The Python code that does the upper case conversion */
+//	private final static String sPythonToUpper = 
+//		"def initialize(ccp):\n" +
+//		"   print \"Initialize called from Python\"\n"+
+//		"\n" +
+//		"def execute(cc):\n" +
+//		"   print \"Execute called from Python\", cc \n" +
+//		"   s = cc.getDataComponentFromInput(\"string\") \n" +
+//		"   cc.pushDataComponentToOutput(\"string\",s.upper()) \n" +
+//		"\n" +
+//		"def dispose(ccp):\n" +
+//		"   print \"Dispose called from Python\"\n" +
+//		"\n";
+
 	private final static String sPythonToUpper = 
 		"def initialize(ccp):\n" +
-		"   print \"Initialize called from Python\"\n"+
+		"   pass\n"+
 		"\n" +
 		"def execute(cc):\n" +
-		"   print \"Execute called from Python\", cc \n" +
 		"   s = cc.getDataComponentFromInput(\"string\") \n" +
 		"   cc.pushDataComponentToOutput(\"string\",s.upper()) \n" +
 		"\n" +
 		"def dispose(ccp):\n" +
-		"   print \"Dispose called from Python\"\n" +
+		"   pass\n" +
 		"\n";
 	
 	/** Create the description for a python to uppercase component.
@@ -399,14 +411,23 @@ public class DemoRepositoryGenerator {
 
 	
 	/** The Lisp code that does the upper case conversion */
+//	private final static String sLispPassThrough = 
+//		"(defn initialize [x] (.(. System out) (println \"Initialize called from Lisp\")) )\n"+
+//		"(defn execute [x] \n"+
+//		"        (.(. System out) (println \"Execute called from Lisp\")) \n" +
+//		"        (. x (pushDataComponentToOutput \n"+
+//		"                 \"string\"\n"+
+//		"                 (. x (getDataComponentFromInput \"string\")))) )\n"+
+//		"(defn dispose [x] (.(. System out) (println \"Dispose called from Lisp\")) )" +
+//		"\n";
+	
 	private final static String sLispPassThrough = 
-		"(defn initialize [x] (.(. System out) (println \"Initialize called from Lisp\")) )\n"+
+		"(defn initialize [x] 1 )\n"+
 		"(defn execute [x] \n"+
-		"        (.(. System out) (println \"Execute called from Lisp\")) \n" +
 		"        (. x (pushDataComponentToOutput \n"+
 		"                 \"string\"\n"+
 		"                 (. x (getDataComponentFromInput \"string\")))) )\n"+
-		"(defn dispose [x] (.(. System out) (println \"Dispose called from Lisp\")) )" +
+		"(defn dispose [x] 1 )" +
 		"\n";
 	
 	/** Create the description for a lisp that change Es for As component.

@@ -9,9 +9,7 @@ import java.io.StringReader;
 import java.util.logging.Logger;
 
 import org.meandre.core.ComponentContext;
-import org.meandre.core.ComponentContextException;
 import org.meandre.core.ComponentContextProperties;
-import org.meandre.core.ComponentExecutionException;
 import org.meandre.core.ExecutableComponent;
 import org.meandre.core.environments.ScriptingEnvironmentAdapter;
 import org.meandre.core.logger.KernelLoggerFactory;

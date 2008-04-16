@@ -4,6 +4,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.Handler;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,6 +15,7 @@ import org.meandre.core.engine.ConductorException;
 import org.meandre.core.engine.Executor;
 import org.meandre.core.engine.MrProbe;
 import org.meandre.core.engine.probes.StatisticsProbeImpl;
+import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.store.repository.CorruptedDescriptionException;
 import org.meandre.core.store.repository.QueryableRepository;
 import org.meandre.core.store.repository.RepositoryImpl;
@@ -33,6 +37,12 @@ public class MAUExecutor {
 	private static final String ZMAU_VERSION = "1.0.0vcli";
 
 	public static void main(String args[]) throws FileNotFoundException {
+		
+		// Tone down the logger
+		KernelLoggerFactory.getCoreLogger().setLevel(Level.WARNING);
+		for ( Handler h:KernelLoggerFactory.getCoreLogger().getHandlers() )
+			h.setLevel(Level.WARNING);
+		
 		if ( args.length!=1 ) {
 			System.err.println("Wrong syntax!!!\nThe MAU executor requires one .mau file");
 		}

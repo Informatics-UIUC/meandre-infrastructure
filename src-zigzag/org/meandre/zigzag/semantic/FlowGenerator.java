@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
 
@@ -16,6 +17,8 @@ import org.meandre.core.store.repository.ExecutableComponentInstanceDescription;
 import org.meandre.core.store.repository.FlowDescription;
 import org.meandre.core.store.repository.PropertiesDescription;
 import org.meandre.core.store.repository.RepositoryImpl;
+import org.meandre.core.system.components.MapExecutableComponent;
+import org.meandre.core.system.components.ReduceExecutableComponent;
 import org.meandre.core.utils.Constants;
 import org.meandre.zigzag.parser.ParseException;
 import org.meandre.zigzag.parser.ZigZag;
@@ -31,6 +34,9 @@ import com.hp.hpl.jena.rdf.model.Resource;
  */
 public class FlowGenerator {
 
+	/** The default parallelization degree */
+	private final static int AUTO_PARALLELIZATION_DEGREE = 4;
+	
 	/** The composed repository */
 	protected RepositoryImpl ri;
 	
@@ -51,6 +57,12 @@ public class FlowGenerator {
 	
 	/** The set of defined connectors */
 	protected HashSet<ConnectorDescription> hsConnectors;
+	
+	/** The parallel instance count */
+	protected Hashtable<String,Integer> htParallelInstances;
+	
+	/** The parallel instance should be ordered? */
+	protected Hashtable<String,Boolean> htParallelOrderedInstances;
 	
 	/** The base URL */
 	protected String sBaseURL;
@@ -82,6 +94,10 @@ public class FlowGenerator {
 		htECAlias = new  Hashtable<String,ExecutableComponentDescription>();
 		htECInsAlias = new  Hashtable<String,ExecutableComponentInstanceDescription>();
 		
+		// Parallization information for instances
+		htParallelInstances = new Hashtable<String,Integer>();
+		htParallelOrderedInstances = new Hashtable<String,Boolean>();
+		
 		// Binding information
 		htPortECIns = new  Hashtable<String,ExecutableComponentInstanceDescription>();
 		hsPortSet = new HashSet<String>();
@@ -92,6 +108,7 @@ public class FlowGenerator {
 		
 		// The base URL
 		sBaseURL = "http://meandre.org/zigzag/"+sName+"/"+System.currentTimeMillis()+"/";
+		
 	}
 	
 	/** Import a repository 
@@ -219,12 +236,31 @@ public class FlowGenerator {
 				htECInsAlias.put(sSymbol, ecid);
 				System.out.println("Instantiating component "+sComponent+" as "+sSymbol);
 			}
-			
 		}
-		
-		
 	}
 
+
+	/** Mark and instance as a parallel one.
+	 * 
+	 * @param sAlias The instance alias
+	 * @param iCopies The number of copies
+	 */
+	public void markParallel(String sAlias, int iCopies) {
+		htParallelInstances.put(sAlias, iCopies);
+		htParallelOrderedInstances.put(sAlias, false);
+		System.out.print("Instance "+sAlias+" mark for paralellization (");
+		System.out.println((iCopies==0)?"AUTO replicas)":""+iCopies+" replicas)");
+	}
+
+	/** Mark a parallel component for enforced order.
+	 * 
+	 * @param sAlias The instance alias
+	 */
+	public void forceOrderedParallel(String sAlias) {
+		htParallelOrderedInstances.put(sAlias, true);
+		System.out.println("Instance "+sAlias+" mark for ordered parallelization");
+	}
+	
 	/** Sets the property values.
 	 * 
 	 * @param qLeftIns The left instance
@@ -407,10 +443,15 @@ public class FlowGenerator {
 	 * @throws IOException The file could not be written
 	 */
 	public void generateMAU(String sFileName) throws IOException {
+		System.out.println("ZigZag compilation finished successfuly!" );
+		System.out.print("Preparing flow descriptor... " );
+		
 		FlowDescription fd = new FlowDescription();
+		
 		String sOutputFileName = sFileName.replaceAll(".zz$", ".mau");
 		
 		// Set the basic flow properties
+		sFileName = (sFileName.endsWith("/"))?sFileName:sFileName+"/";
 		fd.setFlowComponent(ri.getModel().createResource(sBaseURL+"flow/"+sFileName));
 		fd.setName(sFileName);
 		fd.setRights("NCSA/UofI open source license");
@@ -425,14 +466,25 @@ public class FlowGenerator {
 		// Add the connectors to the flow
 		fd.getConnectorDescriptions().addAll(hsConnectors);
 		
+		System.out.println("done");
+		
+		if ( htParallelInstances.size()>0 ) {
+			System.out.println("Postprocessing flow for parallelization");
+			postProcessinParallelization(fd);
+			System.out.println("Postprocessing flow for parallelization finished");
+		}
+		
+		
 		// Add the component descriptions to the model
+		System.out.print("Assembling MAU repository... ");
 		Model mod = fd.getModel();
-		for ( ExecutableComponentInstanceDescription ecid:htECInsAlias.values() )
+		for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() )
 			mod.add(ri.getExecutableComponentDescription(ecid.getExecutableComponent()).getModel());
 		
-		// TODO: Embed the contexts
+		// TODO: Jar EVERYTHING TOGETHER
+		System.out.println("done");
 		
-		System.out.println("ZigZag compilation finished successfuly!" );
+		// Write the file
 		System.out.println("Writing MAU file: "+sOutputFileName);
 		FileOutputStream fos = new FileOutputStream(sOutputFileName);
 		mod.write(fos,"TTL");
@@ -440,6 +492,298 @@ public class FlowGenerator {
 		System.out.println();
 		
 	}
+
+	/** Postprocessing for automatization of the parallelization.
+	 * 
+	 * @param fd The current flow descriptor
+	 */
+	private void postProcessinParallelization(FlowDescription fd) {
+		
+		Model mod = fd.getModel();
+		
+		// Foreach instance that needs to be parallelized
+		for ( String sInsAlias:htParallelInstances.keySet() ) {
+			System.out.print("\tStarting parallelization of instance "+sInsAlias+"... ");
+			
+			// Retrieving the instance descriptor and the number of parallelization requried
+			ExecutableComponentInstanceDescription ecid = htECInsAlias.get(sInsAlias);
+			int iParallel = htParallelInstances.get(sInsAlias);
+			boolean bOrdered = htParallelOrderedInstances.get(sInsAlias);
+			System.out.print("degree: "+((iParallel==0)?"AUTO":""+iParallel)+((bOrdered)?" ordered":" unordereed"));
+			iParallel = (iParallel==0)?AUTO_PARALLELIZATION_DEGREE:iParallel;
+			
+			// Replicate the instance
+			ExecutableComponentInstanceDescription[] ecida = new ExecutableComponentInstanceDescription[iParallel];
+			for ( int i=0 ; i<iParallel ; i++ ) {
+				ExecutableComponentInstanceDescription ecidNew = new ExecutableComponentInstanceDescription();
+				
+				String sNewResIns = ecid.getExecutableComponentInstance().toString()+"/paralell/"+i;
+				ecidNew.setDescription(ecid.getDescription());
+				ecidNew.setExecutableComponent(ecid.getExecutableComponent());
+				ecidNew.setExecutableComponentInstance(mod.createResource(sNewResIns));
+				ecidNew.setName(ecid.getName()+"-parallel-"+i);
+				PropertiesDescription ecidProp = ecid.getProperties();
+				Hashtable<String,String> htNewInsPropValues = new Hashtable<String,String>();
+				if ( ecidProp!=null )
+					for ( String sKey:ecidProp.getKeys() ) 
+						htNewInsPropValues.put(sKey,ecidProp.getValue(sKey));
+				htNewInsPropValues.put("parallel_id", ""+i);
+				htNewInsPropValues.put("parallel_instances", ""+iParallel);
+				ecidNew.setProperties(new PropertiesDescription(htNewInsPropValues));
+				
+				ecida[i] = ecidNew;
+				fd.addExecutableComponentInstance(ecidNew);
+			}
+			
+			// Get the executable component description for the instance
+			ExecutableComponentDescription ecd = ri.getExecutableComponentDescription(ecid.getExecutableComponent());
+			
+			// Process the outputs
+			if ( bOrdered ) {
+				// Connect the output of ordered parallelization
+				
+				// Create the current reducer instance
+				for ( DataPortDescription dpdOutput:ecd.getOutputs() ) {
+					// Create the reducer component and add it to the model
+					ExecutableComponentDescription ecdRed = ReduceExecutableComponent.getExecutableComponentDescription(iParallel);
+					ri.refreshCache(ri.getModel().add(ecdRed.getModel()));
+					
+					// Create a reducer instance
+					ExecutableComponentInstanceDescription ecidReducer = new ExecutableComponentInstanceDescription();
+					String sNewResIns = ecid.getExecutableComponentInstance().toString()+"/reduce/"+dpdOutput.getName()+"/"+iParallel;
+					ecidReducer.setDescription("Ordered reducer for "+ecid.getName());
+					ecidReducer.setExecutableComponent(ecdRed.getExecutableComponent());
+					ecidReducer.setExecutableComponentInstance(mod.createResource(sNewResIns));
+					ecidReducer.setName(ecid.getName()+"-reducer-"+dpdOutput.getName()+"-"+iParallel);
+					Hashtable<String,String> htNewInsPropValues = new Hashtable<String,String>();
+					ecidReducer.setProperties(new PropertiesDescription(htNewInsPropValues));
+					fd.addExecutableComponentInstance(ecidReducer);
+					
+					// Rebind reducer to target instance
+					DataPortDescription dpdReducerOutput = ecdRed.getOutputs().iterator().next();
+					rebindReducerToTarget(fd,ecidReducer,dpdReducerOutput,ecid,dpdOutput);
+					
+					// Bind all the instance port to this reducer
+					for ( int i=0 ; i<iParallel ; i++ )
+						bindParallelInstanceToReducer(fd,ecdRed,ecidReducer,dpdOutput,ecida[i],i);
+				}
+				
+			}
+			else {
+				// Connect the output of unordered parallelization
+				for ( int i=0 ; i<iParallel ; i++ ) {
+					bindUnorderedParallelInstnaces(fd,ecd,ecid,ecida[i],i);
+				}
+				// Remove all connectors
+				removeOldOutputBindings(fd,ecid);
+			}
+			
+			// Rebind the port to the mapper
+			for ( DataPortDescription dpdInput:ecd.getInputs() ) {
+				System.out.print("... rebinding port "+dpdInput.getName());
+				// The component has inputs and a mapper is needed
+				ExecutableComponentDescription ecdMap = MapExecutableComponent.getExecutableComponentDescription(iParallel);
+				ri.refreshCache(ri.getModel().add(ecdMap.getModel()));
+				
+				// Instantiate the mapper and add the mapper instance
+				ExecutableComponentInstanceDescription ecidMapper = new ExecutableComponentInstanceDescription();
+				String sNewResIns = ecid.getExecutableComponentInstance().toString()+"/mapper/"+dpdInput.getName()+"/"+iParallel;
+				ecidMapper.setDescription("Mapper for "+ecid.getName());
+				ecidMapper.setExecutableComponent(ecdMap.getExecutableComponent());
+				ecidMapper.setExecutableComponentInstance(mod.createResource(sNewResIns));
+				ecidMapper.setName(ecid.getName()+"-mapper-"+dpdInput.getName()+"-"+iParallel);
+				Hashtable<String,String> htNewInsPropValues = new Hashtable<String,String>();
+				ecidMapper.setProperties(new PropertiesDescription(htNewInsPropValues));
+				fd.addExecutableComponentInstance(ecidMapper);
+				
+				
+				// Rebind the connections to the mapper
+				rebindTargetPort(fd,ecdMap,ecid,ecidMapper,dpdInput);
+				
+				// Rebind the mapper to the instances
+				for ( int i=0 ; i<iParallel ; i++ ) {
+					Resource resMapperOutputPort = null;
+					Iterator<DataPortDescription> iter = ecdMap.getOutputs().iterator();
+					while ( resMapperOutputPort==null ) {
+						DataPortDescription dpdTmp = iter.next();
+						if ( dpdTmp.getName().equals("object-"+i) )
+							resMapperOutputPort = dpdTmp.getResource();
+					}
+					bindMapperToParallelInstance(fd,ecidMapper,resMapperOutputPort,ecida[i], dpdInput, i);
+				}
+			}
+			
+			// Remove the parallelized instance
+			fd.getExecutableComponentInstances().remove(ecid);
+			
+			
+			System.out.println(" ...done");
+		}
+		
+	}
+
+	/** Binds each of the parallel instance to its reducer.
+	 * 
+	 * @param fd The flow descriptor
+	 * @param ecdRed The reducer executable component descriptor
+	 * @param ecidReducer The executable component instance for the reducer
+	 * @param dpdOutput The parallel instance being processed
+	 * @param ecidParallel The parallel instance executable component instance description
+	 * @param iRound The parallel instance
+	 */
+	private void bindParallelInstanceToReducer(
+			FlowDescription fd,
+			ExecutableComponentDescription ecdRed, ExecutableComponentInstanceDescription ecidReducer,
+			DataPortDescription dpdOutput,
+			ExecutableComponentInstanceDescription ecidParallel,
+			int iRound) {
+
+		Resource resReducerPort = null;
+		Iterator<DataPortDescription> iter = ecdRed.getInputs().iterator();
+		while ( resReducerPort==null ) {
+			DataPortDescription dpdTmp = iter.next();
+			if ( dpdTmp.getName().equals("object-"+iRound) )
+				resReducerPort = dpdTmp.getResource();
+		}
+			
+
+		ConnectorDescription cdParallelInstanceToReducer = new ConnectorDescription();
+		
+		Resource cdRes = fd.getModel().createResource(ecidReducer.getExecutableComponentInstance().toString()+"/output/connector/"+iRound);
+		cdParallelInstanceToReducer.setConnector(cdRes);
+		cdParallelInstanceToReducer.setSourceInstance(ecidParallel.getExecutableComponentInstance());
+		cdParallelInstanceToReducer.setSourceIntaceDataPort(dpdOutput.getResource());
+		cdParallelInstanceToReducer.setTargetInstance(ecidReducer.getExecutableComponentInstance());
+		cdParallelInstanceToReducer.setTargetIntaceDataPort(resReducerPort);
+		
+		fd.getConnectorDescriptions().add(cdParallelInstanceToReducer);
+	}
+
+	/** Binds the reducer to the given target instance and port.
+	 * 
+	 * @param fd The flow descriptor
+	 * @param ecidReducer The executable component instance for the reducer
+	 * @param dpdEcidReducer 
+	 * @param ecid The instance being replaced
+	 * @param dpdOutput The data port being processed
+	 */
+	private void rebindReducerToTarget(FlowDescription fd,
+			ExecutableComponentInstanceDescription ecidReducer,
+			DataPortDescription dpdEcidReducer, ExecutableComponentInstanceDescription ecid,
+			DataPortDescription dpdOutput) {
+		
+		for ( ConnectorDescription cd:fd.getConnectorDescriptions() ) 
+			if ( cd.getSourceInstance().equals(ecid.getExecutableComponentInstance()) && 
+				 cd.getSourceIntaceDataPort().equals(dpdOutput.getResource()) ) {
+				cd.setSourceInstance(ecidReducer.getExecutableComponentInstance());
+				cd.setSourceIntaceDataPort(dpdEcidReducer.getResource());
+			}
+	}
+
+	/** Binds the unordered parallel instances.
+	 * 
+	 * @param fd The flow descriptor
+	 * @param ecd The executable component descriptor
+	 * @param ecid The original executable instance description
+	 * @param ecidNewPar The new unordered parallel instance description 
+	 * @param iParallel The parallel instance being processed
+	 */
+	private void bindUnorderedParallelInstnaces(
+			FlowDescription fd,
+			ExecutableComponentDescription ecd,
+			ExecutableComponentInstanceDescription ecid,
+			ExecutableComponentInstanceDescription ecidNewPar,
+			int iParallel) {
+		
+		Set<ConnectorDescription> setToBeAdded = new HashSet<ConnectorDescription>();
+		
+		int iCnt=0;
+		for ( ConnectorDescription cd:fd.getConnectorDescriptions() ) 
+			if  ( cd.getSourceInstance().equals(ecid.getExecutableComponentInstance()) ) {
+				ConnectorDescription cdMapToParallelInstance = new ConnectorDescription();
+				
+				Resource cdRes = fd.getModel().createResource(ecidNewPar.getExecutableComponentInstance().toString()+"/parallel/"+iParallel+"/connector/"+(iCnt++));
+				cdMapToParallelInstance.setConnector(cdRes);
+				cdMapToParallelInstance.setSourceInstance(ecidNewPar.getExecutableComponentInstance());
+				cdMapToParallelInstance.setSourceIntaceDataPort(cd.getSourceIntaceDataPort());
+				cdMapToParallelInstance.setTargetInstance(cd.getTargetInstance());
+				cdMapToParallelInstance.setTargetIntaceDataPort(cd.getTargetIntaceDataPort());
+				
+				setToBeAdded.add(cdMapToParallelInstance);
+			}
+		
+		// Add the new ones
+		for ( ConnectorDescription cd:setToBeAdded )
+			fd.getConnectorDescriptions().add(cd);
+	}
+
+	/** Remove all the output connector for the given instance.
+	 * 
+	 * @param fd The flow descriptor
+	 * @param ecid The executable instance for which connnectors need to be removed
+	 */
+	private void removeOldOutputBindings ( FlowDescription fd, ExecutableComponentInstanceDescription ecid) {
+		Set<ConnectorDescription> setConnectors = fd.getConnectorDescriptions();
+		Set<ConnectorDescription> setToBeRemoved = new HashSet<ConnectorDescription>();
+		
+		// Collect the ones that need to be removed
+		for ( ConnectorDescription cd:setConnectors ) 
+			if  ( cd.getSourceInstance().equals(ecid.getExecutableComponentInstance()) )
+				setToBeRemoved.add(cd);
+		
+		// Remove them
+		for ( ConnectorDescription cd:setToBeRemoved )
+			setConnectors.remove(cd);
+	}
+	
+	/** Rebinds the port to the indicated mapper.
+	 * 
+	 * @param fd The flow description 
+	 * @param ecdMap The mapper description
+	 * @param ecid The original instance
+	 * @param ecidMapper The executable component instance of the mapper
+	 * @param dpdInput The identifier of the input
+	 */
+	private void rebindTargetPort(FlowDescription fd,
+			ExecutableComponentDescription ecdMap, ExecutableComponentInstanceDescription ecid,
+			ExecutableComponentInstanceDescription ecidMapper, DataPortDescription dpdInput) {
+		
+		for ( ConnectorDescription cd:fd.getConnectorDescriptions() ) 
+			if ( cd.getTargetInstance().equals(ecid.getExecutableComponentInstance()) &&
+				 cd.getTargetIntaceDataPort().equals(dpdInput.getResource() )) {
+				cd.setTargetInstance(ecidMapper.getExecutableComponentInstance());
+				cd.setTargetIntaceDataPort(ecdMap.getInputs().iterator().next().getResource());
+			}
+		
+	}
+
+	/** Binds the mapper to the parallel instances.
+	 * 
+	 * @param fd The flow descriptor
+	 * @param ecidMapper The mapper instance
+	 * @param resMapperOutputPort The mapper output port description
+	 * @param ecidParallelInstance The component instance
+	 * @param dpdInput The current port being processed
+	 * @param iRound The parallel instance being processes
+	 */
+	private void bindMapperToParallelInstance(
+			FlowDescription fd,
+			ExecutableComponentInstanceDescription ecidMapper,
+			Resource resMapperOutputPort,
+			ExecutableComponentInstanceDescription ecidParallelInstance, DataPortDescription dpdInput, int iRound) {
+		
+		ConnectorDescription cdMapToParallelInstance = new ConnectorDescription();
+		
+		Resource cdRes = fd.getModel().createResource(ecidMapper.getExecutableComponentInstance().toString()+"/output/connector/"+iRound);
+		cdMapToParallelInstance.setConnector(cdRes);
+		cdMapToParallelInstance.setSourceInstance(ecidMapper.getExecutableComponentInstance());
+		cdMapToParallelInstance.setSourceIntaceDataPort(resMapperOutputPort);
+		cdMapToParallelInstance.setTargetInstance(ecidParallelInstance.getExecutableComponentInstance());
+		cdMapToParallelInstance.setTargetIntaceDataPort(dpdInput.getResource());
+		
+		fd.getConnectorDescriptions().add(cdMapToParallelInstance);
+	}
+
 
 		
 }

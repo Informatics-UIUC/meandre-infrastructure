@@ -306,7 +306,7 @@ extends Thread {
 		catch ( Exception e ) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
-			log.warning("Something went really wrong\n" +baos.toString());
+			log.warning("Something went really wrong in "+this.ec.getClass().getName()+"\n" +baos.toString());
 		}
 		
 
