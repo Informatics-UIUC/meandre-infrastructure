@@ -16,7 +16,7 @@ import org.meandre.webui.WebUIFragmentCallback;
 
 /** A demo of a web UI callback.
  *
- * @author Xavier llor&agrave;
+ * @author Xavier Llor&agrave;
  *
  */
 public class WebUIHelloWorldFragment implements ExecutableComponent, WebUIFragmentCallback {
@@ -30,7 +30,7 @@ public class WebUIHelloWorldFragment implements ExecutableComponent, WebUIFragme
 	/** The instance ID */
 	private String sInstanceID = null;
 
-	/** This method gets call when a request with no parameters is made to a
+	/** This method gets called when a request with no parameters is made to a
 	 * component WebUI fragment.
 	 *
 	 * @param response The response object
@@ -52,12 +52,12 @@ public class WebUIHelloWorldFragment implements ExecutableComponent, WebUIFragme
 	private String getViz() {
 
 		StringBuffer sb = new StringBuffer("<center><strong><em>"+sMsg+"</em></strong></center>\n");
-		
+
 		sb.append("<a href=\"/"+sInstanceID +"?done=true ");
 		sb.append("title=\"Done with WebUI fragment\" ");
 		sb.append("tooltip=\"Done with WebUI fragment\" >");
 		sb.append("Done with WebUI fragment</a>");
-		
+
 		return sb.toString();
 	}
 
@@ -95,15 +95,15 @@ public class WebUIHelloWorldFragment implements ExecutableComponent, WebUIFragme
 	 */
 	public void execute(ComponentContext cc) throws ComponentExecutionException, ComponentContextException {
 		try {
-			
+
 			sMsg  = cc.getDataComponentFromInput("message").toString();
 			sInstanceID = cc.getExecutionInstanceID();
-			
+
 			sem.acquire();
 			cc.startWebUIFragment(this);
 			sem.acquire();
 			sem.release();
-			
+
 			System.out.println(">>>Done");
 			cc.stopWebUIFragment(this);
 		}
@@ -113,7 +113,7 @@ public class WebUIHelloWorldFragment implements ExecutableComponent, WebUIFragme
 
 	}
 
-	/** This method is invoked when the Meandre Flow is being prepared for 
+	/** This method is invoked when the Meandre Flow is being prepared for
 	 * getting run.
 	 *
 	 * @param ccp The properties associated to a component context
