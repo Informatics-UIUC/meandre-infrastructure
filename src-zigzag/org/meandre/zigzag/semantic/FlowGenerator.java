@@ -443,19 +443,28 @@ public class FlowGenerator {
 	 * @throws IOException The file could not be written
 	 */
 	public void generateMAU(String sFileName) throws IOException {
+		String sOutputFileName = sFileName.replaceAll(".zz$", ".mau");
+		generateMAUWithFile(sOutputFileName);
+	}
+		
+	/** Generates the MAU file for the successfully compiled code.
+	 * 
+	 * @param sOutputFileName The filename
+	 * @throws IOException The file could not be written
+	 */
+	public void generateMAUWithFile(String sOutputFileName) throws IOException {
 		System.out.println("ZigZag compilation finished successfuly!" );
 		System.out.print("Preparing flow descriptor... " );
 		
 		FlowDescription fd = new FlowDescription();
 		
-		String sOutputFileName = sFileName.replaceAll(".zz$", ".mau");
 		
 		// Set the basic flow properties
-		sFileName = (sFileName.endsWith("/"))?sFileName:sFileName+"/";
-		fd.setFlowComponent(ri.getModel().createResource(sBaseURL+"flow/"+sFileName));
-		fd.setName(sFileName);
+		sOutputFileName = (sOutputFileName.endsWith("/"))?sOutputFileName:sOutputFileName+"/";
+		fd.setFlowComponent(ri.getModel().createResource(sBaseURL+"flow/"+sOutputFileName));
+		fd.setName(sOutputFileName);
 		fd.setRights("NCSA/UofI open source license");
-		fd.setDescription("Automatically compiled from ZigZag file "+sFileName);
+		fd.setDescription("Automatically compiled from ZigZag file "+sOutputFileName);
 		fd.setCreator("ZigZag compiler");
 		fd.setCreationDate(new Date());
 		
