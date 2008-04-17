@@ -28,6 +28,22 @@ public class ZigZag {
   
   protected FlowGenerator fg;
   
+  public void setFileName(String fname){
+	this.sFileName = fname;
+  }
+
+  public String getFileName(){
+	return this.sFileName;
+  }
+
+  public void initFlowGenerator(){
+    this.fg = new FlowGenerator();
+  }
+
+  public FlowGenerator getFlowGenerator(){
+   return this.fg;
+  }
+  
   public static void main(String args[]) throws ParseException,FileNotFoundException, IOException {
     
     // Tone down the logger
