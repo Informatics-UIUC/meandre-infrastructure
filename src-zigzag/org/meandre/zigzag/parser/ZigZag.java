@@ -526,5 +526,13 @@ public class ZigZag implements ZigZagConstants {
 
   final public void disable_tracing() {
   }
+  
+  public void setFileName(String fname){
+	  this.sFileName = fname;
+  }
 
+  public void initFlowGenerator(){
+	this.fg = new FlowGenerator();  
+  }
+  
 }
