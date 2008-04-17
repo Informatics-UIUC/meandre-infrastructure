@@ -12,13 +12,19 @@ public interface ZigZagConstants {
   int COLON = 12;
   int SEMICOLON = 13;
   int AT = 14;
-  int IMPORT = 15;
-  int FROM = 16;
-  int ALIAS = 17;
-  int AS = 18;
-  int SYMBOL = 19;
-  int URI = 20;
-  int VALUE = 21;
+  int LB = 15;
+  int RB = 16;
+  int PLUS = 17;
+  int EXCL = 18;
+  int IMPORT = 19;
+  int FROM = 20;
+  int ALIAS = 21;
+  int AS = 22;
+  int AUTO = 23;
+  int NUMBER = 24;
+  int SYMBOL = 25;
+  int URI = 26;
+  int VALUE = 27;
 
   int DEFAULT = 0;
 
@@ -38,10 +44,16 @@ public interface ZigZagConstants {
     "\":\"",
     "\";\"",
     "\"@\"",
+    "\"[\"",
+    "\"]\"",
+    "\"+\"",
+    "\"!\"",
     "\"import\"",
     "\"from\"",
     "\"alias\"",
     "\"as\"",
+    "\"AUTO\"",
+    "<NUMBER>",
     "<SYMBOL>",
     "<URI>",
     "<VALUE>",

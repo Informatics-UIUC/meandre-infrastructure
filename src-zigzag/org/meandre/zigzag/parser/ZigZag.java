@@ -4,6 +4,8 @@ package org.meandre.zigzag.parser;
 import java.io.*;
 import java.util.*;
 import org.meandre.zigzag.semantic.*;
+import java.util.logging.*;
+import org.meandre.core.logger.KernelLoggerFactory;
 
 public class ZigZag implements ZigZagConstants {
 
@@ -13,7 +15,29 @@ public class ZigZag implements ZigZagConstants {
 
   protected FlowGenerator fg;
 
+  public void setFileName(String fname){
+        this.sFileName = fname;
+  }
+
+  public String getFileName(){
+        return this.sFileName;
+  }
+
+  public void initFlowGenerator(){
+    this.fg = new FlowGenerator();
+  }
+
+  public FlowGenerator getFlowGenerator(){
+   return this.fg;
+  }
+
   public static void main(String args[]) throws ParseException,FileNotFoundException, IOException {
+
+    // Tone down the logger
+        KernelLoggerFactory.getCoreLogger().setLevel(Level.WARNING);
+        for ( Handler h:KernelLoggerFactory.getCoreLogger().getHandlers() )
+                h.setLevel(Level.WARNING);
+
     if ( args.length<1 ) {
         System.err.println("Wrong syntax!!!\nThe compiler requires at least one .zz file");
     }
@@ -266,6 +290,7 @@ public class ZigZag implements ZigZagConstants {
   }
 
   final public void ii_call(Token tCall) throws ParseException {
+        Token tParallel;
     jj_consume_token(LP);
     label_6:
     while (true) {
@@ -293,6 +318,43 @@ public class ZigZag implements ZigZagConstants {
       }
     }
     jj_consume_token(RP);
+    label_8:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LB:
+        ;
+        break;
+      default:
+        jj_la1[13] = jj_gen;
+        break label_8;
+      }
+      jj_consume_token(LB);
+      jj_consume_token(PLUS);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case AUTO:
+        jj_consume_token(AUTO);
+                  fg.markParallel(tCall.image,0);
+        break;
+      case NUMBER:
+        tParallel = jj_consume_token(NUMBER);
+                  fg.markParallel(tCall.image,Integer.parseInt(tParallel.image));
+        break;
+      default:
+        jj_la1[14] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case EXCL:
+        jj_consume_token(EXCL);
+                          fg.forceOrderedParallel(tCall.image);
+        break;
+      default:
+        jj_la1[15] = jj_gen;
+        ;
+      }
+      jj_consume_token(RB);
+    }
   }
 
   final public void port_binding(Token tTargetIns) throws ParseException {
@@ -305,15 +367,15 @@ public class ZigZag implements ZigZagConstants {
     jj_consume_token(DOT);
     tSourcePort = jj_consume_token(SYMBOL);
           fg.bindPort(tSourceIns.image,tSourcePort.image,tTargetIns.image,tTargetPort.image,jj_input_stream.getBeginLine()-1);
-    label_8:
+    label_9:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMA:
         ;
         break;
       default:
-        jj_la1[13] = jj_gen;
-        break label_8;
+        jj_la1[16] = jj_gen;
+        break label_9;
       }
       jj_consume_token(COMA);
       tSourceIns = jj_consume_token(SYMBOL);
@@ -326,6 +388,7 @@ public class ZigZag implements ZigZagConstants {
   final public void ii_assigment() throws ParseException {
         Token tBinding;
         Token tTargetIns;
+
         Queue<String> qLeftIns = new LinkedList<String>();
 
         int iLeftCount = 1;
@@ -333,15 +396,15 @@ public class ZigZag implements ZigZagConstants {
     jj_consume_token(AT);
     tBinding = jj_consume_token(SYMBOL);
           fg.createBindingPort(tBinding.image,jj_input_stream.getBeginLine()-1); qLeftIns.offer(tBinding.image);
-    label_9:
+    label_10:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMA:
         ;
         break;
       default:
-        jj_la1[14] = jj_gen;
-        break label_9;
+        jj_la1[17] = jj_gen;
+        break label_10;
       }
       jj_consume_token(COMA);
       jj_consume_token(AT);
@@ -352,15 +415,15 @@ public class ZigZag implements ZigZagConstants {
     tTargetIns = jj_consume_token(SYMBOL);
           fg.bindBindingPort(qLeftIns.poll(),tTargetIns.image,jj_input_stream.getBeginLine()-1);
     ii_call(tTargetIns);
-    label_10:
+    label_11:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMA:
         ;
         break;
       default:
-        jj_la1[15] = jj_gen;
-        break label_10;
+        jj_la1[18] = jj_gen;
+        break label_11;
       }
       jj_consume_token(COMA);
       tTargetIns = jj_consume_token(SYMBOL);
@@ -382,13 +445,13 @@ public class ZigZag implements ZigZagConstants {
   public Token token, jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[16];
+  final private int[] jj_la1 = new int[19];
   static private int[] jj_la1_0;
   static {
       jj_la1_0();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0xbc000,0xb80,0xbc000,0x40000,0x38000,0x80,0x80,0x80,0x280000,0x80,0x280000,0x80000,0x2000,0x80,0x80,0x80,};
+      jj_la1_0 = new int[] {0x2384000,0xb80,0x2384000,0x400000,0x380000,0x80,0x80,0x80,0xa000000,0x80,0xa000000,0x2000000,0x2000,0x8000,0x1800000,0x40000,0x80,0x80,0x80,};
    }
 
   public ZigZag(java.io.InputStream stream) {
@@ -400,7 +463,7 @@ public class ZigZag implements ZigZagConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(java.io.InputStream stream) {
@@ -412,7 +475,7 @@ public class ZigZag implements ZigZagConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
   public ZigZag(java.io.Reader stream) {
@@ -421,7 +484,7 @@ public class ZigZag implements ZigZagConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(java.io.Reader stream) {
@@ -430,7 +493,7 @@ public class ZigZag implements ZigZagConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
   public ZigZag(ZigZagTokenManager tm) {
@@ -438,7 +501,7 @@ public class ZigZag implements ZigZagConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(ZigZagTokenManager tm) {
@@ -446,7 +509,7 @@ public class ZigZag implements ZigZagConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
   final private Token jj_consume_token(int kind) throws ParseException {
@@ -493,12 +556,12 @@ public class ZigZag implements ZigZagConstants {
 
   public ParseException generateParseException() {
     jj_expentries.removeAllElements();
-    boolean[] la1tokens = new boolean[22];
+    boolean[] la1tokens = new boolean[28];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 19; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -507,7 +570,7 @@ public class ZigZag implements ZigZagConstants {
         }
       }
     }
-    for (int i = 0; i < 22; i++) {
+    for (int i = 0; i < 28; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
