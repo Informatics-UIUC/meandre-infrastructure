@@ -39,7 +39,7 @@ public class ZigZag implements ZigZagConstants {
                 h.setLevel(Level.WARNING);
 
     if ( args.length<1 ) {
-        System.err.println("Wrong syntax!!!\nThe compiler requires at least one .zz file");
+        System.err.println("Wrong syntax!!!\nThe compiler requires at least on .zz file");
     }
     else
     {
@@ -589,13 +589,5 @@ public class ZigZag implements ZigZagConstants {
 
   final public void disable_tracing() {
   }
-  
-  public void setFileName(String fname){
-	  this.sFileName = fname;
-  }
 
-  public void initFlowGenerator(){
-	this.fg = new FlowGenerator();  
-  }
-  
 }
