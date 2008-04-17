@@ -14,6 +14,7 @@ import javax.servlet.Servlet;
 import org.meandre.core.logger.PluginsLoggerFactory;
 import org.meandre.core.store.Store;
 import org.meandre.core.utils.Constants;
+import org.meandre.plugins.tools.JarToolServlet;
 import org.meandre.plugins.vfs.VFSServlet;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ResourceHandler;
@@ -80,7 +81,8 @@ public class PluginFactory {
 	 * 
 	 */
 	private static void initializePluginsDefaultProperties() {
-		propPluginFactoryConfig.setProperty("VFS", VFSServlet.class.getName());		
+		propPluginFactoryConfig.setProperty("VFS", VFSServlet.class.getName());	
+		propPluginFactoryConfig.setProperty("JARTOOL", JarToolServlet.class.getName());		
 	}
 
 	/** Initialize the public file server for shared resources
