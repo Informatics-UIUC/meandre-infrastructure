@@ -35,7 +35,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 public class FlowGenerator {
 
 	/** The default parallelization degree */
-	private final static int AUTO_PARALLELIZATION_DEGREE = 4;
+	private final static int AUTO_PARALLELIZATION_DEGREE = Runtime.getRuntime().availableProcessors();
 	
 	/** The composed repository */
 	protected RepositoryImpl ri;
