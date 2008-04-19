@@ -86,7 +86,7 @@ public class MAUExecutor {
 	 * 
 	 * @param os The output stream
 	 */
-	public void setOutpuStream ( OutputStream os ) {
+	public void setOutputStream ( OutputStream os ) {
 		ps  = new PrintStream(os);
 	}
 	
