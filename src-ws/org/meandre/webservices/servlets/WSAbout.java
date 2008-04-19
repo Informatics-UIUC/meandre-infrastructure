@@ -101,8 +101,7 @@ public class WSAbout extends HttpServlet {
 					log.warning("XML serialization failure for request "+request.getRequestURL());
 					throw new IOException(e.toString());
 				}
-			}
-			else  {
+			}else  {
 				//
 				// Invalid format
 				//
@@ -110,6 +109,17 @@ public class WSAbout extends HttpServlet {
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			}
     	}
+    	else if(sTarget.endsWith("/plugin")){
+			if ( sExtension.equals("json") ) {
+				response.getWriter().println(WSAboutLogic.globalPluginsJSON(request, response));
+			}else  {
+				//
+				// Invalid format
+				//
+				log.info("Invalid format "+sExtension+" for requested "+sTarget);
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			}	
+		}
     	else  {
 			//
 			// Invalid request found

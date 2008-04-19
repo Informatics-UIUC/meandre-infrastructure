@@ -21,6 +21,8 @@ import com.meterware.httpunit.WebResponse;
  * @author Amit Kumar
  * Created on Feb 22, 2008 3:50:22 AM
  * Modified by Xavier Llor&agrave;
+ * @modified by Amit Kumar
+ * -added plugin test
  *
  */
 
@@ -44,6 +46,9 @@ public class WSAboutTest extends BaseServletTest {
 	String USER_ROLES_TEST_STRING_XML_TAG_2 ="meandre_user_role";
 
 
+	String PLUGIN_URL = "services/about/plugin";
+	String PLUGIN_TEST_STRING_JSON = "\"JARTOOL\":{\"pluginAlias\":\"";
+	
 
 
 
@@ -213,6 +218,31 @@ public class WSAboutTest extends BaseServletTest {
 		try {
 			assertEquals(response.getContentType(), "text/html");
 			assertTrue("Error: in user_roles.json",response.getText().startsWith(USER_ROLES_TEST_STRING_JSON));
+		} catch (IOException e) {
+			fail(e.toString());
+		}
+	}
+	
+	
+
+	@Test
+	public void testPluginJSONHttpServletRequestHttpServletResponse() {
+		String format = "json";
+		WebRequest request = new GetMethodWebRequest(getMeandreHostUrl()
+				+ PLUGIN_URL + "." + format);
+		WebResponse response = null;
+		try {
+			response = getWebConversation().getResponse(request);
+		} catch (MalformedURLException e) {
+			fail(e.toString());
+		} catch (IOException e) {
+			fail(e.toString());
+		} catch (SAXException e) {
+			fail(e.toString());
+		}
+		try {
+			assertEquals(response.getContentType(), "text/html");
+			assertTrue("Error: in plugin.json",response.getText().indexOf(PLUGIN_TEST_STRING_JSON)!=-1);
 		} catch (IOException e) {
 			fail(e.toString());
 		}

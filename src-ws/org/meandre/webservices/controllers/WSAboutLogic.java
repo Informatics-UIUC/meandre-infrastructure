@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.servlet.Servlet;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,8 +17,11 @@ import org.meandre.core.store.Store;
 import org.meandre.core.store.security.SecurityStore;
 import org.meandre.core.store.security.SecurityStoreException;
 import org.meandre.core.utils.Constants;
+import org.meandre.plugins.MeandrePlugin;
+import org.meandre.plugins.PluginFactory;
 import org.meandre.webservices.WSCoreBootstrapper;
 import org.meandre.webservices.utils.WSLoggerFactory;
+import org.mortbay.jetty.servlet.ServletHolder;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -264,4 +268,26 @@ public class WSAboutLogic {
 	}
 
 
+	/** Get Plugin properties*/
+	public static JSONObject globalPluginsJSON(HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		JSONObject joRes = new JSONObject();
+		
+		Properties properties=PluginFactory.getPropPluginFactoryConfig();
+		for ( Object oKey:properties.keySet()) {
+			try {
+				String sClassName = properties.getProperty(oKey.toString());
+				MeandrePlugin mpPlugin = (MeandrePlugin) Class.forName(sClassName).newInstance();
+				JSONObject jo = new JSONObject();
+				jo.put("pluginClass", sClassName);
+				jo.put("pluginAlias", mpPlugin.getAlias());
+				jo.put("pluginServlet", mpPlugin.isServlet());
+				joRes.put(oKey.toString(), jo);
+			}catch(Exception ex){
+				throw new IOException(ex.toString());
+			}
+			
+		}
+		return joRes;
+	}
 }

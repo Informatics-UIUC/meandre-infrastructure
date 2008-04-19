@@ -32,6 +32,7 @@ public class DemoRepositoryGeneratorTest {
 	public void testGetTestHelloWorldRepository() {
 		 Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
 		 assertTrue(model!=null);
+		 System.out.println(model);
 	}
 
 

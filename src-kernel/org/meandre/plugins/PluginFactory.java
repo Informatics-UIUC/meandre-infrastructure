@@ -153,4 +153,11 @@ public class PluginFactory {
 		}
 	}
 
+	/**
+	 * @return the propPluginFactoryConfig
+	 */
+	public static Properties getPropPluginFactoryConfig() {
+		return propPluginFactoryConfig;
+	}
+
 }
