@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="src-test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/Meandre-Core/lib/JENA/antlr-2.7.5.jar"/>
+	<classpathentry kind="lib" path="/Meandre-Core/lib/JENA/arq.jar"/>
+	<classpathentry kind="lib" path="/Meandre-Core/lib/JENA/arq-extra.jar"/>
+	<classpathentry kind="lib" path="/Meandre-Core/lib/JENA/commons-logging-1.1.jar"/>
+	<classpathentry kind="lib" path="/Meandre-Core/lib/JENA/concurrent.jar"/>
+	<classpathentry kind="lib" path="/Meandre-Core/lib/JENA/icu4j_3_4.jar"/>
+	<classpathentry kind="lib" path="/Meandre-Core/lib/JENA/iri.jar"/>
+	<classpathentry kind="lib" path="/Meandre-Core/lib/JENA/jena.jar"/>
+	<classpathentry kind="lib" path="/Meandre-Core/lib/JENA/jenatest.jar"/>
+	<classpathentry kind="lib" path="/Meandre-Core/lib/JENA/json.jar"/>
+	<classpathentry kind="lib" path="/Meandre-Core/lib/JENA/junit.jar"/>
+	<classpathentry kind="lib" path="/Meandre-Core/lib/JENA/log4j-1.2.12.jar"/>
+	<classpathentry kind="lib" path="/Meandre-Core/lib/JENA/lucene-core-2.0.0.jar"/>
+	<classpathentry kind="lib" path="/Meandre-Core/lib/JENA/stax-api-1.0.jar"/>
+	<classpathentry kind="lib" path="/Meandre-Core/lib/JENA/wstx-asl-3.0.0.jar"/>
+	<classpathentry kind="lib" path="/Meandre-Core/lib/JENA/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="/Meandre-Core/lib/JENA/xml-apis.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
