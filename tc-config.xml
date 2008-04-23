@@ -11,4 +11,9 @@
   <clients>
     <logs>terracotta/client-logs</logs>
   </clients>
+  <application>
+    <dso>
+      <instrumented-classes/>
+    </dso>
+  </application>
 </con:tc-config>

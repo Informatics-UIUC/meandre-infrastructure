@@ -5,11 +5,11 @@ import java.util.Map;
 
 import com.hp.hpl.jena.rdf.model.Resource;
 
-/** The objects of this class describe firing events.
+/** The objects of this class describe firing requests.
  * 
  * @author Xavier Llor&agrave
  */
-public class FiringEvent {
+public class FiringRequest {
 
 	/** The newline separator */
 	private static final String sNL = System.getProperty("line.separator");
@@ -33,7 +33,7 @@ public class FiringEvent {
 
 	
 	/** Creates an empty firing event */
-	public FiringEvent() {
+	public FiringRequest() {
 		
 	}
 	

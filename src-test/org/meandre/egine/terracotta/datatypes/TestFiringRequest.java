@@ -6,18 +6,18 @@ import static org.junit.Assert.assertEquals;
 import java.util.Random;
 
 import org.junit.Test;
-import org.meandre.engine.terracotta.datatypes.FiringEvent;
+import org.meandre.engine.terracotta.datatypes.FiringRequest;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 
-/** The objects of this class describe firing events.
+/** The objects of this class describe firing requests.
  * 
  * @author Xavier Llor&agrave
  */
-public class TestFiringEvent {
+public class TestFiringRequest {
 
 	/** The newline separator */
 	private static final String sNL = System.getProperty("line.separator");
@@ -30,11 +30,11 @@ public class TestFiringEvent {
 		Model mod = ModelFactory.createDefaultModel();
 		Resource resFID = mod.createResource("http://test.org/flow/instance/0");
 		Resource resECID = mod.createResource("http://test.org/flow/instance/0/component/0");
-		FiringEvent fe;
+		FiringRequest fe;
 		
 		for ( long l=0, lMax=100 ; l<lMax ; l++ ) {
 			// Create and test fyring IDs
-			fe = new FiringEvent();
+			fe = new FiringRequest();
 			try {
 				fe.init(resFID, resECID);
 			} catch (InterruptedException e) {
