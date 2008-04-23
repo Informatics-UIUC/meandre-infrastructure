@@ -182,6 +182,7 @@ extends Thread {
 					synchronized (baStatusFlags) {
 						baStatusFlags[TERMINATION] = true;
 						sAbortMessage = e.toString();
+                        e.printStackTrace();
 						this.thdMrProbe.probeWrappedComponentAbort(this);
 					}
 					log.warning(e.getMessage());
@@ -189,6 +190,7 @@ extends Thread {
 					synchronized (baStatusFlags) {
 						baStatusFlags[TERMINATION] = true;
 						sAbortMessage = e.toString();
+                        e.printStackTrace();
 						this.thdMrProbe.probeWrappedComponentAbort(this);
 					}
 					log.warning(e.getMessage());
@@ -197,6 +199,7 @@ extends Thread {
 					synchronized (baStatusFlags) {
 						baStatusFlags[TERMINATION] = true;
 						sAbortMessage = e.toString();
+                        e.printStackTrace();
 						this.thdMrProbe.probeWrappedComponentAbort(this);
 					}
 					log.warning(e.toString());
