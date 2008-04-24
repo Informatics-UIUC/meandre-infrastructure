@@ -4,11 +4,9 @@
 package org.meandre.engine.terracotta.datatypes;
 
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
 import org.meandre.engine.terracotta.agent.ExecutableComponentAgent;
@@ -20,7 +18,7 @@ import org.meandre.engine.terracotta.agent.ExecutableComponentAgent;
 public class FiringPulseQueue {
 
 	/** The pending firing request queue */
-	protected Queue<FiringRequest> frqPending;
+	protected BlockingQueue<FiringRequest> frqPending;
 	
 	/** The set of current firing events */
 	protected Set<FiringEvent> setFiringEvents;
@@ -40,7 +38,7 @@ public class FiringPulseQueue {
 	 */
 	public FiringPulseQueue () {
 		// Initializes the pending queue
-		frqPending = new ConcurrentLinkedQueue<FiringRequest>(); 
+		frqPending = new LinkedBlockingQueue<FiringRequest>(); 
 		// Initializes the set of current firing events
 		setFiringEvents = new HashSet<FiringEvent>();
 		// Initializes the set of iddle/running componets
@@ -48,6 +46,16 @@ public class FiringPulseQueue {
 		secaRunning = new HashSet<ExecutableComponentAgent>();
 		// Create the semaphore
 		semMUTEXeca = new Semaphore(1,true);
+	}
+	
+	/** Set the capacity of the firing request queue.
+	 * 
+	 * @param iCapacity The capacity
+	 */
+	public void setCapacity ( int iCapacity ) {
+		LinkedBlockingQueue<FiringRequest> lbqNew = new LinkedBlockingQueue<FiringRequest>(iCapacity);
+		lbqNew.addAll(frqPending);
+		frqPending = lbqNew;
 	}
 	
 	/** Offers a firing request to the pending queue.
@@ -86,4 +94,6 @@ public class FiringPulseQueue {
 		}
 		
 	}
+
+
 }
