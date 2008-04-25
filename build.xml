@@ -245,6 +245,7 @@
             	<include name="**/*"/>
             	<exclude name="meandre/meandre-config.xml"/>
             	<exclude name="meandre/webservices.properties"/>
+            	<exclude name="meandre/component-upload-test.jar"/>
             </fileset>
         </delete>
     </target>
@@ -269,13 +270,13 @@
                 <fileset dir="${test.src}/demo">
                     <include name="**/*Test.java"/>
                 </fileset>
-
+                
                 <fileset dir="${test.src}/kernel">
-                    <include name="**/*Test.java"/>
+                    <include name="**/*.java"/>
                 </fileset>
-
+                
                 <fileset dir="${test.src}/ws">
-                    <include name="**/*Test.java"/>
+                    <include name="**/MeandreClientTest.java"/>
                     <exclude name="org/meandre/webservices/BaseServletTest.java"/>
                 </fileset>
             </batchtest>
