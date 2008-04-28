@@ -1,0 +1,31 @@
+#
+# This flow creates a flow that concatenates two strings together
+# and then prints it to the console
+#
+# @author Xavier Llora
+# @date April 12, 2008
+#
+
+#
+# Imports the three required components and create the component aliases
+#
+import <file:///Users/xavier/Desktop/dump.ttl>
+alias <http://test.org/component/push_string> as PUSH
+alias <http://test.org/component/print-object> as PRINT
+alias <http://test.org/component/pass-through> as PASS
+	
+#
+# Creates four instances for the flow
+#
+push, pass, print = PUSH(), PASS(), PRINT()
+	
+#
+# Sets up the properties of the instances
+#
+push.message, push.times  = "Hello ", "10"
+#
+# Describe the data-intensive flow
+#
+@pu = push()
+@pt = pass( string:pu.string )
+print( object:pt.string )

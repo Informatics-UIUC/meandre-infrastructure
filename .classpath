@@ -10,6 +10,10 @@
 	<classpathentry kind="src" path="src-demo/test"/>
 	<classpathentry kind="src" path="src-zigzag/code"/>
 	<classpathentry kind="src" path="src-zigzag/test"/>
+	<classpathentry kind="src" path="src-webservices/code"/>
+	<classpathentry kind="src" path="src-webservices/test"/>
+	<classpathentry kind="src" path="src-store/code"/>
+	<classpathentry kind="src" path="src-store/test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/jars/ant-1.6.5.jar"/>
@@ -52,5 +56,25 @@
 	<classpathentry kind="lib" path="lib/jars/xpp3_min-1.1.3.4.O.jar"/>
 	<classpathentry kind="lib" path="lib/jars/xstream-1.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/jars/xstream-benchmark-1.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/jars/commons-fileupload-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/jars/commons-io-1.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derby.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derbyclient.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derbyLocale_cs.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derbyLocale_de_DE.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derbyLocale_es.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derbyLocale_fr.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derbyLocale_hu.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derbyLocale_it.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derbyLocale_ja_JP.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derbyLocale_ko_KR.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derbyLocale_pl.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derbyLocale_pt_BR.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derbyLocale_ru.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derbyLocale_zh_CN.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derbyLocale_zh_TW.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derbynet.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derbyrun.jar"/>
+	<classpathentry kind="lib" path="lib/jars/derbytools.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

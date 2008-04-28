@@ -69,6 +69,10 @@ public class CoreConfiguration {
             fos = new FileOutputStream(propsCore.getProperty(MEANDRE_CORE_CONFIG_FILE));
             propsCore.storeToXML(fos, "Meandre default configuration file (" + Constants.MEANDRE_VERSION + ")");
             fos.close();
+            
+            // Create the run file
+            new File(getRunResourcesDirectory()).mkdir();
+
         }
         catch (Exception eWrite) {
             log.warning("Meandre configuration file " +
