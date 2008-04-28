@@ -1,13 +1,19 @@
 package org.meandre.mau;
 
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 
@@ -22,12 +28,14 @@ import org.meandre.core.engine.ProbeException;
 import org.meandre.core.engine.probes.StatisticsProbeImpl;
 import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.repository.CorruptedDescriptionException;
+import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.utils.Constants;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
@@ -39,7 +47,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 public class MAUExecutor {
 
 	/** The current version of the MAU executor */
-	private static final String ZMAU_VERSION = "1.0.0vcli";
+	private static final String ZMAU_VERSION = "1.0.1vcli";
 
 	/** The output print stream to use */
 	protected PrintStream ps;
@@ -135,10 +143,8 @@ public class MAUExecutor {
 
 		ps.println("Executin MAU file " + sFileName);
 		ps.println();
-
-		Model mod = ModelFactory.createDefaultModel();
-		mod.read(new FileInputStream(sFileName), null,"TTL");
-		QueryableRepository qr = new RepositoryImpl(mod);
+		
+		QueryableRepository qr = processModelFromMAU();
 		
 		Resource resURI = qr.getAvailableFlows().iterator().next();
 		ps.println("Preparing flow: "+resURI);
@@ -221,6 +227,59 @@ public class MAUExecutor {
 		}
 		
 		printStatistics();
+		
+	}
+
+	/** Process the model contained on the MAU file and rearrenge the contexts URIs.
+	 * 
+	 * @return The edited model
+	 * @throws FileNotFoundException The file could not be retrieved
+	 */
+	protected QueryableRepository processModelFromMAU() throws FileNotFoundException {
+		try {
+			// Extract the repository description
+			Model mod = ModelFactory.createDefaultModel();
+			File file = new File(".");
+			URL url = new URL("jar:file://"+file.getAbsolutePath()+"/"+sFileName+"!/repository/repository.ttl");
+			mod.read(url.openStream(), null,"TTL");
+			QueryableRepository qr = new RepositoryImpl(mod);
+			
+			// Edit the contexts URI
+			JarFile jar = new JarFile(sFileName);
+			Enumeration<JarEntry> iterJE = jar.entries();
+			while (iterJE.hasMoreElements()) {
+				JarEntry je = iterJE.nextElement();
+				System.out.println(je.getName());
+				String [] sa = je.getName().split("/");
+				editContextJarURI(qr,sa[sa.length-1],"jar:file://"+file.getAbsolutePath()+"/"+sFileName+"!"+je.getName());
+			}
+			return qr;
+		} catch (MalformedURLException e) {
+			throw new FileNotFoundException(e.toString());
+		} catch (IOException e) {
+			throw new FileNotFoundException(e.toString());
+		}
+		
+	}
+
+	/** Edit the context URI to point to the ones contained in the jar.
+	 * 
+	 * @param qr The queryable repository to edit
+	 * @param sJarName The name of the jar
+	 * @param sNewURI The new URI to set
+	 */
+	private void editContextJarURI(QueryableRepository qr, String sJarName, String sNewURI) {
+		for ( ExecutableComponentDescription ecd:qr.getAvailableExecutableComponentDescriptions() ) {
+			Set<RDFNode> setNew = new HashSet<RDFNode>();
+			for ( RDFNode rdfNode:ecd.getContext() ) 
+				if ( rdfNode.isResource() &&
+					 rdfNode.toString().endsWith(sJarName) ) {
+					setNew.add(qr.getModel().createResource(sNewURI));
+				}
+				else 
+					setNew.add(rdfNode);
+			}
+		
 		
 	}
 

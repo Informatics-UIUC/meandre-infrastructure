@@ -22,7 +22,7 @@ import org.meandre.core.logger.KernelLoggerFactory;
 
 public class ZigZag {
 
-  public static String ZIGZAG_VERSION = "1.0.0vcli";
+  public static String ZIGZAG_VERSION = "1.0.1vcli";
   
   protected String sFileName;
   

@@ -14,7 +14,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
