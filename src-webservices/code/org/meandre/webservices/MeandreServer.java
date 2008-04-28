@@ -186,7 +186,7 @@ public class MeandreServer {
 		sJettyHome = (sJettyHome==null)?MEANDRE_HOME:sJettyHome;
 
 		SecurityHandler sh = new SecurityHandler();
-		sh.setUserRealm(new HashUserRealm("Meandre Flow Execution Engine",sJettyHome+File.separator+cnf.getRunResourcesDirectory()+File.separator+store.getRealmFilename()));
+		sh.setUserRealm(new HashUserRealm("Meandre Flow Execution Engine",store.getRealmFilename()));
 		sh.setConstraintMappings(new ConstraintMapping[]{cm});
 
 		contextWS.addHandler(sh);

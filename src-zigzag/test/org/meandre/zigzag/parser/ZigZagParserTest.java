@@ -1,7 +1,6 @@
 package org.meandre.zigzag.parser;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 
 import org.junit.Test;
+import org.meandre.webservices.MeandreServer;
 import org.meandre.zigzag.semantic.FlowGenerator;
 
 /** This class is intended to run the test for the ZigZag parser
@@ -21,9 +21,16 @@ public class ZigZagParserTest {
 	
 	/** Test for the ZigZag parser.
 	 * 
+	 * @throws Exception Something went wrong
+	 * 
 	 */
 	@Test
-	public void testZigZagParserObject () {
+	public void testZigZagParserObject () throws Exception {
+		MeandreServer ms = new MeandreServer();
+		ms.start(false);
+		
+		Thread.sleep(20000);
+		
 		for ( File file:listZigZagTestFiles()) {
 			 try {
 				 FileInputStream fis = new FileInputStream(file);
@@ -38,6 +45,8 @@ public class ZigZagParserTest {
 		    	fail(e.toString());
 			} 
 		}
+		
+		ms.stop();
 	}
 
 	/** List the ZigZag test files.

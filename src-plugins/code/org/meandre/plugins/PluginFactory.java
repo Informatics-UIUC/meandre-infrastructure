@@ -47,7 +47,7 @@ public class PluginFactory {
 	 * 
 	 */
 	private PluginFactory () {
-		
+		cnf = new CoreConfiguration();
 	}
 	
 	/** Initialize the plugin factory given a certain core configuration.
