@@ -29,7 +29,7 @@ public class ZigZagParserTest {
 		MeandreServer ms = new MeandreServer();
 		ms.start(false);
 		
-		Thread.sleep(20000);
+		Thread.sleep(10000);
 		
 		for ( File file:listZigZagTestFiles()) {
 			 try {
@@ -66,4 +66,36 @@ public class ZigZagParserTest {
 		
 		return fa;
 	}
+	
+	/** Test for the ZigZag parser and MAU generator.
+	 * 
+	 * @throws Exception Something went wrong
+	 * 
+	 */
+	@Test
+	public void testZigZagParserObjectAndMauGenerator () throws Exception {
+		MeandreServer ms = new MeandreServer();
+		ms.start(false);
+		
+		Thread.sleep(10000);
+		
+		for ( File file:listZigZagTestFiles()) {
+			 try {
+				 FileInputStream fis = new FileInputStream(file);
+				 ZigZag parser = new ZigZag(fis);    
+				 parser.sFileName = file.getAbsolutePath();
+				 parser.fg = new FlowGenerator();
+				 parser.start(); 
+				 parser.fg.generateMAU(file.getAbsolutePath().replaceAll(".zz$", ".mau"));
+		    }
+		    catch ( ParseException pe ) {
+		    	fail(pe.toString());
+		    } catch (FileNotFoundException e) {
+		    	fail(e.toString());
+			} 
+		}
+		
+		ms.stop();
+	}
+
 }

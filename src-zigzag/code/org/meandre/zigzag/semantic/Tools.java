@@ -1,12 +1,22 @@
 package org.meandre.zigzag.semantic;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.ExecutableComponentInstanceDescription;
@@ -104,7 +114,7 @@ public abstract class Tools {
 	 * @param fileDirCntxs The folder containing the contexts
 	 * @throws ParserException Something went really wrong
 	 */
-	public static void prepareJarLiteralsToTheFileSystem(FlowDescription fd, QueryableRepository qr, File fileFolderContexts ) 
+	public static void prepareJarsToTheFileSystem(FlowDescription fd, QueryableRepository qr, File fileFolderContexts ) 
 	throws ParserException {
 		
 		for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() ) {
@@ -119,13 +129,15 @@ public abstract class Tools {
 						// Pull the URL and dump it to the local file
 						Resource res = (Resource)node;
 						URL url = new URL(res.getURI());
-						String [] sa = url.getPath().split("/");
-						InputStream is = url.openStream();
-						FileOutputStream fos = new FileOutputStream(new File(fileFolderContexts.toString()+File.separator+sa[sa.length-1]));
-						int iTmp;
-						while ( (iTmp=is.read())!=-1 )
-							fos.write(iTmp);
-						fos.close();
+						if ( url.toString().endsWith(".jar")) {
+							String [] sa = url.getPath().split("/");
+							InputStream is = url.openStream();
+							FileOutputStream fos = new FileOutputStream(new File(fileFolderContexts.toString()+File.separator+sa[sa.length-1]));
+							int iTmp;
+							while ( (iTmp=is.read())!=-1 )
+								fos.write(iTmp);
+							fos.close();
+						}
 					} catch (MalformedURLException e) {
 						throw new ParserException(e.toString());
 					} catch (IOException e) {
@@ -138,6 +150,84 @@ public abstract class Tools {
 					
 		}
 		
+	}
+
+	/** Creates a Jar file (MAU file) for the provided directory.
+	 * 
+	 * @param fileJar The output jar file
+	 * @param fileDirectory The directory to process
+	 * @throws IOException There was an IO problem
+	 */
+	public static void generateJarFromDirectory(File fileJar, File fileDirectory) throws IOException {
+		
+		Collection<File> files = Tools.getCollectionOfFiles(fileDirectory);
+
+		byte buffer[] = new byte[8192];
+		// Open archive file
+		try {
+			FileOutputStream stream = new FileOutputStream(fileJar);
+			JarOutputStream out = new JarOutputStream(stream, new Manifest());
+			Iterator<File> iter = files.iterator();
+			while ( iter.hasNext() ) {
+				File f = iter.next();
+				File fReal = new File(fileDirectory.toString()+f.toString());
+				JarEntry jarAdd = new JarEntry(f.toString().substring(1));
+				jarAdd.setTime(fReal.lastModified());
+				out.putNextEntry(jarAdd);
+	
+				// Write file to archive
+				FileInputStream in = new FileInputStream(fReal);
+				while (true) {
+					int nRead = in.read(buffer, 0, buffer.length);
+					if (nRead <= 0)
+						break;
+					out.write(buffer, 0, nRead);
+				}
+				in.close();
+				// Delete the jared file
+				fReal.delete();
+			}
+			out.close();
+		    stream.close();
+		    // Clean up
+		    new File(fileDirectory+"/repository").delete();
+		    new File(fileDirectory+"/contexts").delete();
+		    new File(fileDirectory+"/plugins").delete();
+		    fileDirectory.delete();
+		    
+		} catch (FileNotFoundException e) {
+			throw e;
+		} catch (IOException e) {
+			throw e;
+		}
+
+		
+	}
+
+	/** Returns a collection of file for the given folder.
+	 * 
+	 * @param fileDirectory The directory to process
+	 * @return The collection of files
+	 */
+	private static Collection<File> getCollectionOfFiles(File fileDirectory) {
+		LinkedList<File> res = new LinkedList<File>();
+		
+		if ( fileDirectory.isDirectory() ) {
+			Queue<File> queuePending = new LinkedList<File>();
+			queuePending.add(fileDirectory);
+			while ( !queuePending.isEmpty() ) {
+				File fileDir = queuePending.poll();
+				for ( String sFile:fileDir.list() ) {
+					File file = new File(fileDir+File.separator+sFile);
+					if ( file.isDirectory() )
+						queuePending.offer(file);
+					else
+						res.add(new File(file.toString().replaceAll(fileDirectory.toString(), "")));
+				}
+			}
+		}
+		
+		return res;
 	}
 
 }

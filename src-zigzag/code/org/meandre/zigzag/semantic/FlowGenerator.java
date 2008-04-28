@@ -535,7 +535,10 @@ public class FlowGenerator {
 			System.out.println("\tMAU repository generated");
 			
 			// Process the contexts
-			Tools.prepareJarLiteralsToTheFileSystem(fd,ri,odContexts);
+			Tools.prepareJarsToTheFileSystem(fd,ri,odContexts);
+			
+			// Generate the jar and delete the temp directories
+			Tools.generateJarFromDirectory(new File(sOutputFileName), outputDirectory);
 			
 			System.out.println();
 		}
