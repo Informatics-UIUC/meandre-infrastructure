@@ -75,13 +75,13 @@ public abstract class Tools {
 	public static Model pullRepository(URL url, int iLine) throws ParseException {
 		Model mod = ModelFactory.createDefaultModel();
 		try {
-			mod.read(url.openStream(),null);
+			mod.read(url.openStream(),null,"TTL");
 		} catch (Exception e) {
 			try {
-				mod.read(url.openStream(),null,"TTL");
+				mod.read(url.openStream(),null,"N-TRIPLE");
 			} catch (Exception e1) {
 				try {
-					mod.read(url.openStream(),null,"N-TRIPLE");
+					mod.read(url.openStream(),null);
 				} catch (Exception e2) {
 					throw new ParseException("Could not retrieve repository from "+url+" (line: "+iLine+")");
 				}

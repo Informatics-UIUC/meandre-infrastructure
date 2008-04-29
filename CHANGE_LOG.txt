@@ -1,6 +1,20 @@
 1.3vcli Xuixo
 
-* Started the ZigZag interpreter console
+* ZigZag interpreter console providing the following system command
+	 - desc   : Describe the requested component.
+	 - help   : Prints the help. Type help [command] for deatiled help.
+	 - load   : Load a ZigZag script into the interpreter.
+	 - ls     : List information related to the ZigZag script built.
+	 - reset  : Resets the current constructed flow.
+	 - search : Searches for any component and flow that match the query.
+	 - save   : Save the flow built so far.
+	 - quit   : Quits the console (same as ctr+D).
+	 - version: Prints the version information.
+	
+* Hooked the ZigZag console to the compiler
+
+* Started the ZigZag interpreter console.
+	- Uses JLine for terminal emulation
 
 * Moved the ZigZag compiler and runner to used jar-based MAUs
  

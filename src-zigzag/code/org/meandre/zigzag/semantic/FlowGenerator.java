@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -18,6 +19,7 @@ import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.ExecutableComponentInstanceDescription;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.PropertiesDescription;
+import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.system.components.MapExecutableComponent;
 import org.meandre.core.system.components.ReduceExecutableComponent;
@@ -82,6 +84,7 @@ public class FlowGenerator {
 	 */
 	public FlowGenerator () {
 		ps = System.out;
+		ri = new RepositoryImpl(ModelFactory.createDefaultModel());
 	}
 	
 	/** Sets the print stream to use.
@@ -203,6 +206,8 @@ public class FlowGenerator {
 		Resource resComp = ri.getModel().createResource(Tools.filterURItoURL(sCompURI, iLine).toString());
 		ExecutableComponentDescription ecd = ri.getExecutableComponentDescription(resComp);
 		FlowDescription fd = ri.getFlowDescription(resComp);
+		if ( htECAlias.get(sAlias)!=null )
+			throw new ParseException(sAlias+" is already aliased to "+htECAlias.get(sAlias));
 		if ( ecd!=null ) {
 			// Check if it is a component
 			if ( ecd!=null ) {
@@ -858,6 +863,39 @@ public class FlowGenerator {
 		fd.getConnectorDescriptions().add(cdMapToParallelInstance);
 	}
 
+	/** Returns the current repository assembled.
+	 * 
+	 * @return The repository in use
+	 */
+	public QueryableRepository getRepository () {
+		return ri;
+	}
 
+	/** Return the current aliased components.
+	 * 
+	 * @return The map of the current aliased components
+	 */
+	public Map<String, ExecutableComponentDescription> getComponentAliases() {
+		return htECAlias;
+	}
+	
+	/** Return the instance map to their parent components
+	 * 
+	 * @return The map from the instance name to the component alias
+	 */
+	public Map<String,String> getInstances () {
+		
+		// Create the reverse alias mapping
+		Hashtable<String, String> htReverse = new Hashtable<String,String>();
+		for ( String sAlias:htECAlias.keySet() )
+			htReverse.put(htECAlias.get(sAlias).getExecutableComponent().toString(), sAlias);
+		
+		// Create the instance of map
+		Hashtable<String,String> htInstanceOf = new Hashtable<String,String>();
+		for ( String sKey:htECInsAlias.keySet() )
+			htInstanceOf.put(sKey, htReverse.get(htECInsAlias.get(sKey).getExecutableComponent().toString()) );
+		
+		return htInstanceOf;
+	}
 		
 }

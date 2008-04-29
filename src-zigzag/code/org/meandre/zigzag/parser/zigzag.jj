@@ -65,6 +65,7 @@ public class ZigZag {
 		    ZigZag parser = new ZigZag(fis);    
 		    parser.sFileName = sFileName;
 		    parser.fg = new FlowGenerator();
+		    parser.fg.init(sFileName);
 		    try {
 		    	parser.start(); 
 		    	System.out.println();
@@ -128,7 +129,6 @@ void start() :
 	Token t;
 } 
 {
-	{ fg.init(sFileName); }
   	(
   		cda() 
 	| 	t=<SYMBOL> (ci(t) | cm(t) | ii_call(t) ) 
