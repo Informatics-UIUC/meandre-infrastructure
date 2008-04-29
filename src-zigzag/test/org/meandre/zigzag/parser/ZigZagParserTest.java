@@ -37,6 +37,7 @@ public class ZigZagParserTest {
 				 ZigZag parser = new ZigZag(fis);    
 				 parser.sFileName = file.getAbsolutePath();
 				 parser.fg = new FlowGenerator();
+				 parser.fg.init(null);
 				 parser.start(); 
 		    }
 		    catch ( ParseException pe ) {
@@ -85,6 +86,7 @@ public class ZigZagParserTest {
 				 ZigZag parser = new ZigZag(fis);    
 				 parser.sFileName = file.getAbsolutePath();
 				 parser.fg = new FlowGenerator();
+				 parser.fg.init(null);
 				 parser.start(); 
 				 parser.fg.generateMAU(file.getAbsolutePath().replaceAll(".zz$", ".mau"));
 		    }
