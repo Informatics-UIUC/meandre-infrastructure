@@ -1,0 +1,178 @@
+1.3vcli Xuixo
+
+* Started the ZigZag interpreter console
+
+* Moved the ZigZag compiler and runner to used jar-based MAUs
+ 
+* Refactoring of the core to avoid intertwined dependencies and static factories
+
+1.2vcli Panellet:
+
+* Modified the Mau code generator of the ZigZag compiler to produce parallel component creation
+	- Supports AUTO parallelization
+	- Supports unforced and forced order maintenance 
+
+* Extension to the ZigZag grammar to allow parallelization of instances (ordered and unordered)
+
+* Fix to the add remove location WS (remove the corruption of descriptions problem identified by Boris)
+
+* Implemented the MAU executor
+
+* Integrated the semantic parser and MAU format generator
+
+* Implemented the ZigZag compiler and parser
+
+* Develop the ZigZag language
+
+* (!!) Cummulative updates to the core
+	- Better cleaning of webuis threads (a while ago Duane mention some apps with webuis were not finishing and this is the reason).
+    - Fix to /admin/abort.txt of a webui (was leaving behind mr propper and thus not letting the flow to be destroyed), and
+    -Webui now effectively also serve /public/resources (which will make AJAX easier so you can get the client pages form the webui /public/resources itself)
+
+* (!!) Bug fixing
+	- Fixed possible lost of data
+	- Fixed out of order data sorting (violation of fairness of the underlying FSM that runs the component)
+	- Toned down the login in the core
+	
+* WS additions
+	- Boris added extra functionally on the queries for components and flows
+	
+* Bug fixing:
+	- Fix the conductor to avoid crashing in the presence of dangling inputs
+	- Forbid pushing nulls
+
+* To the verbose flow execution WS:
+	- Added parameter statistics
+	- If true it dumps the flow execution statistics at the end of the run
+	
+* Created StatisticProbeImpl to gather general statistics about the flow execution
+	- Store the basic statistics
+	- Provides the results in JSON object
+
+* Modified MrProbe to allow installing multiple probes
+
+* Provenance and Python components
+	- Modified the dispose method of JythonExecutableComponentAdapter (removed the nullification of the interpreter to allow MrProbe to clearly clean up)
+	- The state serializations store the string representation of the locals() call
+	- Functions are missing the code, but that code is already available on the embedded component context
+	
+* Meandre provenance infrastructure.
+	- Added MeandreProbingVocabulary (native Meandre provenance dialect)
+	- Implemented the MeandreRDFDialectProbeImpl
+	- Tested and verified the spitted triples
+	
+* MrProbe merge against the Conductor, Executor, WrappedComponent, and ComponentContext
+	- Modification to allow them to be probed
+	- All the present engine tests passed for java only flows
+	
+* Added MrProbe class. This thread stands during the execution to gather information of the run
+	- New class added MrProbe
+	- New package org.meandre.core.engine.probes added
+		* This package contains different implementations of the probe mechanisms
+		* NullProbeImpl discards all the information
+		* ToPrintStreamProbreImpl diverts all the info as text to the provided print stream
+
+* Added cacheRefresh to the add/remove location services
+
+* Modified the ComponentContextProperties to provide getFlowID function [Feb 16th 2008 by Amit Kumar]
+	-Added the function implementation in ComponentContextImpl/Wrapped*Required/Conductor and WrappedComponents
+	- This distinguishes getFlowID/getFlowExecutionID
+
+* Modified the /services/repository/add and /services/repository/add_flow services
+	- Added overwrite flag (if true overwrites the component/flow descriptor)
+	- Added dump flag (if true dumps the repository after the requested modifications using the same format of requested modifications)
+
+* Modified the ConductorTest to include the Python component.
+
+* Added a Python component to the demo set
+	- The component just turns a string to upper case (named To Uppercase)
+
+* Modified the conductor to run embedded Python/Jython components
+	- Python scripts are embedded contexts
+	- Location should point to the component base URI
+	- Multiple contexts (scripts can be attached)
+	- There is no guarante about the order of scripts execution
+
+* Passed the embedding test using the upgraded (see updates ExecutableContext) E2K demo components
+	- Test demo and traditional context URIs work (Fixed a typo on the connector URI convention)
+	- Test with all the embedded components
+
+* (!!) Updated ExecutableContext. This change will break all components so far
+	- initialize() changed to initialize(ComponentContextProperties ccp)
+	- dispose() changed to dispose(ComponentContextPropoerties ccp)
+
+* Root the ComponentContext in to the root interface ComponentContextProperties
+	- ComponentContext presents the same API as before
+	- ComponentContextProperties expose the subset of the original API not related to execution
+
+* Created and tested the class JythonExecutableComponentAdapter
+	- This class acts as an adapter
+	- The adapter translate the ExcecutableComponent interface into it Jython counter part
+	- The ComponentContext instance is accessible thanks to the Jython bindings
+	- The Jython bindings turn getters/setters into pythonic assignable instance variables
+
+* Created the new package subtree org.meandre.core.environments
+	- This package is intended to group all non-java executable components
+	- The package org.meandre.core.environments.python contains Python related environments
+	- The package org.meandre.core.environments.python.jython contains the adapter to run Jython flavored executable components
+
+* Modified the Conductor to allow embedding:
+	- When preparing the URL class loader
+	- If context is a resource pass the URI to the class loader
+	- If context is a literal the content is dumped to /run/java with an encode name ending in .jar
+	- Conductor implements a cache of the already dumped flows to boost up the preparation time (unless the hash code of the literal has changed)
+
+* Modified the Repository beans to deal with RDFNodes
+	- Old URI formats to contexts (jars) are expressed as Resources (external contexts)
+	- Embeddable contexts (jars) are expressed as Literals
+	- RDFNode homogenizes the use of contexts (external or embedded)
+
+* (!!) Patched JENA to allow proper embedding:
+	- Added case Text.CLOB to line 2238 in file DriverRDB.java to allow large literals in Derby
+	- Hacked the derby.sql definition and replace the tail of the literal table to CLOB to allow long literals
+
+* The add service modified:
+	- jar parameter renamed as context
+	- Added the embed check button for contexts
+
+* Rework the repository implementation metadata processing
+	- Moved from SPARQL prototypes to the equivalent procedural version using JENA API
+	- Also used the indexer straight will manual filtering to boost search performance
+	- Performance of the repository interaction hugely improved.
+	- Remove the SPARQL injection problem on the full text search
+
+* Modified the loggers to work on a rotating scheme
+	- ./log dir destination of the loggers
+
+* Added org.meandre.core.utils.vocabulary to contain all metadata relate vocabulary.
+	- Add the repository one and patched the RepositoryImpl, ComponentDescriptionImpl, and FlowDescriptionImpl
+
+* Moved the WSCoreBootstrapper from org.meandre in the src-kernel tree to org.meandre.webservices in the src-ws tree
+
+* Main log file splitted:
+	- The kernel logging goes to meandre-kerne.log file
+	- The demo logging goes to meandre-demo.log file
+	- The WS logging goes to meandre-webservices.log file
+
+* WSCoreBootstrapper got moved to org.meandre.webservices.
+
+* Source refactoring. Will broke:
+	- ant
+	- nbproject
+
+------------------------------------------------------------------------------
+
+1.1vcli Carquinyoli:
+
+* Meandre Core Web Service Execution Engine, Repository, etc.
+
+------------------------------------------------------------------------------
+
+1.0vcli Farina:
+
+* Plain all mixed together (engine, web app demo, and basic publishing services)
+
+___
+Edited by Xavier Llor�.
+	- Contributed update: Amit Kumar on Feb 16th 2008
+

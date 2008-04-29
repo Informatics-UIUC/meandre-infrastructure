@@ -3,6 +3,7 @@ package org.meandre.zigzag.semantic;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URL;
 import java.util.Date;
 import java.util.HashSet;
@@ -72,6 +73,24 @@ public class FlowGenerator {
 	
 	/** The connector counter */
 	protected int iConnectorCounter;
+
+	/** The print stream to use */
+	private PrintStream ps;
+	
+	/** Initialize the flow generator.
+	 * 
+	 */
+	public FlowGenerator () {
+		ps = System.out;
+	}
+	
+	/** Sets the print stream to use.
+	 * 
+	 * @param ps The print stream to use
+	 */
+	public void setPrintStream ( PrintStream ps ) {
+		this.ps = ps;
+	}
 	
 	/** Initialize the flow generator and print the basic info.
 	 * @param sName The name to use
@@ -79,17 +98,17 @@ public class FlowGenerator {
 	 */
 	public void init (String sName) {
 		// Print the welcome information
-		System.out.println("Meandre ZigZag scripting language compiler ["+ZigZag.ZIGZAG_VERSION+"/"+Constants.MEANDRE_VERSION+"]");
-		System.out.println("All rigths reserved by DITA, NCSA, UofI (2007-2008).");
-		System.out.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
-		System.out.println();
-		System.out.flush();
+		ps.println("Meandre ZigZag scripting language compiler ["+ZigZag.ZIGZAG_VERSION+"/"+Constants.MEANDRE_VERSION+"]");
+		ps.println("All rigths reserved by DITA, NCSA, UofI (2007-2008).");
+		ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
+		ps.println();
+		ps.flush();
 		
-		System.out.println("ZigZag compiling file "+sName); 
-    	System.out.println();
+		ps.println("ZigZag compiling file "+sName); 
+    	ps.println();
     	
 		// Initializing the repository
-		System.out.println("Initializing the repository...");
+		ps.println("Initializing the repository...");
 		ri = new RepositoryImpl(ModelFactory.createDefaultModel());
 		hsRepositoryLocations = new HashSet<String>();
 		
@@ -135,7 +154,7 @@ public class FlowGenerator {
 					modStore.add(ec.getModel());
 			// Ignoring the flows
 			
-			System.out.println("Importing repository "+url);
+			ps.println("Importing repository "+url);
 			ri.refreshCache(modStore);	
 			hsRepositoryLocations.add(url.toString());
 		}
@@ -188,7 +207,7 @@ public class FlowGenerator {
 			// Check if it is a component
 			if ( ecd!=null ) {
 				htECAlias.put(sAlias,ecd);
-				System.out.println("Component "+urlComp+" aliased as "+sAlias);
+				ps.println("Component "+urlComp+" aliased as "+sAlias);
 			}
 		}
 		else if ( fd!=null ) {
@@ -237,7 +256,7 @@ public class FlowGenerator {
 				ecid.setExecutableComponentInstance(resECI);
 				// Adding the instance
 				htECInsAlias.put(sSymbol, ecid);
-				System.out.println("Instantiating component "+sComponent+" as "+sSymbol);
+				ps.println("Instantiating component "+sComponent+" as "+sSymbol);
 			}
 		}
 	}
@@ -251,8 +270,8 @@ public class FlowGenerator {
 	public void markParallel(String sAlias, int iCopies) {
 		htParallelInstances.put(sAlias, iCopies);
 		htParallelOrderedInstances.put(sAlias, false);
-		System.out.print("Instance "+sAlias+" mark for paralellization (");
-		System.out.println((iCopies==0)?"AUTO replicas)":""+iCopies+" replicas)");
+		ps.print("Instance "+sAlias+" mark for paralellization (");
+		ps.println((iCopies==0)?"AUTO replicas)":""+iCopies+" replicas)");
 	}
 
 	/** Mark a parallel component for enforced order.
@@ -261,7 +280,7 @@ public class FlowGenerator {
 	 */
 	public void forceOrderedParallel(String sAlias) {
 		htParallelOrderedInstances.put(sAlias, true);
-		System.out.println("Instance "+sAlias+" mark for ordered parallelization");
+		ps.println("Instance "+sAlias+" mark for ordered parallelization");
 	}
 	
 	/** Sets the property values.
@@ -301,7 +320,7 @@ public class FlowGenerator {
 						pd = new PropertiesDescription();
 					pd.add(sLeftProp, sPropVal);
 					ecid.setProperties(pd);
-					System.out.println("Property "+sLeftIns+"."+sLeftProp+" set to \""+sPropVal+"\"");
+					ps.println("Property "+sLeftIns+"."+sLeftProp+" set to \""+sPropVal+"\"");
 				}
 				else {
 					ExecutableComponentInstanceDescription ecidRight = htECInsAlias.get(sRightIns);
@@ -379,7 +398,7 @@ public class FlowGenerator {
 		cd.setTargetIntaceDataPort(getPortResource(ecdTarget.getInputs(),sTargetPort));
 		hsConnectors.add(cd);
 				
-		System.out.println("Binding "+sSourceIns+"."+sSourcePort+" to "+sTargetIns+"."+sTargetPort);
+		ps.println("Binding "+sSourceIns+"."+sSourcePort+" to "+sTargetIns+"."+sTargetPort);
 	}
 
 	/** Return the data port resource for the given name.
@@ -456,8 +475,8 @@ public class FlowGenerator {
 	 * @throws ParseException Something went wrong
 	 */
 	public void generateMAUToFile(String sOutputFileName) throws ParseException {
-		System.out.println("ZigZag compilation finished successfuly!" );
-		System.out.print("Preparing flow descriptor... " );
+		ps.println("ZigZag compilation finished successfuly!" );
+		ps.print("Preparing flow descriptor... " );
 		
 		FlowDescription fd = new FlowDescription();
 		
@@ -478,22 +497,22 @@ public class FlowGenerator {
 		// Add the connectors to the flow
 		fd.getConnectorDescriptions().addAll(hsConnectors);
 		
-		System.out.println("done");
+		ps.println("done");
 		
 		if ( htParallelInstances.size()>0 ) {
-			System.out.println("Postprocessing flow for parallelization");
+			ps.println("Postprocessing flow for parallelization");
 			postProcessinParallelization(fd);
-			System.out.println("Postprocessing flow for parallelization finished");
+			ps.println("Postprocessing flow for parallelization finished");
 		}
 		
 		
 		// Add the component descriptions to the model
-		System.out.print("Assembling MAU repository... ");
+		ps.print("Assembling MAU repository... ");
 		Model mod = fd.getModel();
 		for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() )
 			mod.add(ri.getExecutableComponentDescription(ecid.getExecutableComponent()).getModel());
 		
-		System.out.println("done");
+		ps.println("done");
 		
 		// Generate the compressed MAU file
 		try {
@@ -515,7 +534,7 @@ public class FlowGenerator {
 	private void generateCompressedMau(String sOutputFileName, FlowDescription fd, Model mod)
 			throws ParserException {
 		try {
-			System.out.println("Writing MAU file: "+sOutputFileName);
+			ps.println("Writing MAU file: "+sOutputFileName);
 			
 			// Prepare the tree structure to jar
 			File outputDirectory = Tools.createUniqueDirectory(sOutputFileName);
@@ -526,13 +545,13 @@ public class FlowGenerator {
 			if ( !odRepository.mkdir() || !odContexts.mkdir() || !odPlugins.mkdir() )
 				throw new IOException("Could not create MAU file structure");
 			
-			System.out.println("\tMAU file base structure generated");
+			ps.println("\tMAU file base structure generated");
 			
 			// Write the repository file
 			FileOutputStream fos = new FileOutputStream(odRepository.getAbsolutePath()+File.separator+"repository.ttl");
 			mod.write(fos,"TTL");
 			fos.close();
-			System.out.println("\tMAU repository generated");
+			ps.println("\tMAU repository generated");
 			
 			// Process the contexts
 			Tools.prepareJarsToTheFileSystem(fd,ri,odContexts);
@@ -540,7 +559,7 @@ public class FlowGenerator {
 			// Generate the jar and delete the temp directories
 			Tools.generateJarFromDirectory(new File(sOutputFileName), outputDirectory);
 			
-			System.out.println();
+			ps.println();
 		}
 		catch ( Exception e ) {
 			throw new ParserException(e.toString());
@@ -558,13 +577,13 @@ public class FlowGenerator {
 		
 		// Foreach instance that needs to be parallelized
 		for ( String sInsAlias:htParallelInstances.keySet() ) {
-			System.out.print("\tStarting parallelization of instance "+sInsAlias+"... ");
+			ps.print("\tStarting parallelization of instance "+sInsAlias+"... ");
 			
 			// Retrieving the instance descriptor and the number of parallelization requried
 			ExecutableComponentInstanceDescription ecid = htECInsAlias.get(sInsAlias);
 			int iParallel = htParallelInstances.get(sInsAlias);
 			boolean bOrdered = htParallelOrderedInstances.get(sInsAlias);
-			System.out.print("degree: "+((iParallel==0)?"AUTO":""+iParallel)+((bOrdered)?" ordered":" unordereed"));
+			ps.print("degree: "+((iParallel==0)?"AUTO":""+iParallel)+((bOrdered)?" ordered":" unordereed"));
 			iParallel = (iParallel==0)?AUTO_PARALLELIZATION_DEGREE:iParallel;
 			
 			// Replicate the instance
@@ -635,7 +654,7 @@ public class FlowGenerator {
 			
 			// Rebind the port to the mapper
 			for ( DataPortDescription dpdInput:ecd.getInputs() ) {
-				System.out.print("... rebinding port "+dpdInput.getName());
+				ps.print("... rebinding port "+dpdInput.getName());
 				// The component has inputs and a mapper is needed
 				ExecutableComponentDescription ecdMap = MapExecutableComponent.getExecutableComponentDescription(iParallel);
 				ri.refreshCache(ri.getModel().add(ecdMap.getModel()));
@@ -672,7 +691,7 @@ public class FlowGenerator {
 			fd.getExecutableComponentInstances().remove(ecid);
 			
 			
-			System.out.println(" ...done");
+			ps.println(" ...done");
 		}
 		
 	}

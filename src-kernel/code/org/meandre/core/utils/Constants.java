@@ -8,6 +8,6 @@ package org.meandre.core.utils;
 public class Constants {
 
 	/** The engine version */
-	public final static String MEANDRE_VERSION = "1.2vcli (Panellet)";
+	public final static String MEANDRE_VERSION = "1.3vcli (Xuixo)";
 
 }

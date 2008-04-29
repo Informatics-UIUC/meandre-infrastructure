@@ -40,6 +40,10 @@ public class ZigZag {
     this.fg = new FlowGenerator();
   }
 
+  public void setFlowGenerator ( FlowGenerator fg ) {
+  	this.fg = fg;
+  }
+
   public FlowGenerator getFlowGenerator(){
    return this.fg;
   }
