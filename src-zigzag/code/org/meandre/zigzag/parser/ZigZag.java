@@ -9,7 +9,7 @@ import org.meandre.core.logger.KernelLoggerFactory;
 
 public class ZigZag implements ZigZagConstants {
 
-  public static String ZIGZAG_VERSION = "1.0.0vcli";
+  public static String ZIGZAG_VERSION = "1.0.1vcli";
 
   protected String sFileName;
 
@@ -25,6 +25,10 @@ public class ZigZag implements ZigZagConstants {
 
   public void initFlowGenerator(){
     this.fg = new FlowGenerator();
+  }
+
+  public void setFlowGenerator ( FlowGenerator fg ) {
+        this.fg = fg;
   }
 
   public FlowGenerator getFlowGenerator(){
@@ -48,6 +52,7 @@ public class ZigZag implements ZigZagConstants {
                     ZigZag parser = new ZigZag(fis);
                     parser.sFileName = sFileName;
                     parser.fg = new FlowGenerator();
+                    parser.fg.init(sFileName);
                     try {
                         parser.start();
                         System.out.println();
@@ -62,7 +67,6 @@ public class ZigZag implements ZigZagConstants {
 
   final public void start() throws ParseException {
         Token t;
-          fg.init(sFileName);
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
