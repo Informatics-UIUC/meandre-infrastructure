@@ -32,7 +32,7 @@ public class PluginFactory {
 	private String sConfigPath = ".";
 
 	/** The default configuration file name */
-	private final String sConfigFile = "meandre-plugins.xml";
+	private final String sConfigFile = "meandre-config-plugins.xml";
 
 	/** The plugins logger */
 	private Logger log = PluginsLoggerFactory.getPluginsLogger();

@@ -82,7 +82,7 @@ public class Store {
     /**
      * The default configuration file name
      */
-    private String sConfigFile = "meandre-config.xml";
+    private String sConfigFile = "meandre-config-store.xml";
 
 
     /**

@@ -91,7 +91,7 @@ public class MrProbeTest {
 			
 			// Dump the results
 			Model modProbe = mmrdpi.getModel();
-			assertEquals(581,modProbe.size());
+			assertEquals(581L,modProbe.size());
 		}
 		catch ( Exception e ) {
 			fail("Unexpected exception: "+e.toString());

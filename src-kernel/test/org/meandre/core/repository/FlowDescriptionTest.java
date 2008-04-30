@@ -71,7 +71,7 @@ public class FlowDescriptionTest {
 		assertEquals(fd.getConnectorDescriptions().size(),0);
 		assertEquals(fd.getTags().getTags().size(), 0);
 		
-		assertEquals(fd.getModel().size(),0);
+		assertEquals(0L,fd.getModel().size());
 	}
 
 	/**
