@@ -82,6 +82,8 @@ public class ZigZagConsole {
 	public void start ( String [] sArgs ) throws IOException {
 		
 		printVersion();
+
+		System.out.println("Type help for getting help about the interpreter commands;");
 		System.out.println("Session starterd at: "+new Date());
 		System.out.println();
 		
@@ -100,7 +102,7 @@ public class ZigZagConsole {
 			}
 			catch ( NullPointerException e ) {
 				System.out.println();
-				bNotDone = false;
+				parseSystemCommand("quit");
 			} catch (ParseException e) {
 				System.err.println(e.getMessage());
 				//e.printStackTrace();
@@ -119,6 +121,45 @@ public class ZigZagConsole {
 		System.out.println("Meandre ZigZag scripting language interpreter console ["+ZigZag.ZIGZAG_VERSION+"/"+Constants.MEANDRE_VERSION+"]");
 		System.out.println("All rigths reserved by DITA, NCSA, UofI (2007-2008).");
 		System.out.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
+		System.out.println();
+	}
+	
+	/** Print the UofI/NCSA open source license text.
+	 * 
+	 */
+	protected void printLicense () {
+		System.out.println();
+		System.out.println("University of Illinois/NCSA Open Source License");
+		System.out.println();
+		System.out.println("Permission is hereby granted, free of charge, to any person obtaining a");
+		System.out.println("copy of this software and associated documentation files (the");
+		System.out.println("\"Software\"), to deal with the Software without restriction, including");
+		System.out.println("without limitation the rights to use, copy, modify, merge, publish,");
+		System.out.println("distribute, sublicense, and/or sell copies of the Software, and to");
+		System.out.println("permit persons to whom the Software is furnished to do so, subject to");
+		System.out.println("the following conditions:");
+		System.out.println();
+		System.out.println("* Redistributions of source code must retain the above copyright");
+		System.out.println("  notice, this list of conditions and the following disclaimers.");
+		System.out.println();
+		System.out.println("* Redistributions in binary form must reproduce the above");
+		System.out.println("  copyright notice, this list of conditions and the following disclaimers");
+		System.out.println("  in the documentation and/or other materials provided with the");
+		System.out.println("  distribution.");
+		System.out.println();
+		System.out.println("* Neither the names of Data-Intensive Technologies and Applications, ");
+		System.out.println("  Automatic Learning Group, National Center for Supercomputing Applications,");
+		System.out.println("  University of Illinois, nor the names of its contributors may be used to ");
+		System.out.println("  endorse or promote products derived from this Software without specific ");
+		System.out.println("  prior written permission.");
+		System.out.println();
+		System.out.println("THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS");
+		System.out.println("OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, ");
+		System.out.println("FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE ");
+		System.out.println("CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER ");
+		System.out.println("LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, ");
+		System.out.println("OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH ");
+		System.out.println("THE SOFTWARE.");
 		System.out.println();
 	}
 
@@ -165,6 +206,9 @@ public class ZigZagConsole {
 		}
 		else if ( sCmd.equals("quit") ) {
 			// Quit the console
+			System.out.println();
+			System.out.println("Session ended at: "+new Date());
+			System.out.println();
 			bNotDone = false;
 			bProcessed = true;
 		}
@@ -203,6 +247,10 @@ public class ZigZagConsole {
 		}
 		else if ( sCmd.equals("load") ) {
 			loadZigZag(saLine);
+			bProcessed = true;
+		}
+		else if ( sCmd.equals("license") ) {
+			printLicense();
 			bProcessed = true;
 		}
 		else if ( sCmd.equals("version") ) {
@@ -486,6 +534,7 @@ public class ZigZagConsole {
 			System.out.println("\t help   : Prints the help. Type help [command] for deatiled help.");
 			System.out.println("\t load   : Load a ZigZag script into the interpreter.");
 			System.out.println("\t ls     : List information related to the ZigZag script built.");
+			System.out.println("\t license: Prints the University of Illinois/NCSA open source license.");
 			System.out.println("\t reset  : Resets the current constructed flow.");
 			System.out.println("\t run    : Runs the flow constructed so far.");
 			System.out.println("\t search : Searches for any component and flow that match the query.");
@@ -533,6 +582,10 @@ public class ZigZagConsole {
 		else if ( sCmd.equals("load") ) {
 			System.out.println("\t load zigzag <file_name>: ");
 			System.out.println("\t                  Loads a ZigZag file into the interpreter. ");
+		}
+		else if ( sCmd.equals("license") ) {
+			System.out.println("\t license: Meandre is licensed under University of Illinois/NCSA");
+			System.out.println("\t          open source license. Type license to print the license text.");
 		}
 		else {
 			System.out.println("\t Unknow command "+sCmd+".");

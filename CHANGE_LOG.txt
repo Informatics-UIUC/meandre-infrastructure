@@ -1,6 +1,26 @@
 1.3vcli Xuixo
 
 * ZigZag interpreter adding functionality to the console
+	- license: Prints the University of Illinois/NCSA open source license.
+	
+* Added an ant script. It provides the following tasks:
+
+	- compile
+	- compile-tests
+	- clean
+	- run-tests
+	- test-reports
+	- javadoc
+	- dist
+	
+	You should not run the Meandre server there. The dist task generates 4 standalone jars:
+	
+	- meandre-server-X.Y.jar (Meandre server)
+	- zz-X.Y.jar (The ZigZag interpreter conole)
+	- zzc-X.Y.jar (The ZigZag compiler)
+	- zzre-X.Y.jar (The ZigZag runtime for MAU files)
+
+* ZigZag interpreter adding functionality to the console
 	- run     : Runs the current flow if possible
 	
 * ZigZag interpreter console providing the following system command
