@@ -25,6 +25,7 @@ import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.PropertiesDescriptionDefinition;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.utils.Constants;
+import org.meandre.mau.MAUExecutor;
 import org.meandre.zigzag.parser.ParseException;
 import org.meandre.zigzag.parser.ZigZag;
 import org.meandre.zigzag.semantic.FlowGenerator;
@@ -178,6 +179,26 @@ public class ZigZagConsole {
 		}
 		else if ( sCmd.equals("save") ) {
 			saveFile(saLine);
+			bProcessed = true;
+		}
+		else if ( sCmd.equals("run") ) {
+			String sFileName = "run-console-"+System.currentTimeMillis()+".mau";
+			// Save the current flow
+			String [] sa = { "save", "mau", sFileName};
+			System.out.print("Preparing MAU file...");
+			saveFile(sa);
+			System.out.println("done");
+			System.out.println();
+			// Run the flow
+			MAUExecutor mau = new MAUExecutor(sFileName);
+			try {
+				mau.run();
+			} catch (FileNotFoundException e) {
+				System.out.println("\t The flow could not be executed. "+e.getMessage());
+			}
+			// Delete the mau file
+			new File(sFileName).delete();
+			
 			bProcessed = true;
 		}
 		else if ( sCmd.equals("load") ) {
@@ -457,6 +478,7 @@ public class ZigZagConsole {
 	private void printHelp(String[] saLine) {
 		String sCmd = (saLine.length>1)?saLine[1]:"";
 		
+		System.out.println();
 		if ( saLine.length==1 ) {
 			System.out.println("ZigZag interpreter console help");
 			System.out.println();
@@ -465,6 +487,7 @@ public class ZigZagConsole {
 			System.out.println("\t load   : Load a ZigZag script into the interpreter.");
 			System.out.println("\t ls     : List information related to the ZigZag script built.");
 			System.out.println("\t reset  : Resets the current constructed flow.");
+			System.out.println("\t run    : Runs the flow constructed so far.");
 			System.out.println("\t search : Searches for any component and flow that match the query.");
 			System.out.println("\t save   : Save the flow built so far.");
 			System.out.println("\t quit   : Quits the console (same as ctr+D).");
@@ -493,7 +516,10 @@ public class ZigZagConsole {
 			System.out.println("\t                  Provides a complete description of the requested component.");
 		}
 		else if ( sCmd.equals("reset") ) {
-			System.out.println("\t reset: Resets the current constructed flow build so far.");
+			System.out.println("\t reset: Resets the current constructed flow built so far.");
+		}
+		else if ( sCmd.equals("run") ) {
+			System.out.println("\t run: Runs the current constructed flow built so far.");
 		}
 		else if ( sCmd.equals("version") ) {
 			System.out.println("\t version: Print the version information for this ZigZag interpreter console.");

@@ -1,5 +1,8 @@
 1.3vcli Xuixo
 
+* ZigZag interpreter adding functionality to the console
+	- run     : Runs the current flow if possible
+	
 * ZigZag interpreter console providing the following system command
 	 - desc   : Describe the requested component.
 	 - help   : Prints the help. Type help [command] for deatiled help.

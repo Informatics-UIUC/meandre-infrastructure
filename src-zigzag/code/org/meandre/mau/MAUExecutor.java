@@ -249,7 +249,7 @@ public class MAUExecutor {
 			Enumeration<JarEntry> iterJE = jar.entries();
 			while (iterJE.hasMoreElements()) {
 				JarEntry je = iterJE.nextElement();
-				System.out.println(je.getName());
+				//System.out.println(je.getName());
 				String [] sa = je.getName().split("/");
 				editContextJarURI(qr,sa[sa.length-1],"jar:file://"+file.getAbsolutePath()+"/"+sFileName+"!"+je.getName());
 			}
