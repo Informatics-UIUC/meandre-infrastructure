@@ -27,8 +27,6 @@ import org.meandre.core.utils.Constants;
 import org.meandre.zigzag.parser.ParseException;
 import org.meandre.zigzag.parser.ZigZag;
 
-import sun.tools.jstat.ParserException;
-
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -537,7 +535,7 @@ public class FlowGenerator {
 	 * @throws ParserException Something went wrong
 	 */
 	private void generateCompressedMau(String sOutputFileName, FlowDescription fd, Model mod)
-			throws ParserException {
+			throws ParseException {
 		try {
 			ps.println("Writing MAU file: "+sOutputFileName);
 			
@@ -567,7 +565,7 @@ public class FlowGenerator {
 			ps.println();
 		}
 		catch ( Exception e ) {
-			throw new ParserException(e.toString());
+			throw new ParseException(e.toString());
 		}
 		
 	}
