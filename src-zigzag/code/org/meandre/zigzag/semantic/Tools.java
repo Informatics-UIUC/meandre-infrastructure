@@ -23,8 +23,6 @@ import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.zigzag.parser.ParseException;
 
-import sun.tools.jstat.ParserException;
-
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -114,7 +112,7 @@ public abstract class Tools {
 	 * @throws ParserException Something went really wrong
 	 */
 	public static void prepareJarsToTheFileSystem(FlowDescription fd, QueryableRepository qr, File fileFolderContexts ) 
-	throws ParserException {
+	throws ParseException {
 		
 		for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() ) {
 			ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(ecid.getExecutableComponent());
@@ -138,13 +136,13 @@ public abstract class Tools {
 							fos.close();
 						}
 					} catch (MalformedURLException e) {
-						throw new ParserException(e.toString());
+						throw new ParseException(e.toString());
 					} catch (IOException e) {
-						throw new ParserException(e.toString());
+						throw new ParseException(e.toString());
 					}
 				}
 				else 
-					throw new ParserException("Unknow context type: "+node);
+					throw new ParseException("Unknow context type: "+node);
 			}
 					
 		}
