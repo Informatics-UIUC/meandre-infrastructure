@@ -28,6 +28,7 @@ import org.meandre.core.utils.Constants;
 import org.meandre.mau.MAUExecutor;
 import org.meandre.zigzag.parser.ParseException;
 import org.meandre.zigzag.parser.ZigZag;
+import org.meandre.zigzag.prefuse.FlowDrawer;
 import org.meandre.zigzag.semantic.FlowGenerator;
 
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -225,6 +226,10 @@ public class ZigZagConsole {
 			saveFile(saLine);
 			bProcessed = true;
 		}
+		else if ( sCmd.equals("show") ) {
+			showFlow(saLine);
+			bProcessed = true;
+		}
 		else if ( sCmd.equals("run") ) {
 			String sFileName = "run-console-"+System.currentTimeMillis()+".mau";
 			// Save the current flow
@@ -265,6 +270,27 @@ public class ZigZagConsole {
 		return bProcessed;
 	}
 	
+	/** Shows the current flow.
+	 * 
+	 * @param saLine The command line being processed
+	 */
+	private void showFlow(String[] saLine) {
+		if ( saLine.length!=2 || !saLine[1].equals("flow") ) {
+			System.out.println();
+			System.out.println("\t Wrong syntax. Please see help show for more information.");
+			System.out.println();
+		}
+		else {
+			// Create a runnable for the vizualization
+			Runnable run = new Runnable() {
+				public void run() {
+					FlowDrawer.fireViz(fg.getFlowDescription());
+				}
+			};
+			new Thread(run).start();
+		}
+	}
+
 	/** Load a ZigZag file into the interpreter.
 	 * 
 	 * @param saLine The command line being processes
@@ -539,6 +565,7 @@ public class ZigZagConsole {
 			System.out.println("\t run    : Runs the flow constructed so far.");
 			System.out.println("\t search : Searches for any component and flow that match the query.");
 			System.out.println("\t save   : Save the flow built so far.");
+			System.out.println("\t show   : Shows the flow built so far.");
 			System.out.println("\t quit   : Quits the console (same as ctr+D).");
 			System.out.println("\t version: Prints the version information.");
 		}
@@ -578,6 +605,10 @@ public class ZigZagConsole {
 			System.out.println("\t                  Save the current flow to the provided file name. ");
 			System.out.println("\t                  If the ZigZag format is selected save the flow as a ZigZag file. ");
 			System.out.println("\t                  Otherwise, the flow is saved as a MAU file. ");
+		}
+		else if ( sCmd.equals("show") ) {
+			System.out.println("\t show flow: ");
+			System.out.println("\t                  Shows the flow built so far. ");
 		}
 		else if ( sCmd.equals("load") ) {
 			System.out.println("\t load zigzag <file_name>: ");

@@ -77,5 +77,6 @@
 	<classpathentry kind="lib" path="lib/jars/derbyrun.jar"/>
 	<classpathentry kind="lib" path="lib/jars/derbytools.jar"/>
 	<classpathentry kind="lib" path="lib/jars/jline-0.9.94.jar"/>
+	<classpathentry kind="lib" path="lib/jars/prefuse-2007-10-21.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -481,33 +481,10 @@ public class FlowGenerator {
 		ps.println("ZigZag compilation finished successfuly!" );
 		ps.print("Preparing flow descriptor... " );
 		
-		FlowDescription fd = new FlowDescription();
-		
-		
-		// Set the basic flow properties
 		sOutputFileName = (sOutputFileName.endsWith("/"))?sOutputFileName.replaceAll("/$", ""):sOutputFileName;
-		fd.setFlowComponent(ri.getModel().createResource(sBaseURL+"flow/"+sOutputFileName));
-		fd.setName(sOutputFileName);
-		fd.setRights("NCSA/UofI open source license");
-		fd.setDescription("Automatically compiled from ZigZag file "+sOutputFileName);
-		fd.setCreator("ZigZag compiler");
-		fd.setCreationDate(new Date());
 		
-		// Add the instances to the flow
-		for ( ExecutableComponentInstanceDescription ecid:htECInsAlias.values() )
-			fd.addExecutableComponentInstance(ecid);
-		
-		// Add the connectors to the flow
-		fd.getConnectorDescriptions().addAll(hsConnectors);
-		
-		ps.println("done");
-		
-		if ( htParallelInstances.size()>0 ) {
-			ps.println("Postprocessing flow for parallelization");
-			postProcessinParallelization(fd);
-			ps.println("Postprocessing flow for parallelization finished");
-		}
-		
+		// Get the flow description generated so far (inlcuding the parallel processing)
+		FlowDescription fd = getFlowDescription(sOutputFileName);
 		
 		// Add the component descriptions to the model
 		ps.print("Assembling MAU repository... ");
@@ -525,6 +502,48 @@ public class FlowGenerator {
 			throw new ParseException(e.toString());
 		}
 		
+	}
+
+	/** Return the flow description built so far.
+	 * 
+	 * @return The flow description
+	 */
+	public FlowDescription getFlowDescription() {
+		return getFlowDescription("vcli-empty-file-name");
+	}
+
+	/** Return the flow description built so far.
+	 * 
+	 * @param sOutputFileName The output file name
+	 * @return The flow description
+	 */
+	public FlowDescription getFlowDescription(String sOutputFileName) {
+
+		FlowDescription fd = new FlowDescription();
+		
+		// Set the basic flow properties
+		fd.setFlowComponent(ri.getModel().createResource(sBaseURL+"flow/"+sOutputFileName));
+		fd.setName(sOutputFileName);
+		fd.setRights("NCSA/UofI open source license");
+		fd.setDescription("Automatically compiled from ZigZag file "+sOutputFileName);
+		fd.setCreator("ZigZag compiler");
+		fd.setCreationDate(new Date());
+		
+		// Add the instances to the flow
+		for ( ExecutableComponentInstanceDescription ecid:htECInsAlias.values() )
+			fd.addExecutableComponentInstance(ecid);
+		
+		// Add the connectors to the flow
+		fd.getConnectorDescriptions().addAll(hsConnectors);
+		
+		// Post parellization processing
+		if ( htParallelInstances.size()>0 ) {
+			ps.println("Postprocessing flow for parallelization");
+			postProcessinParallelization(fd);
+			ps.println("Postprocessing flow for parallelization finished");
+		}
+		
+		return fd;
 	}
 
 	/** Generates the compressed MAU file.

@@ -76,6 +76,7 @@
         <fileset dir="${jetty.dir}" includes="*.jar"/>
         <fileset dir="${jena.dir}" includes="*.jar"/>
         <fileset dir="${xstream.dir}" includes="*.jar"/>
+        <fileset dir="${prefuse.dir}" includes="*.jar"/>
         <pathelement location="${truezip.jar}"/>
         <pathelement location="${apache-commons-upload.jar}"/>
         <pathelement location="${apache-commons-logging.jar}"/>

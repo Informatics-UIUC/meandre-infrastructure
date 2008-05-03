@@ -1,6 +1,9 @@
 1.3vcli Xuixo
 
 * ZigZag interpreter adding functionality to the console
+	- show: Shows the flow built so far.
+
+* ZigZag interpreter adding functionality to the console
 	- license: Prints the University of Illinois/NCSA open source license.
 	
 * Added an ant script. It provides the following tasks:
