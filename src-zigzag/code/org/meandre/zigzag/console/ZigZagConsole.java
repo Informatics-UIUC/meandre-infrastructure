@@ -19,9 +19,12 @@ import java.util.logging.Level;
 import jline.ConsoleReader;
 
 import org.meandre.core.logger.KernelLoggerFactory;
+import org.meandre.core.repository.ConnectorDescription;
 import org.meandre.core.repository.DataPortDescription;
 import org.meandre.core.repository.ExecutableComponentDescription;
+import org.meandre.core.repository.ExecutableComponentInstanceDescription;
 import org.meandre.core.repository.FlowDescription;
+import org.meandre.core.repository.PropertiesDescription;
 import org.meandre.core.repository.PropertiesDescriptionDefinition;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.utils.Constants;
@@ -192,7 +195,7 @@ public class ZigZagConsole {
 		}
 		else if ( sCmd.equals("ls") ) {
 			// List whatever needs to be listed
-			listComponentsFlows(saLine);
+			listCommand(saLine);
 			bProcessed = true;
 		}
 		else if ( sCmd.equals("search") ) {
@@ -284,7 +287,7 @@ public class ZigZagConsole {
 			// Create a runnable for the vizualization
 			Runnable run = new Runnable() {
 				public void run() {
-					FlowDrawer.fireViz(fg.getFlowDescription());
+					FlowDrawer.fireViz(fg.getCurrentFlowDescription(true));
 				}
 			};
 			new Thread(run).start();
@@ -421,6 +424,10 @@ public class ZigZagConsole {
 						  ModelFactory.createDefaultModel().createResource(sURI)
 						);
 			
+			if ( ecd==null ) {
+				ecd = fg.getComponentAliases().get(sURI);
+			}
+			
 			if ( ecd!=null ) {
 				System.out.println();
 				
@@ -462,7 +469,7 @@ public class ZigZagConsole {
 	 */
 	private void searchComponentsFlows(String[] saLine) {
 		if ( saLine.length==1 )
-			listComponentsFlows(saLine);
+			listCommand(saLine);
 		else {
 			String sQuery = "";
 			for ( int i=1, iMax=saLine.length ; i<iMax ; i++ )
@@ -494,13 +501,13 @@ public class ZigZagConsole {
 	 * 
 	 * @param saLine The processed command line
 	 */
-	private void listComponentsFlows(String[] saLine) {
+	private void listCommand(String[] saLine) {
 		String sCmd = (saLine.length>1)?saLine[1]:"";
 		
 		QueryableRepository qr = fg.getRepository();
 		System.out.println();
 		boolean bError = true;
-		if ( saLine.length==1 || sCmd.equals("components") ) {
+		if ( sCmd.equals("components") ) {
 			// List Components
 			System.out.println("Components:");
 			for ( ExecutableComponentDescription ecd:qr.getAvailableExecutableComponentDescriptions() ) {
@@ -509,7 +516,7 @@ public class ZigZagConsole {
 			System.out.println();
 			bError = false;
 		}
-		if ( saLine.length==1 || sCmd.equals("flows") ) {
+		if ( sCmd.equals("flows") ) {
 			// List flows
 			System.out.println("Flows:");
 			for ( FlowDescription fd:qr.getAvailableFlowDecriptions() ) {
@@ -532,7 +539,7 @@ public class ZigZagConsole {
 			System.out.println();
 			bError = false;
 		}
-		if ( sCmd.equals("instances") ) {
+		if ( saLine.length==1 || sCmd.equals("instances") ) {
 			// List the current ZigZag script
 			Map<String, String> mapAlias = fg.getInstances();
 			for ( String sKey:mapAlias.keySet() )
@@ -540,9 +547,93 @@ public class ZigZagConsole {
 			System.out.println();
 			bError = false;
 		}
+		if ( saLine.length==2  ) {
+			String sInsName = saLine[1];
+			if ( fg.getInstances().keySet().contains(sInsName) ) {
+				ExecutableComponentInstanceDescription ecid = fg.getInstance(sInsName);
+				PropertiesDescription pd = ecid.getProperties();
+				if ( pd!=null ) {
+					for ( String sKey:pd.getKeys() )
+						System.out.println(sInsName+"."+sKey+" = "+pd.getValue(sKey));
+					System.out.println();
+				}
+				
+				FlowDescription fd = fg.getCurrentFlowDescription(false);
+				Resource resIns = ecid.getExecutableComponentInstance();
+				
+				for ( ConnectorDescription cd:fd.getConnectorDescriptions() )
+					if ( cd.getTargetInstance().equals(resIns) )
+						System.out.println(
+								fg.getInstanceAliasFromResource(cd.getSourceInstance())+
+								"-<"+
+								getOutputPortName(qr,fd,cd.getSourceInstance(),cd.getSourceIntaceDataPort())+
+								" |-> "+
+								getInputPortName(qr,fd,cd.getTargetInstance(),cd.getTargetIntaceDataPort())+
+								">-"+
+								sInsName
+							);
+				for ( ConnectorDescription cd:fd.getConnectorDescriptions() )
+					if ( cd.getSourceInstance().equals(resIns) )
+						System.out.println(
+								sInsName +
+								"-<"+
+								getOutputPortName(qr,fd,cd.getSourceInstance(),cd.getSourceIntaceDataPort())+
+								" |-> "+
+								getInputPortName(qr,fd,cd.getTargetInstance(),cd.getTargetIntaceDataPort())	+
+								">-"+
+								fg.getInstanceAliasFromResource(cd.getTargetInstance())
+							);
+				
+				bError = false;
+			}
+			else {
+				System.out.println("\t Unknown instance name "+sInsName+". See help list for more information.");
+				bError = false;
+			}
+		}
 		if ( bError ) {
 			System.out.println("\t Unknown command ls "+sCmd+". See help list for more information.");
 		}
+	}
+
+	/** Returns the input port name for given instance and port resource.
+	 * 
+	 * @param qr The queryable repository to use
+	 * @param fd The flow description
+	 * @param resInstance The resource instance
+	 * @param resPort The resource port
+	 * @return The name of the port
+	 */
+	private String getInputPortName ( QueryableRepository qr, FlowDescription fd, Resource resInstance, Resource resPort ) {
+		ExecutableComponentDescription ecd = null;
+		for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() )
+			if ( ecid.getExecutableComponentInstance().equals(resInstance)) {
+				ecd = qr.getExecutableComponentDescription(ecid.getExecutableComponent());
+				break;
+			}
+				
+		DataPortDescription cd = ecd.getInput(resPort);
+		return cd.getName();
+	}
+
+	/** Returns the output port name for given instance and port resource.
+	 * 
+	* @param qr The queryable repository to use
+	 * @param fd The flow description
+	 * @param resInstance The resource instance
+	 * @param resPort The resource port
+	 * @return The name of the port
+	 */
+	private String getOutputPortName ( QueryableRepository qr, FlowDescription fd, Resource resInstance, Resource resPort ) {
+		ExecutableComponentDescription ecd = null;
+		for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() )
+			if ( ecid.getExecutableComponentInstance().equals(resInstance)) {
+				ecd = qr.getExecutableComponentDescription(ecid.getExecutableComponent());
+				break;
+			}
+				
+		DataPortDescription cd = ecd.getOutput(resPort);
+		return cd.getName();
 	}
 
 	/** Print the help for the system console commands.
@@ -581,15 +672,17 @@ public class ZigZagConsole {
 			System.out.println("\n                 provided query against the available metadata.");
 		}
 		else if ( sCmd.equals("ls") ) {
-			System.out.println("\t ls [components|flows|zigzag|aliases|instances]: ");
+			System.out.println("\t ls [components|flows|zigzag|aliases|instances|instance_name]: ");
 			System.out.println("\t                  List the current imported components or flows.");
 			System.out.println("\t                  It can also list the current ZigZag script, the alias");
 			System.out.println("\t                  assigned so far, and the current componentent instances.");
-			System.out.println("\t                  If no argument is provided available components and flows are listed.");
+			System.out.println("\t                  If an instance name is provided, its information is printed.");
+			System.out.println("\t                  If no argument is provided ls list the current flow instances.");
 		}
 		else if ( sCmd.equals("desc") ) {
-			System.out.println("\t desc <component_URI>: ");
+			System.out.println("\t desc <component_URI|component_alias>: ");
 			System.out.println("\t                  Provides a complete description of the requested component.");
+			System.out.println("\t                  The command accepts the original component URI or the created alias.");
 		}
 		else if ( sCmd.equals("reset") ) {
 			System.out.println("\t reset: Resets the current constructed flow built so far.");

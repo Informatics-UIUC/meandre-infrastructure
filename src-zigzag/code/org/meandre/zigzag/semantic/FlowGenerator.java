@@ -484,7 +484,7 @@ public class FlowGenerator {
 		sOutputFileName = (sOutputFileName.endsWith("/"))?sOutputFileName.replaceAll("/$", ""):sOutputFileName;
 		
 		// Get the flow description generated so far (inlcuding the parallel processing)
-		FlowDescription fd = getFlowDescription(sOutputFileName);
+		FlowDescription fd = getFlowDescription(sOutputFileName,true);
 		
 		// Add the component descriptions to the model
 		ps.print("Assembling MAU repository... ");
@@ -505,19 +505,22 @@ public class FlowGenerator {
 	}
 
 	/** Return the flow description built so far.
+	 * @param bParallelProcess Should post process the parallelized instances
 	 * 
 	 * @return The flow description
 	 */
-	public FlowDescription getFlowDescription() {
-		return getFlowDescription("vcli-empty-file-name");
+	public FlowDescription getCurrentFlowDescription(boolean bParallelProcess) {
+		return getFlowDescription("vcli-empty-file-name",bParallelProcess);
 	}
 
 	/** Return the flow description built so far.
 	 * 
 	 * @param sOutputFileName The output file name
+	 * @param bParallelProcess Should post process the parallelized instances
+	 * 
 	 * @return The flow description
 	 */
-	public FlowDescription getFlowDescription(String sOutputFileName) {
+	public FlowDescription getFlowDescription(String sOutputFileName,boolean bParallelProcess) {
 
 		FlowDescription fd = new FlowDescription();
 		
@@ -537,7 +540,7 @@ public class FlowGenerator {
 		fd.getConnectorDescriptions().addAll(hsConnectors);
 		
 		// Post parellization processing
-		if ( htParallelInstances.size()>0 ) {
+		if ( bParallelProcess && htParallelInstances.size()>0 ) {
 			ps.println("Postprocessing flow for parallelization");
 			postProcessinParallelization(fd);
 			ps.println("Postprocessing flow for parallelization finished");
@@ -913,6 +916,29 @@ public class FlowGenerator {
 			htInstanceOf.put(sKey, htReverse.get(htECInsAlias.get(sKey).getExecutableComponent().toString()) );
 		
 		return htInstanceOf;
+	}
+
+	/** Returns the executable component instance description for the given instance.
+	 * 
+	 * @param sInstance The instance to retrieve
+	 * @return The executable component instance description for the given instance
+	 */
+	public ExecutableComponentInstanceDescription getInstance(String sInstance) {
+		return htECInsAlias.get(sInstance);
+	}
+
+	/** Return the instance alias name for the given resource.
+	 * 
+	 * @param sourceInstance The resource to locate
+	 * @return The instance alias name
+	 */
+	public String getInstanceAliasFromResource(Resource sourceInstance) {
+		
+		for ( ExecutableComponentInstanceDescription ecid:htECInsAlias.values() )
+			if ( ecid.getExecutableComponentInstance().equals(sourceInstance) )
+				return ecid.getName();
+		
+		return "unknown-instance!";
 	}
 		
 }
