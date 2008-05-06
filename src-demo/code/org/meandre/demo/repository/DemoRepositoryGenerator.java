@@ -58,7 +58,7 @@ public class DemoRepositoryGenerator {
 		
 		ExecutableComponentDescription ecdRes = null;
 		
-		Resource resExecutableComponent =  ModelFactory.createDefaultModel().createResource(sBaseURL+"push_string");
+		Resource resExecutableComponent =  ModelFactory.createDefaultModel().createResource(sBaseURL+"push-string");
 		
 		// General properties
 		String sName = "Push String";
@@ -133,7 +133,7 @@ public class DemoRepositoryGenerator {
 		
 		ExecutableComponentDescription ecdRes = null;
 		
-		Resource resExecutableComponent =  ModelFactory.createDefaultModel().createResource(sBaseURL+"fork_2_by_reference");
+		Resource resExecutableComponent =  ModelFactory.createDefaultModel().createResource(sBaseURL+"fork-2-by-reference");
 		
 		// General properties
 		String sName = "Fork 2 by reference";
@@ -731,14 +731,14 @@ public class DemoRepositoryGenerator {
 		//
 		Set<ExecutableComponentInstanceDescription> setExecutableComponentInstances = new HashSet<ExecutableComponentInstanceDescription>();
 
-		Resource resInsPS0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push_string/0");
+		Resource resInsPS0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push-string/0");
 		Resource resInsPS0Component = ecdPS.getExecutableComponent();
 		String sInsPS0Name = "Push String 0";
 		String sInsPS0Desc = "Push hello world";
 		PropertiesDescription pdPInsPS0Properties = new PropertiesDescription();
 		ExecutableComponentInstanceDescription ecidPS0 = new ExecutableComponentInstanceDescription(resInsPS0,resInsPS0Component,sInsPS0Name,sInsPS0Desc,pdPInsPS0Properties);
 
-		Resource resInsPS1 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push_string/1");
+		Resource resInsPS1 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push-string/1");
 		Resource resInsPS1Component = ecdPS.getExecutableComponent();
 		String sInsPS1Name = "Push String 1";
 		String sInsPS1Desc = "Push hello world";
@@ -880,14 +880,14 @@ public class DemoRepositoryGenerator {
 		Set<ExecutableComponentInstanceDescription> setExecutableComponentInstances = new HashSet<ExecutableComponentInstanceDescription>();
 
 		// Real
-		Resource resInsPS0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push_string/0");
+		Resource resInsPS0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push-string/0");
 		Resource resInsPS0Component = ecdPS.getExecutableComponent();
 		String sInsPS0Name = "Push String 0";
 		String sInsPS0Desc = "Push hello world";
 		PropertiesDescription pdPInsPS0Properties = new PropertiesDescription();
 		ExecutableComponentInstanceDescription ecidPS0 = new ExecutableComponentInstanceDescription(resInsPS0,resInsPS0Component,sInsPS0Name,sInsPS0Desc,pdPInsPS0Properties);
 
-		Resource resInsPS1 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push_string/1");
+		Resource resInsPS1 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push-string/1");
 		Resource resInsPS1Component = ecdPS.getExecutableComponent();
 		String sInsPS1Name = "Push String 1";
 		String sInsPS1Desc = "Push hello world";
@@ -915,7 +915,7 @@ public class DemoRepositoryGenerator {
 		
 		// Dangling instances
 		
-		Resource resInsPSD = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push_string/4");
+		Resource resInsPSD = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push-string/4");
 		Resource resInsPSDComponent = ecdPS.getExecutableComponent();
 		String sInsPSDName = "Push String Dangling";
 		String sInsPSDDesc = "Push hello world";
@@ -1058,14 +1058,14 @@ public class DemoRepositoryGenerator {
 		Set<ExecutableComponentInstanceDescription> setExecutableComponentInstances = new HashSet<ExecutableComponentInstanceDescription>();
 	
 		// Real
-		Resource resInsPS0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push_string/0");
+		Resource resInsPS0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push-string/0");
 		Resource resInsPS0Component = ecdPS.getExecutableComponent();
 		String sInsPS0Name = "Push String 0";
 		String sInsPS0Desc = "Push hello world";
 		PropertiesDescription pdPInsPS0Properties = new PropertiesDescription();
 		ExecutableComponentInstanceDescription ecidPS0 = new ExecutableComponentInstanceDescription(resInsPS0,resInsPS0Component,sInsPS0Name,sInsPS0Desc,pdPInsPS0Properties);
 	
-		Resource resInsPS1 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push_string/1");
+		Resource resInsPS1 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push-string/1");
 		Resource resInsPS1Component = ecdPS.getExecutableComponent();
 		String sInsPS1Name = "Push String 1";
 		String sInsPS1Desc = "Push hello world";
@@ -1109,7 +1109,7 @@ public class DemoRepositoryGenerator {
 		
 		// Dangling instances
 		
-		Resource resInsPSD = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push_string/6");
+		Resource resInsPSD = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push-string/6");
 		Resource resInsPSDComponent = ecdPS.getExecutableComponent();
 		String sInsPSDName = "Push String Dangling";
 		String sInsPSDDesc = "Push hello world";
@@ -1261,14 +1261,14 @@ public class DemoRepositoryGenerator {
 		//
 		Set<ExecutableComponentInstanceDescription> setExecutableComponentInstances = new HashSet<ExecutableComponentInstanceDescription>();
 
-		Resource resInsPS0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push_string/0");
+		Resource resInsPS0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push-string/0");
 		Resource resInsPS0Component = ecdPS.getExecutableComponent();
 		String sInsPS0Name = "Push String 0";
 		String sInsPS0Desc = "Push hello world";
 		PropertiesDescription pdPInsPS0Properties = new PropertiesDescription();
 		ExecutableComponentInstanceDescription ecidPS0 = new ExecutableComponentInstanceDescription(resInsPS0,resInsPS0Component,sInsPS0Name,sInsPS0Desc,pdPInsPS0Properties);
 
-		Resource resInsPS1 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push_string/1");
+		Resource resInsPS1 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push-string/1");
 		Resource resInsPS1Component = ecdPS.getExecutableComponent();
 		String sInsPS1Name = "Push String 1";
 		String sInsPS1Desc = "Push hello world";
@@ -1403,14 +1403,14 @@ public class DemoRepositoryGenerator {
 		//
 		Set<ExecutableComponentInstanceDescription> setExecutableComponentInstances = new HashSet<ExecutableComponentInstanceDescription>();
 
-		Resource resInsPS0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push_string/0");
+		Resource resInsPS0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push-string/0");
 		Resource resInsPS0Component = ecdPS.getExecutableComponent();
 		String sInsPS0Name = "Push String 0";
 		String sInsPS0Desc = "Push hello world";
 		PropertiesDescription pdPInsPS0Properties = new PropertiesDescription();
 		ExecutableComponentInstanceDescription ecidPS0 = new ExecutableComponentInstanceDescription(resInsPS0,resInsPS0Component,sInsPS0Name,sInsPS0Desc,pdPInsPS0Properties);
 
-		Resource resInsPS1 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push_string/1");
+		Resource resInsPS1 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push-string/1");
 		Resource resInsPS1Component = ecdPS.getExecutableComponent();
 		String sInsPS1Name = "Push String 1";
 		String sInsPS1Desc = "Push hello world";
@@ -1580,7 +1580,7 @@ public class DemoRepositoryGenerator {
 		//
 		Set<ExecutableComponentInstanceDescription> setExecutableComponentInstances = new HashSet<ExecutableComponentInstanceDescription>();
 
-		Resource resInsPS0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push_string/0");
+		Resource resInsPS0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/push-string/0");
 		Resource resInsPS0Component = ecdPS.getExecutableComponent();
 		String sInsPS0Name = "Push String 0";
 		String sInsPS0Desc = "Push hello world";

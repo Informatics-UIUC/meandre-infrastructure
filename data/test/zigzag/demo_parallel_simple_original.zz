@@ -10,7 +10,7 @@
 # Imports the three required components and create the component aliases
 #
 import <http://localhost:1714/public/services/demo_repository.ttl>
-alias <http://test.org/component/push_string> as PUSH
+alias <http://test.org/component/push-string> as PUSH
 alias <http://test.org/component/print-object> as PRINT
 alias <http://test.org/component/pass-through> as PASS
 	
