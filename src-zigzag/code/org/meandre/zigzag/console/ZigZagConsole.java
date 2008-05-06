@@ -547,9 +547,12 @@ public class ZigZagConsole {
 			System.out.println();
 			bError = false;
 		}
-		if ( saLine.length==2  ) {
+		if ( saLine.length==2 && bError ) {
 			String sInsName = saLine[1];
 			if ( fg.getInstances().keySet().contains(sInsName) ) {
+				
+				System.out.println(sInsName+" instance-of "+fg.getInstances().get(sInsName));
+				
 				ExecutableComponentInstanceDescription ecid = fg.getInstance(sInsName);
 				PropertiesDescription pd = ecid.getProperties();
 				if ( pd!=null ) {
@@ -584,6 +587,7 @@ public class ZigZagConsole {
 								fg.getInstanceAliasFromResource(cd.getTargetInstance())
 							);
 				
+				System.out.println();
 				bError = false;
 			}
 			else {
