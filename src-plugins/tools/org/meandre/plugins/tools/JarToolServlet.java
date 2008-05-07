@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -71,7 +72,13 @@ implements MeandrePlugin{
 	throws ServletException, IOException {
 		String path = req.getPathInfo();
 		if (path == null) {
+			log.log(Level.SEVERE, "The path is null");
 			res.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
+		if(!new File(PLUGIN_JAR_DIR).exists()){
+			res.sendError(HttpServletResponse.SC_NOT_FOUND);
+			log.log(Level.SEVERE, "The plugin jar directory " + PLUGIN_JAR_DIR + " does not exist.");
 			return;
 		}
 		String locations[] = path.split(URL_SEP);
