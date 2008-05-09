@@ -168,10 +168,10 @@ public abstract class Tools {
 			while ( iter.hasNext() ) {
 				File f = iter.next();
 				File fReal = new File(fileDirectory.toString()+f.toString());
-				JarEntry jarAdd = new JarEntry(f.toString().substring(1));
+				JarEntry jarAdd = new JarEntry(f.toString().substring(1).replace('\\','/'));
 				jarAdd.setTime(fReal.lastModified());
 				out.putNextEntry(jarAdd);
-	
+				
 				// Write file to archive
 				FileInputStream in = new FileInputStream(fReal);
 				while (true) {
@@ -187,9 +187,9 @@ public abstract class Tools {
 			out.close();
 		    stream.close();
 		    // Clean up
-		    new File(fileDirectory+"/repository").delete();
-		    new File(fileDirectory+"/contexts").delete();
-		    new File(fileDirectory+"/plugins").delete();
+		    new File(fileDirectory+File.separator+"repository").delete();
+		    new File(fileDirectory+File.separator+"contexts").delete();
+		    new File(fileDirectory+File.separator+"plugins").delete();
 		    fileDirectory.delete();
 		    
 		} catch (FileNotFoundException e) {
