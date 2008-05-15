@@ -242,7 +242,7 @@ public class MAUExecutor {
 //			File file = new File(".");
 //			URL url = new URL("jar:file://"+file.getAbsolutePath()+"/"+sFileName+"!/repository/repository.ttl");
 			File file = new File(sFileName);
-			URL url = new URL("jar:file://"+sFileName+"!/repository/repository.ttl");
+			URL url = new URL("jar:file://"+file.getAbsolutePath()+"!/repository/repository.ttl");
 			mod.read(url.openStream(), null,"TTL");
 			QueryableRepository qr = new RepositoryImpl(mod);
 			
@@ -254,7 +254,7 @@ public class MAUExecutor {
 				//System.out.println(je.getName());
 				String [] sa = je.getName().split("/");
 //				editContextJarURI(qr,sa[sa.length-1],"jar:file://"+file.getAbsolutePath()+"/"+sFileName+"!"+je.getName());
-				editContextJarURI(qr,sa[sa.length-1],"jar:file://"+sFileName+"!"+je.getName());
+				editContextJarURI(qr,sa[sa.length-1],"jar:file://"+file.getAbsolutePath()+"!"+je.getName());
 			}
 			return qr;
 		} catch (MalformedURLException e) {
