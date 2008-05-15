@@ -141,7 +141,7 @@ public class MAUExecutor {
 		ps.println();
 		ps.flush();
 
-		ps.println("Executin MAU file " + sFileName);
+		ps.println("Executing MAU file " + sFileName);
 		ps.println();
 		
 		QueryableRepository qr = processModelFromMAU();
@@ -239,8 +239,10 @@ public class MAUExecutor {
 		try {
 			// Extract the repository description
 			Model mod = ModelFactory.createDefaultModel();
-			File file = new File(".");
-			URL url = new URL("jar:file://"+file.getAbsolutePath()+"/"+sFileName+"!/repository/repository.ttl");
+//			File file = new File(".");
+//			URL url = new URL("jar:file://"+file.getAbsolutePath()+"/"+sFileName+"!/repository/repository.ttl");
+			File file = new File(sFileName);
+			URL url = new URL("jar:file://"+sFileName+"!/repository/repository.ttl");
 			mod.read(url.openStream(), null,"TTL");
 			QueryableRepository qr = new RepositoryImpl(mod);
 			
@@ -251,7 +253,8 @@ public class MAUExecutor {
 				JarEntry je = iterJE.nextElement();
 				//System.out.println(je.getName());
 				String [] sa = je.getName().split("/");
-				editContextJarURI(qr,sa[sa.length-1],"jar:file://"+file.getAbsolutePath()+"/"+sFileName+"!"+je.getName());
+//				editContextJarURI(qr,sa[sa.length-1],"jar:file://"+file.getAbsolutePath()+"/"+sFileName+"!"+je.getName());
+				editContextJarURI(qr,sa[sa.length-1],"jar:file://"+sFileName+"!"+je.getName());
 			}
 			return qr;
 		} catch (MalformedURLException e) {

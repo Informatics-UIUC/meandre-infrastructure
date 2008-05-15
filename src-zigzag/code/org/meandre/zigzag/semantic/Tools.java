@@ -125,7 +125,7 @@ public abstract class Tools {
 					try {
 						// Pull the URL and dump it to the local file
 						Resource res = (Resource)node;
-						URL url = new URL(res.getURI());
+						URL url = new URL(res.getURI().replaceAll(" ", "%20"));
 						if ( url.toString().endsWith(".jar")) {
 							String [] sa = url.getPath().split("/");
 							InputStream is = url.openStream();

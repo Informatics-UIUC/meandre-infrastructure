@@ -1,5 +1,11 @@
 1.3vcli Xuixo
 
+* (!!) Modified the demo components' URIs to follow the same convention. This
+       may brake previous flows relying on the demo components. Also modified the
+       ZigZag test files to reflect the change.
+
+* Zigzag interpreter improved instance reflection information (now also shows component relation)
+
 * ZigZag interpreter adding functionality to the console
 	- show: Shows the flow built so far.
 
