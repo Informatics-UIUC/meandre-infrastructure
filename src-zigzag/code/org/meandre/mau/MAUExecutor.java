@@ -254,7 +254,7 @@ public class MAUExecutor {
 				//System.out.println(je.getName());
 				String [] sa = je.getName().split("/");
 //				editContextJarURI(qr,sa[sa.length-1],"jar:file://"+file.getAbsolutePath()+"/"+sFileName+"!"+je.getName());
-				editContextJarURI(qr,sa[sa.length-1],"jar:file://"+file.getAbsolutePath()+"!"+je.getName());
+				editContextJarURI(qr,sa[sa.length-1],"jar:file:"+file.getAbsolutePath()+"!/contexts/"+sa[sa.length-1]);
 			}
 			return qr;
 		} catch (MalformedURLException e) {
