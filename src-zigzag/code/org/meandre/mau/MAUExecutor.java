@@ -147,7 +147,7 @@ public class MAUExecutor {
 		ps.flush();
 
 		ps.println("Executing MAU file " + sFileName);
-		File fTmp = new File(sFileName+MAU_RUN_DIR);
+		File fTmp = new File(sFileName+"."+MAU_RUN_DIR);
 		ps.println("Creating temp dir " + fTmp.toString());
 		fTmp.mkdir();
 		ps.println();
@@ -288,7 +288,7 @@ public class MAUExecutor {
 					//setNew.add(qr.getModel().createResource(sNewURI));
 					try {
 						InputStream is = new URL(sNewURI).openStream();
-						File fo = new File(sFileName+MAU_RUN_DIR+File.separator+sJarName);
+						File fo = new File(sFileName+MAU_RUN_DIR+"."+sJarName);
 						FileOutputStream fos = new FileOutputStream(fo);
 						int iRead;
 						while ( (iRead=is.read())>=0 )
