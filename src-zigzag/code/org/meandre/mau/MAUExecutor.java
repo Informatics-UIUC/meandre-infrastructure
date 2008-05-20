@@ -52,7 +52,7 @@ public class MAUExecutor {
 	private static final String ZMAU_VERSION = "1.0.1vcli";
 	
 	/** The run temp dir */
-	private static final String MAU_RUN_DIR = File.separator+"run";
+	private static final String MAU_RUN_DIR = "run";
 
 	/** The output print stream to use */
 	protected PrintStream ps;
