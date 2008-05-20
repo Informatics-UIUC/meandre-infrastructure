@@ -254,7 +254,7 @@ public class MAUExecutor {
 				//System.out.println(je.getName());
 				String [] sa = je.getName().split("/");
 //				editContextJarURI(qr,sa[sa.length-1],"jar:file://"+file.getAbsolutePath()+"/"+sFileName+"!"+je.getName());
-				editContextJarURI(qr,sa[sa.length-1],"jar:file:"+file.getAbsolutePath()+"!/contexts/"+sa[sa.length-1]);
+				editContextJarURI(qr,sa[sa.length-1],"jar:file:"+file.getAbsolutePath()+"!/contexts/"+sa[sa.length-1].trim());
 			}
 			return qr;
 		} catch (MalformedURLException e) {
@@ -274,7 +274,7 @@ public class MAUExecutor {
 	private void editContextJarURI(QueryableRepository qr, String sJarName, String sNewURI) {
 		for ( ExecutableComponentDescription ecd:qr.getAvailableExecutableComponentDescriptions() ) {
 			Set<RDFNode> setNew = new HashSet<RDFNode>();
-			for ( RDFNode rdfNode:ecd.getContext() ) 
+			for ( RDFNode rdfNode:ecd.getContext() ) {
 				if ( rdfNode.isResource() &&
 					 rdfNode.toString().endsWith(sJarName) ) {
 					setNew.add(qr.getModel().createResource(sNewURI));
@@ -282,6 +282,10 @@ public class MAUExecutor {
 				else 
 					setNew.add(rdfNode);
 			}
+			Set<RDFNode> set = ecd.getContext();
+			set.clear();
+			set.addAll(setNew);
+		}
 		
 		
 	}
