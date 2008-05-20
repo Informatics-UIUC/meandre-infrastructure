@@ -2,7 +2,9 @@ package org.meandre.mau;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
@@ -48,6 +50,9 @@ public class MAUExecutor {
 
 	/** The current version of the MAU executor */
 	private static final String ZMAU_VERSION = "1.0.1vcli";
+	
+	/** The run temp dir */
+	private static final String MAU_RUN_DIR = File.separator+"run";
 
 	/** The output print stream to use */
 	protected PrintStream ps;
@@ -142,6 +147,9 @@ public class MAUExecutor {
 		ps.flush();
 
 		ps.println("Executing MAU file " + sFileName);
+		File fTmp = new File(sFileName+MAU_RUN_DIR);
+		ps.println("Creating temp dir " + fTmp.toString());
+		fTmp.mkdir();
 		ps.println();
 		
 		QueryableRepository qr = processModelFromMAU();
@@ -277,7 +285,26 @@ public class MAUExecutor {
 			for ( RDFNode rdfNode:ecd.getContext() ) {
 				if ( rdfNode.isResource() &&
 					 rdfNode.toString().endsWith(sJarName) ) {
-					setNew.add(qr.getModel().createResource(sNewURI));
+					//setNew.add(qr.getModel().createResource(sNewURI));
+					try {
+						InputStream is = new URL(sNewURI).openStream();
+						File fo = new File(sFileName+MAU_RUN_DIR+File.separator+sJarName);
+						FileOutputStream fos = new FileOutputStream(fo);
+						int iRead;
+						while ( (iRead=is.read())>=0 )
+							fos.write(iRead);
+						fos.close();
+						is.close();
+						//setNew.add(qr.getModel().createResource(sNewURI));
+						setNew.add(qr.getModel().createResource("file:"+fo.getAbsolutePath()));
+					} catch (MalformedURLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 				}
 				else 
 					setNew.add(rdfNode);
