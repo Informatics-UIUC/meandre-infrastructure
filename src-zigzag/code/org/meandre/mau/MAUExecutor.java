@@ -236,6 +236,13 @@ public class MAUExecutor {
 		
 		printStatistics();
 		
+		// Cleaning the tmp run dir
+		ps.println("Cleaning temp dir " + fTmp.toString());
+		for ( String sFileName:fTmp.list() )
+			new File(fTmp.getAbsoluteFile()+File.separator+sFileName).delete();
+		fTmp.delete();
+		ps.println();
+		
 	}
 
 	/** Process the model contained on the MAU file and rearrenge the contexts URIs.
@@ -247,8 +254,6 @@ public class MAUExecutor {
 		try {
 			// Extract the repository description
 			Model mod = ModelFactory.createDefaultModel();
-//			File file = new File(".");
-//			URL url = new URL("jar:file://"+file.getAbsolutePath()+"/"+sFileName+"!/repository/repository.ttl");
 			File file = new File(sFileName);
 			URL url = new URL("jar:file:"+file.getAbsolutePath()+"!/repository/repository.ttl");
 			mod.read(url.openStream(), null,"TTL");
@@ -259,9 +264,7 @@ public class MAUExecutor {
 			Enumeration<JarEntry> iterJE = jar.entries();
 			while (iterJE.hasMoreElements()) {
 				JarEntry je = iterJE.nextElement();
-				//System.out.println(je.getName());
 				String [] sa = je.getName().split("/");
-//				editContextJarURI(qr,sa[sa.length-1],"jar:file://"+file.getAbsolutePath()+"/"+sFileName+"!"+je.getName());
 				editContextJarURI(qr,sa[sa.length-1],"jar:file:"+file.getAbsolutePath()+"!/contexts/"+sa[sa.length-1].trim());
 			}
 			return qr;
@@ -285,7 +288,6 @@ public class MAUExecutor {
 			for ( RDFNode rdfNode:ecd.getContext() ) {
 				if ( rdfNode.isResource() &&
 					 rdfNode.toString().endsWith(sJarName) ) {
-					//setNew.add(qr.getModel().createResource(sNewURI));
 					try {
 						InputStream is = new URL(sNewURI).openStream();
 						File fo = new File(sFileName+"."+MAU_RUN_DIR+File.separator+sJarName);
@@ -295,7 +297,6 @@ public class MAUExecutor {
 							fos.write(iRead);
 						fos.close();
 						is.close();
-						//setNew.add(qr.getModel().createResource(sNewURI));
 						setNew.add(qr.getModel().createResource("file:"+fo.getAbsolutePath()));
 					} catch (MalformedURLException e) {
 						// TODO Auto-generated catch block
