@@ -1,5 +1,7 @@
 1.3vcli Xuixo
 
+* Fix to the MAU executor to only use the jars contained on it.
+
 * (!!) Modified the demo components' URIs to follow the same convention. This
        may brake previous flows relying on the demo components. Also modified the
        ZigZag test files to reflect the change.
