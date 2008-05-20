@@ -288,7 +288,7 @@ public class MAUExecutor {
 					//setNew.add(qr.getModel().createResource(sNewURI));
 					try {
 						InputStream is = new URL(sNewURI).openStream();
-						File fo = new File(sFileName+MAU_RUN_DIR+"."+sJarName);
+						File fo = new File(sFileName+"."+MAU_RUN_DIR+"."+sJarName);
 						FileOutputStream fos = new FileOutputStream(fo);
 						int iRead;
 						while ( (iRead=is.read())>=0 )
