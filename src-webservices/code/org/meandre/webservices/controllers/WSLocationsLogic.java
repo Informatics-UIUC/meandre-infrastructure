@@ -118,12 +118,14 @@ public class WSLocationsLogic {
 				//
 				// Read the location and check its consistency
 				//
+			
 				if ( sLocation.endsWith(".ttl"))
 					modelTmp.read(url.openStream(),null,"TTL");
 				else if ( sLocation.endsWith(".nt"))
 					modelTmp.read(url.openStream(),null,"N-TRIPLE");
 				else
 					modelTmp.read(url.openStream(),null);
+
 				
 				//
 				// Test the location
@@ -158,7 +160,7 @@ public class WSLocationsLogic {
 				qr.refreshCache();
 			}
 			catch ( Exception e ) {
-				log.warning("Failed to add location\n"+e.toString());
+				log.warning("WSLocationsLogic.removeLocation: Failed to add location\n"+e.toString());
 				bRes = false;
 			}
 		}
@@ -248,13 +250,22 @@ public class WSLocationsLogic {
 					//
 					// Read the location and check its consistency
 					//
+					try{
 					if ( url.toString().endsWith(".ttl"))
 						modelTmp.read(url.openStream(),null,"TTL");
 					else if ( url.toString().endsWith(".nt"))
 						modelTmp.read(url.openStream(),null,"N-TRIPLE");
 					else
 						modelTmp.read(url.openStream(),null);
-					
+	               }catch(Exception e){
+	                    log.warning("WSLocationsLogic.removeLocation: Failed to " +
+	                            "add location. Couldnt open url:" +
+	                            url.toString() + "\n"+
+	                            e.toString());
+	                    bRes = false;
+	                    return bRes;
+	                    
+	                }
 					QueryableRepository qrNew = new RepositoryImpl(modelTmp);
 					
 					//
@@ -279,7 +290,7 @@ public class WSLocationsLogic {
 					qr.refreshCache();
 				}
 				catch ( Exception e ) {
-					log.warning("Failed to load location\n"+e.toString());
+					log.warning("WSLocationsLogic.removeLocation: Failed to load location\n"+e.toString());
 					bRes = false;
 				}
 			}
