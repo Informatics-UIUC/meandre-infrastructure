@@ -147,6 +147,7 @@
 	    <delete dir="published_resources"/>
 	    <delete dir="run"/>
         <delete dir="log"/>
+        <delete dir="DerbyLog"/>
 		<delete dir="mnt"/>
         <delete file="derby.log"/>
 		<delete file="meandre-config-plugins.xml"/>
