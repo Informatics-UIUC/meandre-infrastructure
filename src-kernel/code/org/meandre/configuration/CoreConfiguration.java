@@ -26,7 +26,10 @@ public class CoreConfiguration {
 
 	/** The config path */
 	private static final String MEANDRE_CORE_CONFIG_FILE = "MEANDRE_CORE_CONFIG_FILE";
-	
+
+    /** The config path */
+    private static final String MEANDRE_HOME_DIRECTORY = "MEANDRE_HOME_DIRECTORY";
+    
 	/** The configuration properties */
 	private Properties propsCore;
 	
@@ -37,8 +40,8 @@ public class CoreConfiguration {
 	 * 
 	 */
 	public CoreConfiguration () {
-		
-		propsCore = new Properties();
+		this(1714, ".");
+		/*propsCore = new Properties();
 		
 		propsCore.setProperty(MEANDRE_BASE_PORT, "1714");
         propsCore.setProperty(MEANDRE_PUBLIC_RESOURCE_DIRECTORY, "." + File.separator + "published_resources");
@@ -48,6 +51,28 @@ public class CoreConfiguration {
         log = KernelLoggerFactory.getCoreLogger();
         
         initializeConfiguration();
+        */
+	}
+	
+	/**
+	 * Creates a core configuration where all file resources will be in
+	 * the specified sInstallDir and the server will run on the specified
+	 * port.
+	 * @param port the port the web services will run on
+	 * @param sInstallDir the directory used for Meandre's persistent data
+	 */
+	public CoreConfiguration(int port, String sInstallDir){
+	    
+	    propsCore = new Properties();
+	        
+	    propsCore.setProperty(MEANDRE_BASE_PORT, Integer.toString(port));
+        propsCore.setProperty(MEANDRE_PUBLIC_RESOURCE_DIRECTORY, sInstallDir + File.separator + "published_resources");
+        propsCore.setProperty(MEANDRE_PRIVATE_RUN_DIRECTORY, sInstallDir + File.separator + "run");
+        propsCore.setProperty(MEANDRE_CORE_CONFIG_FILE, sInstallDir + File.separator + "meandre-config-core.xml");
+        propsCore.setProperty(MEANDRE_HOME_DIRECTORY, sInstallDir);   
+        log = KernelLoggerFactory.getCoreLogger();
+	        
+        initializeConfiguration();    
 	}
 	
 	
@@ -111,5 +136,14 @@ public class CoreConfiguration {
         return Integer.parseInt(propsCore.getProperty(MEANDRE_BASE_PORT));
     }
 
+    /**
+     * the working directory for a meandre instance. this is where persistent
+     * data and config files will be written by default.
+     * 
+     * @return a path in string form. may or may not be a relative path (e.g. ".")
+     */
+    public String getHomeDirectory(){
+        return propsCore.getProperty(MEANDRE_HOME_DIRECTORY);
+    }
 	
 }
