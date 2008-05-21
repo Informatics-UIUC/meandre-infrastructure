@@ -3,32 +3,34 @@
  */
 package org.meandre.client;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import org.meandre.client.MeandreClient;
-import org.meandre.webservices.MeandreServer;
+import java.io.File;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-
 import org.junit.Test;
+import org.meandre.core.repository.ExecutableComponentDescription;
+import org.meandre.core.repository.FlowDescription;
+import org.meandre.core.repository.LocationBean;
+import org.meandre.core.repository.QueryableRepository;
+import org.meandre.core.repository.RepositoryImpl;
+import org.meandre.demo.repository.DemoRepositoryGenerator;
+import org.meandre.webservices.MeandreServer;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.io.File;
-import java.io.StringWriter;
-import java.net.URL;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-
-import org.meandre.configuration.CoreConfiguration;
-import org.meandre.core.repository.*;
-import org.meandre.core.store.Store;
-import org.meandre.demo.repository.DemoRepositoryGenerator;
 
 /**
  * @author pgroves

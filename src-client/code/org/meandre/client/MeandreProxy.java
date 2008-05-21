@@ -6,13 +6,10 @@
 package org.meandre.client;
 
 import java.util.Set;
-import java.util.Iterator;
-import java.util.Map;
-import java.net.URL;
 import java.util.logging.Logger;
-import javax.servlet.jsp.JspWriter;
 
-import org.meandre.core.repository.*;
+import org.meandre.core.repository.LocationBean;
+import org.meandre.core.repository.QueryableRepository;
 
 
 
