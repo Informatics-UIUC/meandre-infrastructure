@@ -46,8 +46,9 @@ public class PluginFactory {
 	/** Creates an unitialized plugin factory and avoids other to instantiate it.
 	 * 
 	 */
-	private PluginFactory () {
-		cnf = new CoreConfiguration();
+	private PluginFactory (CoreConfiguration crcnf) {
+		cnf = crcnf;
+		sConfigPath = cnf.getHomeDirectory();
 	}
 	
 	/** Initialize the plugin factory given a certain core configuration.
@@ -55,15 +56,16 @@ public class PluginFactory {
 	 * @param cnf The core configuration object
 	 */
 	public static PluginFactory getPluginFactory ( CoreConfiguration cnf ) {
-		PluginFactory pf = new PluginFactory();
+		PluginFactory pf = new PluginFactory(cnf);
 		
 		pf.propPluginFactoryConfig = new Properties();
 	    FileInputStream fis;
+	    String sConfigFilePath = pf.sConfigPath + File.separator + pf.sConfigFile;
 		try {
 			//
 			// Load the properties from the default location
 			//
-			fis = new FileInputStream(pf.sConfigPath+File.separator+pf.sConfigFile);
+			fis = new FileInputStream(sConfigFilePath);
 			pf.propPluginFactoryConfig.loadFromXML(fis);
 			fis.close();
 		} catch (Exception eRead) {
@@ -72,18 +74,18 @@ public class PluginFactory {
 			// Creating a default one
 			//
 			pf.log.warning("Meandre configuration file "+
-					pf.sConfigPath+File.separator+pf.sConfigFile+
+					sConfigFilePath+
 					" could not be loaded. Creating a default one.");
 
 			PluginFactory.initializePluginsDefaultProperties(pf);
 			FileOutputStream fos;
 			try {
-				fos = new FileOutputStream(pf.sConfigPath+File.separator+pf.sConfigFile);
+				fos = new FileOutputStream(sConfigFilePath);
 				pf.propPluginFactoryConfig.storeToXML(fos, "Meandre default plugins configuration file ("+Constants.MEANDRE_VERSION+")");
 			    fos.close();
 			} catch (Exception eWrite) {
 				pf.log.warning("Meandre plugins configuration file "+
-						pf.sConfigPath+File.separator+pf.sConfigFile+
+						sConfigFilePath+
 					    " could not be written to disk!");
 			}
 		}
