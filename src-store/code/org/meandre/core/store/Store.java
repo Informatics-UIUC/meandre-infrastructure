@@ -78,11 +78,18 @@ public class Store {
      * The default configuration path to the file name
      */
     private String sConfigPath = ".";
-
+    
+    /**
+     * The directory path to install working files.
+     */
+    private String sInstallDirPath = ".";
+    
     /**
      * The default configuration file name
      */
     private String sConfigFile = "meandre-config-store.xml";
+    
+    
 
 
     /**
@@ -135,6 +142,7 @@ public class Store {
      */
     private SecurityStoreImpl ssSecurityStore = null;
 
+
     /**
      * The repository cache entry
      */
@@ -149,6 +157,18 @@ public class Store {
         initializeStore();
     }
     
+    /** Initialize a default store to install its file resources in a
+     * specified directory. The resources are the store's config file
+     * and jena database files.
+     * 
+     */
+    public Store(String sInstallDir) {
+        sConfigPath = sInstallDir;
+        sInstallDirPath = sInstallDir;
+        propStoreConfig = new Properties();
+        initializeDefaultProperties();
+        initializeStore();
+    }  
     /** Initialize a store with the provided properties
      * 
      * @param props The properties for the store
@@ -171,14 +191,16 @@ public class Store {
     /** The initialization of the store based on properties.
      */
     protected void initializeStore() {
-
+        //the fully expanded path to the config file        
+        String sConfigFileAbs = sConfigPath + File.separator + sConfigFile;
+        
         // Try to open the config file
     	FileInputStream fis;
         try {
             //
             // Load the properties from the default location
             //
-            fis = new FileInputStream(sConfigPath + File.separator + sConfigFile);
+            fis = new FileInputStream(sConfigFileAbs);
             propStoreConfig.loadFromXML(fis);
             fis.close();
         }
@@ -188,19 +210,19 @@ public class Store {
             // Creating a default one
             //
             log.warning("Meandre configuration file " +
-                        sConfigPath + File.separator + sConfigFile +
+                        sConfigFileAbs +
                         " could not be loaded. Creating a default one.");
 
             initializeDefaultProperties();
             FileOutputStream fos;
             try {
-                fos = new FileOutputStream(sConfigPath + File.separator + sConfigFile);
+                fos = new FileOutputStream(sConfigFileAbs);
                 propStoreConfig.storeToXML(fos, "Meandre default configuration file (" + Constants.MEANDRE_VERSION + ")");
                 fos.close();
             }
             catch (Exception eWrite) {
                 log.warning("Meandre configuration file " +
-                            sConfigPath + File.separator + sConfigFile +
+                            sConfigFileAbs +
                             " could not be written to disk!");
 
             }
@@ -231,6 +253,7 @@ public class Store {
 
         log.info("Initialization of JENA RDBModelMaker done");
         initializeSecurityStore();
+        
 
     }
 
@@ -241,15 +264,19 @@ public class Store {
         //
         // Meandre properties
         //
-    	propStoreConfig.setProperty(MEANDRE_STORE_CONFIG_FILE,"." + File.separator + "meandre-config-store.xml");
-        propStoreConfig.setProperty(MEANDRE_AUTHENTICATION_REALM_FILENAME, "."+File.separator+"meandre-realm.properties");
+    	propStoreConfig.setProperty(MEANDRE_STORE_CONFIG_FILE, sConfigPath + File.separator + "meandre-config-store.xml");
+        propStoreConfig.setProperty(MEANDRE_AUTHENTICATION_REALM_FILENAME, sConfigPath + File.separator + "meandre-realm.properties");
         propStoreConfig.setProperty(MEANDRE_ADMIN_USER, "admin");
 
         //
         // Jena DB relational background properties
         //
+        String storeDir = sInstallDirPath + File.separator + "MeandreStore";
+        String logDir = sInstallDirPath;
+        String derbyUrl = "jdbc:derby:" + storeDir + ";create=true" + ";logDevice=" + logDir;
+        		
         propStoreConfig.setProperty(JENA_DB_DRIVER_CLASS_NAME, "org.apache.derby.jdbc.EmbeddedDriver");
-        propStoreConfig.setProperty(JENA_DB_URL, "jdbc:derby:MeandreStore;create=true");
+        propStoreConfig.setProperty(JENA_DB_URL, derbyUrl);
         propStoreConfig.setProperty(JENA_DB_USER_NAME, "");
         propStoreConfig.setProperty(JENA_DB_PASSWD, "");
         propStoreConfig.setProperty(JENA_DB, "Derby");
@@ -269,6 +296,7 @@ public class Store {
         }
 
     }
+
 
     /**
      * Gets the driver class name used.
