@@ -41,7 +41,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 public class MeandreClientTest {
 
     private static String _serverUrl = "localhost";
-    private static int _serverPort = 1714;
+    private static int _serverPort = 1704;
     
     private static String _workingDir = "./test/output/";
 
