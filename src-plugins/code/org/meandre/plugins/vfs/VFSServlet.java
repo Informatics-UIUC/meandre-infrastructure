@@ -74,7 +74,7 @@ implements MeandrePlugin{
 		    try {
 		    	vfsProperties.load(getClass().getResourceAsStream("vfs.properties"));
 		    } catch (IOException e) {
-		    	log.warning("Could not read mime-types.properties " );
+		    	log.warning("Could not read vfs.properties " );
 		    }
 		    PUBLIC_RESOURCES_DIR = vfsProperties.getProperty("mount_dir", "mnt");
 
