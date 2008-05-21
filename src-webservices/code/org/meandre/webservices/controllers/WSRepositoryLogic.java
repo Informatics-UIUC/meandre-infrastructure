@@ -127,7 +127,7 @@ public class WSRepositoryLogic {
 				mod.commit();
 			}
 			catch ( Exception e ) {
-				log.warning("Failed to load location\n"+e.toString());
+				log.warning("WSRepositoryLogic: Failed to load location\n"+e.toString());
 				bRes = false;
 			}
 		}
