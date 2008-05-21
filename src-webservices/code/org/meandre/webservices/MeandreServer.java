@@ -1,6 +1,5 @@
 package org.meandre.webservices;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
@@ -217,7 +216,7 @@ public class MeandreServer {
 		// Adding restrictedly provided services
 		//
 		contextWS.addServlet(new ServletHolder((Servlet) new WSAbout(store)), 		"/services/about/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSLocations(store)),	"/services/locations/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSLocations(store,cnf)),	"/services/locations/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository(store,cnf)),	"/services/repository/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSExecute(store,cnf)),		"/services/execute/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublish(store)),		"/services/publish/*");

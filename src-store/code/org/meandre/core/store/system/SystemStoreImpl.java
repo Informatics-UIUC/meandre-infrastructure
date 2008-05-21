@@ -75,8 +75,10 @@ public class SystemStoreImpl implements SystemStore {
     /** Create a system store for properties and configuration related stuff.
      *
      * @param nmodel the model containing the system store
+     * @param sHost The host name
+     * @param iPort The current port number
      */
-    public SystemStoreImpl( Model model ) {
+    public SystemStoreImpl( Model model, String sHost, int iPort ) {
         this.model = model;
 
         this.model.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
@@ -87,7 +89,7 @@ public class SystemStoreImpl implements SystemStore {
 
         if ( model.size()==0 ) {
         	log.info("Empty model. Initializing a clean one.");
-            setProperty(REPOSITORY_LOCATION,"http://localhost:1714/public/services/repository.nt","The locally published components");
+            setProperty(REPOSITORY_LOCATION,"http://"+sHost+":"+iPort+"/public/services/repository.nt","The locally published components");
         }
 
         flush();

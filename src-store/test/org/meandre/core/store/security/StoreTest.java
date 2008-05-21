@@ -38,7 +38,7 @@ public class StoreTest {
 			fail("Exception should not have been thrown:"+e);
 		}
 		
-		SystemStore sysStore = store.getSystemStore(store.getAdminUserNickName());
+		SystemStore sysStore = store.getSystemStore(cnf,store.getAdminUserNickName());
 		assertEquals(1,sysStore.getPropertyKeys().size());
 	}
 

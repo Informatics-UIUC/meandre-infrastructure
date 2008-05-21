@@ -145,5 +145,14 @@ public class CoreConfiguration {
     public String getHomeDirectory(){
         return propsCore.getProperty(MEANDRE_HOME_DIRECTORY);
     }
+
+    /** Returns the current host IP address.
+     * 
+     * @return The host IP address
+     */
+	public String getHostName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

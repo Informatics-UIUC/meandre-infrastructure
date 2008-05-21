@@ -10,7 +10,9 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.StringWriter;
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -59,6 +61,11 @@ public class MeandreClientTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         System.out.println("MeandreClientTest: setupBeforeClass begin");
+        
+        try {
+        	_serverUrl = InetAddress.getLocalHost().getCanonicalHostName();
+		} catch (UnknownHostException e) {
+		}
         
         File fWorkDir = new File(_workingDir);
         if(!fWorkDir.exists()){

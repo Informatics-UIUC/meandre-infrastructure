@@ -6,6 +6,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 
+import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
@@ -19,6 +20,8 @@ import org.meandre.core.utils.Constants;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -161,6 +164,7 @@ public class Store {
      * specified directory. The resources are the store's config file
      * and jena database files.
      * 
+     * @sInstallDir The base install directory
      */
     public Store(String sInstallDir) {
         sConfigPath = sInstallDir;
@@ -371,10 +375,21 @@ public class Store {
      * Returns the a system store for the given user.
      *
      * @param sNickName The user nickname
+     * @param cnf The core configuration
      * @return The system store for the given user
      */
-    public SystemStore getSystemStore(String sNickName) {
-        return new SystemStoreImpl(getMaker().createModel(BASE_SYSTEM_STORE_URL + sNickName));
+    public SystemStore getSystemStore(CoreConfiguration cnf, String sNickName) {
+    	String sHostName = "127.0.0.1";
+    	try {
+    		sHostName = InetAddress.getLocalHost().getCanonicalHostName();
+		} catch (UnknownHostException e) {
+			log.warning(e.getMessage());
+		}
+        return new SystemStoreImpl(
+        		getMaker().createModel(BASE_SYSTEM_STORE_URL + sNickName),
+        		sHostName,
+        		cnf.getBasePort()
+        	);
     }
 
     /**

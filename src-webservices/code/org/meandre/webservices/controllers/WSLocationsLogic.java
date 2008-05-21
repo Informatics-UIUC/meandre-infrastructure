@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.store.Store;
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.FlowDescription;
@@ -33,13 +34,18 @@ public class WSLocationsLogic {
 	
 	/** The store to use */
 	private Store store;
+
+	/** The core configuration object */
+	private CoreConfiguration cnf;
 	
 	/** Creates a location object for the given store.
 	 * 
+	 * @param cnf The core configuration
 	 * @param store The store to use
 	 */
-    public WSLocationsLogic(Store store) {
-		this.store = store;
+    public WSLocationsLogic(CoreConfiguration cnf, Store store) {
+		this.cnf = cnf;
+    	this.store = store;
 	}
 	/** Returns a JSON object for the given location.
      * 
@@ -71,7 +77,7 @@ public class WSLocationsLogic {
 	public JSONObject listLocationsAsJSONObject ( String sUser )
 			throws IOException, JSONException {
 		
-		SystemStore ss = store.getSystemStore(sUser);
+		SystemStore ss = store.getSystemStore(cnf,sUser);
 		
  	    Set<Hashtable<String, String>> setProps = ss.getProperty(SystemStore.REPOSITORY_LOCATION);
 		
@@ -99,7 +105,7 @@ public class WSLocationsLogic {
 		boolean bRes = true;
 		
 		// Retrieve system store
-		SystemStore ss = store.getSystemStore(sUser);
+		SystemStore ss = store.getSystemStore(cnf,sUser);
 	    
 		if ( !isAlreadyAUsedLocation(ss,sLocation) ) {
 			//
@@ -205,7 +211,7 @@ public class WSLocationsLogic {
 		boolean bRes = true;
 		
 		// Retrieve system store
-		SystemStore ss = store.getSystemStore(sUser);
+		SystemStore ss = store.getSystemStore(cnf,sUser);
 	    
 		if ( !isAlreadyAUsedLocation(ss, sLocation)) {
 			//

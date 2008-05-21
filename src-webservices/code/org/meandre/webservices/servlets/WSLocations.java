@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
+import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.store.Store;
 import org.meandre.core.store.security.Action;
 import org.meandre.webservices.controllers.WSLocationsLogic;
@@ -38,13 +39,19 @@ public class WSLocations extends HttpServlet {
 	/** The location object logic to use */
 	private WSLocationsLogic wsLocationsLogic;
 	
+	/** The core configuration */
+	@SuppressWarnings("unused")
+	private CoreConfiguration cnf;
+	
 	/** Creates a new location server for the given store.
 	 * 
+	 * @param cnf The core configuration
 	 * @param store The store to use
 	 */
-	public WSLocations(Store store) {
+	public WSLocations(Store store,CoreConfiguration cnf) {
+		this.cnf = cnf;
 		this.store = store;
-		this.wsLocationsLogic = new WSLocationsLogic(store);
+		this.wsLocationsLogic = new WSLocationsLogic(cnf,store);
 	}
 
 	/**

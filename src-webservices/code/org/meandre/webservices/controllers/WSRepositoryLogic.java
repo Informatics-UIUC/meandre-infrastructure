@@ -90,7 +90,7 @@ public class WSRepositoryLogic {
 		mod.commit();
 
 		// Regenerating the user repository entries
-		SystemStore ss = store.getSystemStore(sUser);
+		SystemStore ss = store.getSystemStore(cnf,sUser);
 		Set<Hashtable<String, String>> setProps = ss.getProperty(SystemStore.REPOSITORY_LOCATION);
 		for ( Hashtable<String, String> ht:setProps ) {
 			String sLoc = ht.get("value");
