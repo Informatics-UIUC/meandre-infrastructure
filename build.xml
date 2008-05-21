@@ -40,6 +40,7 @@
             <include name="${ws.src}/**/*.java"/>
             <include name="${store.src}/**/*.java"/>
             <include name="${terracotta.src}/**/*.java"/>
+            <include name="${client.src}/**/*.java"/>
         </javac>
 
         <copy todir="${build.dir}" includeEmptyDirs="no">
@@ -124,14 +125,34 @@
 		<javac srcdir="${ws.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
     	<javac srcdir="${store.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
     	<javac srcdir="${terracotta.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
+    	<javac srcdir="${client.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
     </target>
 
 	<!-- clean -->
 	<target name="clean" description="-> removes build artifacts">
 	    <delete dir="${build.dir}"/>
-	    <delete dir="${test.dir}"/>
+        <delete includeemptydirs="true">
+            <fileset dir="${test.dir}" casesensitive="yes">
+                <include name="**/*"/>
+                <exclude name="data/"/>
+            </fileset>
+        </delete>
 	    <delete dir="${doc.dir}"/>
 	    <delete dir="${dist.dir}/tmp"/>
+	</target>
+    	
+	<!-- clean meandre installation-->
+	<target name="clean-meandre" description="-> removes meandre created files">
+	    <delete dir="MeandreStore"/>
+	    <delete dir="published_resources"/>
+	    <delete dir="run"/>
+        <delete dir="log"/>
+		<delete dir="mnt"/>
+        <delete file="derby.log"/>
+		<delete file="meandre-config-plugins.xml"/>
+        <delete file="meandre-config-store.xml"/>
+        <delete file="meandre-config-core.xml"/>
+        <delete file="meandre-realm.properties"/>
 	</target>	
 		
 
@@ -180,6 +201,11 @@
             	<fileset dir="${terracotta.test}">
                     <include name="**/*Test.java"/>
                 </fileset>
+                
+                <fileset dir="${client.test}">
+                    <include name="**/*Test.java"/>
+                </fileset>
+            	
             </batchtest>
         </junit>
     </target>
@@ -217,6 +243,7 @@
 	    	      <include name="${ws.src}/**"/>
 	    	      <include name="${store.src}/**"/>
 	    	      <include name="${terracotta.src}/**"/>
+                  <include name="${client.src}/**"/>
 	    		  <exclude name="**/*.properties" />
 	    		  <exclude name="**/*.jj" />
 	    	</fileset>
@@ -348,6 +375,17 @@
             </fileset>
         </jar>
     	
+        <!-- Create client jar -->
+        <jar destfile="${dist.dir}/lib/${app.name}-client-${build.version}.jar">
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+            </manifest>
+            <fileset dir="${build.dir}">
+                <include name="**/client/**/*.class"/>
+                <include name="**/client/**/*.properties"/>
+                <include name="**/client/**/*.xml"/>
+            </fileset>
+        </jar>  	
     	<!-- Preparations to create the release jars -->
         <copy todir="${dist.dir}/tmp" includeEmptyDirs="no">
              <fileset dir="${build.dir}">

@@ -21,6 +21,7 @@
     <property name="ws.src" value="src-webservices/code"/>
     <property name="store.src" value="src-store/code"/>
     <property name="terracotta.src" value="src-terracotta/code"/>
+    <property name="client.src" value="src-client/code"/>
 	
 	<!-- Test code locations -->
 	<property name="kernel.test" value="src-kernel/test"/>
@@ -30,6 +31,7 @@
 	<property name="ws.test" value="src-webservices/test"/>
 	<property name="store.test" value="src-store/test"/>
 	<property name="terracotta.test" value="src-terracotta/test"/>
+	<property name="client.test" value="src-client/test"/>
 	
 	<!-- The generic classpath to all the code (includes code and tests) -->
 	<path id="meandre.javadoc.src">
@@ -77,6 +79,7 @@
         <fileset dir="${jena.dir}" includes="*.jar"/>
         <fileset dir="${xstream.dir}" includes="*.jar"/>
         <fileset dir="${prefuse.dir}" includes="*.jar"/>
+        <fileset dir="${httpclient.dir}" includes="*.jar"/>
         <pathelement location="${truezip.jar}"/>
         <pathelement location="${apache-commons-upload.jar}"/>
         <pathelement location="${apache-commons-logging.jar}"/>
