@@ -272,7 +272,10 @@ public class Store {
         // Jena DB relational background properties
         //
         String storeDir = sInstallDirPath + File.separator + "MeandreStore";
-        String logDir = sInstallDirPath;
+        //when the logDevice is set, derby will abort if the log directory is already
+        //in use saying "it may be in use by another database", so we have to make
+        // DerbyLog/log/
+        String logDir = sInstallDirPath + File.separator + "DerbyLog";
         String derbyUrl = "jdbc:derby:" + storeDir + ";create=true" + ";logDevice=" + logDir;
         		
         propStoreConfig.setProperty(JENA_DB_DRIVER_CLASS_NAME, "org.apache.derby.jdbc.EmbeddedDriver");
