@@ -66,6 +66,19 @@ public class MeandreServer {
 		cnf = new CoreConfiguration();
 	}
 	
+	/**
+	 * creates (or uses) a default installation in the given install dir
+	 * running on the given port.  
+	 * @param port
+	 * @param sInstallDir
+	 */
+	public MeandreServer(int port, String sInstallDir){
+        log = WSLoggerFactory.getWSLogger();
+        MEANDRE_HOME = sInstallDir;
+        store = new Store(sInstallDir);
+        cnf = new CoreConfiguration(port, sInstallDir);	    
+	    
+	}
 	
 	/** Creates a Meandre server running on the provided home directory and store.
 	 * 
