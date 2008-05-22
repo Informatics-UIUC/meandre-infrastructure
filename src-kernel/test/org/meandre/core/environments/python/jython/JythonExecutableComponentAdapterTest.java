@@ -94,10 +94,10 @@ public class JythonExecutableComponentAdapterTest {
 		jeca.initialize(cc);
 		jeca.untrapOutputAndErrorStreams();
 		sRes = jeca.getOutput().toString();
-		assertEquals("Initialize called\nInitialize called\n",sRes);
+		assertEquals("Initialize called\n",sRes);
 		jeca.dispose(cc);
 		sRes = jeca.getOutput().toString();
-		assertEquals("Initialize called\nInitialize called\nDispose called\n",sRes);
+		assertEquals("Initialize called\nDispose called\n",sRes);
 		thdMrProbe.done();
 	}
 
@@ -124,6 +124,7 @@ public class JythonExecutableComponentAdapterTest {
 				new Hashtable<String, String> (), null,
 				"nothing", new Hashtable<String, String> (), thdMrProbe,cnf);
 		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf);
+		jeca.initialize(cc);
 		try {
 			jeca.execute(cc);
 		} catch (ComponentExecutionException e) {

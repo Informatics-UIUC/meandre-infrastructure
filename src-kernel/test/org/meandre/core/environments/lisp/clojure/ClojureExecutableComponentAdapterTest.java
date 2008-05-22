@@ -68,8 +68,8 @@ public class ClojureExecutableComponentAdapterTest {
 					
 			@SuppressWarnings("unused")
 			ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf);
+			ceca.initialize(cc);
 			ceca.untrapOutputAndErrorStreams();
-			
 			assertEquals("Initialize Called\n",ceca.getOutput().toString());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -104,6 +104,7 @@ public class ClojureExecutableComponentAdapterTest {
 					
 			ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf);
 			
+			ceca.initialize(cc);
 			ceca.execute(cc);
 			
 			ceca.untrapOutputAndErrorStreams();
@@ -145,6 +146,7 @@ public class ClojureExecutableComponentAdapterTest {
 					
 			ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf);
 			
+			ceca.initialize(cc);
 			ceca.execute(cc);
 			ceca.dispose(cc);
 			

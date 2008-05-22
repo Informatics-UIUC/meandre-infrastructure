@@ -138,8 +138,6 @@ extends Thread {
 		// Waste the only ticket to the blocking semaphore
 		this.semBlocking.acquire();
 
-		// Initialize the executable component
-		this.ec.initialize(cc);
 		this.thdMrProbe.probeWrappedComponentInitialize(this);
 	}
 
@@ -149,7 +147,10 @@ extends Thread {
 	 */
 	public void run () {
 		log.info("Initializing a the wrapping component "+ec.toString());
-
+		
+		// Initialize the executable component
+		this.ec.initialize(cc);
+		
 		while ( baStatusFlags[RUNNING] && !baStatusFlags[TERMINATION]) {
 			
 			if ( isExecutable() ) {
