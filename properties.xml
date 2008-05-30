@@ -22,6 +22,7 @@
     <property name="store.src" value="src-store/code"/>
     <property name="terracotta.src" value="src-terracotta/code"/>
     <property name="client.src" value="src-client/code"/>
+	<property name="annotation.src" value="src-annotation/code"/>
 	
 	<!-- Test code locations -->
 	<property name="kernel.test" value="src-kernel/test"/>
