@@ -41,6 +41,7 @@
             <include name="${store.src}/**/*.java"/>
             <include name="${terracotta.src}/**/*.java"/>
             <include name="${client.src}/**/*.java"/>
+        	<include name="${annotation.src}/**/*.java"/>
         </javac>
 
         <copy todir="${build.dir}" includeEmptyDirs="no">
@@ -206,6 +207,7 @@
                 <fileset dir="${client.test}">
                     <include name="**/*Test.java"/>
                 </fileset>
+            
             	
             </batchtest>
         </junit>
@@ -245,6 +247,7 @@
 	    	      <include name="${store.src}/**"/>
 	    	      <include name="${terracotta.src}/**"/>
                   <include name="${client.src}/**"/>
+	    		  <include name="${annotation.src}/**"/>
 	    		  <exclude name="**/*.properties" />
 	    		  <exclude name="**/*.jj" />
 	    	</fileset>
@@ -386,7 +389,21 @@
                 <include name="**/client/**/*.properties"/>
                 <include name="**/client/**/*.xml"/>
             </fileset>
-        </jar>  	
+        </jar>  
+    	
+    	
+    	<!-- Create annotation jar -->
+    	<jar destfile="${dist.dir}/lib/${app.name}-annotation-${build.version}.jar">
+    		<manifest>
+    	        <attribute name="Build-Version" value="${build.version}"/>
+    	    </manifest>
+    	    <fileset dir="${build.dir}">
+    	        <include name="**/annotations/**/*.class"/>
+    	        <include name="**/annotations/**/*.properties"/>
+    	        <include name="**/annotations/**/*.xml"/>
+    	    </fileset>
+    	</jar>  
+    	
     	<!-- Preparations to create the release jars -->
         <copy todir="${dist.dir}/tmp" includeEmptyDirs="no">
              <fileset dir="${build.dir}">
