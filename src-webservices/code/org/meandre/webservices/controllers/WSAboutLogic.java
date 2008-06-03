@@ -2,6 +2,7 @@ package org.meandre.webservices.controllers;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -16,6 +17,9 @@ import org.meandre.core.store.Store;
 import org.meandre.core.store.security.SecurityStore;
 import org.meandre.core.store.security.SecurityStoreException;
 import org.meandre.core.utils.Constants;
+import org.meandre.plugins.MeandrePlugin;
+import org.meandre.plugins.PluginFactory;
+import org.meandre.plugins.bean.Plugin;
 import org.meandre.webservices.WSCoreBootstrapper;
 import org.meandre.webservices.utils.WSLoggerFactory;
 
@@ -28,11 +32,14 @@ import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 
 /** The about services logic
  *
  * @author Xavier Llor&agrave;
- *
+ * @modified by Amit Kumar: -added globalPluginsJSON function and getServerVersion function
+ *  -May 31st 2008
  */
 public class WSAboutLogic {
 
@@ -41,6 +48,9 @@ public class WSAboutLogic {
 
 	/** The store the use */
 	private  Store store;
+	
+	/*XStream used for plugin serialization**/
+	static XStream xstream = new  XStream(new JettisonMappedXmlDriver());
 	
 	/** The about logic for the store.
 	 * 
@@ -273,6 +283,40 @@ public class WSAboutLogic {
 
 		return model;
 	}
+
+	/** Get Plugin properties*/
+	public static String globalPluginsJSON(HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		//JSONObject joRes = new JSONObject();
+		
+		ArrayList<Plugin> alist = new ArrayList<Plugin>(5);
+		Properties properties=PluginFactory.getPropPluginFactoryConfig();
+		for ( Object oKey:properties.keySet()) {
+			try {
+				String sClassName = properties.getProperty(oKey.toString());
+				MeandrePlugin mpPlugin = (MeandrePlugin) Class.forName(sClassName).newInstance();
+				Plugin plugin = new Plugin();
+				plugin.setAlias(mpPlugin.getAlias());
+				plugin.setClassName(mpPlugin.getPluginClassName());
+				plugin.setKey(oKey.toString());
+				plugin.setServlet(mpPlugin.isServlet());
+				alist.add(plugin);
+				
+			}catch(Exception ex){
+				throw new IOException(ex.toString());
+			}
+			
+		}
+		String jsonString=xstream.toXML(alist);
+		return jsonString;
+	}
+
+	/** returns server version */
+	public static String getServerVersion() {
+		return "version="+Constants.MEANDRE_VERSION;
+	}
+
+
 
 
 }

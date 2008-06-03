@@ -19,7 +19,7 @@ import org.meandre.webservices.utils.WSLoggerFactory;
 /** A basic handler to display basic information.
  *
  * @author Xavier Llor&agrave;
- *
+ * @modified Amit Kumar -Added support for /version and /plugins -May 31st 2008
  */
 public class WSAbout extends HttpServlet {
 
@@ -106,6 +106,7 @@ public class WSAbout extends HttpServlet {
     			wsAboutLogic.rolesInText(request,response);
 			}
     		else if ( sExtension.equals("json") ) {
+    			response.setStatus(HttpServletResponse.SC_OK);
 				response.getWriter().println(wsAboutLogic.rolesInJSON(request,response));
 			}
     		else if ( sExtension.equals("xml") ) {
@@ -125,7 +126,30 @@ public class WSAbout extends HttpServlet {
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			}
     	}
-    	else  {
+    	else if ( sTarget.endsWith("/version") ) {
+    		if ( sExtension.equals("txt") ) {
+    			response.setStatus(HttpServletResponse.SC_OK);
+    			response.setContentType("text/plain");
+				response.getWriter().println(WSAboutLogic.getServerVersion());
+			}else  {
+				//
+				// Invalid format
+				//
+				log.info("Invalid format "+sExtension+" for requested "+sTarget);
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			}		
+    	}
+    	else if(sTarget.endsWith("/plugin")){
+			if ( sExtension.equals("json") ) {
+				response.getWriter().println(WSAboutLogic.globalPluginsJSON(request, response));
+			}else  {
+				//
+				// Invalid format
+				//
+				log.info("Invalid format "+sExtension+" for requested "+sTarget);
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			}	
+		}else  {
 			//
 			// Invalid request found
 			//

@@ -36,7 +36,7 @@ import org.meandre.plugins.MeandrePlugin;
  * 
  * @author Amit Kumar
  * Created on Mar 30, 2008 6:46:54 PM
- *
+ * -Used by the eclipse plugin
  */
 public class JarToolServlet extends HttpServlet 
 implements MeandrePlugin{
@@ -107,13 +107,13 @@ implements MeandrePlugin{
 	@SuppressWarnings("unchecked")
 	private void processRequest(String command, String fileName,
 			HttpServletResponse res) throws IOException, JSONException {
-		log.info("the command is " + command);
+		//log.info("the command is " + command);
 		JSONObject joRes = new JSONObject();
 		File file = new File(PLUGIN_JAR_DIR,fileName);
 		if(command.equalsIgnoreCase("manifest")){
 			Manifest manifest = getManifest(file);
 			if(manifest!=null){
-			log.info("getting manifest " + manifest.toString());
+			//log.info("getting manifest " + manifest.toString());
 			Attributes attributes=manifest.getMainAttributes();
 			Iterator it = attributes.keySet().iterator();
 			Object key = null;
@@ -122,7 +122,7 @@ implements MeandrePlugin{
 				joRes.put(key+"", attributes.get(key));
 			}
 			}else{
-				log.info("manifest does not exist..");
+				log.info("manifest does not exist.." + fileName);
 				res.sendError(HttpServletResponse.SC_NOT_FOUND);
 				return;
 			}
@@ -142,7 +142,7 @@ implements MeandrePlugin{
 		
 			Manifest manifest = getManifest(file);
 			if(manifest!=null){
-			log.info("getting manifest " + manifest.toString());
+			//log.info("getting manifest " + manifest.toString());
 			Attributes attributes=manifest.getMainAttributes();
 			Iterator it = attributes.keySet().iterator();
 			Object key = null;
@@ -195,7 +195,7 @@ implements MeandrePlugin{
 		JarFile jarFile = new JarFile(file);
 		
 		int len = jarFile.size();
-		System.out.println("len is: " + len);
+		//System.out.println("len is: " + len);
 		return jarFile.getManifest();
 	}
 

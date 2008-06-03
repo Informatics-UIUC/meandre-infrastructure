@@ -38,7 +38,7 @@ public class PluginFactory {
 	private Logger log = PluginsLoggerFactory.getPluginsLogger();
 	
 	/** The plugin factory store */
-	private Properties propPluginFactoryConfig;
+	private static Properties propPluginFactoryConfig;
 
 	/** The core configuration object */
 	private CoreConfiguration cnf;
@@ -170,6 +170,14 @@ public class PluginFactory {
 			}
 			
 		}
+	}
+
+
+	/**
+	 * @return the propPluginFactoryConfig
+	 */
+	public static Properties getPropPluginFactoryConfig() {
+		return  propPluginFactoryConfig;
 	}
 
 }
