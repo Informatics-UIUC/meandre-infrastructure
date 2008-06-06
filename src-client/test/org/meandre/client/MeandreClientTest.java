@@ -43,9 +43,12 @@ public class MeandreClientTest {
     private static String _serverUrl = "localhost";
     private static int _serverPort = 1704;
     
-    private static String _workingDir = "./test/output/";
+    private static String _workingDir = 
+        "." + File.separator + "test" + File.separator + "output";
 
-    private static String _sTestUploadJar = "./test/data/component-upload-test.jar";
+    private static String _sTestUploadJar = 
+        "." + File.separator + "test" + File.separator + "data" + 
+        File.separator + "component-upload-test.jar";
     
     private static String _sDemoRepo= "http://" + _serverUrl + ":" + _serverPort +
             "/public/services/demo_repository.nt";
