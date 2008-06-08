@@ -53,4 +53,16 @@ public interface MeandrePlugin {
 	 * @param log The logger
 	 */
 	public void setLogger(Logger log);
+
+	/**Set this to true plugin was found and instantiated
+	 * 
+	 * @param success
+	 */
+	public void inited(Boolean success);
+	
+	/**Return true or false
+	 * 
+	 * @return
+	 */
+	public boolean isInited();
 }

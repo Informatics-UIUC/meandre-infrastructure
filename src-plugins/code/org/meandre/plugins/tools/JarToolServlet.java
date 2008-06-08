@@ -59,6 +59,8 @@ implements MeandrePlugin{
 	/** Get the plugin logger */
 	protected Logger log;
 	
+	private boolean inited = Boolean.FALSE;
+	
 	public void init() throws ServletException{
 		log.info("Initing the JarToolServlet...");
 	}
@@ -238,6 +240,18 @@ implements MeandrePlugin{
 		fis.close();
 		return complete.digest();
 }
+
+	public void inited(Boolean success) {
+		this.inited = success;
+	}
+
+
+	/**Return the status of the plugin
+	 * 
+	 */
+	public boolean isInited() {
+		return inited;
+	}
 
 
 

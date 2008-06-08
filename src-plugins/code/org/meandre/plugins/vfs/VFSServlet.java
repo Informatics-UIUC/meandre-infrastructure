@@ -50,6 +50,8 @@ implements MeandrePlugin{
 
 	/** Get the plugin logger */
 	protected Logger log;
+	
+	private Boolean inited;
 
 	/** Sets the pluggin logger 
 	 * 
@@ -256,6 +258,17 @@ implements MeandrePlugin{
 	 */
 	public Properties getProperties() {
 		return vfsProperties;
+	}
+
+	public void inited(Boolean success) {
+		this.inited= success;
+	}
+
+	/**Return the status of the plugin
+	 * 
+	 */
+	public boolean isInited() {
+		return inited;
 	}
 
 }

@@ -161,6 +161,7 @@ public class PluginFactory {
 					mpPlugin.setLogger(log);
 					cntxGlobal.addServlet(new ServletHolder((Servlet)mpPlugin), mpPlugin.getAlias());
 				}
+				mpPlugin.inited(Boolean.TRUE);
 			} catch (InstantiationException e) {
 				log.warning("Pluggin "+oKey+" could not be initialized\n"+e);
 			} catch (IllegalAccessException e) {
