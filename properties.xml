@@ -9,6 +9,7 @@
     <property name="dist.dir" value="${basedir}/dist"/>
 	<property name="test.dir" value="${basedir}/test"/>
 	<property name="doc.dir" value="${basedir}/docs"/>
+	<property name="data.dir" value="${basedir}/data"/>
 
 	<!-- Global required jars folder -->
 	<property name="lib.dep.dir" value="${basedir}/lib/jars"/>

@@ -132,14 +132,10 @@
 	<!-- clean -->
 	<target name="clean" description="-> removes build artifacts">
 	    <delete dir="${build.dir}"/>
-        <delete includeemptydirs="true">
-            <fileset dir="${test.dir}" casesensitive="yes">
-                <include name="**/*"/>
-                <exclude name="data/"/>
-            </fileset>
-        </delete>
 	    <delete dir="${doc.dir}"/>
-	    <delete dir="${dist.dir}/tmp"/>
+	    <delete dir="${test.dir}"/>
+	    <delete dir="${dist.dir}"/>
+	    <delete dir="${lib.dir}/jars/cachedir"/>
 	</target>
     	
 	<!-- clean meandre installation-->
@@ -155,6 +151,11 @@
         <delete file="meandre-config-store.xml"/>
         <delete file="meandre-config-core.xml"/>
         <delete file="meandre-realm.properties"/>
+        <delete>
+            <fileset dir="${data.dir}/test/zigzag/">
+                <include name="*.mau"/>
+            </fileset>
+        </delete>
 	</target>	
 		
 
@@ -464,5 +465,10 @@
     	<delete file="${dist.dir}/tmp/" />
     	
 	</target>
+
+    <target name="clean-all" 
+        description="attempts to clean all generated files"
+        depends="clean, clean-meandre">
+    </target>
 	
 </project>
