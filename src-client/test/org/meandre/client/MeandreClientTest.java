@@ -47,8 +47,9 @@ public class MeandreClientTest {
         "." + File.separator + "test" + File.separator + "output";
 
     private static String _sTestUploadJar = 
-        "." + File.separator + "test" + File.separator + "data" + 
-        File.separator + "component-upload-test.jar";
+        "." + File.separator + "data" + File.separator + "test" + 
+        File.separator + "client" + File.separator + 
+        "component-upload-test.jar";
     
     private static String _sDemoRepo= "http://" + _serverUrl + ":" + _serverPort +
             "/public/services/demo_repository.nt";
