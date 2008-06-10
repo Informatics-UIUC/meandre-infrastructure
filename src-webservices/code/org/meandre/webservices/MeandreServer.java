@@ -1,14 +1,16 @@
 package org.meandre.webservices;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import javax.servlet.Servlet;
 
 import org.meandre.configuration.CoreConfiguration;
+import org.meandre.core.security.Role;
 import org.meandre.core.store.Store;
-import org.meandre.core.store.security.Action;
 import org.meandre.plugins.PluginFactory;
 import org.meandre.webservices.servlets.WSAbout;
 import org.meandre.webservices.servlets.WSExecute;
@@ -16,6 +18,7 @@ import org.meandre.webservices.servlets.WSLocations;
 import org.meandre.webservices.servlets.WSPublic;
 import org.meandre.webservices.servlets.WSPublish;
 import org.meandre.webservices.servlets.WSRepository;
+import org.meandre.webservices.servlets.WSSecurity;
 import org.meandre.webservices.utils.WSLoggerFactory;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.security.Constraint;
@@ -186,8 +189,18 @@ public class MeandreServer {
 
 		Constraint constraint = new Constraint();
 		constraint.setName(Constraint.__BASIC_AUTH);
-		//constraint.setRoles(new String[]{"user","admin","moderator"});
-		constraint.setRoles(Action.ALL_BASIC_ACTION_URLS);
+		
+		
+		//initialize the roles
+		Set<Role> allRoles = Role.getStandardRoles();
+		Iterator<Role> allRolesIter = allRoles.iterator();
+		String[] rolesAsUrls = new String[allRoles.size()];
+		for(int i = 0; i < allRoles.size(); i++){
+		    rolesAsUrls[i] = allRolesIter.next().getUrl();
+		}
+		constraint.setRoles(rolesAsUrls);
+		
+		
 		constraint.setAuthenticate(true);
 
 		ConstraintMapping cm = new ConstraintMapping();
@@ -220,10 +233,18 @@ public class MeandreServer {
 		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository(store,cnf)),	"/services/repository/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSExecute(store,cnf)),		"/services/execute/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublish(store)),		"/services/publish/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurity(store)),		"/services/security/*");
 	
 		return contextWS;
 	}
 
+	/** get the Store this server is using. 
+	 *
+	 */
+	public Store getStore(){
+	    return store;
+	    
+	}
 
 
 }

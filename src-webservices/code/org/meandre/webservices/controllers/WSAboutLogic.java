@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletOutputStream;
@@ -13,9 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.meandre.core.security.Role;
+import org.meandre.core.security.SecurityManager;
+import org.meandre.core.security.SecurityStoreException;
+import org.meandre.core.security.User;
 import org.meandre.core.store.Store;
-import org.meandre.core.store.security.SecurityStore;
-import org.meandre.core.store.security.SecurityStoreException;
 import org.meandre.core.utils.Constants;
 import org.meandre.plugins.MeandrePlugin;
 import org.meandre.plugins.PluginFactory;
@@ -75,9 +78,11 @@ public class WSAboutLogic {
 		response.setContentType("text/plain");
 
 		try {
-			SecurityStore ss = store.getSecurityStore();
-			for ( String sRole:(ss.getUser(request.getRemoteUser()).getGrantedActionRoles()) )
-				pw.println(sRole);
+			SecurityManager ss = store.getSecurityStore();
+			User usr = ss.getUser(request.getRemoteUser());
+			Set<Role> usersRoles = ss.getRolesOfUser(usr);
+			for (Role role: usersRoles)
+				pw.println(role.getUrl());
 		} catch (SecurityStoreException e) {
 			log.warning("Security exception "+e.toString());
 			throw new IOException(e.toString());
@@ -99,10 +104,12 @@ public class WSAboutLogic {
 		JSONArray ja = new JSONArray();
 
 		try {
-			SecurityStore ss = store.getSecurityStore();
-			for ( String sRole:(ss.getUser(request.getRemoteUser()).getGrantedActionRoles()) ) {
-				JSONObject jo = new JSONObject();
-				jo.put("meandre_role", sRole);
+	        SecurityManager ss = store.getSecurityStore();
+	        User usr = ss.getUser(request.getRemoteUser());
+	        Set<Role> usersRoles = ss.getRolesOfUser(usr);
+	        for (Role role: usersRoles){
+	            JSONObject jo = new JSONObject();
+				jo.put("meandre_role", role.getUrl());
 				ja.put(jo);
 			}
 			joRes.put("meandre_user_role",ja);

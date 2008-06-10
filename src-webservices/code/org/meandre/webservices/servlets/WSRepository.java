@@ -13,8 +13,11 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.json.JSONException;
 import org.json.XML;
 import org.meandre.configuration.CoreConfiguration;
+import org.meandre.core.security.Role;
+import org.meandre.core.security.SecurityManager;
+import org.meandre.core.security.SecurityStoreException;
+import org.meandre.core.security.User;
 import org.meandre.core.store.Store;
-import org.meandre.core.store.security.Action;
 import org.meandre.webservices.controllers.WSRepositoryLogic;
 import org.meandre.webservices.utils.WSLoggerFactory;
 
@@ -81,8 +84,8 @@ public class WSRepository extends HttpServlet {
     	}
 
     	if ( sTarget.endsWith("/add") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Flows", request.getRemoteUser()) &&
-          		 store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Components", request.getRemoteUser()) ) {
+    		if (requestorHasRole(request, Role.FLOWS) &&
+    		        requestorHasRole(request, Role.COMPONENTS)) {
                       addRepositoryAction(request, response, sTarget, sExtension);
     		}
     		else {
@@ -90,7 +93,7 @@ public class WSRepository extends HttpServlet {
     		}
     	}
     	else if ( sTarget.endsWith("/add_flow_descriptors") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Flows", request.getRemoteUser())  ) {
+    		if (requestorHasRole(request, Role.FLOWS)) {
     			addFlowsAction(request, response, sTarget, sExtension);
        		}
        		else {
@@ -134,7 +137,7 @@ public class WSRepository extends HttpServlet {
     	}
 
     	if ( sTarget.endsWith("/dump") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Repository", request.getRemoteUser()) ) {
+    		if (requestorHasRole(request, Role.REPOSITORY)) {
                 dumpAction(request, response, sTarget, sExtension);
     		}
     		else {
@@ -142,7 +145,7 @@ public class WSRepository extends HttpServlet {
     		}
     	}
     	else if ( sTarget.endsWith("/regenerate") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Repository", request.getRemoteUser()) ) {
+    		if (requestorHasRole(request, Role.REPOSITORY)) {
                 regenerateAction(request, response, sTarget, sExtension);
     		}
     		else {
@@ -150,7 +153,7 @@ public class WSRepository extends HttpServlet {
     		}
     	}
     	else if ( sTarget.endsWith("/list_components") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Components", request.getRemoteUser()) ) {
+    		if (requestorHasRole(request, Role.COMPONENTS)) {
                 listComponentsAction(request, response, sTarget, sExtension);
     		}
     		else {
@@ -158,7 +161,7 @@ public class WSRepository extends HttpServlet {
     		}
     	}
     	else if ( sTarget.endsWith("/list_flows") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Flows", request.getRemoteUser()) ) {
+    		if (requestorHasRole(request, Role.FLOWS)) {
                 listFlowsAction(request, response, sTarget, sExtension);
     		}
     		else {
@@ -166,8 +169,8 @@ public class WSRepository extends HttpServlet {
     		}
     	}
     	else if ( sTarget.endsWith("/tags") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Flows", request.getRemoteUser()) &&
-    		     store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Components", request.getRemoteUser()) ) {
+    		if (requestorHasRole(request, Role.FLOWS) &&
+    		        requestorHasRole(request, Role.COMPONENTS)) {
                 tagsAction(request, response, sTarget, sExtension);
     		}
     		else {
@@ -175,7 +178,7 @@ public class WSRepository extends HttpServlet {
     		}
     	}
     	else if ( sTarget.endsWith("/tags_components") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Components", request.getRemoteUser()) ) {
+    		if (requestorHasRole(request, Role.COMPONENTS)) {
                 tagsComponentsAction(request, response, sTarget, sExtension);
     		}
     		else {
@@ -183,7 +186,7 @@ public class WSRepository extends HttpServlet {
     		}
     	}
     	else if ( sTarget.endsWith("/tags_flows") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Flows", request.getRemoteUser()) ) {
+    		if (requestorHasRole(request, Role.FLOWS)) {
                 tagsFlowsAction(request, response, sTarget, sExtension);
     		}
     		else {
@@ -191,7 +194,7 @@ public class WSRepository extends HttpServlet {
     		}
     	}
     	else if ( sTarget.endsWith("/components_by_tag") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Components", request.getRemoteUser()) ) {
+    		if (requestorHasRole(request, Role.COMPONENTS)) {
                 componentsByTagAction(request, response, sTarget, sExtension);
     		}
     		else {
@@ -199,7 +202,7 @@ public class WSRepository extends HttpServlet {
     		}
     	}
     	else if ( sTarget.endsWith("/flows_by_tag") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Flows", request.getRemoteUser()) ) {
+    		if (requestorHasRole(request, Role.FLOWS)) {
                 flowsByTagAction(request, response, sTarget, sExtension);
     		}
     		else {
@@ -207,7 +210,7 @@ public class WSRepository extends HttpServlet {
     		}
     	}
     	else if ( sTarget.endsWith("/describe_component") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Components", request.getRemoteUser()) ) {
+    		if (requestorHasRole(request, Role.COMPONENTS)) {
                 describeComponentAction(request, response, sTarget, sExtension);
     		}
     		else {
@@ -215,7 +218,7 @@ public class WSRepository extends HttpServlet {
     		}
     	}
     	else if ( sTarget.endsWith("/describe_flow") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Flows", request.getRemoteUser()) ) {
+    		if (requestorHasRole(request, Role.FLOWS)) {
                 describeFlowAction(request, response, sTarget, sExtension);
     		}
     		else {
@@ -223,7 +226,7 @@ public class WSRepository extends HttpServlet {
     		}
     	}
     	else if ( sTarget.endsWith("/search_components") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Components", request.getRemoteUser()) ) {
+    		if (requestorHasRole(request, Role.COMPONENTS)) {
                 searchComponentAction(request, response, sTarget, sExtension);
     		}
     		else {
@@ -231,7 +234,7 @@ public class WSRepository extends HttpServlet {
     		}
     	}
     	else if ( sTarget.endsWith("/search_flows") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Flows", request.getRemoteUser()) ) {
+    		if (requestorHasRole(request, Role.FLOWS)) {
                 searchFlowAction(request, response, sTarget, sExtension);
     		}
     		else {
@@ -239,8 +242,8 @@ public class WSRepository extends HttpServlet {
     		}
     	}
     	else if ( sTarget.endsWith("/remove") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Flows", request.getRemoteUser()) &&
-       		     store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Components", request.getRemoteUser()) ) {
+    		if (requestorHasRole(request, Role.FLOWS) &&
+    		        requestorHasRole(request, Role.COMPONENTS)) {
                    removeAction(request, response, sTarget, sExtension);
     		}
     		else {
@@ -1069,6 +1072,29 @@ public class WSRepository extends HttpServlet {
 		model.write(response.getOutputStream(),sFormat);
 
 	}
+    /**
+     * checks to see if the user who issued the http request has a
+     * given meandre role.
+     * 
+     * @param request this request's remote user will be checked 
+     * @param roleToCheck 
+     * @return whether or not that user has the role
+     */
+    private boolean requestorHasRole(HttpServletRequest request, 
+            Role roleToCheck){
+        boolean hasRole = false;
+        try{
+            SecurityManager secMan = store.getSecurityStore();
+            User usr = secMan.getUser(request.getRemoteUser());
+            hasRole = secMan.hasRoleGranted(usr, roleToCheck);
+        }catch(SecurityStoreException sse){
+            log.warning("Security Exception while verifying permissions for" + 
+                    "role: " + roleToCheck.toString() + 
+                    ". Permission being denied");
+            hasRole = false;
+        }
+        return hasRole;
 
+    }
 
 }

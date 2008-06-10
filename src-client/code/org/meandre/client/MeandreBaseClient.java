@@ -122,6 +122,7 @@ public class MeandreBaseClient{
 		}
 		byte[] baResponse = null;
 		try{
+			System.out.println("executing get:" + get.getURI());
 			_httpClient.executeMethod(get);
 			baResponse = get.getResponseBody();
 		}catch(Exception e){
@@ -167,7 +168,8 @@ public class MeandreBaseClient{
         parts.toArray(aParts);
         post.setRequestEntity(
                 new MultipartRequestEntity(aParts, post.getParams()));
-        post.getParams().setBooleanParameter(HttpMethodParams.USE_EXPECT_CONTINUE,true);
+        post.getParams().setBooleanParameter(
+				HttpMethodParams.USE_EXPECT_CONTINUE, true);
         byte[] baResponse = null;
         try{
             System.out.println(post.getURI());

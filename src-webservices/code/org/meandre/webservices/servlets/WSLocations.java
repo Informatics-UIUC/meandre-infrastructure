@@ -15,8 +15,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
 import org.meandre.configuration.CoreConfiguration;
+import org.meandre.core.security.Role;
+import org.meandre.core.security.SecurityManager;
+import org.meandre.core.security.SecurityStoreException;
+import org.meandre.core.security.User;
 import org.meandre.core.store.Store;
-import org.meandre.core.store.security.Action;
 import org.meandre.webservices.controllers.WSLocationsLogic;
 import org.meandre.webservices.utils.WSLoggerFactory;
 	
@@ -82,7 +85,7 @@ public class WSLocations extends HttpServlet {
     	}
     	
     	if ( sTarget.endsWith("list") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Repository", request.getRemoteUser()) ) {
+    		if ( requestorHasRole(request, Role.REPOSITORY)) {
     			if ( sExtension.endsWith("txt") ) {
 					listLocationUsingTxt(request,response);
 				}
@@ -108,8 +111,8 @@ public class WSLocations extends HttpServlet {
     		}
     	}
     	else if ( sTarget.endsWith("add") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Repository", request.getRemoteUser()) ) {
-        		if ( sExtension.endsWith("txt") ) {
+            if ( requestorHasRole(request, Role.REPOSITORY)) {
+                if ( sExtension.endsWith("txt") ) {
 					addLocationUsingTxt(request,response);
 				}
 				else if ( sExtension.endsWith("xml") ) {
@@ -134,8 +137,8 @@ public class WSLocations extends HttpServlet {
     		}	
     	}
     	else if ( sTarget.endsWith("remove") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Repository", request.getRemoteUser()) ) {
-            	if ( sExtension.endsWith("txt") ) {
+            if ( requestorHasRole(request, Role.REPOSITORY)) {
+                if ( sExtension.endsWith("txt") ) {
 					removeLocationUsingTxt(request,response);
 				}
 				else if ( sExtension.endsWith("xml") ) {
@@ -481,6 +484,29 @@ public class WSLocations extends HttpServlet {
 			}
 		}
 	}
+    /**
+     * checks to see if the user who issued the http request has a
+     * given meandre role.
+     * 
+     * @param request this request's remote user will be checked 
+     * @param roleToCheck 
+     * @return whether or not that user has the role
+     */
+    private boolean requestorHasRole(HttpServletRequest request, 
+            Role roleToCheck){
+        boolean hasRole = false;
+        try{
+            SecurityManager secMan = store.getSecurityStore();
+            User usr = secMan.getUser(request.getRemoteUser());
+            hasRole = secMan.hasRoleGranted(usr, roleToCheck);
+        }catch(SecurityStoreException sse){
+            log.warning("Security Exception while verifying permissions for" + 
+                    "role: " + roleToCheck.toString() + 
+                    ". Permission being denied");
+            hasRole = false;
+        }
+        return hasRole;
 
+    }
 
 }

@@ -11,8 +11,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONException;
 import org.json.XML;
+import org.meandre.core.security.Role;
+import org.meandre.core.security.SecurityManager;
+import org.meandre.core.security.SecurityStoreException;
+import org.meandre.core.security.User;
 import org.meandre.core.store.Store;
-import org.meandre.core.store.security.Action;
 import org.meandre.webservices.controllers.WSAboutLogic;
 import org.meandre.webservices.utils.WSLoggerFactory;
 
@@ -70,10 +73,21 @@ public class WSAbout extends HttpServlet {
     	if ( saParts.length==2 ) {
     		sExtension = saParts[1];
     	}
-
+    	
+ 
 
     	if ( sTarget.endsWith("/installation") ) {
-    		if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Admin", request.getRemoteUser()) ) {
+    	    boolean isAdmin = false;
+    	    try{
+    	        SecurityManager secStore = store.getSecurityStore();
+    	        User usr = secStore.getUser(request.getRemoteUser());
+    	        isAdmin = secStore.hasRoleGranted(usr, Role.ADMIN);
+    	    }catch(SecurityStoreException sse){
+    	        log.warning("Security Manager problem when replying to an" + 
+    	                "\'installation\' servlet request, denying permission");
+    	        isAdmin = false;
+    	    }
+    		if (isAdmin){
 				if ( sExtension.equals("txt") ) {
 					wsAboutLogic.dumpUsingTxt(request,response);
 				}

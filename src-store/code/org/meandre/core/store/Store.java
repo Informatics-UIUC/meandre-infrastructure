@@ -10,9 +10,9 @@ import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
+import org.meandre.core.security.SecurityManager;
+import org.meandre.core.security.SecurityStoreException;
 import org.meandre.core.store.security.SecurityStore;
-import org.meandre.core.store.security.SecurityStoreException;
-import org.meandre.core.store.security.local.SecurityStoreImpl;
 import org.meandre.core.store.system.SystemStore;
 import org.meandre.core.store.system.SystemStoreImpl;
 import org.meandre.core.utils.Constants;
@@ -143,7 +143,7 @@ public class Store {
     /**
      * The security store
      */
-    private SecurityStoreImpl ssSecurityStore = null;
+    private SecurityStore ssSecurityStore = null;
 
 
     /**
@@ -295,7 +295,7 @@ public class Store {
     protected void initializeSecurityStore() {
 
         try {
-            ssSecurityStore = new SecurityStoreImpl(getMaker().createModel(SECURITY_STORE_URL),this);
+            ssSecurityStore = new SecurityStore(getMaker().createModel(SECURITY_STORE_URL),this);
         }
         catch (SecurityStoreException e) {
             log.severe("Security store could not be initialized. Aborting Meandre execution!\n" + e);

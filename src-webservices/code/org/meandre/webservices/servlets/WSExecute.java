@@ -14,8 +14,11 @@ import org.json.XML;
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.engine.ConductorException;
 import org.meandre.core.repository.CorruptedDescriptionException;
+import org.meandre.core.security.Role;
+import org.meandre.core.security.SecurityManager;
+import org.meandre.core.security.SecurityStoreException;
+import org.meandre.core.security.User;
 import org.meandre.core.store.Store;
-import org.meandre.core.store.security.Action;
 import org.meandre.webservices.controllers.WSExecuteLogic;
 import org.meandre.webservices.utils.WSLoggerFactory;
 
@@ -75,7 +78,7 @@ public class WSExecute extends HttpServlet {
     		sExtension = saParts[1];
     	}
     	
-    	if ( store.getSecurityStore().hasGrantedRoleToUser(Action.BASE_ACTION_URL+"/Execution", request.getRemoteUser()) ) {
+    	if (requestorHasRole(request, Role.EXECUTION)) {
     		if ( sTarget.endsWith("/flow") ) {
     			if ( sExtension.equals("txt") )
     				executeTxt(request,response);
@@ -210,6 +213,30 @@ public class WSExecute extends HttpServlet {
 		wsExecuteLogic.listRunningFlowsAsTxt(request,response);
 	}
 	
+	/**
+	 * checks to see if the user who issued the http request has a
+	 * given meandre role.
+	 * 
+	 * @param request this request's remote user will be checked 
+	 * @param roleToCheck 
+	 * @return whether or not that user has the role
+	 */
+	private boolean requestorHasRole(HttpServletRequest request, 
+	        Role roleToCheck){
+	    boolean hasRole = false;
+	    try{
+	        SecurityManager secMan = store.getSecurityStore();
+	        User usr = secMan.getUser(request.getRemoteUser());
+	        hasRole = secMan.hasRoleGranted(usr, roleToCheck);
+	    }catch(SecurityStoreException sse){
+	        log.warning("Security Exception while verifying permissions for" + 
+	                "role: " + roleToCheck.toString() + 
+	                ". Permission being denied");
+	        hasRole = false;
+	    }
+	    return hasRole;
+
+	}
 
 
 }

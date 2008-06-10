@@ -1,4 +1,4 @@
-package org.meandre.core.store.security;
+package org.meandre.core.security;
 
 /** This exception is thrown when the security store runs into a problem
  * that does not allow it to complete the operation.

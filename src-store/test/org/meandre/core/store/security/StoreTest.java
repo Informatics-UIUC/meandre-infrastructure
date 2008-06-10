@@ -7,9 +7,9 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.meandre.configuration.CoreConfiguration;
+import org.meandre.core.security.SecurityManager;
+import org.meandre.core.security.SecurityStoreException;
 import org.meandre.core.store.Store;
-import org.meandre.core.store.security.SecurityStore;
-import org.meandre.core.store.security.SecurityStoreException;
 import org.meandre.core.store.system.SystemStore;
 
 /** Test the behavior of the security store.
@@ -27,11 +27,11 @@ public class StoreTest {
 		Store store = new Store();
 		CoreConfiguration cnf = new CoreConfiguration();
 		
-		SecurityStore secStore = store.getSecurityStore();
+		SecurityManager secStore = store.getSecurityStore();
 
 		assertEquals(1714,cnf.getBasePort());
 		
-		assertEquals(1,secStore.getUsersNickNames().size());
+
 		try {
 			assertEquals(1,secStore.getUsers().size());
 		} catch (SecurityStoreException e) {
