@@ -470,5 +470,18 @@
         description="attempts to clean all generated files"
         depends="clean, clean-meandre">
     </target>
-	
+
+    <!-- run-core -->
+    <target name="run" 
+        depends="" 
+        description="-> runs the default Meandre-Core server">
+        <java classname="org.meandre.webservices.WSCoreBootstrapper" 
+            fork="yes" maxmemory="1024m">
+            <classpath>
+                <pathelement 
+                location="${dist.dir}/${app.name}-server-${build.version}.jar"/>
+                </classpath>
+            <jvmarg value="-showversion"/>
+        </java>
+    </target>
 </project>
