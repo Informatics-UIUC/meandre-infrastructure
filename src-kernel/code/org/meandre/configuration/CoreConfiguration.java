@@ -123,7 +123,7 @@ public class CoreConfiguration {
 	private boolean checkAndUseConfigurationIfExists(String installDir) {
 		InputStream fis;
         try {
-            fis = new FileInputStream(installDir+File.separator+MEANDRE_CORE_CONFIG_FILE);
+            fis = new FileInputStream(installDir+File.separator+"meandre-config-core.xml");
             propsCore = new Properties();
             propsCore.load(fis);
             fis.close();
@@ -132,7 +132,7 @@ public class CoreConfiguration {
         }
         catch (Exception eWrite) {
             log.warning("Meandre configuration file " +
-            			installDir+File.separator+MEANDRE_CORE_CONFIG_FILE +
+            			installDir+File.separator+"meandre-config-core.xml" +
                         " could not be read -creating new!");
             return Boolean.FALSE;
         }
