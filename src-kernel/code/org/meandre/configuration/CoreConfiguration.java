@@ -124,15 +124,19 @@ public class CoreConfiguration {
         try {
             fis = new FileInputStream(installDir+File.separator+"meandre-config-core.xml");
             propsCore = new Properties();
-            propsCore.load(fis);
+            propsCore.loadFromXML(fis);
             fis.close();
             // Create the run file
-            new File(getRunResourcesDirectory()).mkdir();
+            if(!new File(getRunResourcesDirectory()).exists()){
+            	new File(getRunResourcesDirectory()).mkdir();
+            }
+           
         }
         catch (Exception eWrite) {
             log.warning("Meandre configuration file " +
             			installDir+File.separator+"meandre-config-core.xml" +
                         " could not be read -creating new!");
+            System.out.println(eWrite.getMessage());
             return Boolean.FALSE;
         }
 		return Boolean.TRUE;
