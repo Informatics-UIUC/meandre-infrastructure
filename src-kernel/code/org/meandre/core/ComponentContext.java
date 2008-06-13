@@ -42,6 +42,6 @@ extends ComponentContextProperties {
 	 * 
 	 * @return Path to public resources directory.
 	 */
-	public String getPublicResourcesSurectory ();
+	public String getPublicResourcesDirectory ();
 
 }

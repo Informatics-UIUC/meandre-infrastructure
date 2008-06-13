@@ -171,7 +171,7 @@ implements ComponentContext {
 	 * 
 	 * @return Path to public resources directory.
 	 */
-	public String getPublicResourcesSurectory () {
+	public String getPublicResourcesDirectory () {
 		return ccCnf.getPublicResourcesDirectory();
 	}
 
