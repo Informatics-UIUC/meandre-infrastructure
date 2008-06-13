@@ -49,7 +49,7 @@ public class CoreConfiguration {
 	 * 
 	 */
 	public CoreConfiguration () {
-		if(!checkAndUseConfigurationIfExists() ){
+		if(!checkAndUseConfigurationIfExists(INSTALL_DIR) ){
 			   propsCore = new Properties();
 		       propsCore.setProperty(MEANDRE_BASE_PORT, Integer.toString(DEFAULT_PORT));
 		        propsCore.setProperty(MEANDRE_PUBLIC_RESOURCE_DIRECTORY, INSTALL_DIR + File.separator + "published_resources");
@@ -99,7 +99,7 @@ public class CoreConfiguration {
 	private void initializeConfiguration() {
 		FileOutputStream fos;
         try {
-            fos = new FileOutputStream(propsCore.getProperty(MEANDRE_CORE_CONFIG_FILE));
+            fos = new FileOutputStream("meandre-config-core.xml");
             propsCore.storeToXML(fos, "Meandre default configuration file (" + Constants.MEANDRE_VERSION + ")");
             fos.close();
             
@@ -120,10 +120,10 @@ public class CoreConfiguration {
 	/**Call this function if the core property file is already present.
 	 * 
 	 */
-	private boolean checkAndUseConfigurationIfExists() {
+	private boolean checkAndUseConfigurationIfExists(String installDir) {
 		InputStream fis;
         try {
-            fis = new FileInputStream(propsCore.getProperty(MEANDRE_CORE_CONFIG_FILE));
+            fis = new FileInputStream(installDir+File.separator+MEANDRE_CORE_CONFIG_FILE);
             propsCore = new Properties();
             propsCore.load(fis);
             fis.close();
@@ -132,7 +132,7 @@ public class CoreConfiguration {
         }
         catch (Exception eWrite) {
             log.warning("Meandre configuration file " +
-            		    propsCore.getProperty(MEANDRE_CORE_CONFIG_FILE) +
+            			installDir+File.separator+MEANDRE_CORE_CONFIG_FILE +
                         " could not be read -creating new!");
             return Boolean.FALSE;
         }
