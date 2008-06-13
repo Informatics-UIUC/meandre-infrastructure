@@ -1,7 +1,9 @@
 package org.meandre.configuration;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -35,23 +37,29 @@ public class CoreConfiguration {
 	
 	/** The logger from the core */
 	private Logger log;
+	
+	/** The Default port*/
+	private static final int DEFAULT_PORT =1714;
+	
+	/**The Default install dir*/
+	private static final String INSTALL_DIR =".";
 
 	/** Creates a core configuration object with the default property values.
+	 * It uses the existing property file and uses those values if it exists.
 	 * 
 	 */
 	public CoreConfiguration () {
-		this(1714, ".");
-		/*propsCore = new Properties();
-		
-		propsCore.setProperty(MEANDRE_BASE_PORT, "1714");
-        propsCore.setProperty(MEANDRE_PUBLIC_RESOURCE_DIRECTORY, "." + File.separator + "published_resources");
-        propsCore.setProperty(MEANDRE_PRIVATE_RUN_DIRECTORY, "." + File.separator + "run");
-        propsCore.setProperty(MEANDRE_CORE_CONFIG_FILE,"." + File.separator + "meandre-config-core.xml");
-        
-        log = KernelLoggerFactory.getCoreLogger();
-        
-        initializeConfiguration();
-        */
+		if(!checkAndUseConfigurationIfExists() ){
+			   propsCore = new Properties();
+		       propsCore.setProperty(MEANDRE_BASE_PORT, Integer.toString(DEFAULT_PORT));
+		        propsCore.setProperty(MEANDRE_PUBLIC_RESOURCE_DIRECTORY, INSTALL_DIR + File.separator + "published_resources");
+		        propsCore.setProperty(MEANDRE_PRIVATE_RUN_DIRECTORY,INSTALL_DIR + File.separator + "run");
+		        propsCore.setProperty(MEANDRE_CORE_CONFIG_FILE, INSTALL_DIR + File.separator + "meandre-config-core.xml");
+		        propsCore.setProperty(MEANDRE_HOME_DIRECTORY,INSTALL_DIR);   
+		        log = KernelLoggerFactory.getCoreLogger();
+			        
+		        initializeConfiguration();    	
+		}
 	}
 	
 	/**
@@ -106,6 +114,29 @@ public class CoreConfiguration {
 
         }
 		
+	}
+	
+	
+	/**Call this function if the core property file is already present.
+	 * 
+	 */
+	private boolean checkAndUseConfigurationIfExists() {
+		InputStream fis;
+        try {
+            fis = new FileInputStream(propsCore.getProperty(MEANDRE_CORE_CONFIG_FILE));
+            propsCore = new Properties();
+            propsCore.load(fis);
+            fis.close();
+            // Create the run file
+            new File(getRunResourcesDirectory()).mkdir();
+        }
+        catch (Exception eWrite) {
+            log.warning("Meandre configuration file " +
+            		    propsCore.getProperty(MEANDRE_CORE_CONFIG_FILE) +
+                        " could not be read -creating new!");
+            return Boolean.FALSE;
+        }
+		return Boolean.TRUE;
 	}
 
 
