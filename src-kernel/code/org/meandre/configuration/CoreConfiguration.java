@@ -49,6 +49,7 @@ public class CoreConfiguration {
 	 * 
 	 */
 	public CoreConfiguration () {
+		log = KernelLoggerFactory.getCoreLogger();
 		if(!checkAndUseConfigurationIfExists(INSTALL_DIR) ){
 			   propsCore = new Properties();
 		       propsCore.setProperty(MEANDRE_BASE_PORT, Integer.toString(DEFAULT_PORT));
@@ -56,8 +57,6 @@ public class CoreConfiguration {
 		        propsCore.setProperty(MEANDRE_PRIVATE_RUN_DIRECTORY,INSTALL_DIR + File.separator + "run");
 		        propsCore.setProperty(MEANDRE_CORE_CONFIG_FILE, INSTALL_DIR + File.separator + "meandre-config-core.xml");
 		        propsCore.setProperty(MEANDRE_HOME_DIRECTORY,INSTALL_DIR);   
-		        log = KernelLoggerFactory.getCoreLogger();
-			        
 		        initializeConfiguration();    	
 		}
 	}
