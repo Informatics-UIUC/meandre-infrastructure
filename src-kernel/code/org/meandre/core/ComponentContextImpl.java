@@ -88,6 +88,9 @@ implements ComponentContext {
 	/** The wrapped component parent */
 	private WrappedComponent wcParent = null;
 
+	/** The wrapped component parent */
+	private CoreConfiguration ccCnf = null;
+
 	/** Create a component context with the given input and output active buffers
 	 * for a given wrapped component.
 	 *
@@ -119,6 +122,7 @@ implements ComponentContext {
 		this.sComponentInstanceID = sComponentInstanceID;
 		this.thdMrProbe = thdMrProbe;
 		this.wcParent = wc;
+		this.ccCnf = cnf;
 
 		this.htInputLogicNameMap = htInputLogicNameMap;
 		this.htOutputLogicNameMap = htOutputLogicNameMap;
@@ -163,6 +167,15 @@ implements ComponentContext {
 		}
 	}
 
+	/** Returns the path to the public resources directory.
+	 * 
+	 * @return Path to public resources directory.
+	 */
+	public String getPublicResourcesSurectory () {
+		return ccCnf.getPublicResourcesDirectory();
+	}
+
+	
 	/** The name of the available inputs.
 	 *
 	 * @return The array containing the names
