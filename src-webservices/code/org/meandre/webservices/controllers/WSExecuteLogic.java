@@ -33,7 +33,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 /** This class wraps the basic logic to execute flows.
  * 
  * @author Xavier Llor&agrave;
- *
+ * -modified by Amit Kumar June 14th 2008 to return a 404 status if a flow does not exist
  */
 public class WSExecuteLogic {
 
@@ -82,9 +82,9 @@ public class WSExecuteLogic {
 			FlowDescription fd = qr.getFlowDescription(resURI);
 			if ( fd==null ) {
 				//
-				// Unknow flow
+				// flow not found
 				//
-				response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED);
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			}
 			else {
 				//
@@ -259,9 +259,9 @@ public class WSExecuteLogic {
 			FlowDescription fd = qr.getFlowDescription(resURI);
 			if ( fd==null ) {
 				//
-				// Unknow flow
+				// flow not found
 				//
-				response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED);
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			}
 			else {
 				//
