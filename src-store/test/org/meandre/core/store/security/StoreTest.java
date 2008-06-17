@@ -5,6 +5,8 @@ package org.meandre.core.store.security;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+
 import org.junit.Test;
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.security.SecurityManager;
@@ -19,17 +21,20 @@ import org.meandre.core.store.system.SystemStore;
  */
 public class StoreTest {
 
+     private static String _workingDir = 
+        "." + File.separator + "test" + File.separator + "output";   
+
 	/**
 	 * Test method for {@link org.meandre.core.store.Store#getSecurityStore()}.
 	 */
 	@Test
 	public void testStore() {
 		Store store = new Store();
-		CoreConfiguration cnf = new CoreConfiguration();
+		CoreConfiguration cnf = new CoreConfiguration(1714, _workingDir);
 		
 		SecurityManager secStore = store.getSecurityStore();
 
-		assertEquals(1714,cnf.getBasePort());
+		assertEquals(1714, cnf.getBasePort());
 		
 
 		try {

@@ -25,7 +25,8 @@ public class SecurityStoreTest {
     private static String _serverUrl = "localhost";
     private static int _serverPort = 1704;
     
-    private static String _workingDir = "./test/output/";
+    private static String _workingDir = 
+        "." + File.separator + "test" + File.separator + "output";
 
 
     
