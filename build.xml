@@ -467,7 +467,7 @@
 	</target>
 
     <target name="clean-all" 
-        description="attempts to clean all generated files"
+        description="-> attempts to clean all generated files"
         depends="clean, clean-meandre">
     </target>
 
