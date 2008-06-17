@@ -1155,7 +1155,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 *
 	 * @return The set of resources describing the available flows
 	 */
-	public Set<FlowDescription> getAvailableFlowDecriptions() {
+	public Set<FlowDescription> getAvailableFlowDescriptions() {
 		Set<FlowDescription> setFD = new HashSet<FlowDescription>();
 
 		for ( Resource res:getAvailableFlows() )
@@ -1169,7 +1169,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 *
 	 * @return The set of resources describing the available flows
 	 */
-	public Map<String,FlowDescription> getAvailableFlowDecriptionsMap() {
+	public Map<String,FlowDescription> getAvailableFlowDescriptionsMap() {
 		Map<String,FlowDescription> mapFD = new HashMap<String,FlowDescription>();
 
 		for ( Resource res:getAvailableFlows() )

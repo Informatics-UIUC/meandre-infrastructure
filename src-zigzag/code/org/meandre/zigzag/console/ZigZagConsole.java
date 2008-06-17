@@ -519,7 +519,7 @@ public class ZigZagConsole {
 		if ( sCmd.equals("flows") ) {
 			// List flows
 			System.out.println("Flows:");
-			for ( FlowDescription fd:qr.getAvailableFlowDecriptions() ) {
+			for ( FlowDescription fd:qr.getAvailableFlowDescriptions() ) {
 				System.out.println("\t "+fd.getName()+" ("+fd.getFlowComponent()+")");
 			}
 			System.out.println();
@@ -569,9 +569,9 @@ public class ZigZagConsole {
 						System.out.println(
 								fg.getInstanceAliasFromResource(cd.getSourceInstance())+
 								"-<"+
-								getOutputPortName(qr,fd,cd.getSourceInstance(),cd.getSourceIntaceDataPort())+
+								getOutputPortName(qr,fd,cd.getSourceInstance(),cd.getSourceInstanceDataPort())+
 								" |-> "+
-								getInputPortName(qr,fd,cd.getTargetInstance(),cd.getTargetIntaceDataPort())+
+								getInputPortName(qr,fd,cd.getTargetInstance(),cd.getTargetInstanceDataPort())+
 								">-"+
 								sInsName
 							);
@@ -580,9 +580,9 @@ public class ZigZagConsole {
 						System.out.println(
 								sInsName +
 								"-<"+
-								getOutputPortName(qr,fd,cd.getSourceInstance(),cd.getSourceIntaceDataPort())+
+								getOutputPortName(qr,fd,cd.getSourceInstance(),cd.getSourceInstanceDataPort())+
 								" |-> "+
-								getInputPortName(qr,fd,cd.getTargetInstance(),cd.getTargetIntaceDataPort())	+
+								getInputPortName(qr,fd,cd.getTargetInstance(),cd.getTargetInstanceDataPort())	+
 								">-"+
 								fg.getInstanceAliasFromResource(cd.getTargetInstance())
 							);

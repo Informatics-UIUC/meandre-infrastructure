@@ -25,9 +25,9 @@ public class ConnectorDescriptionTest {
 		
 		assertEquals(cd.getConnector(),null);
 		assertEquals(cd.getSourceInstance(),null);
-		assertEquals(cd.getSourceIntaceDataPort(),null);
+		assertEquals(cd.getSourceInstanceDataPort(),null);
 		assertEquals(cd.getTargetInstance(),null);
-		assertEquals(cd.getTargetIntaceDataPort(),null);
+		assertEquals(cd.getTargetInstanceDataPort(),null);
 		
 	}
 
@@ -49,9 +49,9 @@ public class ConnectorDescriptionTest {
 		
 		assertEquals(cd.getConnector(),resConnector);
 		assertEquals(cd.getSourceInstance(),resInstanceSource);
-		assertEquals(cd.getSourceIntaceDataPort(),resInstanceDataPortSource);
+		assertEquals(cd.getSourceInstanceDataPort(),resInstanceDataPortSource);
 		assertEquals(cd.getTargetInstance(),resInstanceTarget);
-		assertEquals(cd.getTargetIntaceDataPort(),resInstanceDataPortTarget);
+		assertEquals(cd.getTargetInstanceDataPort(),resInstanceDataPortTarget);
 		
 	}
 
@@ -142,7 +142,7 @@ public class ConnectorDescriptionTest {
 	}
 
 	/**
-	 * Test method for {@link org.meandre.core.store.repository.ConnectorDescription#setSourceIntaceDataPort(com.hp.hpl.jena.rdf.model.Resource)}.
+	 * Test method for {@link org.meandre.core.store.repository.ConnectorDescription#setSourceInstanceDataPort(com.hp.hpl.jena.rdf.model.Resource)}.
 	 */
 	@Test
 	public void testSetSourceIntaceDataPort() {
@@ -156,17 +156,17 @@ public class ConnectorDescriptionTest {
 				resInstanceSource, resInstanceDataPortSource,
 				resInstanceTarget, resInstanceDataPortTarget);
 		
-		assertEquals(cd.getSourceIntaceDataPort(),resInstanceDataPortSource);
+		assertEquals(cd.getSourceInstanceDataPort(),resInstanceDataPortSource);
 		
 		Resource resInstanceDataPortSourceNew = ModelFactory.createDefaultModel().createResource("http://meandre.org/test/isdpnew");
 		
-		cd.setSourceIntaceDataPort(resInstanceDataPortSourceNew);
-		assertEquals(cd.getSourceIntaceDataPort(),resInstanceDataPortSourceNew);
+		cd.setSourceInstanceDataPort(resInstanceDataPortSourceNew);
+		assertEquals(cd.getSourceInstanceDataPort(),resInstanceDataPortSourceNew);
 		
 	}
 
 	/**
-	 * Test method for {@link org.meandre.core.store.repository.ConnectorDescription#getSourceIntaceDataPort()}.
+	 * Test method for {@link org.meandre.core.store.repository.ConnectorDescription#getSourceInstanceDataPort()}.
 	 */
 	@Test
 	public void testGetSourceIntaceDataPort() {
@@ -181,7 +181,7 @@ public class ConnectorDescriptionTest {
 				resInstanceSource, resInstanceDataPortSource,
 				resInstanceTarget, resInstanceDataPortTarget);
 		
-		assertEquals(cd.getSourceIntaceDataPort(),resInstanceDataPortSource);
+		assertEquals(cd.getSourceInstanceDataPort(),resInstanceDataPortSource);
 		
 	}
 
@@ -230,7 +230,7 @@ public class ConnectorDescriptionTest {
 	}
 
 	/**
-	 * Test method for {@link org.meandre.core.store.repository.ConnectorDescription#setTargetIntaceDataPort(com.hp.hpl.jena.rdf.model.Resource)}.
+	 * Test method for {@link org.meandre.core.store.repository.ConnectorDescription#setTargetInstanceDataPort(com.hp.hpl.jena.rdf.model.Resource)}.
 	 */
 	@Test
 	public void testSetTargetIntaceDataPort() {
@@ -245,16 +245,16 @@ public class ConnectorDescriptionTest {
 				resInstanceSource, resInstanceDataPortSource,
 				resInstanceTarget, resInstanceDataPortTarget);
 		
-		assertEquals(cd.getTargetIntaceDataPort(),resInstanceDataPortTarget);
+		assertEquals(cd.getTargetInstanceDataPort(),resInstanceDataPortTarget);
 		
 		Resource resInstanceDataPortTargetNew = ModelFactory.createDefaultModel().createResource("http://meandre.org/test/itdpnew");
-		cd.setTargetIntaceDataPort(resInstanceDataPortTargetNew);
-		assertEquals(cd.getTargetIntaceDataPort(),resInstanceDataPortTargetNew);
+		cd.setTargetInstanceDataPort(resInstanceDataPortTargetNew);
+		assertEquals(cd.getTargetInstanceDataPort(),resInstanceDataPortTargetNew);
 		
 	}
 
 	/**
-	 * Test method for {@link org.meandre.core.store.repository.ConnectorDescription#getTargetIntaceDataPort()}.
+	 * Test method for {@link org.meandre.core.store.repository.ConnectorDescription#getTargetInstanceDataPort()}.
 	 */
 	@Test
 	public void testGetTargetIntaceDataPort() {
@@ -269,7 +269,7 @@ public class ConnectorDescriptionTest {
 				resInstanceSource, resInstanceDataPortSource,
 				resInstanceTarget, resInstanceDataPortTarget);
 		
-		assertEquals(cd.getTargetIntaceDataPort(),resInstanceDataPortTarget);
+		assertEquals(cd.getTargetInstanceDataPort(),resInstanceDataPortTarget);
 
 	}
 

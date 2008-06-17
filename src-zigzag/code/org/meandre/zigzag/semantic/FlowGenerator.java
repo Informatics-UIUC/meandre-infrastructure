@@ -396,9 +396,9 @@ public class FlowGenerator {
 		Resource res = ri.getModel().createResource(sBaseURL+"connector/"+(iConnectorCounter++));
 		cd.setConnector(res);
 		cd.setSourceInstance(ecidSource.getExecutableComponentInstance());
-		cd.setSourceIntaceDataPort(getPortResource(ecdSource.getOutputs(),sSourcePort));
+		cd.setSourceInstanceDataPort(getPortResource(ecdSource.getOutputs(),sSourcePort));
 		cd.setTargetInstance(ecidTarget.getExecutableComponentInstance());
-		cd.setTargetIntaceDataPort(getPortResource(ecdTarget.getInputs(),sTargetPort));
+		cd.setTargetInstanceDataPort(getPortResource(ecdTarget.getInputs(),sTargetPort));
 		hsConnectors.add(cd);
 				
 		ps.println("Binding "+sSourceIns+"."+sSourcePort+" to "+sTargetIns+"."+sTargetPort);
@@ -751,9 +751,9 @@ public class FlowGenerator {
 		Resource cdRes = fd.getModel().createResource(ecidReducer.getExecutableComponentInstance().toString()+"/output/connector/"+iRound);
 		cdParallelInstanceToReducer.setConnector(cdRes);
 		cdParallelInstanceToReducer.setSourceInstance(ecidParallel.getExecutableComponentInstance());
-		cdParallelInstanceToReducer.setSourceIntaceDataPort(dpdOutput.getResource());
+		cdParallelInstanceToReducer.setSourceInstanceDataPort(dpdOutput.getResource());
 		cdParallelInstanceToReducer.setTargetInstance(ecidReducer.getExecutableComponentInstance());
-		cdParallelInstanceToReducer.setTargetIntaceDataPort(resReducerPort);
+		cdParallelInstanceToReducer.setTargetInstanceDataPort(resReducerPort);
 		
 		fd.getConnectorDescriptions().add(cdParallelInstanceToReducer);
 	}
@@ -773,9 +773,9 @@ public class FlowGenerator {
 		
 		for ( ConnectorDescription cd:fd.getConnectorDescriptions() ) 
 			if ( cd.getSourceInstance().equals(ecid.getExecutableComponentInstance()) && 
-				 cd.getSourceIntaceDataPort().equals(dpdOutput.getResource()) ) {
+				 cd.getSourceInstanceDataPort().equals(dpdOutput.getResource()) ) {
 				cd.setSourceInstance(ecidReducer.getExecutableComponentInstance());
-				cd.setSourceIntaceDataPort(dpdEcidReducer.getResource());
+				cd.setSourceInstanceDataPort(dpdEcidReducer.getResource());
 			}
 	}
 
@@ -804,9 +804,9 @@ public class FlowGenerator {
 				Resource cdRes = fd.getModel().createResource(ecidNewPar.getExecutableComponentInstance().toString()+"/parallel/"+iParallel+"/connector/"+(iCnt++));
 				cdMapToParallelInstance.setConnector(cdRes);
 				cdMapToParallelInstance.setSourceInstance(ecidNewPar.getExecutableComponentInstance());
-				cdMapToParallelInstance.setSourceIntaceDataPort(cd.getSourceIntaceDataPort());
+				cdMapToParallelInstance.setSourceInstanceDataPort(cd.getSourceInstanceDataPort());
 				cdMapToParallelInstance.setTargetInstance(cd.getTargetInstance());
-				cdMapToParallelInstance.setTargetIntaceDataPort(cd.getTargetIntaceDataPort());
+				cdMapToParallelInstance.setTargetInstanceDataPort(cd.getTargetInstanceDataPort());
 				
 				setToBeAdded.add(cdMapToParallelInstance);
 			}
@@ -849,9 +849,9 @@ public class FlowGenerator {
 		
 		for ( ConnectorDescription cd:fd.getConnectorDescriptions() ) 
 			if ( cd.getTargetInstance().equals(ecid.getExecutableComponentInstance()) &&
-				 cd.getTargetIntaceDataPort().equals(dpdInput.getResource() )) {
+				 cd.getTargetInstanceDataPort().equals(dpdInput.getResource() )) {
 				cd.setTargetInstance(ecidMapper.getExecutableComponentInstance());
-				cd.setTargetIntaceDataPort(ecdMap.getInputs().iterator().next().getResource());
+				cd.setTargetInstanceDataPort(ecdMap.getInputs().iterator().next().getResource());
 			}
 		
 	}
@@ -876,9 +876,9 @@ public class FlowGenerator {
 		Resource cdRes = fd.getModel().createResource(ecidMapper.getExecutableComponentInstance().toString()+"/output/connector/"+iRound);
 		cdMapToParallelInstance.setConnector(cdRes);
 		cdMapToParallelInstance.setSourceInstance(ecidMapper.getExecutableComponentInstance());
-		cdMapToParallelInstance.setSourceIntaceDataPort(resMapperOutputPort);
+		cdMapToParallelInstance.setSourceInstanceDataPort(resMapperOutputPort);
 		cdMapToParallelInstance.setTargetInstance(ecidParallelInstance.getExecutableComponentInstance());
-		cdMapToParallelInstance.setTargetIntaceDataPort(dpdInput.getResource());
+		cdMapToParallelInstance.setTargetInstanceDataPort(dpdInput.getResource());
 		
 		fd.getConnectorDescriptions().add(cdMapToParallelInstance);
 	}

@@ -253,7 +253,7 @@ public class MrProbeTest {
 			QueryableRepository qr = new RepositoryImpl(model);
 			CoreConfiguration cnf = new CoreConfiguration();
 			Conductor cnd = new Conductor(10,cnf);
-			Executor exec = cnd.buildExecutor(qr, qr.getAvailableFlowDecriptions().iterator().next().getFlowComponent());
+			Executor exec = cnd.buildExecutor(qr, qr.getAvailableFlowDescriptions().iterator().next().getFlowComponent());
 			WrappedComponent wc = exec.getWrappedComponents().iterator().next();
 			// Run the tests
 			for ( int i=0; i<NUMBER_OF_REPETITIONS; i++ ) {

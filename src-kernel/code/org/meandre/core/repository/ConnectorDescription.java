@@ -87,7 +87,7 @@ public class ConnectorDescription {
 	 *
 	 * @param res The source instance port
 	 */
-	public void setSourceIntaceDataPort ( Resource res ) {
+	public void setSourceInstanceDataPort ( Resource res ) {
 		resInstanceDataPortSource = res;
 	}
 
@@ -95,7 +95,7 @@ public class ConnectorDescription {
 	 *
 	 * @return The source instance port
 	 */
-	public Resource getSourceIntaceDataPort () {
+	public Resource getSourceInstanceDataPort () {
 		return resInstanceDataPortSource;
 	}
 
@@ -119,7 +119,7 @@ public class ConnectorDescription {
 	 *
 	 * @param res The target instance port
 	 */
-	public void setTargetIntaceDataPort ( Resource res ) {
+	public void setTargetInstanceDataPort ( Resource res ) {
 		resInstanceDataPortTarget = res;
 	}
 
@@ -127,25 +127,25 @@ public class ConnectorDescription {
 	 *
 	 * @return The target instance port
 	 */
-	public Resource getTargetIntaceDataPort () {
+	public Resource getTargetInstanceDataPort () {
 		return resInstanceDataPortTarget;
 	}
-	
+
 	/** Check if two connectors are equal.
-	 * 
+	 *
 	 * @param o The other connector to check
 	 */
 	public boolean equals ( Object o ) {
 		ConnectorDescription cdOther = (ConnectorDescription) o;
 		boolean bRes = false;
-		
-		if ( resInstanceDataPortSource.equals(cdOther.resInstanceDataPortSource) && 
+
+		if ( resInstanceDataPortSource.equals(cdOther.resInstanceDataPortSource) &&
 			 resInstanceDataPortTarget.equals(cdOther.resInstanceDataPortTarget) &&
 			 resInstanceSource.equals(cdOther.resInstanceSource) &&
 			 resInstanceTarget.equals(cdOther.resInstanceTarget)
 		   )
 			bRes = true;
-		
+
 		return bRes;
 	}
 }

@@ -24,17 +24,17 @@ import org.apache.commons.httpclient.methods.multipart.PartSource;
 
 /**
  * Programmatic interface to the Meandre server webservices API. Mimicks opening
- * a session with the server and allowing the client to interact with it, 
+ * a session with the server and allowing the client to interact with it,
  * although in reality the session has no state and WSCLient simply sends an
  * independent http request for every operation.
- * 
+ *
  * @author pgroves
  *
  */
 public class MeandreClient extends MeandreBaseClient{
-	
+
     /**
-     * initialize to talk to a particular server. 
+     * initialize to talk to a particular server.
      *
      * @param serverHost just the hostname, e.g. "localhost", not "http://localhost"
      * @param serversPort the port on the serverhost that the server is listening
@@ -48,13 +48,13 @@ public class MeandreClient extends MeandreBaseClient{
 /////////
 //About
 /////////
-    
+
     /**
      * requests all java properties of the server's Store.
      *
-     *<p> calls: 
+     *<p> calls:
      * http://<meandre_host>:<meandre_port>/services/about/installation.rdf
-     * 
+     *
      * TODO: need a java object instance to represent installation properties
      */
     public Model retrieveInstallationProperties() throws TransmissionException{
@@ -64,14 +64,14 @@ public class MeandreClient extends MeandreBaseClient{
     }
 
     /**
-     * requests a list of assigned roles of the user (defined by the 
+     * requests a list of assigned roles of the user (defined by the
      * credentials of this MeandreClient).
      *
      * @return a list of roles
      *
-     *<p> calls: 
+     *<p> calls:
      * http://<meandre_host>:<meandre_port>/services/about/user_roles.json
-     * @throws TransmissionException 
+     * @throws TransmissionException
      *
      * TODO: Need java object to represent valid roles
      */
@@ -81,7 +81,7 @@ public class MeandreClient extends MeandreBaseClient{
         JSONTokener jtRoles = executeGetRequestJSON(sRestCommand, null);
         String jArrayKey = "meandre_user_role";
         String jElementKey = "meandre_role";
-        Set<String> ss = unpackJSONArray(jtRoles, jArrayKey, jElementKey); 
+        Set<String> ss = unpackJSONArray(jtRoles, jArrayKey, jElementKey);
         return ss;
     }
 
@@ -91,10 +91,10 @@ public class MeandreClient extends MeandreBaseClient{
 //////////
 
     /**
-     * requests the locations (urls) of all meandre servers the server
+     * requests the locations (urls) of all meandre repositories the server
      * is aware of.
      *
-     *<p> calls: 
+     *<p> calls:
      * http://<meandre_host>:<meandre_port>/services/locations/list.json
      */
     public Set<LocationBean> retrieveLocations() throws TransmissionException{
@@ -110,7 +110,7 @@ public class MeandreClient extends MeandreBaseClient{
         while (locIter.hasNext()){
             String sLoc = locIter.next();
             String sDesc = smLocs.get(sLoc);
-            beanSet.add(new LocationBean(sLoc, sDesc));     
+            beanSet.add(new LocationBean(sLoc, sDesc));
         }
         return beanSet;
     }
@@ -120,19 +120,19 @@ public class MeandreClient extends MeandreBaseClient{
      * if the location is registered with the server after the call (whether
      * it was added or was already present).
      *
-     *<p> calls: 
+     *<p> calls:
      * http://<meandre_host>:<meandre_port>/services/locations/add.json
-     * 
+     *
      * TODO: Handle possible bad_request errors in http response
      */
     public boolean addLocation(String sLocationUrl, String description)
         throws TransmissionException{
         String sRestCommand = "services/locations/add.json";
-        
+
         Set<NameValuePair> nvps = new HashSet<NameValuePair>();
         nvps.add(new NameValuePair("location", sLocationUrl));
         nvps.add(new NameValuePair("description", description));
-        
+
         JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
         if(jtRetrieved == null){
             return false;
@@ -151,18 +151,18 @@ public class MeandreClient extends MeandreBaseClient{
     /**
      * removes the input location from the server's list of peers. returns
      * true if the location is not a peer after this method is called
-     * (regardless of whether this removed it or if it wasn't there in 
+     * (regardless of whether this removed it or if it wasn't there in
      * the first place).
      *
-     *<p> calls: 
+     *<p> calls:
      * http://<meandre_host>:<meandre_port>/services/locations/remove.json
      */
     public boolean removeLocation(String sUrl) throws TransmissionException{
         String sRestCommand = "services/locations/remove.json";
-        
+
         Set<NameValuePair> nvps = new HashSet<NameValuePair>();
         nvps.add(new NameValuePair("location", sUrl));
-        
+
         JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
         try{
             JSONObject joRetrieved = new JSONObject(jtRetrieved);
@@ -186,9 +186,9 @@ public class MeandreClient extends MeandreBaseClient{
      * The contents of the repository are dependent on the user requesting
      * it.
      *
-     *<p> calls: 
+     *<p> calls:
      * http://<meandre_host>:<meandre_port/services/repository/dump.nt
-     * @throws TransmissionException 
+     * @throws TransmissionException
      */
     public QueryableRepository retrieveRepository() throws TransmissionException {
         String sRestCommand = "services/repository/dump.nt";
@@ -218,7 +218,7 @@ public class MeandreClient extends MeandreBaseClient{
      *
      *<p> calls:
      * http://<meandre_host>:<meandre_port>/services/repository/list_components.json
-     * @throws TransmissionException 
+     * @throws TransmissionException
      */
     public Set<URL> retrieveComponentUrls() throws TransmissionException {
         String sRestCommand = "services/repository/list_components.json";
@@ -235,7 +235,7 @@ public class MeandreClient extends MeandreBaseClient{
      *
      *<p> calls:
      * http://<meandre_host>:<meandre_port>/services/repository/list_flows.json
-     * @throws TransmissionException 
+     * @throws TransmissionException
      */
     public Set<URL> retrieveFlowUrls() throws TransmissionException {
         String sRestCommand = "services/repository/list_flows.json";
@@ -253,7 +253,7 @@ public class MeandreClient extends MeandreBaseClient{
      *
      *<p> calls:
      *http://<meandre_host>:<meandre_port>/services/repository/tags.json
-     * @throws TransmissionException 
+     * @throws TransmissionException
      *
      * TODO:return tag objects instead of strings
      */
@@ -264,7 +264,7 @@ public class MeandreClient extends MeandreBaseClient{
         String jObjectKey = "tag";
         Set<String> sTags = unpackJSONArray(jtRetrieved, jArrayKey, jObjectKey);
         return sTags;
-            
+
     }
 
     /**
@@ -272,7 +272,7 @@ public class MeandreClient extends MeandreBaseClient{
      *
      *<p> calls:
      *http://<meandre_host>:<meandre_port>/services/repository/tags_components.json
-     * @throws TransmissionException 
+     * @throws TransmissionException
      * TODO:return tag objects instead of strings
      */
     public Set<String> retrieveComponentTags() throws TransmissionException {
@@ -281,7 +281,7 @@ public class MeandreClient extends MeandreBaseClient{
         String jArrayKey = "meandre_tags";
         String jObjectKey = "tag";
         Set<String> sTags = unpackJSONArray(jtRetrieved, jArrayKey, jObjectKey);
-        return sTags;        
+        return sTags;
     }
 
     /**
@@ -289,7 +289,7 @@ public class MeandreClient extends MeandreBaseClient{
      *
      *<p> calls:
      *http://<meandre_host>:<meandre_port>/services/repository/tags_flows.json
-     * @throws TransmissionException 
+     * @throws TransmissionException
      * TODO:return tag objects instead of strings
      */
     public Set<String> retrieveFlowTags() throws TransmissionException {
@@ -298,7 +298,7 @@ public class MeandreClient extends MeandreBaseClient{
         String jArrayKey = "meandre_tags";
         String jObjectKey = "tag";
         Set<String> sTags = unpackJSONArray(jtRetrieved, jArrayKey, jObjectKey);
-        return sTags;        
+        return sTags;
     }
 
     /**
@@ -306,12 +306,12 @@ public class MeandreClient extends MeandreBaseClient{
      *
      *<p> calls:
      *http://<meandre_host>:<meandre_port>/services/repository/components_by_tag.json
-     * @throws TransmissionException 
+     * @throws TransmissionException
      * TODO:input a tag object instead of string
      */
     public Set<URL> retrieveComponentsByTag(String sTag) throws TransmissionException {
         String sRestCommand = "services/repository/components_by_tag.json";
-        
+
         Set<NameValuePair> nvps = new HashSet<NameValuePair>();
         nvps.add(new NameValuePair("q", sTag));
         JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
@@ -327,7 +327,7 @@ public class MeandreClient extends MeandreBaseClient{
      *
      *<p> calls:
      *http://<meandre_host>:<meandre_port>/services/repository/flows_by_tag.json
-     * @throws TransmissionException 
+     * @throws TransmissionException
      * TODO:input a tag object instead of string
      */
     public Set<URL> retrieveFlowsByTag(String sTag) throws TransmissionException {
@@ -348,7 +348,7 @@ public class MeandreClient extends MeandreBaseClient{
      *
      *<p> calls:
      *http://<meandre_host>:<meandre_port>/services/repository/describe_component.nt
-     * @throws TransmissionException 
+     * @throws TransmissionException
      */
     public ExecutableComponentDescription retrieveComponentDescriptor(
             String sComponentUrl) throws TransmissionException {
@@ -357,18 +357,18 @@ public class MeandreClient extends MeandreBaseClient{
         Set<NameValuePair> nvps = new HashSet<NameValuePair>();
         nvps.add(new NameValuePair("uri", sComponentUrl));
         Model compModel = executeGetRequestModel(sRestCommand, nvps);
-        
+
         QueryableRepository repo = new RepositoryImpl(compModel);
-        Set<ExecutableComponentDescription> repoComps = 
+        Set<ExecutableComponentDescription> repoComps =
                 repo.getAvailableExecutableComponentDescriptions();
         Iterator<ExecutableComponentDescription> iter = repoComps.iterator();
         ExecutableComponentDescription comp = iter.next();
-        
+
         if(iter.hasNext()){
-            throw new TransmissionException("More than one Component " + 
+            throw new TransmissionException("More than one Component " +
                     "Description was returned by the server.");
         }
-        
+
         return comp;
     }
 
@@ -377,22 +377,22 @@ public class MeandreClient extends MeandreBaseClient{
      *
      *<p> calls:
      *http://<meandre_host>:<meandre_port>/services/repository/describe_flow.nt
-     * @throws TransmissionException 
+     * @throws TransmissionException
      */
     public FlowDescription retrieveFlowDescriptor(String sFlowUrl) throws TransmissionException {
         String sRestCommand = "services/repository/describe_flow.nt";
         Set<NameValuePair> nvps = new HashSet<NameValuePair>();
         nvps.add(new NameValuePair("uri", sFlowUrl));
         Model flowModel = executeGetRequestModel(sRestCommand, nvps);
-        
+
         QueryableRepository repo = new RepositoryImpl(flowModel);
-        Set<FlowDescription> repoFlows = 
-                repo.getAvailableFlowDecriptions();
+        Set<FlowDescription> repoFlows =
+                repo.getAvailableFlowDescriptions();
         Iterator<FlowDescription> iter = repoFlows.iterator();
         FlowDescription flow = iter.next();
-        
+
         if(iter.hasNext()){
-            throw new TransmissionException("More than one Flow " + 
+            throw new TransmissionException("More than one Flow " +
                     "Description was returned by the server.");
         }
         return flow;
@@ -405,9 +405,9 @@ public class MeandreClient extends MeandreBaseClient{
      *
      *<p> calls:
      *http://<meandre_host>:<meandre_port>/services/repository/search_components.json
-     * @throws TransmissionException 
+     * @throws TransmissionException
      */
-    public Set<URL> retrieveComponentUrlsByQuery(String sQuery) 
+    public Set<URL> retrieveComponentUrlsByQuery(String sQuery)
             throws TransmissionException {
         String sRestCommand = "services/repository/search_components.json";
         Set<NameValuePair> nvps = new HashSet<NameValuePair>();
@@ -418,7 +418,7 @@ public class MeandreClient extends MeandreBaseClient{
         Set<String> sCompUrls = unpackJSONArray(jtRetrieved, jArrayKey, jObjectKey);
         Set<URL> componentUrls = convertStringSetToUrls(sCompUrls);
         return componentUrls;
-        
+
     }
 
     /**
@@ -427,25 +427,25 @@ public class MeandreClient extends MeandreBaseClient{
      *
      *<p> calls:
      *http://<meandre_host>:<meandre_port>/services/repository/search_flows.json
-     * @throws TransmissionException 
+     * @throws TransmissionException
      */
-    public Set<URL> retrieveFlowUrlsByQuery(String sQuery) 
+    public Set<URL> retrieveFlowUrlsByQuery(String sQuery)
             throws TransmissionException {
-        
+
         String sRestCommand = "services/repository/search_flows.json";
         Set<NameValuePair> nvps = new HashSet<NameValuePair>();
         nvps.add(new NameValuePair("q", sQuery));
         JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
-        
+
         String jArrayKey = "meandre_flow_component";
         String jObjectKey = "meandre_uri";
         Set<String> sFlowUrls = unpackJSONArray(jtRetrieved, jArrayKey, jObjectKey);
         Set<URL> uFlows = convertStringSetToUrls(sFlowUrls);
         return uFlows;
     }
-    
 
-    /** 
+
+    /**
      * uploads a single flow to the server.
      *
      * <p> calls:
@@ -459,7 +459,7 @@ public class MeandreClient extends MeandreBaseClient{
         return uploadModel(mod, null, overwrite);
     }
 
-    /** 
+    /**
      * uploads a set of flows to the server.
      *
      * <p> calls:
@@ -468,7 +468,7 @@ public class MeandreClient extends MeandreBaseClient{
      */
     public boolean uploadFlowBatch(Set<FlowDescription> flows, boolean overwrite)
             throws TransmissionException{
-        
+
         HashSet<Model> hsFlowModels = new HashSet<Model>();
         Iterator<FlowDescription> flowIter = flows.iterator();
         while(flowIter.hasNext()){
@@ -477,7 +477,7 @@ public class MeandreClient extends MeandreBaseClient{
         return uploadModelBatch(hsFlowModels, null, overwrite);
     }
 
-    /** 
+    /**
      * uploads a single component to the server.
      *
      * <p> calls:
@@ -485,24 +485,24 @@ public class MeandreClient extends MeandreBaseClient{
      * TODO:Need test
      */
     public boolean uploadComponent(ExecutableComponentDescription component,
-            Set<File> jarFileContexts, boolean overwrite) 
+            Set<File> jarFileContexts, boolean overwrite)
             throws TransmissionException{
 
         Model mod = component.getModel();
         return uploadModel(mod, jarFileContexts, overwrite);
     }
 
-    /** 
+    /**
      * uploads a set of flows to the server.
      *
      * <p> calls:
      * http://<meandre_host>:<meandre_port>/services/repository/add.nt
      * TODO:Need test
      */
-    public boolean uploadComponentBatch(Set<ExecutableComponentDescription> comps, 
+    public boolean uploadComponentBatch(Set<ExecutableComponentDescription> comps,
             Set<File> jarFileContexts, boolean overwrite)
             throws TransmissionException {
-        
+
         HashSet<Model> hsComponentModels = new HashSet<Model>();
         Iterator<ExecutableComponentDescription> compIter = comps.iterator();
         while(compIter.hasNext()){
@@ -523,34 +523,34 @@ public class MeandreClient extends MeandreBaseClient{
      * http://<meandre_host>:<meandre_port>/services/repository/add.nt
      * TODO:Need test
      */
-    public boolean uploadRepository(QueryableRepository repo,  
+    public boolean uploadRepository(QueryableRepository repo,
             Set<File> jarFileContexts, boolean overwrite)
             throws TransmissionException {
-        
+
         Model mod = repo.getModel();
         return uploadModel(mod, jarFileContexts, overwrite);
     }
 
     /**
-     * uploads a single model containing flows and/or components and any 
-     * jar files. 
-     * the jarfiles set may be null. 
+     * uploads a single model containing flows and/or components and any
+     * jar files.
+     * the jarfiles set may be null.
      *
      * <p> calls:
      * http://<meandre_host>:<meandre_port>/services/repository/add.nt
      * TODO:Need test
      */
-    private boolean uploadModel(Model mod, Set<File> jarFileContexts, 
+    private boolean uploadModel(Model mod, Set<File> jarFileContexts,
             boolean overwrite) throws TransmissionException {
-        
+
         HashSet<Model> modSet = new HashSet<Model>(1);
         modSet.add(mod);
         return uploadModelBatch(modSet, jarFileContexts, overwrite);
     }
 
     /**
-     * uploads a set of component or flow resources and any jar files. 
-     * the jarfiles set may be null. 
+     * uploads a set of component or flow resources and any jar files.
+     * the jarfiles set may be null.
      *
      * Note: this is the main upload function that actually does the
      * upload. all other upload* methods call this.
@@ -559,16 +559,16 @@ public class MeandreClient extends MeandreBaseClient{
      * http://<meandre_host>:<meandre_port>/services/repository/add.nt
      * TODO:Need test
      */
-    public boolean uploadModelBatch(Set<Model> msResourceModels,  
+    public boolean uploadModelBatch(Set<Model> msResourceModels,
             Set<File> jarFileContexts, boolean overwrite)
             throws TransmissionException {
 
         String sRestCommand = "services/repository/add.nt";
-        
+
         Set<NameValuePair> nvps = new HashSet<NameValuePair>();
         nvps.add(new NameValuePair("overwrite", Boolean.toString(overwrite)));
         nvps.add(new NameValuePair("dump", "false"));
-        
+
         Set<Part> postParts = new HashSet<Part>();
 
         for(Model modUpload : msResourceModels){
@@ -583,7 +583,7 @@ public class MeandreClient extends MeandreBaseClient{
 
         if(jarFileContexts != null){
             for(File jarFile : jarFileContexts){
-                //System.out.println("MeandreClient Upload, Jar file:" + 
+                //System.out.println("MeandreClient Upload, Jar file:" +
                 //jarFile.getAbsolutePath());
                 try{
                     if(!jarFile.exists()){
@@ -604,11 +604,11 @@ public class MeandreClient extends MeandreBaseClient{
 
     /**
      *removes (deletes) either a component or flow from the server. returns
-     *true if the resource was deleted. 
+     *true if the resource was deleted.
      *
      *<p> calls:
      *http://<meandre_host>:<meandre_port>/services/repository/remove.json
-     * TODO: need more specific error reporting when the server returns an empty 
+     * TODO: need more specific error reporting when the server returns an empty
      * json string
      */
     public boolean removeResource(String sResourceUrl) throws TransmissionException{
@@ -660,13 +660,13 @@ public class MeandreClient extends MeandreBaseClient{
 
 
     /**
-     * commands the server to change a component or flow's status to 
+     * commands the server to change a component or flow's status to
      * "not published."
-     * 
+     *
      * returns true no matter what as long as the server received and understood
      * the request.
-     * 
-     * TODO: modify so returns true if the resource is not in a state of 
+     *
+     * TODO: modify so returns true if the resource is not in a state of
      * "published" after this method returns.
      *
      *<p> calls:
@@ -696,13 +696,13 @@ public class MeandreClient extends MeandreBaseClient{
      *
      * This method currently blocks waiting for flow to complete -> it does
      * not return the result string until the flow has completely finished.
-     * 
+     *
      *<p> calls:
      * http://<meandre_host>:<meandre_port>/services/execute/flow.txt
      */
-     
-       public String runFlow(String sFlowUrl, boolean verbose) 
-            throws TransmissionException{
+
+    public String runFlow(String sFlowUrl, boolean verbose)
+        throws TransmissionException{
         String sRestCommand = "services/execute/flow.txt";
         Set<NameValuePair> nvps = new HashSet<NameValuePair>();
         nvps.add(new NameValuePair("uri", sFlowUrl));
@@ -738,7 +738,7 @@ public class MeandreClient extends MeandreBaseClient{
                 jKeyElementKey, jValueElementKey);
         Map<URL, URL> muRetrievedPairs = convertStringMapToUrls(msRetrievedPairs);
         return muRetrievedPairs;
-    } 
+    }
 
 
 
@@ -747,36 +747,36 @@ public class MeandreClient extends MeandreBaseClient{
 //////////////
 
     /**
-     * retrieves the public repository of published resources. does not 
+     * retrieves the public repository of published resources. does not
      * require authorization.
      *
      *<p> calls:
      * http://<meandre_host>:<meandre_port>/public/services/repository.nt
-     * @throws TransmissionException 
+     * @throws TransmissionException
      */
-    public QueryableRepository retrievePublicRepository() 
+    public QueryableRepository retrievePublicRepository()
             throws TransmissionException {
         String sRestCommand = "public/services/repository.nt";
         byte[] baResponse = executeGetRequestBytes(sRestCommand, null);
 		Model model = ModelFactory.createDefaultModel();
 		model.read(new ByteArrayInputStream(baResponse), null, "N-TRIPLE");
-		return new RepositoryImpl(model);	
+		return new RepositoryImpl(model);
     }
 
     /**
-     * retrieves the demo repository of published resources. does not 
+     * retrieves the demo repository of published resources. does not
      * require authorization
      *
      *<p> calls:
      *http://<meandre_host>:<meandre_port>/public/services/demo_repository.nt
      */
-    public QueryableRepository retrieveDemoRepository() 
+    public QueryableRepository retrieveDemoRepository()
             throws TransmissionException {
         String sRestCommand = "public/services/demo_repository.nt";
         byte[] baResponse = executeGetRequestBytes(sRestCommand, null);
 		Model model = ModelFactory.createDefaultModel();
 		model.read(new ByteArrayInputStream(baResponse), null, "N-TRIPLE");
-		return new RepositoryImpl(model);	
+		return new RepositoryImpl(model);
     }
 
 
@@ -791,7 +791,7 @@ public class MeandreClient extends MeandreBaseClient{
      * active flow will fire. the flow is specified by the port on the server that
      * it's webui is running on.
      *
-     * if this method returns true, it simply means that the abort 
+     * if this method returns true, it simply means that the abort
      * request was received by the server, it does not necessarily mean
      * that the currently running component(s) are no longer running.
      *
@@ -800,7 +800,7 @@ public class MeandreClient extends MeandreBaseClient{
      *http://<meandre_host>:<webui_port>/admin/abort.txt
      * FIXME: This is totally untested.
      */
-    public boolean abortFlow(int iRunningFlowPort) 
+    public boolean abortFlow(int iRunningFlowPort)
             throws TransmissionException {
         //we must modify the global port, so save the value to reset it at the
         //end
@@ -832,13 +832,13 @@ public class MeandreClient extends MeandreBaseClient{
      *
      * *<p> calls:
      * http://<meandre_host>:<webui_port>/admin/statistics.json
-     * 
+     *
      * TODO: refactor StatisticsProbeImpl so that a RunningFlowStatistics
      * "bean" can be read and written to/from json, and StatisticsProbeImpl
      * simply constructs the bean.
      * FIXME: This is totally untested.
      */
-    public JSONObject retrieveRunningFlowStatisitics(int iRunningFlowPort) 
+    public JSONObject retrieveRunningFlowStatisitics(int iRunningFlowPort)
             throws TransmissionException{
 
         //we must modify the global port, so save the value to reset it at the
@@ -858,8 +858,8 @@ public class MeandreClient extends MeandreBaseClient{
         }finally{
             //reset the port for this client instance
             this.setServerAddress(this.getServerUrl(), masterPort);
-        }             
-                
+        }
+
         return joRetrieved;
     }
 
@@ -867,8 +867,8 @@ public class MeandreClient extends MeandreBaseClient{
     ///////////
     //private
     //////////
- 
- 
+
+
 
 
 
@@ -881,25 +881,25 @@ public class MeandreClient extends MeandreBaseClient{
      * That element is a JSONArray with key jArrayKey. Each element in the
      * array is a JSONObject with key jElementKey, and the value of those elements
      * are extracted and returned as an array of strings.
-     * @throws TransmissionException 
+     * @throws TransmissionException
      *
      */
-    private Set<String> unpackJSONArray(JSONTokener jArrayWrapper, 
-            String jArrayKey, String jElementKey) 
+    private Set<String> unpackJSONArray(JSONTokener jArrayWrapper,
+            String jArrayKey, String jElementKey)
             throws TransmissionException{
-        
+
         Set<String> scValues = new HashSet<String>();
         try{
             JSONObject joToplevel = new JSONObject(jArrayWrapper);
             JSONArray jArray = joToplevel.getJSONArray(jArrayKey);
-            int numElems = jArray.length(); 
-            
+            int numElems = jArray.length();
+
             for(int i = 0; i < numElems; i++){
                 JSONObject jo = jArray.getJSONObject(i);
                 String str = jo.getString(jElementKey);
                 scValues.add(str);
             }
-            
+
         }catch (JSONException exc){
             throw new TransmissionException(exc);
         }
@@ -916,7 +916,7 @@ public class MeandreClient extends MeandreBaseClient{
      * If the json conversions fail, the JSONException is wrapped in a Transmission
      * Exception and thrown.
      */
-    private String unpackJSONObject(JSONTokener jWrapper, String jElementKey) 
+    private String unpackJSONObject(JSONTokener jWrapper, String jElementKey)
             throws TransmissionException{
         String sValue = null;
         try{
@@ -930,22 +930,22 @@ public class MeandreClient extends MeandreBaseClient{
 
     /**
      * unpacks a string to string Map encoded as a json array of key,value pairs.
-     *      
+     *
      * The input tokener is converted into a JSONObject. An array with jArrayKey
      * is extracted from the object. Each element of the array is cast to a
      * JSONObject and has a key string with jKeyElementKey and value string
      * with jValueElementKey. The returned Map is then a mapping from the
      * key strings to the value strings.
      */
-    private Map<String, String> unpackJSONMap(JSONTokener jWrapper, 
-            String jArrayKey, String jKeyElementKey, String jValueElementKey) 
+    private Map<String, String> unpackJSONMap(JSONTokener jWrapper,
+            String jArrayKey, String jKeyElementKey, String jValueElementKey)
             throws TransmissionException{
 
         Map<String, String> sMap = new HashMap<String, String>();
         try{
             JSONObject joToplevel = new JSONObject(jWrapper);
             JSONArray jArray = joToplevel.getJSONArray(jArrayKey);
-            int numElems = jArray.length(); 
+            int numElems = jArray.length();
             for(int i = 0; i < numElems; i++){
                 JSONObject jo = jArray.getJSONObject(i);
                 String keyStr = jo.getString(jKeyElementKey);
@@ -959,7 +959,7 @@ public class MeandreClient extends MeandreBaseClient{
     }
 
     /** convert a Set of strings into a Set of URL's */
-    private Set<URL> convertStringSetToUrls(Set<String> strs) 
+    private Set<URL> convertStringSetToUrls(Set<String> strs)
             throws TransmissionException{
         Set<URL> urls = new HashSet<URL>();
         Iterator<String> iter = strs.iterator();

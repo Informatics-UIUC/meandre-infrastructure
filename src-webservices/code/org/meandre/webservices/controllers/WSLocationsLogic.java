@@ -156,7 +156,7 @@ public class WSLocationsLogic {
 						log.warning("Component "+ecd.getExecutableComponent()+" already exist in the current repository. Discarding it.");
 				
 				// Adding flows
-				for ( FlowDescription fd:qrNew.getAvailableFlowDecriptions())
+				for ( FlowDescription fd:qrNew.getAvailableFlowDescriptions())
 					if ( !qr.getAvailableFlows().contains(fd.getFlowComponent()))
 						qr.getModel().add(fd.getModel());
 					else
@@ -287,7 +287,7 @@ public class WSLocationsLogic {
 							log.warning("Component "+ecd.getExecutableComponent()+" already exist in the current repository. Discarding it.");
 					
 					// Adding flows
-					for ( FlowDescription fd:qrNew.getAvailableFlowDecriptions())
+					for ( FlowDescription fd:qrNew.getAvailableFlowDescriptions())
 						if ( !qr.getAvailableFlows().contains(fd.getFlowComponent()))
 							qr.getModel().add(fd.getModel());
 						else

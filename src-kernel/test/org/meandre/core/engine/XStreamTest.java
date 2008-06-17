@@ -54,8 +54,8 @@ public class XStreamTest {
 				qr2.getAvailableExecutableComponentDescriptions().size()
 			);
 		assertEquals(
-				qr.getAvailableFlowDecriptions().size(),
-				qr2.getAvailableFlowDecriptions().size()
+				qr.getAvailableFlowDescriptions().size(),
+				qr2.getAvailableFlowDescriptions().size()
 			);
 	}
 	

@@ -247,7 +247,7 @@ public class MeandreClientTest {
             mod.write(sw);
             System.out.println(sw.toString());
             
-            Set<FlowDescription> fds = repo.getAvailableFlowDecriptions();
+            Set<FlowDescription> fds = repo.getAvailableFlowDescriptions();
             for(FlowDescription fd: fds){
                 System.out.println(fd.getName());
             }
@@ -529,7 +529,7 @@ public class MeandreClientTest {
     public void testUploadFlow() {
         Model modTestRepo = DemoRepositoryGenerator.getTestHelloWorldRepository();
         QueryableRepository repo = new RepositoryImpl(modTestRepo);
-        Set<FlowDescription> flows = repo.getAvailableFlowDecriptions();
+        Set<FlowDescription> flows = repo.getAvailableFlowDescriptions();
         Iterator<FlowDescription> iter = flows.iterator();
         FlowDescription flow = iter.next();
         String sResourceUrl = flow.getFlowComponentAsString();
@@ -563,7 +563,7 @@ public class MeandreClientTest {
     public void testRemove() {
         Model modTestRepo = DemoRepositoryGenerator.getTestHelloWorldRepository();
         QueryableRepository repo = new RepositoryImpl(modTestRepo);
-        Set<FlowDescription> flows = repo.getAvailableFlowDecriptions();
+        Set<FlowDescription> flows = repo.getAvailableFlowDescriptions();
         Iterator<FlowDescription> iter = flows.iterator();
         FlowDescription flow = iter.next();
         String sResourceUrl = flow.getFlowComponentAsString();

@@ -209,7 +209,7 @@ public class Conductor {
 		Hashtable<String,ActiveBuffer> htMapInAB = new Hashtable<String,ActiveBuffer>();
 		for ( ConnectorDescription cd:fd.getConnectorDescriptions() ) {
 			Resource resCSIns = cd.getTargetInstance();
-			Resource resCSInsDP = cd.getTargetIntaceDataPort();
+			Resource resCSInsDP = cd.getTargetInstanceDataPort();
 			//Resource resECID = fd.getExecutableComponentResourceForInstance(resCSIns);
 			//ExecutableComponentDescription compDesc = qr.getExecutableComponentDescription(resECID);
 			String sID = resCSIns.toString()+URL_SEAPARTOR+resCSInsDP.toString();
@@ -261,14 +261,14 @@ public class Conductor {
 		for ( ConnectorDescription cd:fd.getConnectorDescriptions() ) {
 			String sIDOutSet = cd.getSourceInstance().toString();
 			String  sIDInSet = cd.getTargetInstance().toString();
-			String  sIDIn = cd.getTargetInstance().toString()+URL_SEAPARTOR+cd.getTargetIntaceDataPort().toString();
+			String  sIDIn = cd.getTargetInstance().toString()+URL_SEAPARTOR+cd.getTargetInstanceDataPort().toString();
 
 			ActiveBuffer ab = htMapInAB.get(sIDIn);
 
 			// Update the output mapping name for a given instance
 
 			ExecutableComponentDescription compDesc = qr.getExecutableComponentDescription(fd.getExecutableComponentResourceForInstance(cd.getSourceInstance()));
-			DataPortDescription dpdOut = compDesc.getOutput(cd.getSourceIntaceDataPort());
+			DataPortDescription dpdOut = compDesc.getOutput(cd.getSourceInstanceDataPort());
 			Hashtable<String,String> htMapOut = htMapOutputTranslation.get(cd.getSourceInstance());
 			htMapOut.put(sIDOutSet+URL_SEAPARTOR+dpdOut.getIdentifier(), ab.getName());
 

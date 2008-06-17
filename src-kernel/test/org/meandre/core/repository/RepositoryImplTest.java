@@ -184,7 +184,7 @@ public class RepositoryImplTest {
 //				System.out.println(qr.getModel().size());
 //				System.out.println(qr.getAvailableExecutableComponentDescriptions().size());
 //				System.out.println(qr.getAvailableFlowDecriptions().size());
-				assertEquals(i+2,qr.getAvailableFlowDecriptions().size());
+				assertEquals(i+2,qr.getAvailableFlowDescriptions().size());
 				assertEquals(4*(i+2),qr.getAvailableExecutableComponentDescriptions().size());
 			}
 		} catch (InterruptedException e) {

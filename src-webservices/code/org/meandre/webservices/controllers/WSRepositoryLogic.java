@@ -1083,7 +1083,7 @@ public class WSRepositoryLogic {
 		QueryableRepository qr = store.getRepositoryStore(request.getRemoteUser());
 		Model modUser = qr.getModel();
 
-		for ( FlowDescription fd:qrNew.getAvailableFlowDecriptions()) {
+		for ( FlowDescription fd:qrNew.getAvailableFlowDescriptions()) {
 			if ( !qr.getAvailableFlows().contains(fd.getFlowComponent())) {
 				// The model for the flow to add
 				Model fdModel = fd.getModel();

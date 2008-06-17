@@ -43,13 +43,13 @@ public class FlowDescription {
 	/** The date of the executable component */
 	private Date dateCreation = null;
 
-	/** Instanciated executable components */
+	/** Instantiated executable components */
 	private Set<ExecutableComponentInstanceDescription> setExecutableComponentInstances = null;
 
 	/** Hash table to access the instantiated components */
 	private Hashtable<Resource,ExecutableComponentInstanceDescription> htExecutableComponentInstances = null;
 
-	/** Instanctiated connections between instantiated components */
+	/** Instantiated connections between instantiated components */
 	private Set<ConnectorDescription> setConnectorDescription = null;
 
 	/** The tags linked to the flow */
@@ -243,7 +243,7 @@ public class FlowDescription {
 
 	/** Removes an executable component instance.
 	 *
-	 * @param res The executable coponent instances resource to remove
+	 * @param res The executable component instances resource to remove
 	 */
 	public void removeExecutableComponentInstance ( Resource res ) {
 		ExecutableComponentInstanceDescription ecid = htExecutableComponentInstances.get(res);
@@ -255,7 +255,7 @@ public class FlowDescription {
 
 	/** Removes an executable component instance.
 	 *
-	 * @param ecd The executable coponent instances to remove
+	 * @param ecd The executable component instances to remove
 	 */
 	public void removeExecutableComponentInstance ( ExecutableComponentInstanceDescription ecd ) {
 		setExecutableComponentInstances.remove(ecd);
@@ -264,7 +264,7 @@ public class FlowDescription {
 
 	/** Returns the set of executable component instances.
 	 *
-	 * @return The set of executable coponent instances descriptions
+	 * @return The set of executable component instances descriptions
 	 */
 	public Set<ExecutableComponentInstanceDescription> getExecutableComponentInstances () {
 		return setExecutableComponentInstances;
@@ -324,9 +324,9 @@ public class FlowDescription {
 				for ( ConnectorDescription cd:setConnectorDescription ) {
 					String sConID = cd.getConnector().toString();
 					String sSource = cd.getSourceInstance().toString();
-					String sSourceDP = cd.getSourceIntaceDataPort().toString();
+					String sSourceDP = cd.getSourceInstanceDataPort().toString();
 					String sTarget = cd.getTargetInstance().toString();
-					String sTargetDP = cd.getTargetIntaceDataPort().toString();
+					String sTargetDP = cd.getTargetInstanceDataPort().toString();
 					resCons.addProperty(RDF.type,
 							RepositoryVocabulary.connector_set)
 							     .addProperty(RepositoryVocabulary.data_connector,

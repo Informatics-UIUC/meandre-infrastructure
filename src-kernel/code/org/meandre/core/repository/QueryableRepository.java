@@ -79,14 +79,14 @@ public interface QueryableRepository {
 	 * 
 	 * @return The set of resources describing the available flows
 	 */
-	public Set<FlowDescription> getAvailableFlowDecriptions();
+	public Set<FlowDescription> getAvailableFlowDescriptions();
 	
 
 	/** Returns the map of available flows descriptions in the repository.
 	 * 
 	 * @return The set of resources describing the available flows
 	 */
-	public Map<String,FlowDescription> getAvailableFlowDecriptionsMap();
+	public Map<String,FlowDescription> getAvailableFlowDescriptionsMap();
 	
 	/** Returns the set of availabble flows in the repository that match the search criteria. The queries
 	 * are based on Lucene syntax.
