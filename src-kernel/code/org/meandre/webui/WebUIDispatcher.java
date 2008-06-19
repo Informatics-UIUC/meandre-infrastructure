@@ -28,6 +28,7 @@ import org.mortbay.jetty.servlet.Context;
 /** This class dispatches the webui calls.
  * 
  * @author Xavier Llor&agrave;
+ * @modified June 19th 2008 -fix for multipart requests.
  *
  */
 public class WebUIDispatcher extends AbstractHandler {
