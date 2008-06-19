@@ -18,6 +18,9 @@ public interface MeandrePlugin {
 	 */
 	public String getName();
 	
+	/** Check if the plugin is a Filter*/
+	public boolean isFilter();
+	
 	/** Is the plugin a servlet?
 	 * 
 	 * @return True if it is a servlet

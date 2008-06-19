@@ -270,5 +270,12 @@ implements MeandrePlugin{
 	public boolean isInited() {
 		return inited;
 	}
+	
+	/**This is a servlet not a filter
+	 * 
+	 */
+	public boolean isFilter() {
+		return false;
+	}
 
 }

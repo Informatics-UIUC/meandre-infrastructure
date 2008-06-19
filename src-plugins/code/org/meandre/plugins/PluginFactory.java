@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.servlet.Filter;
 import javax.servlet.Servlet;
 
 import org.meandre.configuration.CoreConfiguration;
@@ -19,6 +20,7 @@ import org.meandre.plugins.vfs.VFSServlet;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ResourceHandler;
 import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.ServletHolder;
 
 /**This class provides a basic factory for managing plugins.
@@ -160,6 +162,9 @@ public class PluginFactory {
 				if ( mpPlugin.isServlet() ) {
 					mpPlugin.setLogger(log);
 					cntxGlobal.addServlet(new ServletHolder((Servlet)mpPlugin), mpPlugin.getAlias());
+				}else if(mpPlugin.isFilter()){
+					mpPlugin.setLogger(log);
+					cntxGlobal.addFilter(new FilterHolder((Filter)mpPlugin), mpPlugin.getAlias(), org.mortbay.jetty.Handler.DEFAULT);
 				}
 				mpPlugin.inited(Boolean.TRUE);
 			} catch (InstantiationException e) {
