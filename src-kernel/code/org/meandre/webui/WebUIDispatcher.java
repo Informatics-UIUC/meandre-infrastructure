@@ -108,14 +108,18 @@ public class WebUIDispatcher extends AbstractHandler {
 				//response.getWriter().println(getHeader());
 				
 				boolean bHasParams = !request.getParameterMap().isEmpty();
-	
+				String contentType = request.getContentType();
+				boolean isMultiPart = Boolean.FALSE;
+				if(contentType!=null &&contentType.startsWith("multipart/form-data")){
+					isMultiPart = Boolean.TRUE;
+				}
 				int iSize = lstHandlers.size();
 				int iCnt  = 0;
 				for ( ; iCnt<iSize ; iCnt++ ) {
 					WebUIFragment wuif = lstHandlers.get(iCnt);
 					try {
 						// Check if any paramater has been passed
-						if (bHasParams) {
+						if (bHasParams || isMultiPart) {
 							// Only pass them them to the target
 							if (target.startsWith("/" + wuif.getFragmentID()))
 								wuif.handle(request, response);
