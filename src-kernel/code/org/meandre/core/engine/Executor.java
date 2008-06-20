@@ -58,21 +58,11 @@ public class Executor {
 	 * 
 	 * @param iPriority The execution priority
 	 */
-	public void execute ( int iPriority ) {
+	public void execute ( int iPriority, WebUI webui ) {
 		// Setting up MrProbe info
 		WrappedComponent wcTmp = setWC.iterator().next();
 		MrProbe thdMrProbe = wcTmp.thdMrProbe;
 		String sFlowExecutionID = wcTmp.cc.getFlowExecutionInstanceID();
-		
-		// MrProbe start
-		thdMrProbe.probeFlowStart(sFlowExecutionID);
-		
-		WebUI webui = null;
-		try {
-			 webui = WebUIFactory.getWebUI(sFlowUniqueExecutionID,thdMrPropper,thdMrProbe,cnf);
-		} catch (WebUIException e) {
-			log.warning("WebUI could not be started: "+e.getMessage());
-		}
 		
 		tg.setMaxPriority(iPriority);
 		for ( WrappedComponent wc:setWC )
@@ -103,12 +93,35 @@ public class Executor {
 		thdMrProbe.done();
 	}
 	
+	
+	/**Call this function to get the webui
+	 * 
+	 */
+	public WebUI initWebUI(){
+		
+		WrappedComponent wcTmp = setWC.iterator().next();
+		MrProbe thdMrProbe = wcTmp.thdMrProbe;
+		String sFlowExecutionID = wcTmp.cc.getFlowExecutionInstanceID();
+		
+		// MrProbe start
+		thdMrProbe.probeFlowStart(sFlowExecutionID);
+		
+		WebUI webui = null;
+		try {
+			 webui = WebUIFactory.getWebUI(sFlowUniqueExecutionID,thdMrPropper,thdMrProbe,cnf);
+		} catch (WebUIException e) {
+			log.warning("WebUI could not be started: "+e.getMessage());
+		}
+		
+		return webui;
+	}
+	
 	/** Fires the execution of a given MeandreFlow.
 	 * 
 	 * 
 	 */
-	public void execute () {
-		execute(Thread.NORM_PRIORITY);
+	public void execute( WebUI webui) {
+		execute(Thread.NORM_PRIORITY, webui);
 	}
 	
 	/** Returns the current termination criteria. 
@@ -147,6 +160,13 @@ public class Executor {
 	 */
 	public Set<? extends WrappedComponent> getWrappedComponents() {
 		return setWC;
+	}
+
+	/**
+	 * @return the FlowUniqueExecutionID
+	 */
+	public String getFlowUniqueExecutionID() {
+		return sFlowUniqueExecutionID;
 	}
 
 }

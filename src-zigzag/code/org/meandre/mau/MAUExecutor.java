@@ -34,6 +34,7 @@ import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.utils.Constants;
+import org.meandre.webui.WebUI;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -180,7 +181,8 @@ public class MAUExecutor {
 			ps.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
 			ps.println("----------------------------------------------------------------------------");
 			ps.flush();
-			exec.execute();
+			WebUI webui=exec.initWebUI();
+			exec.execute(webui);
 			ps.flush();
 			ps.println("----------------------------------------------------------------------------");
 			ps.print("Execution finished at: ");

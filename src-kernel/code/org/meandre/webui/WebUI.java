@@ -1,5 +1,7 @@
 package org.meandre.webui;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.logging.Logger;
 
 import org.meandre.configuration.CoreConfiguration;
@@ -133,5 +135,26 @@ public class WebUI {
 	 */
 	public void setMrPropper(MrProper thdMrPropper) {
 		this.mrProper = thdMrPropper;
+	}
+
+	/**
+	 * @return the webUIDispatcher
+	 */
+	public WebUIDispatcher getWebUIDispatcher() {
+		return webUIDispatcher;
+	}
+
+	/**return the host ip address
+	 * 
+	 * @return
+	 */
+	public String getHostName() {
+		try {
+			return 	InetAddress.getLocalHost().getCanonicalHostName();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		};
+		return "127.0.0.1";
 	}
 }

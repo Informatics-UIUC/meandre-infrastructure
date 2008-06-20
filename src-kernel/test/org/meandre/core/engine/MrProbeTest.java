@@ -206,7 +206,7 @@ public class MrProbeTest {
 		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(baosOut));
 		System.setErr(new PrintStream(baosErr));
-		exec.execute();
+		exec.execute(exec.initWebUI());
 		System.setOut(psOut);
 		System.setErr(psErr);
 		// Restore the output

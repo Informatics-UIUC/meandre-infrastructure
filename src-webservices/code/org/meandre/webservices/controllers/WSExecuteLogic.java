@@ -7,6 +7,9 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,9 +27,12 @@ import org.meandre.core.repository.CorruptedDescriptionException;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.utils.Constants;
+import org.meandre.webservices.beans.JobDetail;
 import org.meandre.webservices.utils.WSLoggerFactory;
 import org.meandre.webui.WebUI;
+import org.meandre.webui.WebUIException;
 import org.meandre.webui.WebUIFactory;
+import org.meandre.webui.WebUIFragment;
 
 import com.hp.hpl.jena.rdf.model.Resource;
 
@@ -42,6 +48,8 @@ public class WSExecuteLogic {
 	
 	/** The core configuraion object ot use */
 	private CoreConfiguration cnf;
+	/**Stores process execute*/
+	private Hashtable<String,JobDetail> executionTokenList;
 	
 	/** Creates the execute logic for the given store.
 	 * 
@@ -50,6 +58,7 @@ public class WSExecuteLogic {
 	public WSExecuteLogic ( Store store, CoreConfiguration cnf ) {
 		this.store = store;
 		this.cnf = cnf;
+		this.executionTokenList = new Hashtable<String,JobDetail>();
 	}
 	
 	/** Runs a flow given a URI against the user repository verbosely
@@ -63,11 +72,24 @@ public class WSExecuteLogic {
 	public void executeVerboseFlowURI(HttpServletRequest request,
 			HttpServletResponse response) throws IOException,
 			CorruptedDescriptionException, ConductorException {
+		JobDetail jobDetail = new JobDetail();
 		String sURI = request.getParameter("uri");
 		boolean bStats = false;
+		boolean hasToken = Boolean.FALSE;
+		String token = null;
 		String sStats = request.getParameter("statistics");
+		// unique identifier sent by the client
+		token = request.getParameter("token");
 		if ( sStats!=null ) {
 			bStats = sStats.equals("true");
+		}
+		
+		if(token!=null){
+			hasToken = Boolean.TRUE;
+			if(this.executionTokenList.containsKey(token)){
+				System.out.println("Error: "+ token +"  already used. The token should be unique." );
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST);		
+			}
 		}
 		
 		if ( sURI==null ) {
@@ -122,6 +144,14 @@ public class WSExecuteLogic {
 						exec = conductor.buildExecutor(qr, resURI, mrProbe);
 					}
 					
+					if(hasToken){
+						String executionId=	exec.getFlowUniqueExecutionID();
+						if(executionId!=null){
+							jobDetail.setToken(token);
+							jobDetail.setFlowInstanceId(executionId);
+							this.executionTokenList.put(token, jobDetail);
+						}
+					}
 					pw.flush();
 					
 					
@@ -135,7 +165,13 @@ public class WSExecuteLogic {
 					pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
 					pw.println("----------------------------------------------------------------------------");
 					pw.flush();
-					exec.execute();
+					WebUI webui=exec.initWebUI();
+					if(hasToken){
+						jobDetail.setHostname(webui.getHostName());
+						jobDetail.setPort(webui.getPort());
+						this.executionTokenList.put(token, jobDetail);
+					}
+					exec.execute(webui);
 					pw.flush();
 					pw.println("----------------------------------------------------------------------------");
 					pw.print("Execution finished at: ");
@@ -187,6 +223,8 @@ public class WSExecuteLogic {
 					pw.println();
 					pw.println(te);
 					pw.flush();
+				}finally{
+					
 				}
 				
 				if ( bStats ) { 
@@ -288,7 +326,8 @@ public class WSExecuteLogic {
 					System.setErr(pw);
 		
 					pw.flush();
-					exec.execute();
+					WebUI webui=exec.initWebUI();
+					exec.execute(webui);
 					pw.flush();
 					
 					if ( !exec.hadGracefullTermination() ) {
@@ -395,5 +434,96 @@ public class WSExecuteLogic {
 		
 		return joRes;
 	}
-
+	
+	/**Returns the flow url
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 * @throws WebUIException
+	 */
+	public void getFlowURL(HttpServletRequest request, HttpServletResponse response) throws IOException, WebUIException {
+		String sURI = request.getParameter("uri");
+		String sHostName = "http://"+request.getLocalName()+":";
+		if ( sURI==null ) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+		}else {
+			WebUI webuiTmp = WebUIFactory.getExistingWebUI(sURI);
+			PrintWriter pw = response.getWriter();
+			if(webuiTmp!=null){
+				String port=webuiTmp.getPort()+"";
+				pw.println( sHostName+ port+"/" );
+				pw.flush();
+			}else{
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			}
+		
+		}
+		
+	}
+	
+	/**Returns the list of component web urls.
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 * @throws WebUIException
+	 */
+	public void getWebComponentURLForFlow(HttpServletRequest request, HttpServletResponse response) throws IOException, WebUIException {
+		String sURI = request.getParameter("uri");
+		String sHostName = "http://"+request.getLocalName()+":";
+		if ( sURI==null ) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+		}else {
+			WebUI webuiTmp = WebUIFactory.getExistingWebUI(sURI);
+			
+			PrintWriter pw = response.getWriter();
+			if(webuiTmp!=null){
+				String port = webuiTmp.getPort()+"";
+				List<WebUIFragment> fragmentList=webuiTmp.getWebUIDispatcher().getLstHandlers();
+				if(fragmentList!=null){
+					Iterator<WebUIFragment> itw=fragmentList.iterator();
+					while(itw.hasNext()){
+					WebUIFragment wfrag = itw.next();
+					pw.println(sHostName+port+"/"+wfrag.getFragmentID());
+					}
+				}
+				pw.flush();
+			}else{
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			}
+		
+		}
+		
+	
+	}
+	
+	/**For a given token submitted by the client initially upon the start of the flow
+	 * return the flowInstanceID -this function is useful when the flow is web based
+	 * flow.
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 */
+	public void getFlowURIFromToken(HttpServletRequest request, HttpServletResponse response) 
+	throws IOException{
+		String token = request.getParameter("token");
+		if(token==null){
+			response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED);
+			return;
+		}
+		JobDetail jobdetail = this.executionTokenList.get(token);
+		if(jobdetail==null){
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);	
+		}else{
+			PrintWriter pw = response.getWriter();
+			pw.println("port="+ jobdetail.getPort());
+			pw.println("hostname="+ jobdetail.getHostname());
+			pw.println("token="+ jobdetail.getToken());
+			pw.println("uri="+ jobdetail.getFlowInstanceId());
+			pw.flush();
+		}
+	}
+	
 }

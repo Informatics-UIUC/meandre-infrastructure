@@ -302,4 +302,11 @@ public class WebUIDispatcher extends AbstractHandler {
 		lstHandlers.remove(wuif);
 	}
 
+	/**
+	 * @return the lstHandlers
+	 */
+	public List<WebUIFragment> getLstHandlers() {
+		return lstHandlers;
+	}
+
 }

@@ -14,6 +14,7 @@ import org.meandre.core.repository.CorruptedDescriptionException;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.demo.repository.DemoRepositoryGenerator;
+import org.meandre.webui.WebUI;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -43,7 +44,8 @@ public class ConductorTest {
 		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(baosOut));
 		System.setErr(new PrintStream(baosErr));
-		exec.execute();
+		WebUI webui = exec.initWebUI();
+		exec.execute(webui);
 		System.setOut(psOut);
 		System.setErr(psErr);
 		// Restore the output
@@ -74,7 +76,7 @@ public class ConductorTest {
 		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(baosOut));
 		System.setErr(new PrintStream(baosErr));
-		exec.execute();
+		exec.execute(exec.initWebUI());
 		System.setOut(psOut);
 		System.setErr(psErr);
 		// Restore the output
@@ -108,7 +110,7 @@ public class ConductorTest {
 		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(baosOut));
 		System.setErr(new PrintStream(baosErr));
-		exec.execute();
+		exec.execute(exec.initWebUI());
 		System.setOut(psOut);
 		System.setErr(psErr);
 		// Restore the output

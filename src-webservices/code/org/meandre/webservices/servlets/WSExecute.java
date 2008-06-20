@@ -21,6 +21,7 @@ import org.meandre.core.security.User;
 import org.meandre.core.store.Store;
 import org.meandre.webservices.controllers.WSExecuteLogic;
 import org.meandre.webservices.utils.WSLoggerFactory;
+import org.meandre.webui.WebUIException;
 
 /** A basic handler to execute flows.
  * 
@@ -108,6 +109,42 @@ public class WSExecute extends HttpServlet {
     			}	
     			
     		}
+    		else if(sTarget.endsWith("/url")){
+    			if ( sExtension.equals("txt") )
+    				getFlowURL(request,response);
+    			else{
+    				// 
+    				// Invalid format found
+    				//
+    				log.info(sTarget +" Uknown format requested "+sExtension);
+    				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+    			}	
+    				
+    		
+    		}
+    		else if(sTarget.endsWith("/web_component_url")){
+    			if ( sExtension.equals("txt") )
+    				getWebComponentURLForFlow(request,response);
+    			else{
+    				// 
+    				// Invalid format found
+    				//
+    				log.info(sTarget +" Uknown format requested "+sExtension);
+    				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+    			}	
+    				
+    		}
+    		else if(sTarget.endsWith("/uri_flow")){
+    			if ( sExtension.equals("txt") )
+    				getFlowURIFromToken(request,response);
+    			else{
+    				// 
+    				// Invalid format found
+    				//
+    				log.info(sTarget +" Uknown format requested "+sExtension);
+    				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+    			}
+    		}
     		else  {
 				// 
 				// Invalid request found
@@ -126,7 +163,8 @@ public class WSExecute extends HttpServlet {
 		
 	}
 
-    /** Executes the requested flow.
+
+	/** Executes the requested flow.
      * 
      * @param request The request object
      * @param response The response object
@@ -186,7 +224,48 @@ public class WSExecute extends HttpServlet {
 		
 	}
     
+    /** Returns the url where a flow is running along with the hostname and port address
+     * */
+    private void getFlowURL(HttpServletRequest request, HttpServletResponse response) throws IOException{
+    	try {
+			wsExecuteLogic.getFlowURL(request,response);
+		} catch (IOException e) {
+			throw e;
+		} catch (WebUIException e) {
+			throw new IOException(e.getMessage());
+		}
+    }
     
+    /**This web component url for the flow
+     * 
+     * @param request
+     * @param response
+     * @throws IOException
+     */
+    private void getWebComponentURLForFlow(HttpServletRequest request, HttpServletResponse response) throws IOException{
+    	try {
+			wsExecuteLogic.getWebComponentURLForFlow(request, response);
+		} catch (IOException e) {
+			throw e;
+		} catch (WebUIException e) {
+			throw new IOException(e.getMessage());
+		}
+    }
+    
+    /**This function returns flow uri for a token
+     * 
+     * @param request
+     * @param response
+     * @throws IOException
+     */
+    private void getFlowURIFromToken(HttpServletRequest request,
+			HttpServletResponse response) throws IOException{
+    	try {
+			wsExecuteLogic.getFlowURIFromToken(request, response);
+		} catch (IOException e) {
+			throw e;
+		} 
+	}
 
     /** List the set of running flows and the links to their webui's as JSON.
      * @param request The request object
