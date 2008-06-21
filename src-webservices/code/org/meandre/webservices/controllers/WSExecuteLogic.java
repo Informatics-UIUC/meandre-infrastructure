@@ -72,25 +72,19 @@ public class WSExecuteLogic {
 	public void executeVerboseFlowURI(HttpServletRequest request,
 			HttpServletResponse response) throws IOException,
 			CorruptedDescriptionException, ConductorException {
-		JobDetail jobDetail = new JobDetail();
+		
 		String sURI = request.getParameter("uri");
 		boolean bStats = false;
 		boolean hasToken = Boolean.FALSE;
 		String token = null;
 		String sStats = request.getParameter("statistics");
 		// unique identifier sent by the client
-		token = request.getParameter("token");
+		
 		if ( sStats!=null ) {
 			bStats = sStats.equals("true");
 		}
 		
-		if(token!=null){
-			hasToken = Boolean.TRUE;
-			if(this.executionTokenList.containsKey(token)){
-				System.out.println("Error: "+ token +"  already used. The token should be unique." );
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST);		
-			}
-		}
+	
 		
 		if ( sURI==null ) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -145,12 +139,7 @@ public class WSExecuteLogic {
 					}
 					
 					if(hasToken){
-						String executionId=	exec.getFlowUniqueExecutionID();
-						if(executionId!=null){
-							jobDetail.setToken(token);
-							jobDetail.setFlowInstanceId(executionId);
-							this.executionTokenList.put(token, jobDetail);
-						}
+						
 					}
 					pw.flush();
 					
@@ -166,11 +155,27 @@ public class WSExecuteLogic {
 					pw.println("----------------------------------------------------------------------------");
 					pw.flush();
 					WebUI webui=exec.initWebUI();
+					/*This needs to be synchronized*/
+					token = request.getParameter("token");
+					if(token!=null){
+						hasToken = Boolean.TRUE;
+						if(this.executionTokenList.containsKey(token)){
+							System.out.println("Error: "+ token +"  already used. The token should be unique." );
+							response.sendError(HttpServletResponse.SC_BAD_REQUEST);		
+						}
+					}
 					if(hasToken){
+						String executionId=	exec.getFlowUniqueExecutionID();
+						if(executionId!=null){
+						JobDetail jobDetail = new JobDetail();
+						jobDetail.setToken(token);
+						jobDetail.setFlowInstanceId(executionId);
 						jobDetail.setHostname(webui.getHostName());
 						jobDetail.setPort(webui.getPort());
 						this.executionTokenList.put(token, jobDetail);
+						}
 					}
+					/**/
 					exec.execute(webui);
 					pw.flush();
 					pw.println("----------------------------------------------------------------------------");
