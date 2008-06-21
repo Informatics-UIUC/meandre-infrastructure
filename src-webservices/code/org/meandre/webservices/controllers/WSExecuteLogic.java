@@ -75,8 +75,7 @@ public class WSExecuteLogic {
 		
 		String sURI = request.getParameter("uri");
 		boolean bStats = false;
-		boolean hasToken = Boolean.FALSE;
-		String token = null;
+		
 		String sStats = request.getParameter("statistics");
 		// unique identifier sent by the client
 		
@@ -137,10 +136,6 @@ public class WSExecuteLogic {
 						MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),spi,false,false);
 						exec = conductor.buildExecutor(qr, resURI, mrProbe);
 					}
-					
-					if(hasToken){
-						
-					}
 					pw.flush();
 					
 					
@@ -156,6 +151,8 @@ public class WSExecuteLogic {
 					pw.flush();
 					WebUI webui=exec.initWebUI();
 					/*This needs to be synchronized*/
+					boolean hasToken = Boolean.FALSE;
+					String token = null;
 					token = request.getParameter("token");
 					if(token!=null){
 						hasToken = Boolean.TRUE;
