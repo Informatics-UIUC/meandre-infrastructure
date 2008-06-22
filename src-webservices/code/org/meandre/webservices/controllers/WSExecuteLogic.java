@@ -329,6 +329,29 @@ public class WSExecuteLogic {
 		
 					pw.flush();
 					WebUI webui=exec.initWebUI();
+					/*This needs to be synchronized*/
+					boolean hasToken = Boolean.FALSE;
+					String token = null;
+					token = request.getParameter("token");
+					if(token!=null){
+						hasToken = Boolean.TRUE;
+						if(this.executionTokenList.containsKey(token)){
+							System.out.println("Error: "+ token +"  already used. The token should be unique." );
+							response.sendError(HttpServletResponse.SC_BAD_REQUEST);		
+						}
+					}
+					if(hasToken){
+						String executionId=	exec.getFlowUniqueExecutionID();
+						if(executionId!=null){
+						JobDetail jobDetail = new JobDetail();
+						jobDetail.setToken(token);
+						jobDetail.setFlowInstanceId(executionId);
+						jobDetail.setHostname(webui.getHostName());
+						jobDetail.setPort(webui.getPort());
+						this.executionTokenList.put(token, jobDetail);
+						}
+					}
+					/**/
 					exec.execute(webui);
 					pw.flush();
 					
