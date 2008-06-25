@@ -466,8 +466,101 @@
     	
 	</target>
 
+	<!-- make source jars -->
+    <target name="make-source-jars" 
+        depends="" 
+        description="-> creates jars of source directories">
+
+    	<mkdir dir="${dist.dir}/src-jars"/>
+    	    	
+        <!-- Create annotation jar -->
+        <jar destfile="${dist.dir}/src-jars/src-annotation-${build.version}.jar">
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+            </manifest>
+            <fileset dir="${annotation.src}">
+                <include name="**/*"/>
+            </fileset>
+        </jar>
+
+        <!-- Create kernel jar -->
+        <jar destfile="${dist.dir}/src-jars/src-kernel-${build.version}.jar">
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+            </manifest>
+            <fileset dir="${kernel.src}">
+                <include name="**/*"/>
+            </fileset>
+        </jar>
+
+        <!-- Create zigzag jar -->
+        <jar destfile="${dist.dir}/src-jars/src-zigzag-${build.version}.jar">
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+            </manifest>
+            <fileset dir="${zigzag.src}">
+                <include name="**/*"/>
+            </fileset>
+        </jar>
+
+        <!-- Create plugins jar -->
+        <jar destfile="${dist.dir}/src-jars/src-plugins-${build.version}.jar">
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+            </manifest>
+            <fileset dir="${plugins.src}">
+                <include name="**/*"/>
+            </fileset>
+        </jar>
+        <!-- Create demo jar -->
+        <jar destfile="${dist.dir}/src-jars/src-demo-${build.version}.jar">
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+            </manifest>
+            <fileset dir="${demo.src}">
+                <include name="**/*"/>
+            </fileset>
+        </jar>
+        <!-- Create jar -->
+        <jar destfile="${dist.dir}/src-jars/src-ws-${build.version}.jar">
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+            </manifest>
+            <fileset dir="${ws.src}">
+                <include name="**/*"/>
+            </fileset>
+        </jar>
+        <!-- Create jar -->
+        <jar destfile="${dist.dir}/src-jars/src-store-${build.version}.jar">
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+            </manifest>
+            <fileset dir="${store.src}">
+                <include name="**/*"/>
+            </fileset>
+        </jar>
+        <!-- Create jar -->
+        <jar destfile="${dist.dir}/src-jars/src-terracotta-${build.version}.jar">
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+            </manifest>
+            <fileset dir="${terracotta.src}">
+                <include name="**/*"/>
+            </fileset>
+        </jar>
+        <!-- Create jar -->
+        <jar destfile="${dist.dir}/src-jars/src-client-${build.version}.jar">
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+            </manifest>
+            <fileset dir="${client.src}">
+                <include name="**/*"/>
+            </fileset>
+        </jar>
+
+    </target>
     <target name="clean-all" 
-        description="-> attempts to clean all generated files"
+        description="->attempts to clean all generated files"
         depends="clean, clean-meandre">
     </target>
 
