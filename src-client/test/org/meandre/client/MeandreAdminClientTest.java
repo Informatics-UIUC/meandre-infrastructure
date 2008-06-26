@@ -17,7 +17,6 @@ import org.meandre.webservices.MeandreServer;
 import org.meandre.core.security.SecurityManager;
 import org.meandre.core.store.security.SecurityManagerProctor;
 
-import com.hp.hpl.jena.rdf.model.Model;
 
 /**
  * Tests cases for MeandreAdminClient. Starts up a MeandreServer and creates a

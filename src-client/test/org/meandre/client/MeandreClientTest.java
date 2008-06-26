@@ -144,7 +144,7 @@ public class MeandreClientTest {
     }
 
     /**
-     * Test method for {@link org.meandre.client.MeandreClient#retrieveUserRoles()}.
+     * Test method for {@link org.meandre.client.MeandreClient#retrieveRoles()}.
      */
     @Test
     public void testRetrieveUserRoles() {
@@ -160,6 +160,27 @@ public class MeandreClientTest {
         for(String observedRole: roles){
             assertTrue(observedRole.startsWith(expectedPrefix));
         }
+        return;
+    }
+    /**
+     * Test method for 
+     * {@link org.meandre.client.MeandreClient#retrieveValidRoles()}.
+     */
+    @Test
+    public void testRetrieveValidRoles() {
+        Set<String> roles = null;
+        try{
+           roles = _meandreClient.retrieveValidRoles();
+           
+        }catch(TransmissionException e){
+            fail("Transmission failure: " + e.toString());
+        }
+        Set<Role> expectedRoles = Role.getStandardRoles();
+        Set<Role> observedRoles = new HashSet<Role>();
+        for(String observedRoleUrl: roles){
+            observedRoles.add(Role.fromUrl(observedRoleUrl));
+        }
+        assertTrue(observedRoles.equals(expectedRoles));
         return;
     }
 

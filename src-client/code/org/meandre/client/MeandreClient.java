@@ -85,6 +85,27 @@ public class MeandreClient extends MeandreBaseClient{
         return ss;
     }
 
+    /**
+     * requests the list of all valid roles the server supports. the roles
+     * are returned in their url form.
+     *
+     * this is equivalent to getValidRoles() in MeandreAdminClient, but
+     * this version requires only the 'about' role and not the 'admin'
+     * role to access it. Also, this returns the url representation of
+     * the roles, not Role objects.
+     *
+     * @return list of all valid roles
+     */
+    public Set<String> retrieveValidRoles() throws TransmissionException{
+        String sRestCommand = "services/about/valid_roles.json";
+        JSONTokener jtRoles = executeGetRequestJSON(sRestCommand, null);
+        String jArrayKey = "meandre_user_role";
+        String jElementKey = "meandre_role";
+        Set<String> ss = unpackJSONArray(jtRoles, jArrayKey, jElementKey);
+        return ss;
+
+    }
+
 
 /////////
 //Locations (known peers of the server)

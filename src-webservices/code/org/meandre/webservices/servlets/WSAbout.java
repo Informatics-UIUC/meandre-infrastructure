@@ -140,6 +140,31 @@ public class WSAbout extends HttpServlet {
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			}
     	}
+    	else if ( sTarget.endsWith("/valid_roles") ) {
+            if ( sExtension.equals("txt") ) {
+                wsAboutLogic.allRolesInText(request,response);
+            }
+            else if ( sExtension.equals("json") ) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().println(wsAboutLogic.allRolesInJSON(request,response));
+            }
+            else if ( sExtension.equals("xml") ) {
+                try {
+                    response.setContentType("text/xml");
+                    response.getWriter().println(XML.toString(wsAboutLogic.allRolesInJSON(request,response),"meandre_security"));
+                } catch (JSONException e) {
+                    log.warning("XML serialization failure for request "+request.getRequestURL());
+                    throw new IOException(e.toString());
+                }
+            }
+            else  {
+                //
+                // Invalid format
+                //
+                log.info("Invalid format "+sExtension+" for requested "+sTarget);
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            }
+        }
     	else if ( sTarget.endsWith("/version") ) {
     		if ( sExtension.equals("txt") ) {
     			response.setStatus(HttpServletResponse.SC_OK);

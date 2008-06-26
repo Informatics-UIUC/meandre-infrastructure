@@ -123,6 +123,64 @@ public class WSAboutLogic {
 
 	}
 
+	/** Prints the list of all valid role the server supports.
+    *
+    * @param request The request object
+    * @param response The response object
+    * @throws IOException A problem while printing
+    */
+   public void allRolesInText(HttpServletRequest request,
+           HttpServletResponse response) throws IOException {
+
+       PrintWriter pw = response.getWriter();
+
+       response.setStatus(HttpServletResponse.SC_OK);
+       response.setContentType("text/plain");
+
+       try {
+           SecurityManager ss = store.getSecurityStore();
+           User usr = ss.getUser(request.getRemoteUser());
+           Set<Role> usersRoles = ss.getRolesOfUser(usr);
+           Set<Role> validRoles = Role.getStandardRoles();
+           for (Role role: validRoles)
+               pw.println(role.getUrl());
+       } catch (SecurityStoreException e) {
+           log.warning("Security exception "+e.toString());
+           throw new IOException(e.toString());
+       }
+
+   }
+
+   /** Returns the list of roles the server supports as a JSON object.
+    *
+    * @param request The request object
+    * @param response The response object
+    * @return
+    * @throws IOException Something when wrong
+    */
+   public JSONObject allRolesInJSON (HttpServletRequest request,
+           HttpServletResponse response) throws IOException {
+
+       JSONObject joRes = new JSONObject();
+       JSONArray ja = new JSONArray();
+
+       try {
+           Set<Role> validRoles = Role.getStandardRoles();
+           for (Role role: validRoles){
+               JSONObject jo = new JSONObject();
+               jo.put("meandre_role", role.getUrl());
+               ja.put(jo);
+           }
+           joRes.put("meandre_user_role",ja);
+
+       }
+       catch ( Exception e ) {
+           throw new IOException(e.toString());
+       }
+
+       return joRes;
+
+   }
 
 	/** Dump the information in plain text
 	 *
