@@ -30,7 +30,7 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowStart(String sFlowUniqueID, Date ts, String weburl,String token){
+	public void probeFlowStart(String sFlowUniqueID, Date ts, String weburl){
 		psOut.println("Flow "+sFlowUniqueID+" started executing at "+ts + " weburl " + weburl);
 	}
 	
@@ -39,7 +39,7 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowFinish(String sFlowUniqueID, Date ts,String token){
+	public void probeFlowFinish(String sFlowUniqueID, Date ts){
 		psOut.println("Flow "+sFlowUniqueID+" finished executing at "+ts);
 	}
 	
@@ -48,7 +48,7 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowAbort(String sFlowUniqueID, Date ts,String token,String message){
+	public void probeFlowAbort(String sFlowUniqueID, Date ts,String message){
 		psOut.println("Flow "+sFlowUniqueID+" aborted execution at "+ts);
 	}
 	

@@ -17,6 +17,8 @@ import org.meandre.core.engine.MrProbe;
 import org.meandre.core.engine.MrProper;
 import org.meandre.core.engine.WrappedComponent;
 import org.meandre.core.logger.KernelLoggerFactory;
+import org.meandre.plugins.MeandrePlugin;
+import org.meandre.plugins.PluginFactory;
 import org.meandre.webui.PortScroller;
 import org.meandre.webui.WebUI;
 import org.meandre.webui.WebUIException;
@@ -28,7 +30,8 @@ import org.meandre.webui.WebUIFragmentCallback;
  *
  * @author Xavier Llor&agrave;
  * @last-modified: Amit Kumar -added the getter for sFlowUniqueExecutionID
- * @last-modified: Amit Kumat -added support for flowID
+ * @last-modified: Amit Kumar -added support for flowID
+ * @last-mofified: Amit Kumar -added support for getPlugin
  *
  *
  */
@@ -429,5 +432,15 @@ implements ComponentContext {
 	 */
 	public void setMrPropper(MrProper thdMrPropper) {
 		this.webui.setMrPropper(thdMrPropper);	
+	}
+
+	/**Returns the plugin or null if there was a failure initing
+	 * the plugin
+	 * 
+	 */
+	public MeandrePlugin getPlugin(String id) {
+		PluginFactory  pluginFactory = PluginFactory.getPluginFactory(ccCnf);
+		MeandrePlugin mp=pluginFactory.getPlugin(id);
+		return mp;
 	}
 }

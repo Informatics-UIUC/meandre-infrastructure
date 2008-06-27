@@ -134,8 +134,8 @@ extends Thread {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowStart(String sFlowUniqueID, String weburl,String token){
-		Object[] oa = {Probe.ProbeCommands.FLOW_STARTED,sFlowUniqueID,new Date(), weburl,token};
+	public void probeFlowStart(String sFlowUniqueID, String weburl){
+		Object[] oa = {Probe.ProbeCommands.FLOW_STARTED,sFlowUniqueID,new Date(), weburl};
 		clqStatements.add(oa);
 		semWorkAvailable.release();
 	}
@@ -145,8 +145,8 @@ extends Thread {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowFinish(String sFlowUniqueID,String token){
-		Object[] oa = {Probe.ProbeCommands.FLOW_FINISHED,sFlowUniqueID,new Date(),token};
+	public void probeFlowFinish(String sFlowUniqueID){
+		Object[] oa = {Probe.ProbeCommands.FLOW_FINISHED,sFlowUniqueID,new Date()};
 		clqStatements.add(oa);
 		semWorkAvailable.release();
 	}
@@ -156,8 +156,8 @@ extends Thread {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowAbort(String sFlowUniqueID,String token,String message){
-		Object[] oa = {Probe.ProbeCommands.FLOW_ABORTED,sFlowUniqueID,new Date(),token,message};
+	public void probeFlowAbort(String sFlowUniqueID,String message){
+		Object[] oa = {Probe.ProbeCommands.FLOW_ABORTED,sFlowUniqueID,new Date(),message};
 		clqStatements.add(oa);
 		semWorkAvailable.release();
 	}
@@ -343,15 +343,15 @@ extends Thread {
 		switch((Probe.ProbeCommands)oa[0]) {
 			case FLOW_STARTED:
 				for ( Probe probe:this.probea)
-					probe.probeFlowStart((String)oa[1], (Date)oa[2], (String)oa[3],(String)oa[4]);
+					probe.probeFlowStart((String)oa[1], (Date)oa[2], (String)oa[3]);
 				break;
 			case FLOW_FINISHED:
 				for ( Probe probe:this.probea)
-					probe.probeFlowFinish((String)oa[1], (Date)oa[2],(String)oa[3]);
+					probe.probeFlowFinish((String)oa[1], (Date)oa[2]);
 				break;
 			case FLOW_ABORTED:
 				for ( Probe probe:this.probea)
-					probe.probeFlowAbort((String)oa[1], (Date)oa[2],(String)oa[3],(String)oa[4]);
+					probe.probeFlowAbort((String)oa[1], (Date)oa[2],(String)oa[3]);
 				break;
 			case EXECUTABLE_COMPONENT_INITIALIZED:
 				for ( Probe probe:this.probea)

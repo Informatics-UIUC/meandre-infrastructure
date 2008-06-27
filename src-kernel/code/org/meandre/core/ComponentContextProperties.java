@@ -3,6 +3,7 @@ package org.meandre.core;
 import java.net.URL;
 import java.util.logging.Logger;
 
+import org.meandre.plugins.MeandrePlugin;
 import org.meandre.webui.WebUIFragmentCallback;
 
 /** The component context contains methods to access the context environment
@@ -94,4 +95,11 @@ public interface ComponentContextProperties {
 	 * @return The flow ID being run
 	 */
 	public String getFlowID();
+	
+	/**Return the plugin 
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public MeandrePlugin getPlugin(String id);
 }

@@ -1,5 +1,7 @@
 package org.meandre.core;
 
+import org.meandre.plugins.MeandrePlugin;
+
 /** The component context contains methods to access the context environment
  * during the execution of a component.
  *
@@ -43,5 +45,10 @@ extends ComponentContextProperties {
 	 * @return Path to public resources directory.
 	 */
 	public String getPublicResourcesDirectory ();
+	
+	/**Return the MeandrePlugin for a particular id
+	 * 
+	 */
+	public MeandrePlugin getPlugin(String id);
 
 }

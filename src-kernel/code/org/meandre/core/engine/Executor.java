@@ -92,9 +92,9 @@ public class Executor {
 		
 		// MrProbe last words
 		if ( hadGracefullTermination() ) 
-			thdMrProbe.probeFlowFinish(sFlowExecutionID,token);
+			thdMrProbe.probeFlowFinish(sFlowExecutionID);
 		else
-			thdMrProbe.probeFlowAbort(sFlowExecutionID,token,concat(getAbortMessage()));
+			thdMrProbe.probeFlowAbort(sFlowExecutionID,concat(getAbortMessage()));
 		
 		thdMrProbe.done();
 	}
@@ -125,7 +125,7 @@ public class Executor {
 		String sFlowExecutionID = wcTmp.cc.getFlowExecutionInstanceID();
 		
 		// MrProbe start
-		thdMrProbe.probeFlowStart(sFlowExecutionID,getHostWebUrl(nextPortForUse),token);
+		thdMrProbe.probeFlowStart(sFlowExecutionID,getHostWebUrl(nextPortForUse));
 		
 		WebUI webui = null;
 		try {

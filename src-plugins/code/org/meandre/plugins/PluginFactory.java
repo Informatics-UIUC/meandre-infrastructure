@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -26,7 +27,8 @@ import org.mortbay.jetty.servlet.ServletHolder;
 /**This class provides a basic factory for managing plugins.
  * 
  * @author Xavier Llor&agrave;
- *
+ * @modified Amit Kumar -added support for Filters and getter Method for 
+ * plugin information June 27th 2008
  */
 public class PluginFactory {
 
@@ -53,11 +55,25 @@ public class PluginFactory {
 		sConfigPath = cnf.getHomeDirectory();
 	}
 	
+	
+	/** Store the plugin information**/
+	private static HashMap<String,MeandrePlugin> pluginList = new HashMap<String,MeandrePlugin>(5);
+	
+	/** Stores the PluginFactory**/
+	private static HashMap<CoreConfiguration, PluginFactory> pluginFactoryList = new HashMap<CoreConfiguration, PluginFactory>(5);
+	
+
+	
+	
 	/** Initialize the plugin factory given a certain core configuration.
 	 * 
 	 * @param cnf The core configuration object
 	 */
 	public static PluginFactory getPluginFactory ( CoreConfiguration cnf ) {
+		// check the hashmap for the pluginfactory
+		if(pluginFactoryList.get(cnf)!=null){
+			return pluginFactoryList.get(cnf);
+		}
 		PluginFactory pf = new PluginFactory(cnf);
 		
 		pf.propPluginFactoryConfig = new Properties();
@@ -90,11 +106,14 @@ public class PluginFactory {
 						sConfigFilePath+
 					    " could not be written to disk!");
 			}
+			
 		}
 
 		// Create the run file
 		new File(pf.sConfigPath+File.separator+pf.cnf.getRunResourcesDirectory()).mkdir();
 
+		//store the plugin factory in the hashmap and return when asked for
+		pluginFactoryList.put(cnf, pf);
 		return pf;
 	}
 
@@ -167,6 +186,7 @@ public class PluginFactory {
 					cntxGlobal.addFilter(new FilterHolder((Filter)mpPlugin), mpPlugin.getAlias(), org.mortbay.jetty.Handler.DEFAULT);
 				}
 				mpPlugin.inited(Boolean.TRUE);
+				pluginList.put(oKey.toString(), mpPlugin);
 			} catch (InstantiationException e) {
 				log.warning("Pluggin "+oKey+" could not be initialized\n"+e);
 			} catch (IllegalAccessException e) {
@@ -178,6 +198,15 @@ public class PluginFactory {
 		}
 	}
 
+	
+	/**Return the plugin
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public static MeandrePlugin getPlugin(String id){
+		return pluginList.get(id);
+	}
 
 	/**
 	 * @return the propPluginFactoryConfig

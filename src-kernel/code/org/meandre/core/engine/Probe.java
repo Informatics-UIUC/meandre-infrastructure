@@ -34,21 +34,21 @@ public interface Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowStart(String sFlowUniqueID, Date ts, String weburl,String token);
+	public void probeFlowStart(String sFlowUniqueID, Date ts, String weburl);
 	
 	/** The flow stopped executing.
 	 * 
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowFinish(String sFlowUniqueID, Date ts,String token);
+	public void probeFlowFinish(String sFlowUniqueID, Date ts);
 	
 	/** The flow aborted the execution.
 	 * 
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowAbort(String sFlowUniqueID, Date ts,String token,String message);
+	public void probeFlowAbort(String sFlowUniqueID, Date ts,String message);
 
 	/** The executable component finished initialization.
 	 * 

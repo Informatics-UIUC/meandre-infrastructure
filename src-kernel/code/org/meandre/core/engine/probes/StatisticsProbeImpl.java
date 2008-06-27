@@ -92,7 +92,7 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowStart(String sFlowUniqueID, Date ts,String weburl,String token) {
+	public void probeFlowStart(String sFlowUniqueID, Date ts,String weburl) {
 		// Update the timestamp
 		this.dateLatestDate = ts;
 		
@@ -106,7 +106,7 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowFinish(String sFlowUniqueID, Date ts,String token) {
+	public void probeFlowFinish(String sFlowUniqueID, Date ts) {
 		// Update the timestamp
 		this.dateLatestDate = ts;
 		
@@ -118,7 +118,7 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowAbort(String sFlowUniqueID, Date ts,String token,String message) {
+	public void probeFlowAbort(String sFlowUniqueID, Date ts,String message) {
 		// Update the timestamp
 		this.dateLatestDate = ts;
 		this.abortMessage = message;

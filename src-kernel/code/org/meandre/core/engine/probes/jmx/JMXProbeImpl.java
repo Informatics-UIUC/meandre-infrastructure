@@ -134,7 +134,7 @@ public class JMXProbeImpl implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowStart(String sFlowUniqueID, Date ts, String weburl,String token) {
+	public void probeFlowStart(String sFlowUniqueID, Date ts, String weburl) {
 		// Update the timestamp
 	
 		this.dateLatestDate = ts;
@@ -148,7 +148,6 @@ public class JMXProbeImpl implements Probe {
 		flowData.setDateStart(ts);
 		flowData.setStatus("RUNNING");
 		flowData.setWebUrl(weburl);
-		flowData.setToken(token);
 		flowList.addFlowData(sFlowUniqueID, flowData);
 	}
 	
@@ -157,7 +156,7 @@ public class JMXProbeImpl implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowFinish(String sFlowUniqueID, Date ts,String token) {
+	public void probeFlowFinish(String sFlowUniqueID, Date ts) {
 		// Update the timestamp
 		this.dateLatestDate = ts;
 		FlowData flowData = new FlowData();
@@ -165,7 +164,6 @@ public class JMXProbeImpl implements Probe {
 		flowData.setLatestDate(ts);
 		flowData.setStatus("ENDED");
 		flowData.setWebUrl("nil");
-		flowData.setToken(token);
 		flowList.updateFlowData(sFlowUniqueID, flowData);
 		this.flowStatus = FlowStates.ENDED;
 		// don't need this anymore
@@ -185,7 +183,7 @@ public class JMXProbeImpl implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowAbort(String sFlowUniqueID, Date ts,String token,String message) {
+	public void probeFlowAbort(String sFlowUniqueID, Date ts,String message) {
 		// Update the timestamp
 		this.dateLatestDate = ts;
 		FlowData flowData = new FlowData();
@@ -193,7 +191,6 @@ public class JMXProbeImpl implements Probe {
 		flowData.setLatestDate(ts);
 		flowData.setStatus("ABORTED");
 		flowData.setWebUrl("nil");
-		flowData.setToken(token);
 		flowList.updateFlowData(sFlowUniqueID, flowData);
 		this.flowStatus = FlowStates.ABORTED;
 	}

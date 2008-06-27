@@ -258,9 +258,9 @@ public class MrProbeTest {
 			// Run the tests
 			String rands=Math.random()+"";
 			for ( int i=0; i<NUMBER_OF_REPETITIONS; i++ ) {
-				mp.probeFlowStart(BASE_TEST_URI,"http://127.0.0.1:1704/",rands);
-				mp.probeFlowFinish(BASE_TEST_URI,rands);
-				mp.probeFlowAbort(BASE_TEST_URI,rands,"Some Error message");
+				mp.probeFlowStart(BASE_TEST_URI,"http://127.0.0.1:1704/");
+				mp.probeFlowFinish(BASE_TEST_URI);
+				mp.probeFlowAbort(BASE_TEST_URI,"Some Error message");
 				mp.probeWrappedComponentInitialize(wc);
 				mp.probeWrappedComponentAbort(wc);
 				mp.probeWrappedComponentDispose(wc);

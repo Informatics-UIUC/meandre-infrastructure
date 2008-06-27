@@ -72,6 +72,10 @@ public class MeandreServer {
 	
 	private int REG_PORT = 1099;
 	
+	private JMXConnectorServer cs =null;
+	private  MBeanServer mBeanServer =null;
+	private  MBeanContainer mBeanContainer=null;
+	
 	/** Creates a Meandre server with the default configuration.
 	 * 
 	 */
@@ -198,13 +202,19 @@ public class MeandreServer {
 		
 	}
 	
-	/** Stops the main Jetty server.
-	 * 
+	/** Stops the main Jetty server and MXBeanServer container
 	 * @throws Exception Jetty could not be stopped
 	 * 
 	 */
 	public void stop () throws Exception {
+		try {
+			cs.stop();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally{
 		server.stop();
+		}
 	}
 
 	/** Initialize the webservices
@@ -264,13 +274,13 @@ public class MeandreServer {
 		
 		JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi");
 				
-		 MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
-		 MBeanContainer mBeanContainer = new MBeanContainer(mBeanServer);
+	     mBeanServer= ManagementFactory.getPlatformMBeanServer();
+		 mBeanContainer = new MBeanContainer(mBeanServer);
 		 server.getContainer().addEventListener(mBeanContainer);
 		 mBeanContainer.start();
 		
-		 JMXConnectorServer cs = 
-		 JMXConnectorServerFactory.newJMXConnectorServer(url, null, mBeanServer);
+		 
+		 cs=JMXConnectorServerFactory.newJMXConnectorServer(url, null, mBeanServer);
 
 
 		 cs.start();

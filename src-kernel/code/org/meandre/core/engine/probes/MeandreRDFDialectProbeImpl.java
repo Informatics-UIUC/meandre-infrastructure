@@ -61,7 +61,7 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowStart(String sFlowUniqueID, Date ts, String weburl,String token){
+	public void probeFlowStart(String sFlowUniqueID, Date ts, String weburl){
 		Statement stm = modProbe.createStatement(
 				modProbe.createResource(sFlowUniqueID),
 				MeandreProbingVocabulary.flow_started,
@@ -77,7 +77,7 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowFinish(String sFlowUniqueID, Date ts,String token){
+	public void probeFlowFinish(String sFlowUniqueID, Date ts){
 		Statement stm = modProbe.createStatement(
 				modProbe.createResource(sFlowUniqueID),
 				MeandreProbingVocabulary.flow_finished,
@@ -93,7 +93,7 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowAbort(String sFlowUniqueID, Date ts,String token,String message){
+	public void probeFlowAbort(String sFlowUniqueID, Date ts,String message){
 		Statement stm = modProbe.createStatement(
 				modProbe.createResource(sFlowUniqueID),
 				MeandreProbingVocabulary.flow_aborted,
