@@ -7,7 +7,7 @@ import org.meandre.core.engine.Probe;
 /** This class implements a probe for the engine that just does nothing.
  * 
  * @author Xavier Llor&agrave;
- *
+ * @modified by Amit Kumar -Support for portnames
  */
 public class NullProbeImpl 
 implements Probe {
@@ -18,7 +18,7 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowStart(String sFlowUniqueID, Date ts) {
+	public void probeFlowStart(String sFlowUniqueID, Date ts, String weburl,String token) {
 		
 	}
 	
@@ -27,7 +27,7 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowFinish(String sFlowUniqueID, Date ts) {
+	public void probeFlowFinish(String sFlowUniqueID, Date ts,String token) {
 		
 	}
 	
@@ -36,7 +36,7 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowAbort(String sFlowUniqueID, Date ts) {
+	public void probeFlowAbort(String sFlowUniqueID, Date ts,String token,String message) {
 		
 	}
 
@@ -83,7 +83,7 @@ implements Probe {
 	 * @param bSerializeState The wrapped component is serialized
 	 * @param bSerializedData The data provided has been serialized
 	 */
-	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts, boolean bSerializeState, boolean bSerializedData) {
+	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts,String portName, boolean bSerializeState, boolean bSerializedData) {
 		
 	}
 
@@ -94,7 +94,7 @@ implements Probe {
 	 * @param odata The data being pulled
 	 * @param ts The time stamp
 	 */
-	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts, boolean bSerializeState, boolean bSerializedData) {
+	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts,String portName, boolean bSerializeState, boolean bSerializedData) {
 		
 	}
 	

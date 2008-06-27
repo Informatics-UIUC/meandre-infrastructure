@@ -18,7 +18,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
  * to the provided PrintStream.
  * 
  * @author Xavier Llor&agrave;
- *
+ * @modified by Amit Kumar -Support for portnames
  */
 public class MeandreRDFDialectProbeImpl 
 implements Probe {
@@ -61,7 +61,7 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowStart(String sFlowUniqueID, Date ts){
+	public void probeFlowStart(String sFlowUniqueID, Date ts, String weburl,String token){
 		Statement stm = modProbe.createStatement(
 				modProbe.createResource(sFlowUniqueID),
 				MeandreProbingVocabulary.flow_started,
@@ -77,7 +77,7 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowFinish(String sFlowUniqueID, Date ts){
+	public void probeFlowFinish(String sFlowUniqueID, Date ts,String token){
 		Statement stm = modProbe.createStatement(
 				modProbe.createResource(sFlowUniqueID),
 				MeandreProbingVocabulary.flow_finished,
@@ -93,7 +93,7 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowAbort(String sFlowUniqueID, Date ts){
+	public void probeFlowAbort(String sFlowUniqueID, Date ts,String token,String message){
 		Statement stm = modProbe.createStatement(
 				modProbe.createResource(sFlowUniqueID),
 				MeandreProbingVocabulary.flow_aborted,
@@ -183,7 +183,7 @@ implements Probe {
 	 * @param bSerializeState The state has been serialized
 	 * @param bSerializedData The serialized data
 	 */
-	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts, boolean bSerializeState, boolean bSerializedData) {
+	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts, String portName,boolean bSerializeState, boolean bSerializedData) {
 		Statement stm = modProbe.createStatement(
 				modProbe.createResource(sECID),
 				MeandreProbingVocabulary.executable_component_instance_pushed_data,
@@ -212,7 +212,7 @@ implements Probe {
 	 * @param bSerializeState The state has been serialized
 	 * @param bSerializedData The serialized data
 	 */
-	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts, boolean bSerializeState, boolean bSerializedData) {
+	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts,String portName, boolean bSerializeState, boolean bSerializedData) {
 		Statement stm = modProbe.createStatement(
 				modProbe.createResource(sECID),
 				MeandreProbingVocabulary.executable_component_instance_pulled_data,

@@ -1,11 +1,20 @@
 package org.meandre.webservices;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnectorServer;
+import javax.management.remote.JMXConnectorServerFactory;
+import javax.management.remote.JMXServiceURL;
 import javax.servlet.Servlet;
 
 import org.meandre.configuration.CoreConfiguration;
@@ -27,6 +36,7 @@ import org.mortbay.jetty.security.HashUserRealm;
 import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
+import org.mortbay.management.MBeanContainer;
 
 
 /**
@@ -58,6 +68,10 @@ public class MeandreServer {
 	/** The main Jetty server */
 	private Server server;
 
+	private Registry registry;
+	
+	private int REG_PORT = 1099;
+	
 	/** Creates a Meandre server with the default configuration.
 	 * 
 	 */
@@ -136,7 +150,7 @@ public class MeandreServer {
 	 * @throws Exception Jetty could not be started or joined
 	 */
 	public void start (boolean bJoin) throws Exception {
-
+		startRMIRegistry();
 		server = new Server(cnf.getBasePort());
 
 		// Initialize global file server
@@ -155,6 +169,25 @@ public class MeandreServer {
 			server.join();
 	}
 	
+	/**Start the RMIRegistry used by the JMX server
+	 * 
+	 */
+	private void startRMIRegistry() {
+		try {
+			registry= LocateRegistry.createRegistry(REG_PORT);
+			System.out.println("Starting RMI registry");
+		} catch (Exception e) {
+			System.out.println("Error creating RMI registry");
+			   try {
+		            registry = LocateRegistry.getRegistry(REG_PORT);
+		        } catch (RemoteException rex) {
+		        	System.out.println("Error creating RMI registry");
+		            return;
+		        }
+		}
+		
+	}
+
 	/** Joins the main Jetty server.
 	 * 
 	 * @throws InterruptedException Jetty could not be joined
@@ -224,6 +257,23 @@ public class MeandreServer {
 		// Adding the publicly provided services
 		//
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublic(store)), "/public/services/*");
+		
+		//
+		// Start the MBeanServer
+		//
+		
+		JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi");
+				
+		 MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+		 MBeanContainer mBeanContainer = new MBeanContainer(mBeanServer);
+		 server.getContainer().addEventListener(mBeanContainer);
+		 mBeanContainer.start();
+		
+		 JMXConnectorServer cs = 
+		 JMXConnectorServerFactory.newJMXConnectorServer(url, null, mBeanServer);
+
+
+		 cs.start();
 
 		//
 		// Adding restrictedly provided services
@@ -231,7 +281,7 @@ public class MeandreServer {
 		contextWS.addServlet(new ServletHolder((Servlet) new WSAbout(store)), 		"/services/about/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSLocations(store,cnf)),	"/services/locations/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository(store,cnf)),	"/services/repository/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSExecute(store,cnf)),		"/services/execute/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSExecute(store,cnf,mBeanServer)),		"/services/execute/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublish(store)),		"/services/publish/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurity(store)),		"/services/security/*");
 	

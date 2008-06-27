@@ -20,6 +20,7 @@ import com.thoughtworks.xstream.XStream;
  * but a little better). 
  * 
  * @author Xavier Llor&agrave;
+ * @modified Amit Kumar -Added portNames as the objects that are sent to the probeComponent
  * @param <WrappedComponent>
  *
  */
@@ -133,8 +134,8 @@ extends Thread {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowStart(String sFlowUniqueID){
-		Object[] oa = {Probe.ProbeCommands.FLOW_STARTED,sFlowUniqueID,new Date()};
+	public void probeFlowStart(String sFlowUniqueID, String weburl,String token){
+		Object[] oa = {Probe.ProbeCommands.FLOW_STARTED,sFlowUniqueID,new Date(), weburl,token};
 		clqStatements.add(oa);
 		semWorkAvailable.release();
 	}
@@ -144,8 +145,8 @@ extends Thread {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowFinish(String sFlowUniqueID){
-		Object[] oa = {Probe.ProbeCommands.FLOW_FINISHED,sFlowUniqueID,new Date()};
+	public void probeFlowFinish(String sFlowUniqueID,String token){
+		Object[] oa = {Probe.ProbeCommands.FLOW_FINISHED,sFlowUniqueID,new Date(),token};
 		clqStatements.add(oa);
 		semWorkAvailable.release();
 	}
@@ -155,8 +156,8 @@ extends Thread {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowAbort(String sFlowUniqueID){
-		Object[] oa = {Probe.ProbeCommands.FLOW_ABORTED,sFlowUniqueID,new Date()};
+	public void probeFlowAbort(String sFlowUniqueID,String token,String message){
+		Object[] oa = {Probe.ProbeCommands.FLOW_ABORTED,sFlowUniqueID,new Date(),token,message};
 		clqStatements.add(oa);
 		semWorkAvailable.release();
 	}
@@ -228,7 +229,7 @@ extends Thread {
 		if ( bDataSerialization )
 			oSDataXML = serializeDataPiece(objData);
 		
-		Object[] oa = {Probe.ProbeCommands.EXECUTABLE_COMPONENT_PUSH_DATA,wc.getExecutableComponentInstanceID(),oSWCXML,oSDataXML,new Date()};
+		Object[] oa = {Probe.ProbeCommands.EXECUTABLE_COMPONENT_PUSH_DATA,wc.getExecutableComponentInstanceID(),oSWCXML,oSDataXML,new Date(),sPortName};
 		clqStatements.add(oa);
 		semWorkAvailable.release();
 	}
@@ -251,7 +252,7 @@ extends Thread {
 		if ( bDataSerialization )
 			oSDataXML = serializeDataPiece(objData);
 		
-		Object[] oa = {Probe.ProbeCommands.EXECUTABLE_COMPONENT_PULL_DATA,wc.getExecutableComponentInstanceID(),oSWCXML,oSDataXML,new Date()};
+		Object[] oa = {Probe.ProbeCommands.EXECUTABLE_COMPONENT_PULL_DATA,wc.getExecutableComponentInstanceID(),oSWCXML,oSDataXML,new Date(),sPortName};
 		clqStatements.add(oa);
 		semWorkAvailable.release();
 	}
@@ -342,15 +343,15 @@ extends Thread {
 		switch((Probe.ProbeCommands)oa[0]) {
 			case FLOW_STARTED:
 				for ( Probe probe:this.probea)
-					probe.probeFlowStart((String)oa[1], (Date)oa[2]);
+					probe.probeFlowStart((String)oa[1], (Date)oa[2], (String)oa[3],(String)oa[4]);
 				break;
 			case FLOW_FINISHED:
 				for ( Probe probe:this.probea)
-					probe.probeFlowFinish((String)oa[1], (Date)oa[2]);
+					probe.probeFlowFinish((String)oa[1], (Date)oa[2],(String)oa[3]);
 				break;
 			case FLOW_ABORTED:
 				for ( Probe probe:this.probea)
-					probe.probeFlowAbort((String)oa[1], (Date)oa[2]);
+					probe.probeFlowAbort((String)oa[1], (Date)oa[2],(String)oa[3],(String)oa[4]);
 				break;
 			case EXECUTABLE_COMPONENT_INITIALIZED:
 				for ( Probe probe:this.probea)
@@ -366,11 +367,11 @@ extends Thread {
 				break;
 			case EXECUTABLE_COMPONENT_PUSH_DATA:
 				for ( Probe probe:this.probea)
-					probe.probeExecutableComponentPushData((String)oa[1],oa[2],oa[3],(Date)oa[4],bStateSerialization,bDataSerialization);
+					probe.probeExecutableComponentPushData((String)oa[1],oa[2],oa[3],(Date)oa[4],(String)oa[5],bStateSerialization,bDataSerialization);
 				break;
 			case EXECUTABLE_COMPONENT_PULL_DATA:
 				for ( Probe probe:this.probea)
-					probe.probeExecutableComponentPullData((String)oa[1],oa[2],oa[3],(Date)oa[4],bStateSerialization,bDataSerialization);
+					probe.probeExecutableComponentPullData((String)oa[1],oa[2],oa[3],(Date)oa[4],(String)oa[5],bStateSerialization,bDataSerialization);
 				break;
 			case EXECUTABLE_COMPONENT_GET_PROPERTY:
 				for ( Probe probe:this.probea)

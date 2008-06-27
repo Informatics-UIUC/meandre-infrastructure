@@ -1,6 +1,9 @@
 package org.meandre.core.engine;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -36,6 +39,9 @@ public class Executor {
 
 	/** The core configuration object */
 	private CoreConfiguration cnf;
+	
+	/**Unique ID provided by the client*/
+	private String token;
 
 	/** Constructs and executor based on the set of wrapped components.
 	 * @param sFlowUniqueExecutionID The unique flow execution ID
@@ -86,29 +92,44 @@ public class Executor {
 		
 		// MrProbe last words
 		if ( hadGracefullTermination() ) 
-			thdMrProbe.probeFlowFinish(sFlowExecutionID);
+			thdMrProbe.probeFlowFinish(sFlowExecutionID,token);
 		else
-			thdMrProbe.probeFlowAbort(sFlowExecutionID);
+			thdMrProbe.probeFlowAbort(sFlowExecutionID,token,concat(getAbortMessage()));
 		
 		thdMrProbe.done();
 	}
 	
 	
+	private String concat(Set<String> abortMessage) {
+		StringBuffer sbuffer =new StringBuffer();
+		sbuffer.append("Error Message:\n");
+		if(abortMessage!=null){
+			if(abortMessage.size()>0){
+				Iterator<String> its = abortMessage.iterator();
+				while(its.hasNext()){
+				sbuffer.append(its.next()+"\n");
+				}
+			}
+			
+		}
+		return sbuffer.toString();
+	}
+
 	/**Call this function to get the webui
 	 * 
 	 */
-	public WebUI initWebUI(){
-		
+	public WebUI initWebUI(int nextPortForUse,String token){
+		this.token = token;
 		WrappedComponent wcTmp = setWC.iterator().next();
 		MrProbe thdMrProbe = wcTmp.thdMrProbe;
 		String sFlowExecutionID = wcTmp.cc.getFlowExecutionInstanceID();
 		
 		// MrProbe start
-		thdMrProbe.probeFlowStart(sFlowExecutionID);
+		thdMrProbe.probeFlowStart(sFlowExecutionID,getHostWebUrl(nextPortForUse),token);
 		
 		WebUI webui = null;
 		try {
-			 webui = WebUIFactory.getWebUI(sFlowUniqueExecutionID,thdMrPropper,thdMrProbe,cnf);
+			 webui = WebUIFactory.getWebUI(sFlowUniqueExecutionID,thdMrPropper,thdMrProbe,cnf,nextPortForUse);
 		} catch (WebUIException e) {
 			log.warning("WebUI could not be started: "+e.getMessage());
 		}
@@ -116,6 +137,24 @@ public class Executor {
 		return webui;
 	}
 	
+	/**This function is protocol dependent. When changing the application
+	 * to Https -we need to modify this function
+	 * 
+	 * @param nextPortForUse
+	 * @return
+	 */
+	private String getHostWebUrl(int nextPortForUse) {
+			try {
+				return 	"http://"+InetAddress.getLocalHost().getCanonicalHostName()+":"+ nextPortForUse+"/";
+			} catch (UnknownHostException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			};
+			return "http://127.0.0.1:"+nextPortForUse+"/";
+		}
+		
+		
+
 	/** Fires the execution of a given MeandreFlow.
 	 * 
 	 * 
@@ -134,7 +173,7 @@ public class Executor {
 		for ( WrappedComponent wc:setWC )
 			if ( !wc.hadGracefullTermination() )
 				return false;
-		
+	
 		return bFlag;
 	}
 	

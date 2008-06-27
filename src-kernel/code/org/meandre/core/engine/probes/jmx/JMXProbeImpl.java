@@ -1,31 +1,46 @@
-package org.meandre.core.engine.probes;
+/*
+ * @(#) JMXProbeImpl.java @VERSION@
+ * 
+ * Copyright (c) 2008+ Amit Kumar
+ * 
+ * The software is released under ASL 2.0, Please
+ * read License.txt
+ *
+ */
+package org.meandre.core.engine.probes.jmx;
 
 import java.util.Date;
 import java.util.Hashtable;
+
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.meandre.core.engine.Probe;
 import org.meandre.core.engine.ProbeException;
-
-/** This class implements a probe for the engine that collects statistics of the 
- * execution.
- * 
- * @author Xavier Llor&agrave;
- * @modified Amit Kumar on June 25th 2008 -Added portName
- */
-public class StatisticsProbeImpl 
-implements Probe {
-
-	/** The flow execution states */
+public class JMXProbeImpl implements Probe {
+	
+	private FlowList flowList;
+	private MBeanServer mbeanServer;
+	ObjectName flowName;
+	private FlowComponentActions flowComponentActions;
+	
+	
+	
 	private enum FlowStates { 
 			RUNNING, 			// The flow is running
 			ENDED, 				// The flow ended
 			ABORTED 			// The flow aborted
 		};
 	
-	/** The executable component execution states */
 	private enum ExecutableComponentStates { 
 			INITIALIZED,		// The component was initialized
 			FIRED, 				// The component got fired
@@ -66,14 +81,16 @@ implements Probe {
 
 	/** The number of data units generated */
 	protected Hashtable<String,Long> htExecutableComponentsExecutionReadProperties = null;
-	
-	/**This variable stores the abort message if the flow aborts*/
-	protected String abortMessage=null;
 
-	/** Initialize the statistics probe.
+	
+	/**Initialize the JMSProbeImpl
+	 * @param beanServer 
 	 * 
+	 * @param mbeansServer
 	 */
-	public StatisticsProbeImpl () {
+	public JMXProbeImpl(MBeanServer mbeanServer,FlowList flowList,String token){
+		this.flowList = flowList;
+		this.mbeanServer = mbeanServer;
 		this.sFlowID = null;
 		this.flowStatus = null;
 		this.dateFlowStart = null;
@@ -85,20 +102,54 @@ implements Probe {
 		this.htExecutableComponentsExecutionDataIn = new Hashtable<String,Long>();  
 		this.htExecutableComponentsExecutionDataOut = new Hashtable<String,Long>(); 
 		this.htExecutableComponentsExecutionReadProperties = new Hashtable<String,Long>(); 
+		
+		try {
+			flowName= new ObjectName("org.meandre.core.engine.probes.jmx:type=FlowComponentActions,token="+token);
+		} catch (MalformedObjectNameException e) {
+			e.printStackTrace();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
+		// Register the FlowComponentActions bean
+		flowComponentActions = new FlowComponentActions();
+		try {
+			this.mbeanServer.registerMBean(flowComponentActions,flowName);
+		} catch (InstanceAlreadyExistsException e) {
+			e.printStackTrace();
+		} catch (MBeanRegistrationException e) {
+			e.printStackTrace();
+		} catch (NotCompliantMBeanException e) {
+			e.printStackTrace();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
+		
 	}
+
+
+	
 	
 	/** The flow started executing.
 	 * 
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowStart(String sFlowUniqueID, Date ts,String weburl,String token) {
+	public void probeFlowStart(String sFlowUniqueID, Date ts, String weburl,String token) {
 		// Update the timestamp
+	
 		this.dateLatestDate = ts;
-		
 		this.sFlowID = sFlowUniqueID;
 		this.dateFlowStart = ts;
 		this.flowStatus = FlowStates.RUNNING;
+
+		FlowData flowData = new FlowData();
+		flowData.setId(sFlowUniqueID);
+		flowData.setLatestDate(ts);
+		flowData.setDateStart(ts);
+		flowData.setStatus("RUNNING");
+		flowData.setWebUrl(weburl);
+		flowData.setToken(token);
+		flowList.addFlowData(sFlowUniqueID, flowData);
 	}
 	
 	/** The flow stopped executing.
@@ -109,8 +160,24 @@ implements Probe {
 	public void probeFlowFinish(String sFlowUniqueID, Date ts,String token) {
 		// Update the timestamp
 		this.dateLatestDate = ts;
-		
+		FlowData flowData = new FlowData();
+		flowData.setId(sFlowUniqueID);
+		flowData.setLatestDate(ts);
+		flowData.setStatus("ENDED");
+		flowData.setWebUrl("nil");
+		flowData.setToken(token);
+		flowList.updateFlowData(sFlowUniqueID, flowData);
 		this.flowStatus = FlowStates.ENDED;
+		// don't need this anymore
+		try {
+			this.mbeanServer.unregisterMBean(flowName);
+		} catch (InstanceNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MBeanRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/** The flow aborted the execution.
@@ -121,7 +188,13 @@ implements Probe {
 	public void probeFlowAbort(String sFlowUniqueID, Date ts,String token,String message) {
 		// Update the timestamp
 		this.dateLatestDate = ts;
-		this.abortMessage = message;
+		FlowData flowData = new FlowData();
+		flowData.setId(sFlowUniqueID);
+		flowData.setLatestDate(ts);
+		flowData.setStatus("ABORTED");
+		flowData.setWebUrl("nil");
+		flowData.setToken(token);
+		flowList.updateFlowData(sFlowUniqueID, flowData);
 		this.flowStatus = FlowStates.ABORTED;
 	}
 
@@ -142,6 +215,14 @@ implements Probe {
 		this.htExecutableComponentsFiredTimeStamp.put(sECID,0L);
 		this.htExecutableComponentsExecutionDataIn.put(sECID,0L);
 		this.htExecutableComponentsExecutionDataOut.put(sECID,0L);
+		ComponentAction caction = new ComponentAction();
+		caction.setId(sECID);
+		caction.setAction(ComponentStates.INITIALIZED);
+		caction.setActionTime(ts.getTime());
+		ComponentData cdata = new ComponentData();
+		cdata.setId(sECID);
+		flowComponentActions.addComponentData(sECID,cdata);
+		flowComponentActions.updateComponentData(sECID, caction);
 	}
 
 	/** The executable component requested execution abortion.
@@ -156,6 +237,11 @@ implements Probe {
 		this.dateLatestDate = ts;
 		
 		this.htExecutableComponentsStates.put(sECID,ExecutableComponentStates.ABORTED);
+		ComponentAction caction = new ComponentAction();
+		caction.setId(sECID);
+		caction.setAction(ComponentStates.ABORTED);
+		caction.setActionTime(ts.getTime());
+		flowComponentActions.updateComponentData(sECID, caction);
 	}
 
 	/** The executable component finished disposing itself.
@@ -171,6 +257,11 @@ implements Probe {
 		this.dateLatestDate = ts;
 
 		this.htExecutableComponentsStates.put(sECID,ExecutableComponentStates.DISPOSED);
+		ComponentAction caction = new ComponentAction();
+		caction.setId(sECID);
+		caction.setAction(ComponentStates.DISPOSED);
+		caction.setActionTime(ts.getTime());
+		flowComponentActions.updateComponentData(sECID, caction);
 	}
 
 	/** The executable component pushed a piece of data.
@@ -182,7 +273,8 @@ implements Probe {
 	 * @param bSerializeState The wrapped component is serialized
 	 * @param bSerializedData The data provided has been serialized
 	 */
-	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts,String portName, boolean bSerializeState, boolean bSerializedData) {
+	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts, 
+			String portName,boolean bSerializeState, boolean bSerializedData) {
 		// Update the timestamp
 		this.dateLatestDate = ts;
 		
@@ -190,6 +282,14 @@ implements Probe {
 				sECID, 
 				this.htExecutableComponentsExecutionDataOut.get(sECID)+1
 			);
+		
+		ComponentAction caction = new ComponentAction();
+		caction.setId(sECID);
+		caction.setAction(ComponentStates.DATA_OUT);
+		caction.setActionTime(ts.getTime());
+		caction.setSubjectName(portName);
+		flowComponentActions.updateComponentData(sECID, caction);
+	
 	}
 
 	/** The executable component pulled a piece of data.
@@ -199,7 +299,8 @@ implements Probe {
 	 * @param odata The data being pulled
 	 * @param ts The time stamp
 	 */
-	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts,String portName, boolean bSerializeState, boolean bSerializedData) {
+	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts,
+			String portName, boolean bSerializeState, boolean bSerializedData) {
 		// Update the timestamp
 		this.dateLatestDate = ts;
 		
@@ -207,6 +308,13 @@ implements Probe {
 				sECID, 
 				this.htExecutableComponentsExecutionDataIn.get(sECID)+1
 			);
+		ComponentAction caction = new ComponentAction();
+		caction.setId(sECID);
+		caction.setAction(ComponentStates.DATA_IN);
+		caction.setActionTime(ts.getTime());
+		caction.setSubjectName(portName);
+		flowComponentActions.updateComponentData(sECID, caction);
+	
 	}
 	
 	/** The executable component was fired.
@@ -226,6 +334,13 @@ implements Probe {
 				sECID,
 				this.htExecutableComponentsTimesFired.get(sECID)+1
 			);
+		ComponentAction caction = new ComponentAction();
+		caction.setId(sECID);
+		caction.setAction(ComponentStates.FIRED);
+		caction.setActionTime(ts.getTime());
+		flowComponentActions.updateComponentData(sECID, caction);
+	
+		
 	}
 
 	/** The executable component is cooling down.
@@ -245,6 +360,12 @@ implements Probe {
 				this.htExecutableComponentsExecutionTime.get(sECID)+
 					ts.getTime()-this.htExecutableComponentsFiredTimeStamp.get(sECID)
 			);
+		ComponentAction caction = new ComponentAction();
+		caction.setId(sECID);
+		caction.setAction(ComponentStates.COOLING_DOWN);
+		caction.setActionTime(ts.getTime());
+		flowComponentActions.updateComponentData(sECID, caction);
+	
 	}
 
 	/** The executable component requested a property value.
@@ -265,6 +386,15 @@ implements Probe {
 					sECID,
 					this.htExecutableComponentsExecutionReadProperties.get(sECID)+1
 				);
+		ComponentAction caction = new ComponentAction();
+		caction.setId(sECID);
+		caction.setAction(ComponentStates.PROP_READ);
+		caction.setActionTime(ts.getTime());
+		caction.setSubjectName(sPropertyName);
+		flowComponentActions.updateComponentData(sECID, caction);
+	
+
+		
 	}
 
 	/** Returns the current statistics.
@@ -282,9 +412,7 @@ implements Probe {
 			joRes.put("started_at", dateFlowStart);
 			joRes.put("latest_probe_at", dateLatestDate);
 			joRes.put("runtime", dateLatestDate.getTime()-dateFlowStart.getTime());
-			if(this.abortMessage!=null){
-				joRes.put("abort_message", this.abortMessage);
-			}
+			
 			// Add the executable component statistics
 			JSONArray jaExecCompStats = new JSONArray();
 			for ( String sKey:htExecutableComponentsStates.keySet() ) {
@@ -344,4 +472,5 @@ implements Probe {
 			default:      return "unknown flow execution status!";
 		}
 	}
- }
+
+}

@@ -39,22 +39,24 @@ public class WebUIFactory {
 	 * @return The webui object
 	 * @throws WebUIException An exception occurred while initializing a web
 	 */
-	static public WebUI getWebUI ( String sFlowUniqueID, MrProper mrProper, MrProbe mrProbe, CoreConfiguration cnf ) throws WebUIException {
+	static public WebUI getWebUI ( String sFlowUniqueID, MrProper mrProper, MrProbe mrProbe, CoreConfiguration cnf, int port ) throws WebUIException {
 		WebUI webui = htActiveWebUI.get(sFlowUniqueID);
 		
 		if ( webui==null ) {
-			try {
+		/*	try {
 				semMutEX.acquire();
 				if ( iPortScroller==-1 )
 					iPortScroller = cnf.getBasePort();
 				int iNewPort = ++iPortScroller;
 				semMutEX.release();		
-				webui = new WebUI(sFlowUniqueID,mrProper,mrProbe,iNewPort,log,cnf);
+				System.out.println("Something out of whack: " + port + " " + iNewPort);
+			*/	
+				webui = new WebUI(sFlowUniqueID,mrProper,mrProbe,port,log,cnf);
 				htActiveWebUI.put(sFlowUniqueID, webui);
-			} catch (InterruptedException e) {
+	/*		} catch (InterruptedException e) {
 				throw new WebUIException(e);
 			}
-			
+		*/	
 		}
 		
 		return webui;

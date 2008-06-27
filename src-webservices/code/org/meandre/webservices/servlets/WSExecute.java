@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Logger;
 
+import javax.management.MBeanServer;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,9 +47,9 @@ public class WSExecute extends HttpServlet {
 	 * 
 	 * @param store The store to use
 	 */
-	public WSExecute(Store store, CoreConfiguration cnf) {
+	public WSExecute(Store store, CoreConfiguration cnf, MBeanServer mbeanServer) {
 		this.store = store;
-		this.wsExecuteLogic = new WSExecuteLogic(store,cnf);
+		this.wsExecuteLogic = new WSExecuteLogic(store,cnf, mbeanServer);
 	}
 
 	/**

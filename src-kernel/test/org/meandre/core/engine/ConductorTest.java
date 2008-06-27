@@ -44,7 +44,7 @@ public class ConductorTest {
 		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(baosOut));
 		System.setErr(new PrintStream(baosErr));
-		WebUI webui = exec.initWebUI();
+		WebUI webui = exec.initWebUI(1704,Math.random()+"");
 		exec.execute(webui);
 		System.setOut(psOut);
 		System.setErr(psErr);
@@ -76,7 +76,7 @@ public class ConductorTest {
 		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(baosOut));
 		System.setErr(new PrintStream(baosErr));
-		exec.execute(exec.initWebUI());
+		exec.execute(exec.initWebUI(1705,Math.random()+""));
 		System.setOut(psOut);
 		System.setErr(psErr);
 		// Restore the output
@@ -110,7 +110,7 @@ public class ConductorTest {
 		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(baosOut));
 		System.setErr(new PrintStream(baosErr));
-		exec.execute(exec.initWebUI());
+		exec.execute(exec.initWebUI(1706,Math.random()+""));
 		System.setOut(psOut);
 		System.setErr(psErr);
 		// Restore the output

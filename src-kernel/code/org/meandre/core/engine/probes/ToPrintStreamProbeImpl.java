@@ -9,7 +9,7 @@ import org.meandre.core.engine.Probe;
  * to the provided PrintStream.
  * 
  * @author Xavier Llor&agrave;
- *
+ * @modified by Amit Kumar -Support for portnames
  */
 public class ToPrintStreamProbeImpl 
 implements Probe {
@@ -30,8 +30,8 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowStart(String sFlowUniqueID, Date ts){
-		psOut.println("Flow "+sFlowUniqueID+" started executing at "+ts);
+	public void probeFlowStart(String sFlowUniqueID, Date ts, String weburl,String token){
+		psOut.println("Flow "+sFlowUniqueID+" started executing at "+ts + " weburl " + weburl);
 	}
 	
 	/** The flow stopped executing.
@@ -39,7 +39,7 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowFinish(String sFlowUniqueID, Date ts){
+	public void probeFlowFinish(String sFlowUniqueID, Date ts,String token){
 		psOut.println("Flow "+sFlowUniqueID+" finished executing at "+ts);
 	}
 	
@@ -48,7 +48,7 @@ implements Probe {
 	 * @param sFlowUniqueID The unique execution flow ID
 	 * @param ts The time stamp
 	 */
-	public void probeFlowAbort(String sFlowUniqueID, Date ts){
+	public void probeFlowAbort(String sFlowUniqueID, Date ts,String token,String message){
 		psOut.println("Flow "+sFlowUniqueID+" aborted execution at "+ts);
 	}
 	
@@ -95,7 +95,7 @@ implements Probe {
 	 * @param bSerializeState The wrapped component is serialized
 	 * @param bSerializedData The serialized data
 	 */
-	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts, boolean bSerializedState, boolean bSerializedData) {
+	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts,String portName, boolean bSerializedState, boolean bSerializedData) {
 		psOut.println("Executable component "+sECID+" pushed data "+odata.toString()+" at "+ts+" to state "+owc.toString());	
 	}
 
@@ -108,7 +108,7 @@ implements Probe {
 	 * @param bSerializeState The wrapped component is serialized
 	 * @param bSerializedData The serialized data
 	 */
-	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts, boolean bSerializedState, boolean bSerializedData) {
+	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts, String portName,boolean bSerializedState, boolean bSerializedData) {
 		psOut.println("Executable component "+sECID+" pulled data "+odata.toString()+" at "+ts+" to state "+owc.toString());	
 	}
 

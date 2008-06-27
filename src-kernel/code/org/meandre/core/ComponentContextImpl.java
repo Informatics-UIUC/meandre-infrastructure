@@ -17,6 +17,7 @@ import org.meandre.core.engine.MrProbe;
 import org.meandre.core.engine.MrProper;
 import org.meandre.core.engine.WrappedComponent;
 import org.meandre.core.logger.KernelLoggerFactory;
+import org.meandre.webui.PortScroller;
 import org.meandre.webui.WebUI;
 import org.meandre.webui.WebUIException;
 import org.meandre.webui.WebUIFactory;
@@ -90,6 +91,8 @@ implements ComponentContext {
 
 	/** The wrapped component parent */
 	private CoreConfiguration ccCnf = null;
+	
+
 
 	/** Create a component context with the given input and output active buffers
 	 * for a given wrapped component.
@@ -161,7 +164,9 @@ implements ComponentContext {
 		}
 
 		try {
-			 webui = WebUIFactory.getWebUI(sFlowUniqueExecutionID,wcParent.getMrProper(),thdMrProbe,cnf);
+			 webui = WebUIFactory.getWebUI(sFlowUniqueExecutionID,wcParent.getMrProper(),
+					 thdMrProbe,cnf, 
+					 PortScroller.getInstance(cnf.getBasePort()).nextAvailablePort(sFlowUniqueExecutionID));
 		} catch (WebUIException e) {
 			log.warning("WebUI could not be retrieved: "+e.getMessage());
 		}

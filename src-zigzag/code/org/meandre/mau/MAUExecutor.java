@@ -34,6 +34,7 @@ import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.utils.Constants;
+import org.meandre.webui.PortScroller;
 import org.meandre.webui.WebUI;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -181,7 +182,9 @@ public class MAUExecutor {
 			ps.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
 			ps.println("----------------------------------------------------------------------------");
 			ps.flush();
-			WebUI webui=exec.initWebUI();
+			int nextPort = PortScroller.getInstance(cnf.getBasePort()).nextAvailablePort(exec.getFlowUniqueExecutionID());
+			String token=System.currentTimeMillis()+"";
+			WebUI webui=exec.initWebUI(nextPort,token);
 			exec.execute(webui);
 			ps.flush();
 			ps.println("----------------------------------------------------------------------------");

@@ -5,12 +5,20 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,6 +29,8 @@ import org.meandre.core.engine.Conductor;
 import org.meandre.core.engine.ConductorException;
 import org.meandre.core.engine.Executor;
 import org.meandre.core.engine.MrProbe;
+import org.meandre.core.engine.probes.jmx.FlowList;
+import org.meandre.core.engine.probes.jmx.JMXProbeImpl;
 import org.meandre.core.engine.probes.StatisticsProbeImpl;
 import org.meandre.core.store.Store;
 import org.meandre.core.repository.CorruptedDescriptionException;
@@ -29,10 +39,12 @@ import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.utils.Constants;
 import org.meandre.webservices.beans.JobDetail;
 import org.meandre.webservices.utils.WSLoggerFactory;
+import org.meandre.webui.PortScroller;
 import org.meandre.webui.WebUI;
 import org.meandre.webui.WebUIException;
 import org.meandre.webui.WebUIFactory;
 import org.meandre.webui.WebUIFragment;
+
 
 import com.hp.hpl.jena.rdf.model.Resource;
 
@@ -45,7 +57,10 @@ public class WSExecuteLogic {
 
 	/** The store to be used */
 	private Store store;
+	/** JMX MBean Server -get from the platform*/
+	private MBeanServer mbeanServer;
 	
+	private FlowList flowList;
 	/** The core configuraion object ot use */
 	private CoreConfiguration cnf;
 	/**Stores process execute*/
@@ -55,10 +70,33 @@ public class WSExecuteLogic {
 	 * 
 	 * @param store The store to use
 	 */
-	public WSExecuteLogic ( Store store, CoreConfiguration cnf ) {
+	public WSExecuteLogic ( Store store, CoreConfiguration cnf , MBeanServer mbeanServer) {
 		this.store = store;
 		this.cnf = cnf;
 		this.executionTokenList = new Hashtable<String,JobDetail>();
+		this.mbeanServer = mbeanServer;
+		// Construct the ObjectName for the MBean we will register
+		try {
+			ObjectName name = new ObjectName("org.meandre.core.engine.probes.jmx:type=FlowList");
+			flowList = new FlowList();
+			this.mbeanServer.registerMBean(flowList,name);
+			 
+		} catch (MalformedObjectNameException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NullPointerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstanceAlreadyExistsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MBeanRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotCompliantMBeanException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/** Runs a flow given a URI against the user repository verbosely
@@ -75,14 +113,26 @@ public class WSExecuteLogic {
 		
 		String sURI = request.getParameter("uri");
 		boolean bStats = false;
+		boolean bJmx = false;
 		
 		String sStats = request.getParameter("statistics");
+		// JMX flag
+		String sJmx = request.getParameter("jmx");
 		// unique identifier sent by the client
+		String token = request.getParameter("token");	
 		
 		if ( sStats!=null ) {
 			bStats = sStats.equals("true");
 		}
 		
+		if(sJmx != null){
+			bJmx = sJmx.equals("true");
+		}
+		
+		if(bJmx && token==null ){
+			// with JMX a token is a requirement
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST);	
+		}
 	
 		
 		if ( sURI==null ) {
@@ -127,33 +177,26 @@ public class WSExecuteLogic {
 				PrintStream psOUT = System.out;
 				PrintStream psERR = System.err;
 				StatisticsProbeImpl spi = null;
-				
+				JMXProbeImpl jpi = null;
 				try {
-					if ( !bStats )
+					if ( !bStats ){
 						exec = conductor.buildExecutor(qr, resURI);
-					else {
+					}else {
+						if(!bJmx){
 						spi = new StatisticsProbeImpl();
 						MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),spi,false,false);
 						exec = conductor.buildExecutor(qr, resURI, mrProbe);
+						}else{
+							// USE probe array to support this.
+						jpi = new JMXProbeImpl(this.mbeanServer,flowList,token);
+						MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),jpi,false,false);
+						exec = conductor.buildExecutor(qr, resURI, mrProbe);
+						}
 					}
 					pw.flush();
-					
-					
-					// Redirecting the streamers
-					System.setOut(pw);
-					System.setErr(pw);
-	
-					pw.println("Preparation completed correctly\n");
-					
-					pw.print("Execution started at: ");
-					pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
-					pw.println("----------------------------------------------------------------------------");
-					pw.flush();
-					WebUI webui=exec.initWebUI();
+					int nextPort = PortScroller.getInstance(cnf.getBasePort()).nextAvailablePort(exec.getFlowUniqueExecutionID());
 					/*This needs to be synchronized*/
 					boolean hasToken = Boolean.FALSE;
-					String token = null;
-					token = request.getParameter("token");
 					if(token!=null){
 						hasToken = Boolean.TRUE;
 						if(this.executionTokenList.containsKey(token)){
@@ -167,12 +210,24 @@ public class WSExecuteLogic {
 						JobDetail jobDetail = new JobDetail();
 						jobDetail.setToken(token);
 						jobDetail.setFlowInstanceId(executionId);
-						jobDetail.setHostname(webui.getHostName());
-						jobDetail.setPort(webui.getPort());
+						jobDetail.setHostname(getHostName());
+						jobDetail.setPort(nextPort);
 						this.executionTokenList.put(token, jobDetail);
 						}
 					}
 					/**/
+					
+					// Redirecting the streamers
+					System.setOut(pw);
+					System.setErr(pw);
+	
+					pw.println("Preparation completed correctly\n");
+					
+					pw.print("Execution started at: " + nextPort +" on ");
+					pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
+					pw.println("----------------------------------------------------------------------------");
+					pw.flush();
+					WebUI webui=exec.initWebUI(nextPort,token);
 					exec.execute(webui);
 					pw.flush();
 					pw.println("----------------------------------------------------------------------------");
@@ -229,7 +284,7 @@ public class WSExecuteLogic {
 					
 				}
 				
-				if ( bStats ) { 
+				if ( bStats && !bJmx) { 
 					try {
 						JSONObject jsonStats = spi.getSerializedStatistics();
 						pw.println("----------------------------------------------------------------------------");
@@ -328,7 +383,7 @@ public class WSExecuteLogic {
 					System.setErr(pw);
 		
 					pw.flush();
-					WebUI webui=exec.initWebUI();
+					int nextPort = PortScroller.getInstance(cnf.getBasePort()).nextAvailablePort(exec.getFlowUniqueExecutionID());
 					/*This needs to be synchronized*/
 					boolean hasToken = Boolean.FALSE;
 					String token = null;
@@ -346,12 +401,15 @@ public class WSExecuteLogic {
 						JobDetail jobDetail = new JobDetail();
 						jobDetail.setToken(token);
 						jobDetail.setFlowInstanceId(executionId);
-						jobDetail.setHostname(webui.getHostName());
-						jobDetail.setPort(webui.getPort());
+						jobDetail.setHostname(getHostName());
+						jobDetail.setPort(nextPort);
 						this.executionTokenList.put(token, jobDetail);
 						}
 					}
 					/**/
+					// this is where the server actually starts -so populate the hashtable before
+					// starting the server as that takes a bit of time
+					WebUI webui=exec.initWebUI(nextPort,token);
 					exec.execute(webui);
 					pw.flush();
 					
@@ -549,6 +607,20 @@ public class WSExecuteLogic {
 			pw.println("uri="+ jobdetail.getFlowInstanceId());
 			pw.flush();
 		}
+	}
+	
+	/**return the host ip address
+	 * 
+	 * @return
+	 */
+	public String getHostName() {
+		try {
+			return 	InetAddress.getLocalHost().getCanonicalHostName();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		};
+		return "127.0.0.1";
 	}
 	
 }

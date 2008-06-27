@@ -26,7 +26,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 /** This class gathers together the tests related to MrProbe.
  * 
  * @author Xavier Llor&agrave;
- *
+ * @modified by Amit Kumar -Added error message to the abort flow probe
  */
 public class MrProbeTest {
 	
@@ -206,7 +206,7 @@ public class MrProbeTest {
 		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(baosOut));
 		System.setErr(new PrintStream(baosErr));
-		exec.execute(exec.initWebUI());
+		exec.execute(exec.initWebUI(1707,Math.random()+""));
 		System.setOut(psOut);
 		System.setErr(psErr);
 		// Restore the output
@@ -256,10 +256,11 @@ public class MrProbeTest {
 			Executor exec = cnd.buildExecutor(qr, qr.getAvailableFlowDescriptions().iterator().next().getFlowComponent());
 			WrappedComponent wc = exec.getWrappedComponents().iterator().next();
 			// Run the tests
+			String rands=Math.random()+"";
 			for ( int i=0; i<NUMBER_OF_REPETITIONS; i++ ) {
-				mp.probeFlowStart(BASE_TEST_URI);
-				mp.probeFlowFinish(BASE_TEST_URI);
-				mp.probeFlowAbort(BASE_TEST_URI);
+				mp.probeFlowStart(BASE_TEST_URI,"http://127.0.0.1:1704/",rands);
+				mp.probeFlowFinish(BASE_TEST_URI,rands);
+				mp.probeFlowAbort(BASE_TEST_URI,rands,"Some Error message");
 				mp.probeWrappedComponentInitialize(wc);
 				mp.probeWrappedComponentAbort(wc);
 				mp.probeWrappedComponentDispose(wc);

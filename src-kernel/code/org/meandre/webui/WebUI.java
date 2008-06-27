@@ -1,7 +1,5 @@
 package org.meandre.webui;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.logging.Logger;
 
 import org.meandre.configuration.CoreConfiguration;
@@ -35,6 +33,9 @@ public class WebUI {
 
 	/** The flow Mr Probe */
 	private MrProbe mrProbe = null;
+	
+	/**Temporary assignment*/
+	private int basePort = 1714;
 
 	/** Creates a WebUI for the given flow on the specified port.
 	 *
@@ -52,6 +53,7 @@ public class WebUI {
 		this.mrProper = mrProper;
 		this.mrProbe = mrProbe;
 		this.iPort = iPort;
+		this.basePort = cnf.getBasePort();
 		// Creating the server and the connector
 		this.server = new Server();
 		Connector connector = new SocketConnector();
@@ -77,8 +79,14 @@ public class WebUI {
 	 * @throws Exception The server could not be stoped
 	 */
 	public void shutdown() throws Exception {
+		try{
 		this.server.stop();
 		this.server.getGracefulShutdown();
+		}catch(Exception ex){
+			throw new Exception(ex);
+		}finally{
+		PortScroller.getInstance(this.basePort).releasePort(this.sFlowUniqueID);
+		}
 	}
 
 	/** Returns the flow execution unique ID.
@@ -144,17 +152,4 @@ public class WebUI {
 		return webUIDispatcher;
 	}
 
-	/**return the host ip address
-	 * 
-	 * @return
-	 */
-	public String getHostName() {
-		try {
-			return 	InetAddress.getLocalHost().getCanonicalHostName();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		};
-		return "127.0.0.1";
-	}
 }
