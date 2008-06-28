@@ -3,7 +3,6 @@ package org.meandre.client;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 

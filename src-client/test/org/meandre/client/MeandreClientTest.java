@@ -7,6 +7,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.URL;
@@ -655,7 +658,8 @@ public class MeandreClientTest {
      */
     @Test
     public void testRunFlow() {
-        String sUrl = "http://test.org/flow/test-hello-world-with-python-and-lisp/";
+        String sUrl = 
+                "http://test.org/flow/test-hello-world-with-python-and-lisp/";
         String ret;
         try{
             
@@ -670,9 +674,41 @@ public class MeandreClientTest {
         return;      
         
     }
-
+    
     /**
-     * Test method for {@link org.meandre.client.MeandreClient#retrieveRunningFlows()}.
+     * Test method for 
+     * {@link org.meandre.client.MeandreClient#
+     *      runFlowStreamOutput(java.lang.String)}.
+     */
+    @Test
+    public void testRunFlowStreamOutput() {
+        
+        String sUrl = 
+            "http://test.org/flow/test-hello-world-with-python-and-lisp/";
+        
+        try{
+        
+            InputStream ins = _meandreClient.runFlowStreamOutput(sUrl, false);
+            System.out.println("testRunFlow flow output:");
+            LineNumberReader reader = new LineNumberReader(
+                    new InputStreamReader(ins));
+            String str = "\n\n*******TEST::::BEGIN FLOW OUTPUT*******\n\n";
+            while(str != null){
+                System.out.println(str);
+                str = reader.readLine();
+            }
+            System.out.println("\n\n*******TEST::::END FLOW OUTPUT*******\n\n");
+        
+        }catch(Exception e){
+            e.printStackTrace();
+            fail(e.toString());
+        }
+        return;       
+                
+    }
+    /**
+     * Test method for {@link 
+     * org.meandre.client.MeandreClient#retrieveRunningFlows()}.
      */
     @Test
     public void testRetrieveRunningFlows() {

@@ -2,6 +2,7 @@ package org.meandre.client;
 
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Set;
@@ -132,6 +133,46 @@ public class MeandreBaseClient{
 		return baResponse;
 	}
 
+    /** Does an authenticated GET request against the server using the
+     * input url suffix and params. returns an input stream that needs
+     * to be consumed, rather than the complete response content all
+     * at once. The input stream will remain open for as long as more
+     * data is being downloaded, which is potentially a long time. 
+     * 
+     * <p>url visited will be:
+     * <p>http://<meandre-host>:<port>/<sRestCommand><queryParams(?n1=v1?n2=v2...)>
+     * 
+     * @param sRestCommand The url suffix
+     * @param queryParams the http query params to append to the url. Null is
+     * an acceptable value for this set if no params are needed.
+     * 
+     * @return The raw content bytes of the server's response as a stream
+     */
+    public InputStream executeGetRequestStream(String sRestCommand, 
+            Set<NameValuePair> queryParams)
+            throws TransmissionException{
+
+        GetMethod get = new GetMethod();
+        get.setPath("/" + sRestCommand);
+        get.setDoAuthentication(true);
+        if(queryParams != null){
+            NameValuePair[] nvp = new NameValuePair[queryParams.size()]; 
+            nvp = queryParams.toArray(nvp);
+            get.setQueryString(nvp);
+        }
+        InputStream insResponse = null;
+        try{
+            System.out.println("executing get:" + get.getURI());
+            _httpClient.executeMethod(get);
+            insResponse = get.getResponseBodyAsStream();
+        }catch(Exception e){
+            e.printStackTrace();
+            throw new TransmissionException(e);
+        }
+        return insResponse;
+    }	
+	
+	
 
     /** Does an authenticated POST request against the server with the input
 	 * url suffix, params, and file/data parts. 

@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -734,7 +735,29 @@ public class MeandreClient extends MeandreBaseClient{
         return sResults;
     }
 
+    /**
+     * commands the server to run the flow with the given url-name. the returned
+     * string is a human readable printout of stdout from the components in the
+     * flow and (optionally, if verbose=true) statistics about the flow run.
+     *
+     * This method currently blocks waiting for flow to complete -> it does
+     * not return the result string until the flow has completely finished.
+     *
+     *<p> calls:
+     * http://<meandre_host>:<meandre_port>/services/execute/flow.txt
+     */
 
+    public InputStream runFlowStreamOutput(String sFlowUrl, boolean verbose)
+        throws TransmissionException{
+        String sRestCommand = "services/execute/flow.txt";
+        Set<NameValuePair> nvps = new HashSet<NameValuePair>();
+        nvps.add(new NameValuePair("uri", sFlowUrl));
+        nvps.add(new NameValuePair("statistic", Boolean.toString(verbose)));
+
+
+        InputStream insResult = executeGetRequestStream(sRestCommand, nvps);
+        return insResult;
+    }
     /**
      * returns the url name of any running flows and the url assigned to
      * the webui component of the flow.
