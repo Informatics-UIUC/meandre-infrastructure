@@ -10,7 +10,6 @@ import org.meandre.core.environments.python.jython.JythonExecutableComponentAdap
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.demo.repository.DemoRepositoryGenerator;
-import org.meandre.webui.PortScroller;
 import org.python.core.PyObject;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -97,7 +96,7 @@ public class XStreamTest {
 		}
 		catch ( Exception e ) {
 			e.printStackTrace();
-			fail("This exeception should have not been thrown:"+e.getMessage());
+			fail("This exeception should have not been thrown:"+e.toString());
 		}
 	}
 	

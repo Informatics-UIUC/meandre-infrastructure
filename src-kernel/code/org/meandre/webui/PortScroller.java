@@ -61,12 +61,13 @@ public final class  PortScroller {
 	 * @return The port scroller
 	 */
 	public static PortScroller getInstance(CoreConfiguration cnf){
-		if ( globlaMappingContainsCoreConfiguration(cnf) )
-			return globalMapping.get(cnf);
+		PortScroller ps = getMappingForConfigurationObject(cnf);
+		if ( ps!=null )
+			return ps;
 		else {
-			PortScroller portScroller = new PortScroller(cnf);
-			globalMapping.put(cnf, portScroller);
-			return portScroller;
+			ps = new PortScroller(cnf);
+			globalMapping.put(cnf, ps);
+			return ps;
 		}
 		
 	}
@@ -76,14 +77,14 @@ public final class  PortScroller {
 	 * @param cnf The core configuration object
 	 * @return True if it contains this core configuration. False otherwise.
 	 */
-	private static boolean globlaMappingContainsCoreConfiguration(
+	private static PortScroller getMappingForConfigurationObject(
 			CoreConfiguration cnf) {
 
 		for ( CoreConfiguration c:globalMapping.keySet() )
 			if ( c.equals(cnf) )
-				return true;
+				return globalMapping.get(c);
 		
-		return false;
+		return null;
 	}
 
 	/**Return the next available port

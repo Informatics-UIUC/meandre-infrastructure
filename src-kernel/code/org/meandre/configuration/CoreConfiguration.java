@@ -188,14 +188,13 @@ public class CoreConfiguration {
 			return false;
 		
 		// Check property values
-		for ( Object objKey:propsCore.keySet() ) {
+		for ( Object objKey:cnf.propsCore.keySet() ) {
 			if ( !cnf.propsCore.containsKey(objKey) )
 				return false;
 			else if ( !cnf.propsCore.getProperty(objKey.toString()).equals(propsCore.getProperty(objKey.toString())) )
 				return false;
 		}
 		
-		
-		return false;
+		return true;
 	}
 }
