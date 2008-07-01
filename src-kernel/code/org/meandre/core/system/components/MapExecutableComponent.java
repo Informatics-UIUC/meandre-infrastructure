@@ -122,7 +122,7 @@ public class MapExecutableComponent implements ExecutableComponent {
 			ecdRes = new ExecutableComponentDescription(resExecutableComponent,
 					sName, sDescription, sRights, sCreator, dateCreation,
 					sRunnable, sFiringPolicy, sFormat, setContext, resLocation,
-					setInputs, setOutputs, pddProperties, tagDesc);
+					setInputs, setOutputs, pddProperties, tagDesc, ExecutableComponentDescription.COMPUTE_COMPONENT);
 			
 		} catch (CorruptedDescriptionException e) {
 			log.severe("An exception should have not been trown: "+e);

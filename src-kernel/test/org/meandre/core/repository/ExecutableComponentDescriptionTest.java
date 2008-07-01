@@ -75,7 +75,7 @@ public class ExecutableComponentDescriptionTest {
 			dpdres = new ExecutableComponentDescription(resExecutableComponent,
 					sName, sDescription, sRights, sCreator, dateCreation,
 					sRunnable, sFiringPolicy, sFormat, setContext, resLocation,
-					setInputs, setOutputs, pddProperties, tagDesc);
+					setInputs, setOutputs, pddProperties, tagDesc, ExecutableComponentDescription.COMPUTE_COMPONENT);
 			
 			fail("An exception should have been trown for using wrong runnable, format, and firing policy");
 		} catch (CorruptedDescriptionException e) {
@@ -87,7 +87,7 @@ public class ExecutableComponentDescriptionTest {
 			dpdres = new ExecutableComponentDescription(resExecutableComponent,
 					sName, sDescription, sRights, sCreator, dateCreation,
 					sRunnable, sFiringPolicy, sFormat, setContext, resLocation,
-					setInputs, setOutputs, pddProperties, tagDesc);
+					setInputs, setOutputs, pddProperties, tagDesc, ExecutableComponentDescription.COMPUTE_COMPONENT);
 			
 			fail("An exception should have been trown for using wrong format, and firing policy");
 		} catch (CorruptedDescriptionException e) {
@@ -99,7 +99,7 @@ public class ExecutableComponentDescriptionTest {
 			dpdres = new ExecutableComponentDescription(resExecutableComponent,
 					sName, sDescription, sRights, sCreator, dateCreation,
 					sRunnable, sFiringPolicy, sFormat, setContext, resLocation,
-					setInputs, setOutputs, pddProperties, tagDesc);
+					setInputs, setOutputs, pddProperties, tagDesc, ExecutableComponentDescription.COMPUTE_COMPONENT);
 			
 			fail("An exception should have been trown for using wrong firing policy");
 		} catch (CorruptedDescriptionException e) {
@@ -111,7 +111,7 @@ public class ExecutableComponentDescriptionTest {
 			dpdres = new ExecutableComponentDescription(resExecutableComponent,
 					sName, sDescription, sRights, sCreator, dateCreation,
 					sRunnable, sFiringPolicy, sFormat, setContext, resLocation,
-					setInputs, setOutputs, pddProperties, tagDesc);
+					setInputs, setOutputs, pddProperties, tagDesc, ExecutableComponentDescription.COMPUTE_COMPONENT);
 			
 		} catch (CorruptedDescriptionException e) {
 			fail("An exception should have been never trown");

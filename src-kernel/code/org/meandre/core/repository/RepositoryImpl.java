@@ -368,6 +368,7 @@ public class RepositoryImpl implements QueryableRepository {
 		Resource resLocation = null;
 		Set<DataPortDescription> setInputs = null;
 		Set<DataPortDescription> setOutputs = null;
+		Resource resMode = ExecutableComponentDescription.COMPUTE_COMPONENT;
 
 		// Check the resource is a component
 		if ( model.listStatements(res,RDF.type,RepositoryVocabulary.executable_component).toList().size()!=1 )
@@ -442,6 +443,12 @@ public class RepositoryImpl implements QueryableRepository {
 			throw new CorruptedDescriptionException(e);
 		}
 
+		// Check the mode
+		List<Resource> ls = getObjectResourcesFromModel(res,RepositoryVocabulary.mode,false);
+		if ( ls.size()==1 )
+			resMode = ls.get(0);
+		else if ( ls.size()>1 )
+			throw new CorruptedDescriptionException("Multiple modes for component "+res+": "+ls);
 
 		/* Original SPARQL version
 		private final static String QUERY_GET_EXECUTABLE_TAGS =
@@ -698,7 +705,8 @@ public class RepositoryImpl implements QueryableRepository {
 					setInputs,
 					setOutputs,
 					pddProperties,
-					tagDesc
+					tagDesc,
+					resMode
 				);
 	}
 

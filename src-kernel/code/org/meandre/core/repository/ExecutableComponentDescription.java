@@ -24,6 +24,12 @@ import com.hp.hpl.jena.vocabulary.XSD;
  */
 public class ExecutableComponentDescription {
 
+	/** The resource describing compute components */
+	public final static Resource COMPUTE_COMPONENT = ModelFactory.createDefaultModel().createResource("http://www.meandre.org/ontology/component/type/compute");
+
+	/** The resource describing compute components */
+	public final static Resource WEBUI_COMPONENT = ModelFactory.createDefaultModel().createResource("http://www.meandre.org/ontology/component/type/webui");
+	
 	/** The resource for the executable component */
 	private Resource resExecutableComponent = null;
 
@@ -74,6 +80,10 @@ public class ExecutableComponentDescription {
 
 	/** The tag description */
 	private TagsDescription tagDesc = null;
+	
+	/** The component mode */
+	private Resource resMode = null;
+	
 
 	/** Describes an executable component.
 	 *
@@ -90,8 +100,9 @@ public class ExecutableComponentDescription {
 	 * @param resLocation The location of the implementation of the component
 	 * @param setInputs The set of input data ports
 	 * @param setOutputs The set of output data ports
-	 * @param pddProperties
-	 * @param tagDesc
+	 * @param pddProperties The properties description object
+	 * @param tagDesc The tag description
+	 * @param resMode The mode of the component
 	 * @throws CorruptedDescriptionException Either the wrong runnable, format, or firing policy are incorrect
 	 */
 	public ExecutableComponentDescription (
@@ -109,7 +120,8 @@ public class ExecutableComponentDescription {
 			Set<DataPortDescription> setInputs,
 			Set<DataPortDescription> setOutputs,
 			PropertiesDescriptionDefinition pddProperties,
-			TagsDescription tagDesc
+			TagsDescription tagDesc,
+			Resource resMode
 		) throws CorruptedDescriptionException{
 		// Sanity checks
 		if ( !RepositoryImpl.setRunnable.contains(sRunnable) )
@@ -144,6 +156,7 @@ public class ExecutableComponentDescription {
 			htInputsMap.put(dpd.getResource(),dpd);
 		for ( DataPortDescription dpd:setOutputs )
 			htOutputsMap.put(dpd.getResource(),dpd);
+		this.resMode = resMode;
 	}
 
 	/** Returns the executable component resource.
@@ -292,6 +305,14 @@ public class ExecutableComponentDescription {
 		return tagDesc;
 	}
 
+	/** Returns the mode of the component (compute or webui component).
+	 * 
+	 * @return The resource indicating the component mode
+	 */
+	public Resource getMode() {
+		return resMode;
+	}
+	
 	/** Returns the model describing this executable component.
 	*
 	 * @return The model
@@ -372,6 +393,9 @@ public class ExecutableComponentDescription {
 				);
 		}
 
+		// Adding the component mode
+		res.addProperty(RepositoryVocabulary.mode, resMode);
+		
 		return model;
 	}
 
