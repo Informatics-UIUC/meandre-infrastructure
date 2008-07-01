@@ -22,8 +22,14 @@ public class PushStringComponent implements ExecutableComponent {
 	 * getting run.
 	 *
 	 * @param ccp The properties associated to a component context
+	 * @throws ComponentExecutionException If a fatal condition arises during
+	 *         the execution of a component, a ComponentExecutionException
+	 *         should be thrown to signal termination of execution required.
+	 * @throws ComponentContextException A violation of the component context
+	 *         access was detected
 	 */
-	public void initialize ( ComponentContextProperties ccp ) {
+	public void initialize ( ComponentContextProperties ccp ) 
+	throws ComponentExecutionException, ComponentContextException {
 		sRandom = (""+new Random().nextFloat()).substring(0,7);
 	}
 
@@ -47,9 +53,15 @@ public class PushStringComponent implements ExecutableComponent {
 
 	/** This method is called when the Menadre Flow execution is completed.
 	 *
+	 * @throws ComponentExecutionException If a fatal condition arises during
+	 *         the execution of a component, a ComponentExecutionException
+	 *         should be thrown to signal termination of execution required.
+	 * @throws ComponentContextException A violation of the component context
+	 *         access was detected
 	 * @param ccp The properties associated to a component context
 	 */
-	public void dispose ( ComponentContextProperties ccp ) {
+	public void dispose ( ComponentContextProperties ccp ) 
+	throws ComponentExecutionException, ComponentContextException {
 
 	}
 }

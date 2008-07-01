@@ -149,8 +149,25 @@ extends Thread {
 		log.info("Initializing a the wrapping component "+ec.toString());
 		
 		// Initialize the executable component
-		this.ec.initialize(cc);
+		try {
+			this.ec.initialize(cc);
+		} catch (ComponentExecutionException e) {
+			synchronized (baStatusFlags) {
+				baStatusFlags[TERMINATION] = true;
+				sAbortMessage = e.toString();
+				this.thdMrProbe.probeWrappedComponentAbort(this);
+			}
+			log.severe("Component initialize failed "+e.toString());
+		} catch (ComponentContextException e) {
+			synchronized (baStatusFlags) {
+				baStatusFlags[TERMINATION] = true;
+				sAbortMessage = e.toString();
+				this.thdMrProbe.probeWrappedComponentAbort(this);
+			}
+			log.severe("Component initialize failed "+e.toString());
+		}
 		
+		// Main loop
 		while ( baStatusFlags[RUNNING] && !baStatusFlags[TERMINATION]) {
 			
 			if ( isExecutable() ) {
@@ -253,7 +270,24 @@ extends Thread {
 		log.info("Disposing WebUI if any." );
 		cc.stopAllWebUIFragments();
 		log.info("Finalizing the execution of the wrapping component "+ec.toString());
-		ec.dispose(cc);
+		try {
+			ec.dispose(cc);
+		} catch (ComponentExecutionException e) {
+			synchronized (baStatusFlags) {
+				baStatusFlags[TERMINATION] = true;
+				sAbortMessage = e.toString();
+				this.thdMrProbe.probeWrappedComponentAbort(this);
+			}
+			log.severe("Component disposed failed "+e.toString());
+		} catch (ComponentContextException e) {
+			synchronized (baStatusFlags) {
+				baStatusFlags[TERMINATION] = true;
+				sAbortMessage = e.toString();
+				this.thdMrProbe.probeWrappedComponentAbort(this);
+			}
+			log.severe("Component disposed failed "+e.toString());
+			e.printStackTrace();
+		}
 		this.thdMrProbe.probeWrappedComponentDispose(this);
 
 	}
