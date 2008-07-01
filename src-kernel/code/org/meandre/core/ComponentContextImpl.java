@@ -169,7 +169,7 @@ implements ComponentContext {
 		try {
 			 webui = WebUIFactory.getWebUI(sFlowUniqueExecutionID,wcParent.getMrProper(),
 					 thdMrProbe,cnf, 
-					 PortScroller.getInstance(cnf.getBasePort()).nextAvailablePort(sFlowUniqueExecutionID));
+					 PortScroller.getInstance(cnf).nextAvailablePort(sFlowUniqueExecutionID));
 		} catch (WebUIException e) {
 			log.warning("WebUI could not be retrieved: "+e.getMessage());
 		}

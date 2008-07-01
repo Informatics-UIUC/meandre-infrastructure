@@ -128,7 +128,8 @@ public class SecurityStore implements SecurityManager {
 
         if ( model.size()==0 ) {
             _log.info("Empty security store. Starting a clean one.");
-            Resource resRoot = _model.createResource(BASE_SECURITY_URL);
+            //Resource resRoot = _model.createResource(BASE_SECURITY_URL);
+            _model.createResource(BASE_SECURITY_URL);
             //create the admin account
             String adminUserName = _store.getAdminUserNickName();
             String adminPass = PasswordEncryptor.encrypt(adminUserName);

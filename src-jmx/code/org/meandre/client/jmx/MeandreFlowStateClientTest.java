@@ -10,7 +10,6 @@
 package org.meandre.client.jmx;
 
 import java.io.IOException;
-import java.util.Hashtable;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServerConnection;
@@ -66,9 +65,9 @@ public class MeandreFlowStateClientTest {
 			NonBlockingFlowStateListener nbl = new NonBlockingFlowStateListener(fso);
 			mct.addFlowListListener(nbl);
 			
-		
 			
-			Thread.currentThread().sleep(Integer.MAX_VALUE);
+			//Thread.currentThread().sleep(Integer.MAX_VALUE);
+			Thread.sleep(Integer.MAX_VALUE);
 
 			/*
 			 * nbs.addNotificationListener(javax.management.NotificationListener,

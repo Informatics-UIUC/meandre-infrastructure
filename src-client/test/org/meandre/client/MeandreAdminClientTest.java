@@ -1,6 +1,6 @@
 package org.meandre.client;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -11,10 +11,9 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import org.meandre.webservices.MeandreServer;
 import org.meandre.core.security.SecurityManager;
 import org.meandre.core.store.security.SecurityManagerProctor;
+import org.meandre.webservices.MeandreServer;
 
 
 /**

@@ -1,20 +1,16 @@
 package org.meandre.client;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
+import org.apache.commons.httpclient.NameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.meandre.core.security.Role;
 import org.meandre.core.security.SecurityManager;
 import org.meandre.core.security.SecurityStoreException;
 import org.meandre.core.security.User;
-
-
-import org.json.*;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.PartSource;
 
 public class MeandreAdminClient extends MeandreBaseClient 
 implements SecurityManager{
@@ -148,10 +144,11 @@ implements SecurityManager{
         nvps.add(new NameValuePair(PARAM_USER_NAME, usr.getNickName()));
         nvps.add(new NameValuePair(PARAM_ROLE, roleToGrant.getUrl()));
 
-		User retrievedUsr = null;
+		//User retrievedUsr = null;
 		try{
 	        JSONTokener jtUser = executeGetRequestJSON(sRestCommand, nvps);
-    	    retrievedUsr = User.fromJSON(new JSONObject(jtUser));
+    	    //retrievedUsr = User.fromJSON(new JSONObject(jtUser));
+    	    User.fromJSON(new JSONObject(jtUser));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -189,10 +186,11 @@ implements SecurityManager{
 		String sRestCommand = CMD_BASE + CMD_REVOKE_ALL_ROLES + ".json";
 		Set<NameValuePair> nvps = new HashSet<NameValuePair>();
        	nvps.add(new NameValuePair(PARAM_USER_NAME, usr.getNickName()));
-		User retrievedUsr = null;
+		//User retrievedUsr = null;
 		try{
 	        JSONTokener jtUser = executeGetRequestJSON(sRestCommand, nvps);
-    	    usr = User.fromJSON(new JSONObject(jtUser));
+    	    //usr = User.fromJSON(new JSONObject(jtUser));
+    	    User.fromJSON(new JSONObject(jtUser));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -209,10 +207,11 @@ implements SecurityManager{
 		Set<NameValuePair> nvps = new HashSet<NameValuePair>();
        	nvps.add(new NameValuePair(PARAM_USER_NAME, usr.getNickName()));
         nvps.add(new NameValuePair(PARAM_ROLE, roleToRevoke.getUrl()));
-		User retrievedUsr = null;
+		//User retrievedUsr = null;
 		try{
 	        JSONTokener jtUser = executeGetRequestJSON(sRestCommand, nvps);
-	        retrievedUsr = User.fromJSON(new JSONObject(jtUser));
+	        //retrievedUsr = User.fromJSON(new JSONObject(jtUser));
+	        User.fromJSON(new JSONObject(jtUser));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -239,10 +238,11 @@ implements SecurityManager{
    		String sRestCommand = CMD_BASE + CMD_REMOVE_USER + ".json";
 		Set<NameValuePair> nvps = new HashSet<NameValuePair>();
        	nvps.add(new NameValuePair(PARAM_USER_NAME, usr.getNickName()));
-		User retrievedUsr = null;
+		//User retrievedUsr = null;
 		try{
 	        JSONTokener jtUser = executeGetRequestJSON(sRestCommand, nvps);
-	        retrievedUsr = User.fromJSON(new JSONObject(jtUser));
+	        //retrievedUsr = User.fromJSON(new JSONObject(jtUser));
+	        User.fromJSON(new JSONObject(jtUser));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){

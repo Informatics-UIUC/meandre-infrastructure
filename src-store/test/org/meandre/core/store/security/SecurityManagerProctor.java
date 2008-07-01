@@ -1,6 +1,5 @@
 package org.meandre.core.store.security;
 
-import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,8 +8,6 @@ import org.meandre.core.security.Role;
 import org.meandre.core.security.SecurityManager;
 import org.meandre.core.security.SecurityStoreException;
 import org.meandre.core.security.User;
-
-import com.hp.hpl.jena.rdf.model.Model;
 /**
  * Provides stand alone tests for classes implementing the
  * SecurityManager interface. Like in an exam where a Proctor gives
@@ -79,7 +76,8 @@ public class SecurityManagerProctor{
      * not there using getUser.
      */
     public static void testRemoveUser(SecurityManager secMan){
-        User usr1 = makeUser1(secMan);
+    	//User usr1 = makeUser1(secMan);
+    	makeUser1(secMan);
         removeUser1(secMan);
         return;
     }
@@ -516,7 +514,8 @@ public class SecurityManagerProctor{
         return usr;
     }
 
-    private static void removeUser2(SecurityManager secMan){
+    @SuppressWarnings("unused")
+	private static void removeUser2(SecurityManager secMan){
         try{
             User usr = secMan.getUser(_userName2);
             Assert.assertEquals("Removing: !_userName2", _userName2, 

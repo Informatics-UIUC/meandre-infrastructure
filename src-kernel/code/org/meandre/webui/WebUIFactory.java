@@ -2,7 +2,6 @@ package org.meandre.webui;
 
 import java.util.Hashtable;
 import java.util.Set;
-import java.util.concurrent.Semaphore;
 import java.util.logging.Logger;
 
 import org.meandre.configuration.CoreConfiguration;
@@ -21,11 +20,11 @@ public class WebUIFactory {
 	/** The core root logger */
 	protected static Logger log = KernelLoggerFactory.getCoreLogger();
 		
-	/** The semaphore to implement mutual exclusion */
-	private static Semaphore semMutEX = new Semaphore(1,true);
+	// /** The semaphore to implement mutual exclusion */
+	// private static Semaphore semMutEX = new Semaphore(1,true);
 	
-	/** The incremental port counter to start execution ports */
-	private static int iPortScroller = -1;
+	// /** The incremental port counter to start execution ports */
+	// private static int iPortScroller = -1;
 	
 	/** The hashtable maintaning the current active webUIs */
 	protected static Hashtable<String,WebUI> htActiveWebUI = new Hashtable<String,WebUI>();

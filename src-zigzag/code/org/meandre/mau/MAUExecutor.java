@@ -182,7 +182,7 @@ public class MAUExecutor {
 			ps.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
 			ps.println("----------------------------------------------------------------------------");
 			ps.flush();
-			int nextPort = PortScroller.getInstance(cnf.getBasePort()).nextAvailablePort(exec.getFlowUniqueExecutionID());
+			int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
 			String token=System.currentTimeMillis()+"";
 			WebUI webui=exec.initWebUI(nextPort,token);
 			exec.execute(webui);

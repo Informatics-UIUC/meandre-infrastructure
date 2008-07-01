@@ -14,6 +14,7 @@ import org.meandre.core.environments.python.jython.JythonExecutableComponentAdap
 import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.repository.*;
 import org.meandre.core.utils.HexConverter;
+import org.meandre.webui.PortScroller;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -100,7 +101,9 @@ public class Conductor {
 	public Executor buildExecutor(QueryableRepository qr, Resource res )
 	throws CorruptedDescriptionException, ConductorException {
 		MrProbe thdMrProbe = new MrProbe(log,new NullProbeImpl(),false,false);
-		return buildExecutor(qr, res,thdMrProbe);
+		Executor exec = buildExecutor(qr, res,thdMrProbe);
+		exec.initWebUI(PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID()), "XStreamTest");
+		return exec;
 	}
 	
 	/** Creates an execution object for the given flow description.

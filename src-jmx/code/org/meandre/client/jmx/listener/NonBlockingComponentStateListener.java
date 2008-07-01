@@ -9,7 +9,6 @@ import javax.management.NotificationListener;
 import org.meandre.client.jmx.observer.ComponentStateObserver;
 import org.meandre.core.engine.probes.jmx.ComponentAction;
 import org.meandre.core.engine.probes.jmx.ComponentStates;
-import org.meandre.core.engine.probes.jmx.FlowComponentActionsMBean;
 
 /*
  * @(#) NonBlockingNewFlowDataListener.java @VERSION@
@@ -38,7 +37,7 @@ public class NonBlockingComponentStateListener implements NotificationListener {
 	    public void handleNotification(final Notification n, final Object handback) {
 	        executor.execute(new Runnable() {
 	            public void run() {
-	            	FlowComponentActionsMBean proxy = (FlowComponentActionsMBean)handback;
+	            	//FlowComponentActionsMBean proxy = (FlowComponentActionsMBean)handback;
 	            	ComponentAction caction= (ComponentAction)n.getUserData();
 	            	String action = caction.getAction();
 	            	String subjectName = caction.getSubjectName();

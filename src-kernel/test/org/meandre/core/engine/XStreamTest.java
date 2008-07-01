@@ -10,6 +10,7 @@ import org.meandre.core.environments.python.jython.JythonExecutableComponentAdap
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.demo.repository.DemoRepositoryGenerator;
+import org.meandre.webui.PortScroller;
 import org.python.core.PyObject;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -74,7 +75,7 @@ public class XStreamTest {
 			CoreConfiguration cnf = new CoreConfiguration();
 			Conductor conductor = new Conductor(10,cnf);
 			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next());
-
+			
 			// Starting serialization tests
 			assertTrue(0<xstream.toXML(model).length());
 			assertTrue(0<xstream.toXML(qr).length());
@@ -96,7 +97,7 @@ public class XStreamTest {
 		}
 		catch ( Exception e ) {
 			e.printStackTrace();
-			fail("This exeception should have not been thrown:"+e);
+			fail("This exeception should have not been thrown:"+e.getMessage());
 		}
 	}
 	

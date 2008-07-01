@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONException;
 import org.json.XML;
+import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.security.Role;
 import org.meandre.core.security.SecurityManager;
 import org.meandre.core.security.SecurityStoreException;
@@ -38,12 +39,17 @@ public class WSAbout extends HttpServlet {
 	/** The about logic object */
 	private WSAboutLogic wsAboutLogic;
 
+	/** The core configuration file */
+	private CoreConfiguration cnf;
+
 	/** Creates the about servlet for the given store.
 	 * 
 	 * @param store The store to use
+	 * @param cnf The core configuration file
 	 */
-	public WSAbout(Store store) {
+	public WSAbout(Store store, CoreConfiguration cnf) {
 		this.store = store;
+		this.cnf = cnf;
 		this.wsAboutLogic = new WSAboutLogic(store);
 	}
 
@@ -180,7 +186,7 @@ public class WSAbout extends HttpServlet {
     	}
     	else if(sTarget.endsWith("/plugin")){
 			if ( sExtension.equals("json") ) {
-				response.getWriter().println(WSAboutLogic.globalPluginsJSON(request, response));
+				response.getWriter().println(WSAboutLogic.globalPluginsJSON(request, response,cnf));
 			}else  {
 				//
 				// Invalid format

@@ -1,18 +1,13 @@
 package org.meandre.webservices.controllers;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Properties;
-import java.util.logging.Logger;
 import java.util.Set;
+import java.util.logging.Logger;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
@@ -20,9 +15,6 @@ import org.meandre.core.security.Role;
 import org.meandre.core.security.SecurityManager;
 import org.meandre.core.security.SecurityStoreException;
 import org.meandre.core.security.User;
-import org.meandre.core.store.Store;
-import org.meandre.core.utils.Constants;
-
 import org.meandre.webservices.servlets.WSSecurity;
 import org.meandre.webservices.utils.WSLoggerFactory;
 
@@ -37,6 +29,7 @@ import org.meandre.webservices.utils.WSLoggerFactory;
 public class WSSecurityLogic {
 
 	/** The logger for the WebServices. */
+	@SuppressWarnings("unused")
 	private static Logger log = WSLoggerFactory.getWSLogger();
 
 	/** The security store that will be manipulated by http calls. */
@@ -476,7 +469,8 @@ public class WSSecurityLogic {
 
     }
 
-    private void replyWithRole(Role role, HttpServletRequest request, 
+    @SuppressWarnings("unused")
+	private void replyWithRole(Role role, HttpServletRequest request, 
             HttpServletResponse response, String sReplyFormatExtension,
             String sRestCommand){
         Set<Role> roles = new HashSet<Role>();
@@ -485,6 +479,7 @@ public class WSSecurityLogic {
                 sRestCommand);
         return;
     }
+    
     /**
      * after a resonse data set has been converted to json, this method
      * converts it to a string representation in the final output response

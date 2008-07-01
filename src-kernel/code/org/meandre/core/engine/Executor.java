@@ -40,8 +40,8 @@ public class Executor {
 	/** The core configuration object */
 	private CoreConfiguration cnf;
 	
-	/**Unique ID provided by the client*/
-	private String token;
+	// /**Unique ID provided by the client*/
+	// private String token;
 
 	/** Constructs and executor based on the set of wrapped components.
 	 * @param sFlowUniqueExecutionID The unique flow execution ID
@@ -119,7 +119,7 @@ public class Executor {
 	 * 
 	 */
 	public WebUI initWebUI(int nextPortForUse,String token){
-		this.token = token;
+		//this.token = token;
 		WrappedComponent wcTmp = setWC.iterator().next();
 		MrProbe thdMrProbe = wcTmp.thdMrProbe;
 		String sFlowExecutionID = wcTmp.cc.getFlowExecutionInstanceID();

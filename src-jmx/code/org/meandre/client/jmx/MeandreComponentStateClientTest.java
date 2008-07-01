@@ -60,7 +60,8 @@ public class MeandreComponentStateClientTest {
 			ComponentStateObserver cso = new ComponentStateObserverImpl();
 			NonBlockingComponentStateListener nblfd = new NonBlockingComponentStateListener(cso);
 			flowComponentMonitor.addNotificationListener(nblfd, null);
-			Thread.currentThread().sleep(Integer.MAX_VALUE);
+			//Thread.currentThread().sleep(Integer.MAX_VALUE);
+			Thread.sleep(Integer.MAX_VALUE);
 	}
 
 	

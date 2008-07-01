@@ -9,94 +9,137 @@
  */
 package org.meandre.webui;
 
-import java.util.Hashtable;
-import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-/**
+import org.meandre.configuration.CoreConfiguration;
+
+/** Implements a port scroller with memory
  * 
- * @author Amit Kumar
+ * @author Amit Kumar, Xavier Llor&agrave;
  * Created on Jun 23, 2008 1:11:15 AM
+ * Modfied by X. to solve the MUTEX flawed design
  *
  */
 public final class  PortScroller {
 
+	/** The base port */
 	private int basePort;
+	
+	/** The current port */
 	private int currentPort;
-	Hashtable<String, Integer> flowPortMap = new Hashtable<String,Integer>(10); 
-	Queue<Integer> portQueue = new LinkedList<Integer>();
-	private static PortScroller portScroller;
 	
+	/** The map of port and name */
+	Map<String, Integer> flowPortMap = new ConcurrentHashMap<String,Integer>(); 
 	
-	
-	private PortScroller(int basePort) {
-		this.basePort = basePort;
-		this.currentPort= basePort;
-	}
+	/** The queue of available ports */
+	Queue<Integer> portQueue = new ConcurrentLinkedQueue<Integer>();
 
-
-	public static PortScroller getInstance(int basePort){
-		if(portScroller==null){
-			portScroller = new PortScroller(basePort);
-		}
-		return portScroller;
-	}
+	/** The core configuration object used by the port scroller */
+	private CoreConfiguration cnf;
 	
-	
-	/**Return the next available port
-	 * @param flowUniqueExecutionID 
-	 * 
-	 * @return
+	/** The unique object. This should have been done differently, I wil
+	 * just fix the MUTEX flawed design. X.
 	 */
-	public int nextAvailablePort(String flowUniqueExecutionID){
-		if(this.flowPortMap.get(flowUniqueExecutionID)!=null){
-			return this.flowPortMap.get(flowUniqueExecutionID);
+	private static Map<CoreConfiguration, PortScroller> globalMapping = new ConcurrentHashMap<CoreConfiguration, PortScroller>(); 
+	
+	/** Create a port scroller object.
+	 * 
+	 * @param cnf The core configuration object
+	 */
+	protected PortScroller(CoreConfiguration cnf) {
+		this.cnf = cnf;
+		this.basePort = this.cnf.getBasePort();
+		this.currentPort = this.cnf.getBasePort();
+	}
+
+	/** Returns the instance for this given base port.
+	 * 
+	 * @param cnf The core configuration object
+	 * @return The port scroller
+	 */
+	public static PortScroller getInstance(CoreConfiguration cnf){
+		if ( globlaMappingContainsCoreConfiguration(cnf) )
+			return globalMapping.get(cnf);
+		else {
+			PortScroller portScroller = new PortScroller(cnf);
+			globalMapping.put(cnf, portScroller);
+			return portScroller;
 		}
-		int thisPort=-1;
-			synchronized(this){
-				if(portQueue.isEmpty()){
-					currentPort++;
-					thisPort = currentPort;
-					this.flowPortMap.put(flowUniqueExecutionID, thisPort);	
-				}else{
-					thisPort=portQueue.remove();
-					this.flowPortMap.put(flowUniqueExecutionID, thisPort);	
-				}
-			}
 		
-		return thisPort;
 	}
 	
-	
-	/**Returns current port
+	/** Check if the global mapping contains this core configuration.
+	 * 
+	 * @param cnf The core configuration object
+	 * @return True if it contains this core configuration. False otherwise.
+	 */
+	private static boolean globlaMappingContainsCoreConfiguration(
+			CoreConfiguration cnf) {
+
+		for ( CoreConfiguration c:globalMapping.keySet() )
+			if ( c.equals(cnf) )
+				return true;
+		
+		return false;
+	}
+
+	/**Return the next available port
+	 * @param sFlowUniqueExecutionID 
 	 * 
 	 * @return
 	 */
-	public int getCurrentPort(){
-		return currentPort;
-	}
-	
-	
-	public int getPort(String flowUniqueExecutionID){
-		return this.flowPortMap.get(flowUniqueExecutionID);
+	public int nextAvailablePort(String sFlowUniqueExecutionID){
+		if(flowPortMap.containsKey(sFlowUniqueExecutionID)){
+			return this.flowPortMap.get(sFlowUniqueExecutionID);
+		}
+		int iThisPort = -1;
+		synchronized(this){
+			if(portQueue.isEmpty()) {
+				iThisPort = ++currentPort;
+				flowPortMap.put(sFlowUniqueExecutionID, iThisPort);	
+			}
+			else {
+				iThisPort = portQueue.remove();
+				this.flowPortMap.put(sFlowUniqueExecutionID, iThisPort);	
+			}
+		}
+		return iThisPort;
 	}
 	
 	/**Call this at the end of the flow
 	 * 
-	 * @param flowUniqueExecutionID
+	 * @param sFlowUniqueExecutionID
 	 */
-	public void releasePort(String flowUniqueExecutionID){
-		try{
-		int thisPort = this.flowPortMap.get(flowUniqueExecutionID);
-		synchronized(this){
-		portQueue.add(thisPort);
+	public void releasePort(String sFlowUniqueExecutionID){
+		synchronized ( this ) {
+			if ( flowPortMap.containsKey(sFlowUniqueExecutionID)) {
+				int thisPort = flowPortMap.get(sFlowUniqueExecutionID);
+				flowPortMap.remove(sFlowUniqueExecutionID);
+				portQueue.add(thisPort);
+			}
 		}
-		}catch(Exception ex){
-			
-		}
-		
 	}
 
-
+	/**Returns the base port
+	 * 
+	 * @return The base port
+	 */
+	public int getBasePort(){
+		return basePort;
+	}
+	
+	/** Returns the port binded to a given executing flow ID.
+	 * 
+	 * @param flowUniqueExecutionID The unique executing flow ID
+	 * @return The port number
+	 */
+	public int getPortOfRunningFlow(String flowUniqueExecutionID){
+		synchronized ( this ) {
+			return this.flowPortMap.get(flowUniqueExecutionID);
+		}
+	}
 	
 }

@@ -22,7 +22,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 public class SecurityStoreTest {
     
     
-    private static String _serverUrl = "localhost";
+    @SuppressWarnings("unused")
+	private static String _serverUrl = "localhost";
     private static int _serverPort = 1704;
     
     private static String _workingDir = 

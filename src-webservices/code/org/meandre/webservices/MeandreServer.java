@@ -11,7 +11,6 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
@@ -68,6 +67,7 @@ public class MeandreServer {
 	/** The main Jetty server */
 	private Server server;
 
+	@SuppressWarnings("unused")
 	private Registry registry;
 	
 	private int REG_PORT = 1099;
@@ -288,7 +288,7 @@ public class MeandreServer {
 		//
 		// Adding restrictedly provided services
 		//
-		contextWS.addServlet(new ServletHolder((Servlet) new WSAbout(store)), 		"/services/about/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSAbout(store,cnf)), 		"/services/about/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSLocations(store,cnf)),	"/services/locations/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository(store,cnf)),	"/services/repository/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSExecute(store,cnf,mBeanServer)),		"/services/execute/*");

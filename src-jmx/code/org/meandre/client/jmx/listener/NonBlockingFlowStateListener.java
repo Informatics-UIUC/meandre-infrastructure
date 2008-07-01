@@ -47,7 +47,7 @@ public class NonBlockingFlowStateListener implements NotificationListener {
 	        	    while(it.hasNext()){
 	        	    	key = it.next();
 	        	    	value = hm.get(key);
-	        	    	System.out.println(hm.get(key).getId()+ "  " + hm.get(key).getWebUrl());
+	        	    	System.out.println(hm.get(key).getId()+ "  " + hm.get(key).getWebUrl() + " " +value.toString());
 	        	    }
 	        	    FlowData flowData = (FlowData)n.getUserData();
 	        	    

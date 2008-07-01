@@ -107,10 +107,11 @@ public class MeandreClientTest {
         
         //add the demo repository
 
-        boolean ret;
+        
         try{
-             ret = _meandreClient.addLocation(_sDemoRepo, "Hello Demo");
-             _meandreClient.regenerate();
+             //boolean ret = _meandreClient.addLocation(_sDemoRepo, "Hello Demo");
+        	_meandreClient.addLocation(_sDemoRepo, "Hello Demo");
+            _meandreClient.regenerate();
              
         }catch(TransmissionException e){
             e.printStackTrace();
@@ -595,10 +596,10 @@ public class MeandreClientTest {
         boolean retStat = false;
         Set<URL> flowsAfter = null;
         try{
-            Set<URL> flowsBefore = _meandreClient.retrieveFlowUrls();
+            //Set<URL> flowsBefore = _meandreClient.retrieveFlowUrls();
             retStat = _meandreClient.uploadFlow(flow, true);
             assertTrue(retStat);
-            Set<URL> flowsMid = _meandreClient.retrieveFlowUrls();
+            //Set<URL> flowsMid = _meandreClient.retrieveFlowUrls();
             retStat =  _meandreClient.removeResource(sResourceUrl);
             assertTrue(retStat);
             flowsAfter = _meandreClient.retrieveFlowUrls();
@@ -721,9 +722,10 @@ public class MeandreClientTest {
      */
     @Test
     public void testRetrievePublicRepository() {
-        QueryableRepository repo = null;
+        //QueryableRepository repo = null;
         try{
-            repo = _meandreClient.retrievePublicRepository();
+        	//repo = _meandreClient.retrievePublicRepository();
+        	_meandreClient.retrievePublicRepository();
         }catch (TransmissionException e){
             fail("Transmission failure: " + e.toString());
         }
@@ -735,9 +737,10 @@ public class MeandreClientTest {
      */
     @Test
     public void testRetrieveDemoRepository() {
-        QueryableRepository repo = null;
+        //QueryableRepository repo = null;
         try{
-            repo = _meandreClient.retrieveDemoRepository();
+           //repo = _meandreClient.retrieveDemoRepository();
+           _meandreClient.retrieveDemoRepository();
         }catch (TransmissionException e){
             fail("Transmission failure: " + e.toString());
         }

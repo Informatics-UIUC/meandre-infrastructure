@@ -15,6 +15,7 @@ import static org.junit.Assert.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.meandre.configuration.CoreConfiguration;
 import org.meandre.webui.PortScroller;
 
 /**This class tests the port scrolling 
@@ -36,26 +37,22 @@ public class PortScrollerTest {
 	
 	@Test
 	public void testPortReuse(){
-		PortScroller ps = PortScroller.getInstance(1000);
+		CoreConfiguration cnf = new CoreConfiguration(1000,".");
+		assertEquals(cnf.getBasePort(),1000);
+		
+		PortScroller ps = PortScroller.getInstance(cnf);
 		int i=ps.nextAvailablePort("dumbell1");
-		System.out.println(i);
-		assertTrue(i==1001);
+		assertEquals(1001,i);
 		i=ps.nextAvailablePort("dumbell2");
 		i=ps.nextAvailablePort("dumbell3");
 		
 		ps.releasePort("dumbell2");
 	
 		i=ps.nextAvailablePort("dumbell4");
-		System.out.println(i);
-		assertTrue(i==1002);
-	
-		
+		assertEquals(1002,i);
 
 		i=ps.nextAvailablePort("dumbell5");
-		System.out.println(i);
-		assertTrue(i==1004);
-	
-		
+		assertEquals(1004,i);
 	}
 
 }

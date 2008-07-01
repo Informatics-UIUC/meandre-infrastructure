@@ -1,22 +1,5 @@
 package org.meandre.core.store;
 
-import com.hp.hpl.jena.db.DBConnection;
-import com.hp.hpl.jena.db.IDBConnection;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ModelMaker;
-
-import org.meandre.configuration.CoreConfiguration;
-import org.meandre.core.logger.KernelLoggerFactory;
-import org.meandre.core.repository.QueryableRepository;
-import org.meandre.core.repository.RepositoryImpl;
-import org.meandre.core.security.SecurityManager;
-import org.meandre.core.security.SecurityStoreException;
-import org.meandre.core.store.security.SecurityStore;
-import org.meandre.core.store.system.SystemStore;
-import org.meandre.core.store.system.SystemStoreImpl;
-import org.meandre.core.utils.Constants;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -25,6 +8,22 @@ import java.net.UnknownHostException;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.logging.Logger;
+
+import org.meandre.configuration.CoreConfiguration;
+import org.meandre.core.logger.KernelLoggerFactory;
+import org.meandre.core.repository.QueryableRepository;
+import org.meandre.core.repository.RepositoryImpl;
+import org.meandre.core.security.SecurityStoreException;
+import org.meandre.core.store.security.SecurityStore;
+import org.meandre.core.store.system.SystemStore;
+import org.meandre.core.store.system.SystemStoreImpl;
+import org.meandre.core.utils.Constants;
+
+import com.hp.hpl.jena.db.DBConnection;
+import com.hp.hpl.jena.db.IDBConnection;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.ModelMaker;
 
 /**
  * This class provides the basic configuration for the Meandre store.

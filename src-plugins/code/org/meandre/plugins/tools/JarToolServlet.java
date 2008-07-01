@@ -1,12 +1,3 @@
-/*
- * @(#) JarToolServlet.java @VERSION@
- * 
- * Copyright (c) 2008+ Amit Kumar
- * 
- * The software is released under ASL 2.0, Please
- * read License.txt
- *
- */
 package org.meandre.plugins.tools;
 
 import java.io.File;
@@ -196,7 +187,7 @@ implements MeandrePlugin{
 	private Manifest getManifest(File file) throws IOException {
 		JarFile jarFile = new JarFile(file);
 		
-		int len = jarFile.size();
+		//int len = jarFile.size();
 		//System.out.println("len is: " + len);
 		return jarFile.getManifest();
 	}

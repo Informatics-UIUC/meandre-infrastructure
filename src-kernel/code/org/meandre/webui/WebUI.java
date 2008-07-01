@@ -34,8 +34,8 @@ public class WebUI {
 	/** The flow Mr Probe */
 	private MrProbe mrProbe = null;
 	
-	/**Temporary assignment*/
-	private int basePort = 1714;
+	/** The core configuration object*/
+	private CoreConfiguration cnf = null;
 
 	/** Creates a WebUI for the given flow on the specified port.
 	 *
@@ -53,7 +53,7 @@ public class WebUI {
 		this.mrProper = mrProper;
 		this.mrProbe = mrProbe;
 		this.iPort = iPort;
-		this.basePort = cnf.getBasePort();
+		this.cnf = cnf;
 		// Creating the server and the connector
 		this.server = new Server();
 		Connector connector = new SocketConnector();
@@ -85,7 +85,7 @@ public class WebUI {
 		}catch(Exception ex){
 			throw new Exception(ex);
 		}finally{
-		PortScroller.getInstance(this.basePort).releasePort(this.sFlowUniqueID);
+			PortScroller.getInstance(cnf).releasePort(this.sFlowUniqueID);
 		}
 	}
 

@@ -55,16 +55,12 @@ public class PluginFactory {
 		sConfigPath = cnf.getHomeDirectory();
 	}
 	
-	
 	/** Store the plugin information**/
-	private static HashMap<String,MeandrePlugin> pluginList = new HashMap<String,MeandrePlugin>(5);
+	private static HashMap<String,MeandrePlugin> pluginMap = new HashMap<String,MeandrePlugin>(5);
 	
 	/** Stores the PluginFactory**/
 	private static HashMap<CoreConfiguration, PluginFactory> pluginFactoryList = new HashMap<CoreConfiguration, PluginFactory>(5);
-	
 
-	
-	
 	/** Initialize the plugin factory given a certain core configuration.
 	 * 
 	 * @param cnf The core configuration object
@@ -76,7 +72,7 @@ public class PluginFactory {
 		}
 		PluginFactory pf = new PluginFactory(cnf);
 		
-		pf.propPluginFactoryConfig = new Properties();
+		PluginFactory.propPluginFactoryConfig = new Properties();
 	    FileInputStream fis;
 	    String sConfigFilePath = pf.sConfigPath + File.separator + pf.sConfigFile;
 		try {
@@ -84,7 +80,7 @@ public class PluginFactory {
 			// Load the properties from the default location
 			//
 			fis = new FileInputStream(sConfigFilePath);
-			pf.propPluginFactoryConfig.loadFromXML(fis);
+			PluginFactory.propPluginFactoryConfig.loadFromXML(fis);
 			fis.close();
 		} catch (Exception eRead) {
 			//
@@ -99,7 +95,7 @@ public class PluginFactory {
 			FileOutputStream fos;
 			try {
 				fos = new FileOutputStream(sConfigFilePath);
-				pf.propPluginFactoryConfig.storeToXML(fos, "Meandre default plugins configuration file ("+Constants.MEANDRE_VERSION+")");
+				PluginFactory.propPluginFactoryConfig.storeToXML(fos, "Meandre default plugins configuration file ("+Constants.MEANDRE_VERSION+")");
 			    fos.close();
 			} catch (Exception eWrite) {
 				pf.log.warning("Meandre plugins configuration file "+
@@ -122,8 +118,8 @@ public class PluginFactory {
 	 * @param pf  The plugin factory being initialized
 	 */
 	private static void initializePluginsDefaultProperties(PluginFactory pf) {
-		pf.propPluginFactoryConfig.setProperty("VFS", VFSServlet.class.getName());	
-		pf.propPluginFactoryConfig.setProperty("JARTOOL", JarToolServlet.class.getName());		
+		PluginFactory.propPluginFactoryConfig.setProperty("VFS", VFSServlet.class.getName());	
+		PluginFactory.propPluginFactoryConfig.setProperty("JARTOOL", JarToolServlet.class.getName());		
 	}
 
 	/** Initialize the public file server for shared resources
@@ -186,7 +182,7 @@ public class PluginFactory {
 					cntxGlobal.addFilter(new FilterHolder((Filter)mpPlugin), mpPlugin.getAlias(), org.mortbay.jetty.Handler.DEFAULT);
 				}
 				mpPlugin.inited(Boolean.TRUE);
-				pluginList.put(oKey.toString(), mpPlugin);
+				pluginMap.put(oKey.toString(), mpPlugin);
 			} catch (InstantiationException e) {
 				log.warning("Pluggin "+oKey+" could not be initialized\n"+e);
 			} catch (IllegalAccessException e) {
@@ -198,20 +194,21 @@ public class PluginFactory {
 		}
 	}
 
-	
-	/**Return the plugin
+	 
+	/** Return the plugin give its ID
 	 * 
-	 * @param id
-	 * @return
+	 * @param sID The id of the plugin
+	 * @return Returns the plugin
 	 */
-	public static MeandrePlugin getPlugin(String id){
-		return pluginList.get(id);
+	public MeandrePlugin getPlugin(String sID){
+		return pluginMap.get(sID);
 	}
 
-	/**
-	 * @return the propPluginFactoryConfig
+	/** Returns the properties of the plugin factory.
+	 * 
+	 * @return The properties of the factory
 	 */
-	public static Properties getPropPluginFactoryConfig() {
+	public Properties getPropPluginFactoryConfig() {
 		return  propPluginFactoryConfig;
 	}
 

@@ -194,7 +194,7 @@ public class WSExecuteLogic {
 						}
 					}
 					pw.flush();
-					int nextPort = PortScroller.getInstance(cnf.getBasePort()).nextAvailablePort(exec.getFlowUniqueExecutionID());
+					int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
 					/*This needs to be synchronized*/
 					boolean hasToken = Boolean.FALSE;
 					if(token!=null){
@@ -383,7 +383,7 @@ public class WSExecuteLogic {
 					System.setErr(pw);
 		
 					pw.flush();
-					int nextPort = PortScroller.getInstance(cnf.getBasePort()).nextAvailablePort(exec.getFlowUniqueExecutionID());
+					int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
 					/*This needs to be synchronized*/
 					boolean hasToken = Boolean.FALSE;
 					String token = null;

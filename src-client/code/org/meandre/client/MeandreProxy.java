@@ -28,9 +28,11 @@ public class MeandreProxy{
 	private String sPassword;
 
 	/** The base url of the remote server */
+	@SuppressWarnings("unused")
 	private String sBaseURL;
 
 	/** The credentials */
+	@SuppressWarnings("unused")
 	private String sUPEncoding;
 	
 	/** Cached roles */
@@ -119,7 +121,8 @@ public class MeandreProxy{
 	public Set<String> getRoles() {
 		if ( mapRoles==null ) {
             try{
-                Set<String> roles = this.client.retrieveUserRoles();
+                //Set<String> roles = this.client.retrieveUserRoles();
+                this.client.retrieveUserRoles();
             }catch(TransmissionException e){
                 bWasCallOK = false;
                 log("Couldn't retrieve roles: " + e.toString());

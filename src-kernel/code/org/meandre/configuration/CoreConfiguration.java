@@ -1,9 +1,7 @@
 package org.meandre.configuration;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -32,17 +30,17 @@ public class CoreConfiguration {
     /** The config path */
     private static final String MEANDRE_HOME_DIRECTORY = "MEANDRE_HOME_DIRECTORY";
     
+    /** The Default port*/
+	private static final int DEFAULT_PORT =1714;
+	
 	/** The configuration properties */
 	private Properties propsCore;
 	
 	/** The logger from the core */
 	private Logger log;
 	
-	/** The Default port*/
-	private static final int DEFAULT_PORT =1714;
-	
 	/**The Default install dir*/
-	private static final String INSTALL_DIR =".";
+	private String INSTALL_DIR =".";
 
 	/** Creates a core configuration object with the default property values.
 	 * It uses the existing property file and uses those values if it exists.
@@ -50,15 +48,15 @@ public class CoreConfiguration {
 	 */
 	public CoreConfiguration () {
 		log = KernelLoggerFactory.getCoreLogger();
-		if(!checkAndUseConfigurationIfExists(INSTALL_DIR) ){
-			   propsCore = new Properties();
-		       propsCore.setProperty(MEANDRE_BASE_PORT, Integer.toString(DEFAULT_PORT));
-		        propsCore.setProperty(MEANDRE_PUBLIC_RESOURCE_DIRECTORY, INSTALL_DIR + File.separator + "published_resources");
-		        propsCore.setProperty(MEANDRE_PRIVATE_RUN_DIRECTORY,INSTALL_DIR + File.separator + "run");
-		        propsCore.setProperty(MEANDRE_CORE_CONFIG_FILE, INSTALL_DIR + File.separator + "meandre-config-core.xml");
-		        propsCore.setProperty(MEANDRE_HOME_DIRECTORY,INSTALL_DIR);   
-		        initializeConfiguration();    	
-		}
+		
+		propsCore = new Properties();
+		propsCore.setProperty(MEANDRE_BASE_PORT, Integer.toString(DEFAULT_PORT));
+        propsCore.setProperty(MEANDRE_PUBLIC_RESOURCE_DIRECTORY, INSTALL_DIR + File.separator + "published_resources");
+        propsCore.setProperty(MEANDRE_PRIVATE_RUN_DIRECTORY,INSTALL_DIR + File.separator + "run");
+        propsCore.setProperty(MEANDRE_CORE_CONFIG_FILE, INSTALL_DIR + File.separator + "meandre-config-core.xml");
+        propsCore.setProperty(MEANDRE_HOME_DIRECTORY,INSTALL_DIR);   
+        
+        initializeConfiguration();    	
 	}
 	
 	/**
@@ -76,9 +74,10 @@ public class CoreConfiguration {
         propsCore.setProperty(MEANDRE_PUBLIC_RESOURCE_DIRECTORY, sInstallDir + File.separator + "published_resources");
         propsCore.setProperty(MEANDRE_PRIVATE_RUN_DIRECTORY, sInstallDir + File.separator + "run");
         propsCore.setProperty(MEANDRE_CORE_CONFIG_FILE, sInstallDir + File.separator + "meandre-config-core.xml");
-        propsCore.setProperty(MEANDRE_HOME_DIRECTORY, sInstallDir);   
+        propsCore.setProperty(MEANDRE_HOME_DIRECTORY, sInstallDir);  
+        INSTALL_DIR = sInstallDir;
         log = KernelLoggerFactory.getCoreLogger();
-	        
+	     
         initializeConfiguration();    
 	}
 	
@@ -96,50 +95,31 @@ public class CoreConfiguration {
 	 * 
 	 */
 	private void initializeConfiguration() {
-		FileOutputStream fos;
-        try {
-            fos = new FileOutputStream("meandre-config-core.xml");
-            propsCore.storeToXML(fos, "Meandre default configuration file (" + Constants.MEANDRE_VERSION + ")");
-            fos.close();
-            
-            // Create the run file
-            new File(getRunResourcesDirectory()).mkdir();
-
-        }
-        catch (Exception eWrite) {
-            log.warning("Meandre configuration file " +
-            		    propsCore.getProperty(MEANDRE_CORE_CONFIG_FILE) +
-                        " could not be written to disk!");
-
-        }
 		
-	}
+		File fileCnf = new File(propsCore.getProperty(MEANDRE_CORE_CONFIG_FILE));
+		if ( !fileCnf.exists() ) {
+			FileOutputStream fos;
+	        try {
+	        	// Create home dir
+	        	new File(getHomeDirectory()).mkdir();
+	            
+	        	// Dump properties
+	            fos = new FileOutputStream("meandre-config-core.xml");
+	            propsCore.storeToXML(fos, "Meandre default configuration file (" + Constants.MEANDRE_VERSION + ")");
+	            fos.close();
+	            
+	            // Create the run file
+	            new File(getRunResourcesDirectory()).mkdir();
+	            new File(getRunResourcesDirectory()).mkdir();
 	
+	        }
+	        catch (Exception eWrite) {
+	            log.warning("Meandre configuration file " +
+	            		    propsCore.getProperty(MEANDRE_CORE_CONFIG_FILE) +
+	                        " could not be written to disk!");
 	
-	/**Call this function if the core property file is already present.
-	 * 
-	 */
-	private boolean checkAndUseConfigurationIfExists(String installDir) {
-		InputStream fis;
-        try {
-            fis = new FileInputStream(installDir+File.separator+"meandre-config-core.xml");
-            propsCore = new Properties();
-            propsCore.loadFromXML(fis);
-            fis.close();
-            // Create the run file
-            if(!new File(getRunResourcesDirectory()).exists()){
-            	new File(getRunResourcesDirectory()).mkdir();
-            }
-           
-        }
-        catch (Exception eWrite) {
-            log.warning("Meandre configuration file " +
-            			installDir+File.separator+"meandre-config-core.xml" +
-                        " could not be read -creating new!");
-            System.out.println(eWrite.getMessage());
-            return Boolean.FALSE;
-        }
-		return Boolean.TRUE;
+	        }
+		}
 	}
 
 
@@ -180,13 +160,42 @@ public class CoreConfiguration {
         return propsCore.getProperty(MEANDRE_HOME_DIRECTORY);
     }
 
-    /** Returns the current host IP address.
-     * 
-     * @return The host IP address
-     */
-	public String getHostName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//    /** Returns the current host IP address.
+//     * 
+//     * @return The host IP address
+//     */
+//	public String getHostName() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 	
+	/** Compare if two configurations are the same.
+	 * 
+	 * @param objCnf The configuration to compare
+	 * @return True if equal, false otherwhise.
+	 */
+	public boolean equals ( Object objCnf ) {
+		
+		// Check type
+		if ( !(objCnf instanceof CoreConfiguration) )
+			return false;
+		
+		// Type cast
+		CoreConfiguration cnf = (CoreConfiguration)objCnf;
+		
+		// Check property sizes
+		if ( propsCore.size()!=cnf.propsCore.size() ) 
+			return false;
+		
+		// Check property values
+		for ( Object objKey:propsCore.keySet() ) {
+			if ( !cnf.propsCore.containsKey(objKey) )
+				return false;
+			else if ( !cnf.propsCore.getProperty(objKey.toString()).equals(propsCore.getProperty(objKey.toString())) )
+				return false;
+		}
+		
+		
+		return false;
+	}
 }

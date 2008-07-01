@@ -256,7 +256,7 @@ public class MrProbeTest {
 			Executor exec = cnd.buildExecutor(qr, qr.getAvailableFlowDescriptions().iterator().next().getFlowComponent());
 			WrappedComponent wc = exec.getWrappedComponents().iterator().next();
 			// Run the tests
-			String rands=Math.random()+"";
+			//String rands=Math.random()+"";
 			for ( int i=0; i<NUMBER_OF_REPETITIONS; i++ ) {
 				mp.probeFlowStart(BASE_TEST_URI,"http://127.0.0.1:1704/");
 				mp.probeFlowFinish(BASE_TEST_URI);

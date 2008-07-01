@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.security.Role;
 import org.meandre.core.security.SecurityManager;
 import org.meandre.core.security.SecurityStoreException;
@@ -140,7 +141,8 @@ public class WSAboutLogic {
        try {
            SecurityManager ss = store.getSecurityStore();
            User usr = ss.getUser(request.getRemoteUser());
-           Set<Role> usersRoles = ss.getRolesOfUser(usr);
+           //Set<Role> usersRoles = ss.getRolesOfUser(usr);
+           ss.getRolesOfUser(usr);
            Set<Role> validRoles = Role.getStandardRoles();
            for (Role role: validRoles)
                pw.println(role.getUrl());
@@ -349,13 +351,20 @@ public class WSAboutLogic {
 		return model;
 	}
 
-	/** Get Plugin properties*/
+	/** Get the global list of plugins.
+	 * 
+	 * @param request The request object 
+	 * @param response The response object
+	 * @param cnf The core configuration object
+	 * @return The JSON string containing the list
+	 * @throws IOException
+	 */
 	public static String globalPluginsJSON(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+			HttpServletResponse response, CoreConfiguration cnf) throws IOException {
 		//JSONObject joRes = new JSONObject();
 		
 		ArrayList<Plugin> alist = new ArrayList<Plugin>(5);
-		Properties properties=PluginFactory.getPropPluginFactoryConfig();
+		Properties properties=PluginFactory.getPluginFactory(cnf).getPropPluginFactoryConfig();
 		for ( Object oKey:properties.keySet()) {
 			try {
 				String sClassName = properties.getProperty(oKey.toString());
