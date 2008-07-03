@@ -410,6 +410,14 @@ implements ComponentContext {
 		return this.flowID;
 	}
 	
+	/** Request the abortion of the flow.
+	 * 
+	 */
+	public void requestFlowAbortion() {
+		wcParent.getMrProper().abort();
+		log.warning("Abort requested by component "+wcParent.getExecutableComponentInstanceID());
+	}
+	
 	/** Returns true if the flow has started a termination request.
 	 * 
 	 * @return True if the flow is aborting

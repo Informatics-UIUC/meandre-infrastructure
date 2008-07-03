@@ -34,6 +34,11 @@ extends ComponentContextProperties {
 	 */
 	public boolean isInputAvailable ( String sInputBuffer ) throws ComponentContextException;
 
+	/** Request the abortion of the flow.
+	 * 
+	 */
+	public void requestFlowAbortion();
+	
 	/** Returns true if the flow has started a termination request.
 	 * 
 	 * @return True if the flow is aborting

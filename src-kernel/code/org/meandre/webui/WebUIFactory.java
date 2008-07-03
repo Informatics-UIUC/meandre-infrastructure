@@ -42,20 +42,8 @@ public class WebUIFactory {
 		WebUI webui = htActiveWebUI.get(sFlowUniqueID);
 		
 		if ( webui==null ) {
-		/*	try {
-				semMutEX.acquire();
-				if ( iPortScroller==-1 )
-					iPortScroller = cnf.getBasePort();
-				int iNewPort = ++iPortScroller;
-				semMutEX.release();		
-				System.out.println("Something out of whack: " + port + " " + iNewPort);
-			*/	
-				webui = new WebUI(sFlowUniqueID,mrProper,mrProbe,port,log,cnf);
-				htActiveWebUI.put(sFlowUniqueID, webui);
-	/*		} catch (InterruptedException e) {
-				throw new WebUIException(e);
-			}
-		*/	
+			webui = new WebUI(sFlowUniqueID,mrProper,mrProbe,port,log,cnf);
+			htActiveWebUI.put(sFlowUniqueID, webui);
 		}
 		
 		return webui;
@@ -103,35 +91,5 @@ public class WebUIFactory {
 		return htActiveWebUI.keySet();
 	}
 	
-//	/** A main for testing WebUIs.
-//	 * 
-//	 * @param sArgs The command line arguments
-//	 * @throws Exception Something went wrong
-//	 */
-//	static public void main ( String [] sArgs ) throws Exception {
-//		WebUI webui = WebUIFactory.getWebUI("potato-flow");
-//		
-//		Thread.sleep(10000);
-//		System.out.println("Adding hellow world");
-//		WebUIFragment wuif = new WebUIFragment("potato-hw-1", new WebUIHelloWorldFragment("potato-hw-1","Hello world!"));
-//		webui.addFragment(wuif);
-//		
-//		Thread.sleep(10000);
-//		System.out.println("Adding hellow world 2");
-//		WebUIFragment wuif2 = new WebUIFragment("potato-hw-2", new WebUIHelloWorldFragment("potato-hw-2","Hello world again!"));
-//		webui.addFragment(wuif2);
-//		
-//		Thread.sleep(10000);
-//		System.out.println("Removing hello world ");
-//		webui.removeFragment(wuif);
-//		
-//		Thread.sleep(10000);
-//		System.out.println("Removing hello world 2 ");
-//		webui.removeFragment(wuif2);
-//		
-//		Thread.sleep(10000);
-//		System.out.println("Shutting down");
-//		
-//		webui.shutdown();
-//	}
+
 }
