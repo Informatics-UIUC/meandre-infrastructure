@@ -13,11 +13,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -81,21 +77,8 @@ public class WSExecuteLogic {
 			flowList = new FlowList();
 			this.mbeanServer.registerMBean(flowList,name);
 			 
-		} catch (MalformedObjectNameException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NullPointerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstanceAlreadyExistsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MBeanRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NotCompliantMBeanException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e) {
+			WSLoggerFactory.getWSLogger().warning(e.toString());
 		}
 	}
 	

@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.meandre.plugins.MeandrePlugin;
+import org.meandre.webservices.utils.WSLoggerFactory;
 
 /**
  * This plugins starts a RMI registry at a well known port
@@ -47,7 +48,7 @@ public class RMIRegistryServlet extends HttpServlet implements MeandrePlugin {
 	public RMIRegistryServlet(){
 		try {
 			registry= LocateRegistry.createRegistry(REG_PORT);
-			System.out.println("Starting RMI registry");
+			WSLoggerFactory.getWSLogger().info("Starting RMI registry");
 		} catch (Exception e) {
 			System.out.println("Error creating RMI registry");
 			   try {

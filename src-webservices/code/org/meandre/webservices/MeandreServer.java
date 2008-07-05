@@ -179,13 +179,13 @@ public class MeandreServer {
 	private void startRMIRegistry() {
 		try {
 			registry= LocateRegistry.createRegistry(REG_PORT);
-			System.out.println("Starting RMI registry");
+			WSLoggerFactory.getWSLogger().info("Starting RMI registry");
 		} catch (Exception e) {
 			System.out.println("Error creating RMI registry");
 			   try {
 		            registry = LocateRegistry.getRegistry(REG_PORT);
 		        } catch (RemoteException rex) {
-		        	System.out.println("Error creating RMI registry");
+		        	WSLoggerFactory.getWSLogger().warning("Error creating RMI registry");
 		            return;
 		        }
 		}
@@ -273,10 +273,10 @@ public class MeandreServer {
 		//
 		
 		JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi");
-				
+		
 	     mBeanServer= ManagementFactory.getPlatformMBeanServer();
-		 mBeanContainer = new MBeanContainer(mBeanServer);
-		 server.getContainer().addEventListener(mBeanContainer);
+	     mBeanContainer = new MBeanContainer(mBeanServer);
+	     server.getContainer().addEventListener(mBeanContainer);
 		 mBeanContainer.start();
 		
 		 
