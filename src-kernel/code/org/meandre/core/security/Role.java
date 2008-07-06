@@ -6,6 +6,8 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.XML;
+
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
@@ -39,7 +41,11 @@ public class Role {
 	/** used for json keys, etc, when a set of roles is an attribute in
 	 * a data set*/
 	private static final String FIELD_ROLE_SET = "role_set";
-
+	
+    /** used for xml keys, etc, when a url identifier is a separate 
+     * attribute in a data set*/
+    private static final String FIELD_MEANDRE_URL = "meandre_url";
+    
     /** the short name of a Role is the unique part of it's identifying URL.
      */
     String _shortName;
@@ -222,5 +228,43 @@ public class Role {
 		}
 		return roles;
     }
+    
+    /**
+     * converts a set of roles into an xml form. this does not do a 
+     * one to one mapping from the result of setToJSON, but does construct
+     * a new json representation that can be transformed into valid xml.
+     *  
+     * @param roles
+     * @return a string representation of 'roles' as xml
+     */
+    public static String setToXML(Set<Role> roles){
+        String sXml = null;
+        try{
+            JSONArray ja = new JSONArray();
+            for(Role rl : roles){
+                JSONObject jRole = new JSONObject();
+                jRole.put(FIELD_MEANDRE_URL, rl.getUrl());
+                ja.put(jRole);
+            }
+            JSONObject jo = new JSONObject();
+            jo.put(FIELD_ROLE, ja);
+            sXml = XML.toString(jo, FIELD_ROLE_SET);
+            
+        }catch(JSONException je){
+            //This supposedly won't ever happen
+            je.printStackTrace();
+        }
+        return sXml;     
+    }
+    
+    public static String setToText(Set<Role> roles){
+        StringBuffer sb = new StringBuffer();
+        for(Role rl : roles){
+            sb.append(rl.getUrl());
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+    
     
 }

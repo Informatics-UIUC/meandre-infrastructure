@@ -43,6 +43,11 @@ public class WSSecurityLogic {
 		_securityStore = store;
 	}
 
+	
+	///////////////////////////////////
+	//Handlers  for web services calls
+	//////////////////////////////////
+	
     /**
      * handles a servlet request for the all users in the
      * system. 
@@ -287,6 +292,10 @@ public class WSSecurityLogic {
         return;
     }
 
+    ////////////////////////
+    //http param extraction
+    ///////////////////////
+    
     /**
      * extracts a user name parameter value from an http request. will
      * return null if the request does not contain a user name 
@@ -320,6 +329,152 @@ public class WSSecurityLogic {
     }
 
 
+    ////////////////
+    //Bean Responses
+    ////////////////
+
+    /**
+     * responds to a http request with a set of Users. generates a string
+     * representation of the users in a format determined by 
+     * sReplyFormatExtension and writes it to the response.
+     *
+     * @param sReplyFormatExtension 
+     * acceptable formats are 'txt', 'xml', and 'json'. If another format
+     * is requested, an error message will be written to the response.
+     *
+     * @param sRestCommand is an identifier for the original command that
+     * was issued that this response is for. only used to log errors.
+     */
+    private void replyWithUsers(Set<User> users, HttpServletRequest request, 
+            HttpServletResponse response, String sReplyFormatExtension,
+            String sRestCommand){
+        
+        if(sReplyFormatExtension.equals("txt")) {
+            String str = User.setToText(users);
+            replyWithText(request, response, str);
+        }else if (sReplyFormatExtension.equals("xml")){
+            try{
+                String str = User.setToXml(users);
+                replyWithXml(request, response, str);
+            }catch(Exception jse){
+                replyWithGeneralError(request, response, jse, sRestCommand);
+            }
+        }else if (sReplyFormatExtension.equals("json")){
+            try{
+                String str = User.setToJSON(users).toString();
+                replyWithText(request, response, str);
+            }catch(Exception jse){
+                replyWithGeneralError(request, response, jse, sRestCommand);
+            }          
+        }else{
+            replyWithBadExtensionError(request, response, sReplyFormatExtension,
+                    sRestCommand);
+        }
+
+    }
+
+
+
+
+    private void replyWithUser(User usr, HttpServletRequest request, 
+            HttpServletResponse response, String sReplyFormatExtension,
+            String sRestCommand){
+
+        if(sReplyFormatExtension.equals("txt")) {
+            String str = usr.toString();
+            replyWithText(request, response, str);
+        }else if (sReplyFormatExtension.equals("xml")){
+            try{
+                String str = usr.toXml();
+                replyWithXml(request, response, str);
+            }catch(Exception jse){
+                replyWithGeneralError(request, response, jse, sRestCommand);
+            }
+        }else if (sReplyFormatExtension.equals("json")){
+            try{
+                String str = usr.toJSON().toString();
+                replyWithText(request, response, str);
+            }catch(Exception jse){
+                replyWithGeneralError(request, response, jse, sRestCommand);
+            }          
+        }else{
+            replyWithBadExtensionError(request, response, sReplyFormatExtension,
+                    sRestCommand);
+        }
+        return;
+    }
+
+    /**
+     * responds to a http request with a set of Roles. generates a string
+     * representation of the roles in a format determined by 
+     * sReplyFormatExtension and writes it to the response.
+     *
+     * @param sReplyFormatExtension 
+     * acceptable formats are 'txt', 'xml', and 'json'. If another format
+     * is requested, an error message will be written to the response.
+     *
+     * @param sRestCommand is an identifier for the original command that
+     * was issued that this response is for. only used to log errors.
+     */
+    private void replyWithRoles(Set<Role> roles, HttpServletRequest request, 
+            HttpServletResponse response, String sReplyFormatExtension,
+            String sRestCommand){
+        
+        if(sReplyFormatExtension.equals("txt")) {
+            String str = Role.setToText(roles);
+            replyWithText(request, response, str);
+        }else if (sReplyFormatExtension.equals("xml")){
+            try{
+                String str = Role.setToXML(roles);
+                replyWithXml(request, response, str);
+            }catch(Exception jse){
+                replyWithGeneralError(request, response, jse, sRestCommand);
+            }
+        }else if (sReplyFormatExtension.equals("json")){
+            try{
+                String str = Role.setToJSON(roles).toString();
+                replyWithText(request, response, str);
+            }catch(Exception jse){
+                replyWithGeneralError(request, response, jse, sRestCommand);
+            }          
+        }else{
+            replyWithBadExtensionError(request, response, sReplyFormatExtension,
+                    sRestCommand);
+        }
+        return;
+    }
+    
+    ////////////////////
+    //Formatted Responses
+    ////////////////////
+    private void replyWithXml(HttpServletRequest request,
+            HttpServletResponse response, String xmlContent) {
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/xml");
+        try {
+            response.getWriter().println(xmlContent);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void replyWithText(HttpServletRequest request,
+            HttpServletResponse response, String textContent) {
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("text/plain");
+        try {
+            response.getWriter().println(textContent);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return;
+    }
+
+    //////////////////
+    //Error responses
+    //////////////////
+    
     /**
      * used to handle a request when the request uses an invalid extension
      * for the type of info it's requesting (eg user requested
@@ -356,7 +511,8 @@ public class WSSecurityLogic {
         try{
             response.getWriter().println(sResponse);
         }catch(IOException ioe){
-            //FIXME
+            ioe.printStackTrace();
+    
         }
     }
 
@@ -370,143 +526,39 @@ public class WSSecurityLogic {
             String sRestCommand){
         //TODO: transmit exception, not just human readable err message
         String sResponse = "Missing HTTP Param: " + sExpectedHttpParam;
-        sResponse += "\nIn Calling Command: sRestCommand";
+        sResponse += "\nIn Calling Command: " + sRestCommand;
         try{
             response.getWriter().println(sResponse);
         }catch(IOException ioe){
-            //FIXME
+            ioe.printStackTrace();
         }
-    }
-
-
-    /**
-     * responds to a http request with a set of Users. generates a string
-     * representation of the users in a format determined by 
-     * sReplyFormatExtension and writes it to the response.
-     *
-     * @param sReplyFormatExtension 
-     * acceptable formats are 'txt', 'xml', and 'json'. If another format
-     * is requested, an error message will be written to the response.
-     *
-     * @param sRestCommand is an identifier for the original command that
-     * was issued that this response is for. only used to log errors.
-     */
-    private void replyWithUsers(Set<User> users, HttpServletRequest request, 
-            HttpServletResponse response, String sReplyFormatExtension,
-            String sRestCommand){
-
-        JSONObject usersAsJson = User.setToJSON(users);
-        String usersAsString = jsonToResponseString(usersAsJson, 
-                sReplyFormatExtension);
-        if(usersAsString == null){
-            replyWithBadExtensionError(request, response, sReplyFormatExtension,
-                    sRestCommand);
-            return;
-        }
-        try{
-            response.getWriter().println(usersAsString);
-        }catch(IOException ioe){
-            //FIXME
-        }
-        return;
-    }
-
-    private void replyWithUser(User usr, HttpServletRequest request, 
-            HttpServletResponse response, String sReplyFormatExtension,
-            String sRestCommand){
-        /*Set<User> usrs = new HashSet<User>();
-        usrs.add(usr);
-        replyWithUsers(usrs, request, response, sReplyFormatExtension,
-                sRestCommand);
-                */
-        JSONObject userAsJson = usr.toJSON();
-        String usersAsString = jsonToResponseString(userAsJson, 
-                sReplyFormatExtension);
-        if(usersAsString == null){
-            replyWithBadExtensionError(request, response, sReplyFormatExtension,
-                    sRestCommand);
-            return;
-        }
-        try{
-            response.getWriter().println(usersAsString);
-        }catch(IOException ioe){
-            //FIXME
-        }  	
-        return;
-    }
-
-    /**
-     * responds to a http request with a set of Roles. generates a string
-     * representation of the roles in a format determined by 
-     * sReplyFormatExtension and writes it to the response.
-     *
-     * @param sReplyFormatExtension 
-     * acceptable formats are 'txt', 'xml', and 'json'. If another format
-     * is requested, an error message will be written to the response.
-     *
-     * @param sRestCommand is an identifier for the original command that
-     * was issued that this response is for. only used to log errors.
-     */
-    private void replyWithRoles(Set<Role> roles, HttpServletRequest request, 
-            HttpServletResponse response, String sReplyFormatExtension,
-            String sRestCommand){
-
-        JSONObject rolesAsJson = Role.setToJSON(roles);
-        String rolesAsString = jsonToResponseString(rolesAsJson, 
-                sReplyFormatExtension);
-
-        if(rolesAsString == null){
-            replyWithBadExtensionError(request, response, sReplyFormatExtension,
-                    sRestCommand);
-            return;
-        }
-        try{
-            response.getWriter().println(rolesAsString);
-        }catch(IOException ioe){
-            //FIXME
-        }
-        return;
-
-    }
-
-    @SuppressWarnings("unused")
-	private void replyWithRole(Role role, HttpServletRequest request, 
-            HttpServletResponse response, String sReplyFormatExtension,
-            String sRestCommand){
-        Set<Role> roles = new HashSet<Role>();
-        roles.add(role);
-        replyWithRoles(roles, request, response, sReplyFormatExtension,
-                sRestCommand);
-        return;
     }
     
     /**
-     * after a resonse data set has been converted to json, this method
-     * converts it to a string representation in the final output response
-     * format.
+     * handles a response when any Exception has occured. prints the
+     * exception into the response. This is the catch-all error
+     * propagation through the webservices and should only be used as a 
+     * last resort.
+     * 
+     * @param request the original http request
+     * @param response  the http response to respond with
+     * @param exc the exception to be sent via this servlet call
+     * @param sRestCommand the webservices command being called when the
+     * exception occurred
      */
-    private String jsonToResponseString(JSONObject jobj, 
-            String sReplyFormatExtension){
-
-        String str = null;
-
-        if(sReplyFormatExtension.equals("txt")) {
-            str = jobj.toString();//FIXME: needs to not be json
-        }else if (sReplyFormatExtension.equals("xml")){
-            try{
-                str = XML.toString(jobj);
-            }catch(JSONException jse){
-                return null;//FIXME: need to do something else
-            }
-        }else if (sReplyFormatExtension.equals("json")){
-            str = jobj.toString();
-        }else{
-            str = null;
-        }
-        return str;
-
+    private void replyWithGeneralError(HttpServletRequest request,
+            HttpServletResponse response, Exception exc,
+            String sRestCommand) {
+        
+        String sResponse = "Meandre Error: " + exc.toString();
+        sResponse += "\nIn Calling Command:" + sRestCommand;
+        try{
+            response.getWriter().println(sResponse);
+        }catch(IOException ioe){
+            ioe.printStackTrace();
+            
+        }       
     }
-
 
     
 }

@@ -6,6 +6,7 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.XML;
 import org.meandre.core.security.User;
 
 
@@ -37,6 +38,9 @@ public class User {
 	/** field for representing a list of users. */
 	private static final String FIELD_SET = "user_set";
 	
+	/** field for representing a single user in a set of users. */
+    private static final String FIELD_USER = "user";
+    
 	/** The user nickname */
 	private String sNickName = null;
 	
@@ -144,7 +148,7 @@ public class User {
 	}
 
     public int hashCode(){
-        //TODO: should be hash of the url
+        //TODO: should be hash of the url?
         return sName.hashCode() + sNickName.hashCode();
     }
     
@@ -162,6 +166,54 @@ public class User {
         isEqual &= otherUser.getNickName().equals(this.getNickName());
         isEqual &= otherUser.getName().equals(this.getName());
         return isEqual;
+    }
+
+    public static String setToText(Set<User> users) {
+        StringBuffer sb = new StringBuffer();
+        for(User usr : users){
+            sb.append(usr.toString());
+            sb.append("\n");
+        }
+        return sb.toString();
+        
+    }
+
+    public static String setToXml(Set<User> users) {
+
+        String sXml = null;
+        try{
+            JSONArray ja = new JSONArray();
+            for(User usr : users){
+                             
+                ja.put(usr.toJSON());
+            }
+            JSONObject jo = new JSONObject();
+            jo.put(FIELD_USER, ja);
+            sXml = XML.toString(jo, FIELD_SET);
+            
+        }catch(JSONException je){
+            //This supposedly won't ever happen
+            je.printStackTrace();
+        }
+        return sXml; 
+        
+    }
+
+    public String toXml() {
+
+        String sXml = null;
+        try{
+            JSONArray ja = new JSONArray();
+            ja.put(this.toJSON());
+            JSONObject jo = new JSONObject();
+            jo.put(FIELD_USER, ja);
+            sXml = XML.toString(jo, FIELD_SET);
+            
+        }catch(JSONException je){
+            //This supposedly won't ever happen
+            je.printStackTrace();
+        }
+        return sXml;     
     }
 
 }
