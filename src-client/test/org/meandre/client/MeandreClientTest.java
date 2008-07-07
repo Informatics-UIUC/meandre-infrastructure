@@ -579,7 +579,29 @@ public class MeandreClientTest {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Test method for 
+     * {@link org.meandre.client.MeandreClient#uploadFiles(Set<File>, boolean)}.
+     */
+    @Test
+    public void testUploadFiles() {
+        Set<File> jars = new HashSet<File>();
+        File jarFile = new File(_sTestUploadJar);
+        jars.add(jarFile);
+        //assertTrue("FileExists", jarFile.exists());
+        System.out.println(jarFile.toString());
+    
+        try{
+            boolean ret;
+            //ret = _meandreClient.removeResource(sCompUrl);
+            ret = _meandreClient.uploadFiles(jars, true);
+            assertTrue("!upload success", ret);
+        }catch(Exception e){
+            e.printStackTrace();
+            fail("could not complete upload");
+        }
+        return;
+    }
     /**
      * Test method for 
      * {@link org.meandre.client.MeandreClient#remove(java.lang.String)}.

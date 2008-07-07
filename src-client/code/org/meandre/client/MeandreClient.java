@@ -472,7 +472,7 @@ public class MeandreClient extends MeandreBaseClient{
      *
      * <p> calls:
      * http://<meandre_host>:<meandre_port>/services/repository/add.nt
-     * TODO:Need test
+     * 
      */
     public boolean uploadFlow(FlowDescription flow, boolean overwrite)
             throws TransmissionException{
@@ -504,7 +504,7 @@ public class MeandreClient extends MeandreBaseClient{
      *
      * <p> calls:
      * http://<meandre_host>:<meandre_port>/services/repository/add.nt
-     * TODO:Need test
+     * 
      */
     public boolean uploadComponent(ExecutableComponentDescription component,
             Set<File> jarFileContexts, boolean overwrite)
@@ -599,7 +599,8 @@ public class MeandreClient extends MeandreBaseClient{
             byte[] baModel = osModel.toByteArray();
             //NOTE: "InMemoryBytes" is given as the filename, and it is not
             //clear what it's used for by httpclient in this context
-            PartSource source = new ByteArrayPartSource("InMemoryBytes", baModel);
+            PartSource source = new ByteArrayPartSource("InMemoryBytes", 
+            		baModel);
             postParts.add(new FilePart("repository", source));
         }
 
@@ -623,6 +624,25 @@ public class MeandreClient extends MeandreBaseClient{
         return true;
     }
 
+    /**
+     * Uploads a set of jar files to the resources directory of the server.
+     * For instance, jar files required by an applet that a component 
+     * uses in it's web UI, which are not uploaded with the component itself
+     * because the component has no direct dependency on them, would be
+     * uploaded via this method and then be available to the applet. 
+     * 
+     *
+     * <p> calls:
+     * http://<meandre_host>:<meandre_port>/services/repository/add.nt
+     * TODO:Need test
+     */
+    public boolean uploadFiles(Set<File> files, boolean overwrite)
+            throws TransmissionException {
+    	//just use the regular uploader with no models
+    	Set<Model> emptyModelSet = new HashSet<Model>(0);
+    	boolean ret = uploadModelBatch(emptyModelSet, files, overwrite);
+    	return ret;
+    }
 
     /**
      *removes (deletes) either a component or flow from the server. returns
