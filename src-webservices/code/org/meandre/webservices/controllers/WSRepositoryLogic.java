@@ -936,6 +936,7 @@ public class WSRepositoryLogic {
 				log.warning("Component "+resComp+" already exist in "+request.getRemoteUser()+" repository. Discarding it.");
 			}
 		}
+		
 		// Adding flows
 		Model modUser = qr.getModel();
 		modUser.begin();
@@ -962,7 +963,7 @@ public class WSRepositoryLogic {
 		boolean bWriteOnce = true;
 		for ( ExecutableComponentDescription ecd:setComponentsToAdd) {
 			if ( htContextBytes.keySet().isEmpty() ) {
-				if ( qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent()) ) {
+				if ( qr.getExecutableComponentDescription(ecd.getExecutableComponent())!=null ) {
 					if ( bOverwrite ) {
 						modUser.remove(qr.getExecutableComponentDescription(ecd.getExecutableComponent()).getModel());
 						modUser.add(ecd.getExecutableComponent().getModel());
@@ -976,7 +977,8 @@ public class WSRepositoryLogic {
 			}
 			else {
 				if ( (bEmbed && ecd.getRunnable().equals("java") && ecd.getFormat().equals("java/class") ) ||
-					 (ecd.getRunnable().equals("python") && ecd.getFormat().equals("jython")) ) {
+						 (ecd.getRunnable().equals("python") && ecd.getFormat().equals("jython"))||
+						 (ecd.getRunnable().equals("lisp") && ecd.getFormat().equals("clojure")) ) {
 					//
 					// Embed all the context per descriptor
 					//
@@ -1010,7 +1012,7 @@ public class WSRepositoryLogic {
 					bWriteOnce = false;
 				}
 
-				if ( qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent()) ) {
+				if ( qr.getExecutableComponentDescription(ecd.getExecutableComponent())!=null ) {
 					if ( bOverwrite ) {
 						modUser.remove(qr.getExecutableComponentDescription(ecd.getExecutableComponent()).getModel());
 						modUser.add(ecd.getModel());
