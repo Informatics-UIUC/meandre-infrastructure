@@ -257,7 +257,7 @@
 	</target>
 
 	<!-- dist -->
-    <target name="dist" depends="compile" description="-> creates jars for distribution">
+    <target name="dist" depends="compile,test-reports" description="-> creates jars for distribution">
 
     	<mkdir dir="${dist.dir}/lib"/>
     	<mkdir dir="${dist.dir}/tmp"/>
@@ -472,6 +472,42 @@
         description="-> creates jars of source directories">
 
     	<mkdir dir="${dist.dir}/src-jars"/>
+    	
+    	    <!-- Create core jar -->
+    	        <jar destfile="${dist.dir}/src-jars/${app.name}-core-${build.version}-src.jar">
+    	        	<manifest>
+    	        	 <attribute name="Build-Version" value="${build.version}"/>
+    	        	 </manifest>
+    	        	            <fileset dir="${annotation.src}">
+    	        	                <include name="**/*"/>
+    	        	            </fileset>
+    	        				<fileset dir="${kernel.src}">
+    	        	                <include name="**/*"/>
+    	        	            </fileset>
+    	        	 			<fileset dir="${zigzag.src}">
+    	        	                <include name="**/*"/>
+    	        	            </fileset>
+    	        	 			 <fileset dir="${plugins.src}">
+    	        	                <include name="**/*"/>
+    	        	            </fileset>
+    	        				 <fileset dir="${demo.src}">
+    	        	                <include name="**/*"/>
+    	        	            </fileset>
+    	        				<fileset dir="${ws.src}">
+    	        	                <include name="**/*"/>
+    	        	            </fileset>
+    	        	 			<fileset dir="${store.src}">
+    	        	                <include name="**/*"/>
+    	        	            </fileset>
+    	        	 			 <fileset dir="${terracotta.src}">
+    	        	                <include name="**/*"/>
+    	        	            </fileset>
+    	        	  			<fileset dir="${client.src}">
+    	        	                <include name="**/*"/>
+    	        	            </fileset>
+    	        </jar>
+
+    	
     	    	
         <!-- Create annotation jar -->
         <jar destfile="${dist.dir}/src-jars/meandre-annotation-${build.version}-src.jar">
