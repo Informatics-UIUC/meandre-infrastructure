@@ -227,7 +227,7 @@ public class FlowDescriptionTest {
 		
 		fd.addExecutableComponentInstance(ecid);
 		
-		assertNotNull(fd.getExecutableComponentResourceForInstance(ecid.getExecutableComponent()));
+		assertNotNull(fd.getExecutableComponentResourceForInstance(ecid.getExecutableComponentInstance()));
 	}
 
 	/**
@@ -258,10 +258,10 @@ public class FlowDescriptionTest {
 		
 		fd.addExecutableComponentInstance(ecid);
 		iSize = fd.getExecutableComponentInstances().size();
-		fd.removeExecutableComponentInstance(ecid.getExecutableComponent());
+		fd.removeExecutableComponentInstance(ecid.getExecutableComponentInstance());
 		assertEquals(iSize-1,fd.getExecutableComponentInstances().size());
 
-		fd.removeExecutableComponentInstance(ecid.getExecutableComponent());
+		fd.removeExecutableComponentInstance(ecid.getExecutableComponentInstance());
 		assertEquals(0,fd.getExecutableComponentInstances().size());
 	}
 

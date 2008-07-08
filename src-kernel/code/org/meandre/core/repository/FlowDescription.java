@@ -238,7 +238,7 @@ public class FlowDescription {
 	 */
 	public void addExecutableComponentInstance ( ExecutableComponentInstanceDescription ecid ) {
 		setExecutableComponentInstances.add(ecid);
-		htExecutableComponentInstances.put(ecid.getExecutableComponent(), ecid);
+		htExecutableComponentInstances.put(ecid.getExecutableComponentInstance(), ecid);
 	}
 
 	/** Removes an executable component instance.
@@ -249,7 +249,7 @@ public class FlowDescription {
 		ExecutableComponentInstanceDescription ecid = htExecutableComponentInstances.get(res);
 		if ( ecid!=null ) {
 			setExecutableComponentInstances.remove(ecid);
-			htExecutableComponentInstances.remove(ecid.getExecutableComponent());
+			htExecutableComponentInstances.remove(ecid.getExecutableComponentInstance());
 		}
 	}
 
@@ -259,7 +259,7 @@ public class FlowDescription {
 	 */
 	public void removeExecutableComponentInstance ( ExecutableComponentInstanceDescription ecd ) {
 		setExecutableComponentInstances.remove(ecd);
-		htExecutableComponentInstances.remove(ecd.getExecutableComponent());
+		htExecutableComponentInstances.remove(ecd.getExecutableComponentInstance());
 	}
 
 	/** Returns the set of executable component instances.
