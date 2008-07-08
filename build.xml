@@ -257,7 +257,7 @@
 	</target>
 
 	<!-- dist -->
-    <target name="dist" depends="compile,test-reports" description="-> creates jars for distribution">
+    <target name="dist" depends="compile" description="-> creates jars for distribution">
 
     	<mkdir dir="${dist.dir}/lib"/>
     	<mkdir dir="${dist.dir}/tmp"/>
@@ -474,7 +474,7 @@
     	<mkdir dir="${dist.dir}/src-jars"/>
     	    	
         <!-- Create annotation jar -->
-        <jar destfile="${dist.dir}/src-jars/src-annotation-${build.version}.jar">
+        <jar destfile="${dist.dir}/src-jars/meandre-annotation-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
             </manifest>
@@ -484,7 +484,7 @@
         </jar>
 
         <!-- Create kernel jar -->
-        <jar destfile="${dist.dir}/src-jars/src-kernel-${build.version}.jar">
+        <jar destfile="${dist.dir}/src-jars/meandre-kernel-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
             </manifest>
@@ -494,7 +494,7 @@
         </jar>
 
         <!-- Create zigzag jar -->
-        <jar destfile="${dist.dir}/src-jars/src-zigzag-${build.version}.jar">
+        <jar destfile="${dist.dir}/src-jars/meandre-zigzag-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
             </manifest>
@@ -504,7 +504,7 @@
         </jar>
 
         <!-- Create plugins jar -->
-        <jar destfile="${dist.dir}/src-jars/src-plugins-${build.version}.jar">
+        <jar destfile="${dist.dir}/src-jars/meandre-plugins-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
             </manifest>
@@ -513,7 +513,7 @@
             </fileset>
         </jar>
         <!-- Create demo jar -->
-        <jar destfile="${dist.dir}/src-jars/src-demo-${build.version}.jar">
+        <jar destfile="${dist.dir}/src-jars/meandre-demo-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
             </manifest>
@@ -522,7 +522,7 @@
             </fileset>
         </jar>
         <!-- Create jar -->
-        <jar destfile="${dist.dir}/src-jars/src-ws-${build.version}.jar">
+        <jar destfile="${dist.dir}/src-jars/meandre-ws-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
             </manifest>
@@ -531,7 +531,7 @@
             </fileset>
         </jar>
         <!-- Create jar -->
-        <jar destfile="${dist.dir}/src-jars/src-store-${build.version}.jar">
+        <jar destfile="${dist.dir}/src-jars/meandre-store-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
             </manifest>
@@ -540,7 +540,7 @@
             </fileset>
         </jar>
         <!-- Create jar -->
-        <jar destfile="${dist.dir}/src-jars/src-terracotta-${build.version}.jar">
+        <jar destfile="${dist.dir}/src-jars/meandre-terracotta-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
             </manifest>
@@ -549,7 +549,7 @@
             </fileset>
         </jar>
         <!-- Create jar -->
-        <jar destfile="${dist.dir}/src-jars/src-client-${build.version}.jar">
+        <jar destfile="${dist.dir}/src-jars/meandre-client-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
             </manifest>
