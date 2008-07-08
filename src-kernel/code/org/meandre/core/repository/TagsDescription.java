@@ -45,8 +45,9 @@ public class TagsDescription {
 		StringBuffer sb = new StringBuffer();
 		
 		for ( String sTag:setTags )
-			sb.append(sTag+" ");
+			sb.append(sTag+", ");
 		
-		return sb.toString().trim();
+		String sRes = sb.toString();
+		return (sRes.length()>0)? sRes.substring(0, sRes.length()-2).trim(): "";
 	}
 }
