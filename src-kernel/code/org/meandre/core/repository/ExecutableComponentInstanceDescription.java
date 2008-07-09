@@ -11,7 +11,7 @@ public class ExecutableComponentInstanceDescription {
 
 
 	/** The resource for the executable component */
-	private Resource resExecutableComponentInstace = null;
+	private Resource resExecutableComponentInstance = null;
 
 	/** The module pointing to the resource */
 	private Resource resComponent = null;
@@ -30,7 +30,7 @@ public class ExecutableComponentInstanceDescription {
 	 *
 	 */
 	public ExecutableComponentInstanceDescription () {
-		this.resExecutableComponentInstace = null;
+		this.resExecutableComponentInstance = null;
 		this.resComponent = null;
 		this.sName = "";
 		this.sDescription = "";
@@ -52,7 +52,7 @@ public class ExecutableComponentInstanceDescription {
 				String sDescription,
 				PropertiesDescription pdProperties
 			) {
-		this.resExecutableComponentInstace = resExecutableComponentInstance;
+		this.resExecutableComponentInstance = resExecutableComponentInstance;
 		this.resComponent = resComponent;
 		this.sName = sName;
 		this.sDescription = sDescription;
@@ -65,7 +65,7 @@ public class ExecutableComponentInstanceDescription {
 	 * @param res The instance resources
 	 */
 	public void setExecutableComponentInstance ( Resource res ) {
-		resExecutableComponentInstace = res;
+		resExecutableComponentInstance = res;
 	}
 
 	/** Returns the instance resource.
@@ -73,7 +73,7 @@ public class ExecutableComponentInstanceDescription {
 	 * @return The instance resources
 	 */
 	public Resource getExecutableComponentInstance() {
-		return resExecutableComponentInstace;
+		return resExecutableComponentInstance;
 	}
 
 	/** Set the executable component resource.
