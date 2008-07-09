@@ -9,7 +9,9 @@ import java.io.StringReader;
 import java.util.logging.Logger;
 
 import org.meandre.core.ComponentContext;
+import org.meandre.core.ComponentContextException;
 import org.meandre.core.ComponentContextProperties;
+import org.meandre.core.ComponentExecutionException;
 import org.meandre.core.ExecutableComponent;
 import org.meandre.core.environments.ScriptingEnvironmentAdapter;
 import org.meandre.core.logger.KernelLoggerFactory;
@@ -91,7 +93,13 @@ implements ExecutableComponent, ScriptingEnvironmentAdapter {
 			
 		} catch (Exception e) {
 			KernelLoggerFactory.getCoreLogger().warning("Clojure init: "+e.toString());
-			dispose(null);
+			try {
+				dispose(null);
+			} catch (ComponentExecutionException e1) {
+				KernelLoggerFactory.getCoreLogger().warning("Clojure dispose: "+e.toString());
+			} catch (ComponentContextException e1) {
+				KernelLoggerFactory.getCoreLogger().warning("Clojure dispose: "+e.toString());
+			}
 		}
 		
 	}
@@ -166,8 +174,14 @@ implements ExecutableComponent, ScriptingEnvironmentAdapter {
 	/** Invokes the initialize method.
 	 * 
 	 * @param ccp The component context properties
-	 */
-	public void initialize(ComponentContextProperties ccp) {
+	 * @throws ComponentExecutionException If a fatal condition arises during
+	 *         the execution of a component, a ComponentExecutionException
+	 *         should be thrown to signal termination of execution required.
+	 * @throws ComponentContextException A violation of the component context
+	 *         access was detected
+	*/
+	public void initialize(ComponentContextProperties ccp) 
+	throws ComponentExecutionException, ComponentContextException {
 		Var cjCCP = RT.var(USER.getName(), "initialize");
 		try {
 			cjCCP.invoke(ccp);
@@ -180,8 +194,15 @@ implements ExecutableComponent, ScriptingEnvironmentAdapter {
 	/** Invokes the execute method.
 	 * 
 	 * @param ccp The component context 
+	 * @throws ComponentExecutionException If a fatal condition arises during
+	 *         the execution of a component, a ComponentExecutionException
+	 *         should be thrown to signal termination of execution required.
+	 * @throws ComponentContextException A violation of the component context
+	 *         access was detected
+	
 	 */
-	public void execute(ComponentContext cc) {
+	public void execute(ComponentContext cc) 
+	throws ComponentExecutionException, ComponentContextException {
 		Var cjCCP = RT.var(USER.getName(), "execute");
 		try {
 			cjCCP.invoke(cc);
@@ -195,8 +216,14 @@ implements ExecutableComponent, ScriptingEnvironmentAdapter {
 	/** Invokes the dispose method.
 	 * 
 	 * @param ccp The component context 
+	 * @throws ComponentExecutionException If a fatal condition arises during
+	 *         the execution of a component, a ComponentExecutionException
+	 *         should be thrown to signal termination of execution required.
+	 * @throws ComponentContextException A violation of the component context
+	 *         access was detected
 	 */
-	public void dispose(ComponentContextProperties ccp) {
+	public void dispose(ComponentContextProperties ccp) 
+	throws ComponentExecutionException, ComponentContextException {
 		Var cjCCP = RT.var(USER.getName(), "dispose");
 		try {
 			cjCCP.invoke(ccp);

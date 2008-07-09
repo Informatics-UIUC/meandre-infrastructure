@@ -63,8 +63,14 @@ implements ExecutableComponent, ScriptingEnvironmentAdapter {
 	 * getting run.
 	 *
 	 * @param ccp The properties associated to a component context
-	 */
-	public void initialize ( ComponentContextProperties ccp ) {
+	 * @throws ComponentExecutionException If a fatal condition arises during
+	 *         the execution of a component, a ComponentExecutionException
+	 *         should be thrown to signal termination of execution required.
+	 * @throws ComponentContextException A violation of the component context
+	 *         access was detected
+	*/
+	public void initialize ( ComponentContextProperties ccp ) 
+	throws ComponentExecutionException, ComponentContextException {
 		// Call the python initialize function
 		pi.set("ccp", ccp);
 		pi.exec("initialize(ccp)");
@@ -91,8 +97,14 @@ implements ExecutableComponent, ScriptingEnvironmentAdapter {
 	/** This method is called when the Menadre Flow execution is completed.
 	 *
 	 * @param ccp The properties associated to a component context
-	 */
-	public void dispose ( ComponentContextProperties ccp ) {
+	 * @throws ComponentExecutionException If a fatal condition arises during
+	 *         the execution of a component, a ComponentExecutionException
+	 *         should be thrown to signal termination of execution required.
+	 * @throws ComponentContextException A violation of the component context
+	 *         access was detected
+	*/
+	public void dispose ( ComponentContextProperties ccp ) 
+	throws ComponentExecutionException, ComponentContextException {
 		// Call the python initialize function
 		pi.set("ccp", ccp);
 		pi.exec("dispose(ccp)");

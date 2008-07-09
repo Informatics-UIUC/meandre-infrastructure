@@ -70,10 +70,12 @@ public class JythonExecutableComponentAdapterTest {
 
 	/** Test the initialize method.
 	 * @throws InterruptedException Something went wrong
+	 * @throws ComponentContextException  Something went wrong
+	 * @throws ComponentExecutionException Something went wrong
 	 *
 	 */
 	@Test
-	public void testInitializeAndDispose() throws InterruptedException {
+	public void testInitializeAndDispose() throws InterruptedException, ComponentExecutionException, ComponentContextException {
 		String sRes = null;
 		MrProbe thdMrProbe = new MrProbe(TestLoggerFactory.getTestLogger(), new NullProbeImpl(), false, false);
 		thdMrProbe.start();
@@ -124,8 +126,8 @@ public class JythonExecutableComponentAdapterTest {
 				new Hashtable<String, String> (), null,
 				"nothing", new Hashtable<String, String> (), thdMrProbe,cnf);
 		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf);
-		jeca.initialize(cc);
 		try {
+			jeca.initialize(cc);
 			jeca.execute(cc);
 		} catch (ComponentExecutionException e) {
 			fail("This execption should not be thrown "+e);
