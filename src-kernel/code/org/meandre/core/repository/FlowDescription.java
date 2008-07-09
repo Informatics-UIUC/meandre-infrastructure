@@ -28,19 +28,19 @@ public class FlowDescription {
 	/** The resource for the flow component */
 	private Resource resFlowComponent = null;
 
-	/** The name of the executable component */
+	/** The name of the flow */
 	private String sName = null;
 
-	/** The description of the executable component */
+	/** The description of the flow */
 	private String sDescription = null;
 
-	/** The rights of the executable component */
+	/** The rights of the flow */
 	private String sRights = null;
 
-	/** The creator of the executable component */
+	/** The creator of the flow */
 	private String sCreator = null;
 
-	/** The date of the executable component */
+	/** The date of the flow */
 	private Date dateCreation = null;
 
 	/** Instantiated executable components */
@@ -114,7 +114,7 @@ public class FlowDescription {
 		}
 	}
 
-	/** Sets the executable component resource.
+	/** Sets the flow resource.
 	 *
 	 * @param res The resource
 	 */
@@ -122,7 +122,7 @@ public class FlowDescription {
 		resFlowComponent = res;
 	}
 
-	/** Returns the executable component resource.
+	/** Returns the flow resource.
 	 *
 	 * @return The resource
 	 */
@@ -130,7 +130,7 @@ public class FlowDescription {
 		return resFlowComponent;
 	}
 
-	/** Returns the executable component resource as a string.
+	/** Returns the flow resource as a string.
 	 *
 	 * @return The resource
 	 */
@@ -138,7 +138,7 @@ public class FlowDescription {
 		return resFlowComponent.toString();
 	}
 
-	/** Sets the components name.
+	/** Sets the flow name.
 	 *
 	 * @param sName The name
 	 */
@@ -146,7 +146,7 @@ public class FlowDescription {
 		this.sName=sName;
 	}
 
-	/** Returns the components name.
+	/** Returns the flow name.
 	 *
 	 * @return The name
 	 */
@@ -154,7 +154,7 @@ public class FlowDescription {
 		return sName;
 	}
 
-	/** Sets the executable component description.
+	/** Sets the flow description.
 	 *
 	 * @param sDesc The description
 	 */
@@ -162,7 +162,7 @@ public class FlowDescription {
 		this.sDescription=sDesc;
 	}
 
-	/** Returns the executable component description.
+	/** Returns the flow description.
 	 *
 	 * @return The description
 	 */
@@ -170,7 +170,7 @@ public class FlowDescription {
 		return sDescription;
 	}
 
-	/** Set the rights of the component.
+	/** Set the rights for the flow.
 	 *
 	 * @param sRightsText The rights
 	 */
@@ -178,7 +178,7 @@ public class FlowDescription {
 		sRights =  sRightsText;
 	}
 
-	/** Returns the rights of the component.
+	/** Returns the rights of the flow.
 	 *
 	 * @return The rights
 	 */
@@ -186,7 +186,7 @@ public class FlowDescription {
 		return sRights;
 	}
 
-	/** Sets the creator of the component.
+	/** Sets the creator of the flow.
 	 *
 	 * @param sCreator The creator
 	 */
@@ -194,7 +194,7 @@ public class FlowDescription {
 		this.sCreator=sCreator;
 	}
 
-	/** Returns the creator of the component.
+	/** Returns the creator of the flow.
 	 *
 	 * @return The creator
 	 */
@@ -202,15 +202,15 @@ public class FlowDescription {
 		return sCreator;
 	}
 
-	/** Sets the creation date of the component.
+	/** Sets the creation date of the flow.
 	 *
 	 * @param date The date
 	 */
-	public void setCreationDate  ( Date d ) {
+	public void setCreationDate ( Date d ) {
 		dateCreation = d;
 	}
 
-	/** Returns the creation date of the component.
+	/** Returns the creation date of the flow.
 	 *
 	 * @return The date
 	 */
