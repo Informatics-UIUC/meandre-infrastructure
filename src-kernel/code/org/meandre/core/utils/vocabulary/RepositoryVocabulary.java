@@ -114,5 +114,5 @@ public class RepositoryVocabulary {
 	public static final Property value = m_model.createProperty("http://www.meandre.org/ontology/value");
 
 	/** The mode property */
-	public static final Property mode = m_model.createProperty("http://www.meandre.org/ontology/value");
+	public static final Property mode = m_model.createProperty("http://www.meandre.org/ontology/mode");
 }
