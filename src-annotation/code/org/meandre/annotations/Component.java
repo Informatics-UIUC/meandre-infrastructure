@@ -12,6 +12,7 @@ import java.lang.annotation.ElementType;
  * Created on May 23, 2008 6:59:04 PM
  *  //modified May 31st 2008 made name attribute essential.
  *  // the runnable and format properties are enums.
+ *  // added type -July 08
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target (ElementType.TYPE)
@@ -19,6 +20,11 @@ public @interface Component {
 	public enum FiringPolicy { all, any};
 	public enum Licenses {UofINCSA, ASL_2, Other};
 	public enum Runnable {java,python,lisp};
+	/*corresponds to resMode in the description*/
+	public enum Type {webui,compute};
+	// "http://www.meandre.org/ontology/component/type/webui"
+	// "http://www.meandre.org/ontology/component/type/compute"
+	
 	//public enum Format {javaFormat,pythonFormat,lispFormat};
 	//final static String javaFormat ="java/class";
 	//final static String pythonFormat ="jython";
@@ -39,8 +45,6 @@ public @interface Component {
 	String[] dependency() default "";
 	/*property files or other dependencies that are not jar libraries*/
 	String[] resources() default "";
-	//  public enum type {webUI,nonWebUI};
-	// "http://www.meandre.org/ontology/component/type/nonwebui"
-	// "http://www.meandre.org/ontology/component/type/webui"
+	Type type() default Type.compute;
 	
 }
