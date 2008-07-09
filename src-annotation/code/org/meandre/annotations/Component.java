@@ -21,7 +21,7 @@ public @interface Component {
 	public enum Licenses {UofINCSA, ASL_2, Other};
 	public enum Runnable {java,python,lisp};
 	/*corresponds to resMode in the description*/
-	public enum Type {webui,compute};
+	public enum Mode {webui,compute};
 	// "http://www.meandre.org/ontology/component/type/webui"
 	// "http://www.meandre.org/ontology/component/type/compute"
 	
@@ -45,6 +45,6 @@ public @interface Component {
 	String[] dependency() default "";
 	/*property files or other dependencies that are not jar libraries*/
 	String[] resources() default "";
-	Type type() default Type.compute;
+	Mode mode() default Mode.compute;
 	
 }
