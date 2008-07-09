@@ -1,16 +1,12 @@
 package org.meandre.webservices.controllers;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.XML;
 import org.meandre.core.security.Role;
 import org.meandre.core.security.SecurityManager;
 import org.meandre.core.security.SecurityStoreException;

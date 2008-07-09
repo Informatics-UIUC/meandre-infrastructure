@@ -217,9 +217,25 @@ public class WSRepository extends HttpServlet {
     			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
     		}
     	}
+    	else if ( sTarget.endsWith("/describe_all_components") ) {
+    		if (requestorHasRole(request, Role.COMPONENTS)) {
+                describeAllComponentsAction(request, response, sTarget, sExtension);
+    		}
+    		else {
+    			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+    		}
+    	}
     	else if ( sTarget.endsWith("/describe_flow") ) {
     		if (requestorHasRole(request, Role.FLOWS)) {
                 describeFlowAction(request, response, sTarget, sExtension);
+    		}
+    		else {
+    			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+    		}
+    	}
+    	else if ( sTarget.endsWith("/describe_all_flows") ) {
+    		if (requestorHasRole(request, Role.FLOWS)) {
+                describeAllFlowsAction(request, response, sTarget, sExtension);
     		}
     		else {
     			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -672,6 +688,40 @@ public class WSRepository extends HttpServlet {
 	}
 
 
+	/** Describe all the available flows.
+	 * 
+	 * @param request The request object
+	 * @param response The response object
+	 * @param sTarget The target 
+	 * @param sExtension The extension of the call
+	 * @throws IOException Something went wrong when dumping the model
+	 */
+	private void describeAllFlowsAction(HttpServletRequest request,
+			HttpServletResponse response, String sTarget, String sExtension ) throws IOException {
+		
+		if ( sExtension.endsWith("rdf") ) {
+			Model mod = wsRepositoryLogic.getAllFlowsDescription(request.getRemoteUser());
+			dumpModel(request,response,mod,"RDF/XML-ABBREV");
+		}
+		else if ( sExtension.endsWith("ttl") ) {
+			Model mod = wsRepositoryLogic.getAllFlowsDescription(request.getRemoteUser());
+			dumpModel(request,response,mod,"TTL");
+		}
+		else if ( sExtension.endsWith("nt") ) {
+			Model mod = wsRepositoryLogic.getAllFlowsDescription(request.getRemoteUser());
+			dumpModel(request,response,mod,"N-TRIPLE");
+		}
+		else  {
+			//
+			// Invalid request found
+			//
+			log.info("Uknown repository service requested "+sTarget);
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		}
+	}
+
+
+
     /** Describes the requested component.
      *
      * @param request The request object
@@ -718,6 +768,41 @@ public class WSRepository extends HttpServlet {
 		}
 	}
 
+
+	/** Describe all the available components.
+	 * 
+	 * @param request The request object
+	 * @param response The response object
+	 * @param target The target 
+	 * @param extension The extension of the call
+	 * @throws IOException Something went wrong when dumping the model
+	 */
+    private void describeAllComponentsAction(HttpServletRequest request,
+			HttpServletResponse response, String sTarget, String sExtension) throws IOException {
+		// TODO Auto-generated method stub
+    	
+    	if ( sExtension.endsWith("rdf") ) {
+			Model mod = wsRepositoryLogic.getAllComponentsDescription(request.getRemoteUser());
+			dumpModel(request,response,mod,"RDF/XML-ABBREV");
+		}
+		else if ( sExtension.endsWith("ttl") ) {
+			Model mod = wsRepositoryLogic.getAllComponentsDescription(request.getRemoteUser());
+			dumpModel(request,response,mod,"TTL");
+		}
+		else if ( sExtension.endsWith("nt") ) {
+			Model mod = wsRepositoryLogic.getAllComponentsDescription(request.getRemoteUser());
+			dumpModel(request,response,mod,"N-TRIPLE");
+		}
+		else  {
+			//
+			// Invalid request found
+			//
+			log.info("Uknown repository service requested "+sTarget);
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		}
+		
+	}
+    
 	/** The tag flow action.
 	 *
 	 * @param request The request object

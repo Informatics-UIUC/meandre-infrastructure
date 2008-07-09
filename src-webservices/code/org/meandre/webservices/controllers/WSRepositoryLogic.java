@@ -498,16 +498,37 @@ public class WSRepositoryLogic {
 	 */
 	public String getListOfFlowTagsAsTxt ( String sUser )
 	throws IOException {
-
+	
 		StringBuffer sbRes = new StringBuffer();
-
+	
 		QueryableRepository qr = store.getRepositoryStore(sUser);
-
+	
 		for ( String sTag:qr.getFlowTags() )
 			sbRes.append(sTag+"\n");
-
+	
 		return sbRes.toString();
+	
+	}
 
+	/** Creates a model containing all the available components.
+	 * 
+	 * @param remoteUser The remote user
+	 * @return The model containing all the available components
+	 */
+	public Model getAllComponentsDescription(String remoteUser) {
+		Model modelRes = ModelFactory.createDefaultModel();
+
+		modelRes.setNsPrefix("", "http://www.meandre.org/ontology/");
+		modelRes.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
+		modelRes.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
+		modelRes.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
+
+		QueryableRepository qr = store.getRepositoryStore(remoteUser);
+		
+		for ( ExecutableComponentDescription ecd:qr.getAvailableExecutableComponentDescriptions())
+			modelRes.add(ecd.getModel());
+
+		return modelRes;
 	}
 
 	/** Returns the model description for the requested component URI.
@@ -540,6 +561,26 @@ public class WSRepositoryLogic {
 		return modelRes;
 	}
 
+	/** Returns a model with all the available descriptors
+	 * 
+	 * @param remoteUser The user requesting the description
+	 * @return The model containing the available models
+	 */
+	public Model getAllFlowsDescription(String remoteUser) {
+		Model modelRes = ModelFactory.createDefaultModel();
+
+		modelRes.setNsPrefix("", "http://www.meandre.org/ontology/");
+		modelRes.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
+		modelRes.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
+		modelRes.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
+
+		QueryableRepository qr = store.getRepositoryStore(remoteUser);
+		
+		for ( FlowDescription fd:qr.getAvailableFlowDescriptions())
+			modelRes.add(fd.getModel());
+
+		return modelRes;
+	}
 
 	/** Returns the model description for the requested flow URI.
 	 *
@@ -1198,6 +1239,8 @@ public class WSRepositoryLogic {
 
 		return joRes;
 	}
+
+
 
 
 }
