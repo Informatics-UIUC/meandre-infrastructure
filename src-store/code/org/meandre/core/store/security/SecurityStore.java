@@ -191,7 +191,7 @@ public class SecurityStore implements SecurityManager {
     public User createUser(String sNickName, String sName, String sPassword) 
     throws SecurityStoreException {
         //create storedUser instance
-        StoredUser stUser = new StoredUser(sNickName, sName, sPassword);
+        StoredUser stUser = new StoredUser(sNickName, sName, PasswordEncryptor.encrypt(sPassword));
 
         //add the model of the storedUser to the rdf store
         _model.add(stUser.getModel());

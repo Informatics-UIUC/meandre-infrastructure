@@ -36,6 +36,7 @@ import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
 import org.mortbay.jetty.security.HashUserRealm;
 import org.mortbay.jetty.security.SecurityHandler;
+import org.mortbay.jetty.security.UserRealm;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.management.MBeanContainer;
@@ -78,6 +79,8 @@ public class MeandreServer {
 	private JMXConnectorServer cs =null;
 	private  MBeanServer mBeanServer =null;
 	private  MBeanContainer mBeanContainer=null;
+
+	private boolean bStop = false;
 	
 	/** Creates a Meandre server with the default configuration.
 	 * 
@@ -256,11 +259,11 @@ public class MeandreServer {
 	 * 
 	 */
 	public void stop () throws Exception {
+		bStop  = true;
 		try {
 			cs.stop();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.warning(e.toString());
 		}finally{
 		server.stop();
 		}
@@ -302,10 +305,32 @@ public class MeandreServer {
 		String sJettyHome = System.getProperty("jetty.home");
 		sJettyHome = (sJettyHome==null)?MEANDRE_HOME:sJettyHome;
 
-		SecurityHandler sh = new SecurityHandler();
-		sh.setUserRealm(new HashUserRealm("Meandre Flow Execution Engine",store.getRealmFilename()));
+		final SecurityHandler sh = new SecurityHandler();
+		HashUserRealm hur = new HashUserRealm("Meandre Flow Execution Engine",store.getRealmFilename());
+		sh.setUserRealm(hur);
 		sh.setConstraintMappings(new ConstraintMapping[]{cm});
 
+		// Force the refresh of the realm
+		bStop = false;
+		new Thread (
+				new Runnable () {
+
+					public void run() {
+						while (!bStop ) {
+							try {
+								HashUserRealm hur = new HashUserRealm("Meandre Flow Execution Engine",store.getRealmFilename());
+								sh.setUserRealm(hur);
+								Thread.sleep(10000);
+							} catch (InterruptedException e) {
+								log.warning(e.toString());
+							} catch (IOException e) {
+								log.warning(e.toString());
+							}
+						}						
+					}					
+				}
+			).start();
+	
 		contextWS.addHandler(sh);
 
 		//
