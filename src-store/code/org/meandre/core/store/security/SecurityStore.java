@@ -132,7 +132,8 @@ public class SecurityStore implements SecurityManager {
             _model.createResource(BASE_SECURITY_URL);
             //create the admin account
             String adminUserName = _store.getAdminUserNickName();
-            String adminPass = PasswordEncryptor.encrypt(adminUserName);
+            //String adminPass = PasswordEncryptor.encrypt(adminUserName);
+            String adminPass = adminUserName;
             String adminFullName = "Admin Istrator";
             log("creating admin");
             User admin = createUser(adminUserName, adminFullName, adminPass);
