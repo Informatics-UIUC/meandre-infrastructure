@@ -1,10 +1,12 @@
 package org.meandre.client;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -15,7 +17,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import org.meandre.core.repository.*;
-
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
@@ -472,7 +473,7 @@ public class MeandreClient extends MeandreBaseClient{
      *
      * <p> calls:
      * http://<meandre_host>:<meandre_port>/services/repository/add.nt
-     * 
+     *
      */
     public boolean uploadFlow(FlowDescription flow, boolean overwrite)
             throws TransmissionException{
@@ -504,7 +505,7 @@ public class MeandreClient extends MeandreBaseClient{
      *
      * <p> calls:
      * http://<meandre_host>:<meandre_port>/services/repository/add.nt
-     * 
+     *
      */
     public boolean uploadComponent(ExecutableComponentDescription component,
             Set<File> jarFileContexts, boolean overwrite)
@@ -599,7 +600,7 @@ public class MeandreClient extends MeandreBaseClient{
             byte[] baModel = osModel.toByteArray();
             //NOTE: "InMemoryBytes" is given as the filename, and it is not
             //clear what it's used for by httpclient in this context
-            PartSource source = new ByteArrayPartSource("InMemoryBytes", 
+            PartSource source = new ByteArrayPartSource("InMemoryBytes",
             		baModel);
             postParts.add(new FilePart("repository", source));
         }
@@ -626,11 +627,11 @@ public class MeandreClient extends MeandreBaseClient{
 
     /**
      * Uploads a set of jar files to the resources directory of the server.
-     * For instance, jar files required by an applet that a component 
+     * For instance, jar files required by an applet that a component
      * uses in it's web UI, which are not uploaded with the component itself
      * because the component has no direct dependency on them, would be
-     * uploaded via this method and then be available to the applet. 
-     * 
+     * uploaded via this method and then be available to the applet.
+     *
      *
      * <p> calls:
      * http://<meandre_host>:<meandre_port>/services/repository/add.nt
@@ -778,6 +779,51 @@ public class MeandreClient extends MeandreBaseClient{
         InputStream insResult = executeGetRequestStream(sRestCommand, nvps);
         return insResult;
     }
+
+    /**
+     * Retrieves the WebUI information for the flow referenced by 'token'
+     * Example of WebUI information returned:
+     *          port=1716
+     *          hostname=192.168.0.2
+     *          token=1213938009687
+     *          uri=http://test.org/flow/webmonkflow/1213938147793/1565344277
+     *
+     * Note: Not yet unit tested
+     *
+     * @param token The token of the flow to return the WebUI information for
+     * @return  A JSONObject containing the WebUI information
+     * @throws TransmissionException
+     */
+    public JSONObject retrieveWebUIInfo(String token) throws TransmissionException {
+        String sRestCommand = "services/execute/uri_flow.txt";
+        Set<NameValuePair> nvps = new HashSet<NameValuePair>();
+        nvps.add(new NameValuePair("token", token));
+
+        InputStream results = executeGetRequestStream(sRestCommand, nvps);
+
+        Properties properties = new Properties();
+        try {
+            properties.load(results);
+        }
+        catch (IOException e) {
+            throw new TransmissionException(e);
+        }
+
+        System.out.println(properties.toString());
+
+        JSONObject joWebUIInfo = (properties.isEmpty()) ? null : new JSONObject();
+
+        for (Entry<Object, Object> prop : properties.entrySet())
+            try {
+                joWebUIInfo.put(prop.getKey().toString(), prop.getValue());
+            }
+            catch (JSONException e) {
+                throw new TransmissionException(e);
+            }
+
+        return joWebUIInfo;
+    }
+
     /**
      * returns the url name of any running flows and the url assigned to
      * the webui component of the flow.
