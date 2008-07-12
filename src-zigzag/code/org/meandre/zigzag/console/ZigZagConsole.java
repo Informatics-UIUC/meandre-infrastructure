@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.meandre.zigzag.console;
 
@@ -38,7 +38,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /** The ZigZag interpreter console
- * 
+ *
  * @author Xavier Llor&agrave
  *
  */
@@ -46,59 +46,59 @@ public class ZigZagConsole {
 
 	/** The new line caracter */
 	private final static String NEW_LINE = System.getProperty("line.separator");
-	
+
 	/** The ZigZag parser */
 	private ZigZag parser;
-	
+
 	/** The flow generator object */
 	private FlowGenerator fg;
 
 	/** Should the console be disposed */
 	private boolean bNotDone;
-	
+
 	/** The current ZigZag file so far */
 	private StringBuffer sbZigZag;
 
 	/** Creates a ZigZag console object.
-	 * 
+	 *
 	 */
 	public ZigZagConsole () {
 		bNotDone = true;
-		parser = null;    
+		parser = null;
 		sbZigZag =  new StringBuffer();
 	    resetFlowDescriptor();
 	}
-	
+
 	/** Resets the current flow descriptor.
-	 * 
+	 *
 	 */
 	public void resetFlowDescriptor() {
 		fg = new FlowGenerator();
 	    fg.setPrintStream(new PrintStream(new NullOuputStream()));
 	    fg.init(null);
 	}
-	
+
 	/** Fires the console interpreter.
-	 * 
+	 *
 	 * @param sArgs The commandline arguaments
 	 * @throws IOException Problem arised on the console reader
 	 */
 	public void start ( String [] sArgs ) throws IOException {
-		
+
 		printVersion();
 
 		System.out.println("Type help for getting help about the interpreter commands;");
 		System.out.println("Session starterd at: "+new Date());
 		System.out.println();
-		
+
 		ConsoleReader cr = new ConsoleReader();
 		cr.setDefaultPrompt(">>> ");
 		cr.setBellEnabled(true);
-		
+
 		bNotDone = true;
 		String sLine;
 		while ( bNotDone ) {
-			//System.out.print(">>> "); 
+			//System.out.print(">>> ");
 			try {
 				sLine = cr.readLine().trim();
 				if (sLine.length()>0 )
@@ -111,25 +111,25 @@ public class ZigZagConsole {
 				System.err.println(e.getMessage());
 				//e.printStackTrace();
 			}
-			
+
 		}
-		
-		
+
+
 	}
 
 	/** Print the current version of the ZigZga interpreter console.
-	 * 
+	 *
 	 */
 	protected void printVersion() {
 		System.out.println();
 		System.out.println("Meandre ZigZag scripting language interpreter console ["+ZigZag.ZIGZAG_VERSION+"/"+Constants.MEANDRE_VERSION+"]");
-		System.out.println("All rigths reserved by DITA, NCSA, UofI (2007-2008).");
+		System.out.println("All rights reserved by DITA, NCSA, UofI (2007-2008)");
 		System.out.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		System.out.println();
 	}
-	
+
 	/** Print the UofI/NCSA open source license text.
-	 * 
+	 *
 	 */
 	protected void printLicense () {
 		System.out.println();
@@ -168,18 +168,18 @@ public class ZigZagConsole {
 	}
 
 	/** Parses the interpreter command line.
-	 * 
+	 *
 	 * @param sLine The line to parser
 	 * @throws ParseException There was a parser problem
 	 */
 	private void parseCommandLine(String sLine) throws ParseException {
 		boolean bParsed = parseSystemCommand(sLine);
 		if ( !bParsed )
-			parseZigZagEntry(sLine);		
+			parseZigZagEntry(sLine);
 	}
 
 	/** Tries to parser a system command.
-	 * 
+	 *
 	 * @param sLine The line to parse
 	 * @return True if that was a system command
 	 */
@@ -187,7 +187,7 @@ public class ZigZagConsole {
 		boolean bProcessed = false;
 		String[] saLine = sLine.split("[ \t]");
 		String sCmd = saLine[0];
-	
+
 		if ( sCmd.equals("help") ) {
 			// Print the help
 			printHelp(saLine);
@@ -250,7 +250,7 @@ public class ZigZagConsole {
 			}
 			// Delete the mau file
 			new File(sFileName).delete();
-			
+
 			bProcessed = true;
 		}
 		else if ( sCmd.equals("load") ) {
@@ -269,12 +269,12 @@ public class ZigZagConsole {
 			System.out.println();
 			bProcessed = true;
 		}
-			
+
 		return bProcessed;
 	}
-	
+
 	/** Shows the current flow.
-	 * 
+	 *
 	 * @param saLine The command line being processed
 	 */
 	private void showFlow(String[] saLine) {
@@ -295,7 +295,7 @@ public class ZigZagConsole {
 	}
 
 	/** Load a ZigZag file into the interpreter.
-	 * 
+	 *
 	 * @param saLine The command line being processes
 	 */
 	private void loadZigZag(String[] saLine) {
@@ -310,9 +310,9 @@ public class ZigZagConsole {
 			for ( int i=2, iMax=saLine.length ; i<iMax ; i++ )
 				sURI += saLine[i]+" ";
 			sURI = sURI.trim();
-		
+
 			if ( sFormat.equals("zigzag") ) {
-				
+
 				try {
 					FileReader fr = new FileReader(sURI);
 					LineNumberReader lnr = new LineNumberReader(fr);
@@ -320,9 +320,9 @@ public class ZigZagConsole {
 					String sLine;
 					while ( (sLine=lnr.readLine())!=null )
 						sb.append(sLine+NEW_LINE);
-					
+
 					parseZigZagEntry(sb.toString());
-					
+
 				} catch (FileNotFoundException e) {
 					System.out.println();
 					System.out.println("\t File "+sURI+" could not be loaded.");
@@ -346,7 +346,7 @@ public class ZigZagConsole {
 	}
 
 	/** Save the current flow to the disk.
-	 * 
+	 *
 	 * @param saLine The command line being processed.
 	 */
 	private void saveFile(String[] saLine) {
@@ -357,12 +357,12 @@ public class ZigZagConsole {
 		}
 		else {
 			String sFormat = saLine[1];
-			
+
 			String sURI = "";
 			for ( int i=2, iMax=saLine.length ; i<iMax ; i++ )
 				sURI += saLine[i]+" ";
 			sURI = sURI.trim();
-			
+
 			if ( sFormat.equals("zigzag") ) {
 				// Save the ZigZag file
 				try {
@@ -399,11 +399,11 @@ public class ZigZagConsole {
 				System.out.println();
 			}
 		}
-		
+
 	}
 
 	/** Describes the requested component
-	 * 
+	 *
 	 * @param saLine The processed command line
 	 */
 	private void describeComponent(String[] saLine) {
@@ -417,20 +417,20 @@ public class ZigZagConsole {
 			for ( int i=1, iMax=saLine.length ; i<iMax ; i++ )
 				sURI += saLine[i]+" ";
 			sURI = sURI.trim();
-			
-			ExecutableComponentDescription ecd = 
+
+			ExecutableComponentDescription ecd =
 				fg.getRepository()
 				  .getExecutableComponentDescription(
 						  ModelFactory.createDefaultModel().createResource(sURI)
 						);
-			
+
 			if ( ecd==null ) {
 				ecd = fg.getComponentAliases().get(sURI);
 			}
-			
+
 			if ( ecd!=null ) {
 				System.out.println();
-				
+
 				System.out.println("\t "+ecd.getName()+" ("+ecd.getExecutableComponent()+")");
 				System.out.println("\t by "+ecd.getCreator()+" on "+ecd.getCreationDate());
 				// Tags
@@ -448,13 +448,13 @@ public class ZigZagConsole {
 					System.out.println("\t\t "+sKey+" = "+pdd.getValue(sKey)+" ("+pdd.getDescription(sKey)+")");
 				// Inputs
 				System.out.println("\t Inputs:");
-				for ( DataPortDescription dpd:ecd.getInputs()) 
+				for ( DataPortDescription dpd:ecd.getInputs())
 					System.out.println("\t\t "+dpd.getName()+" ("+dpd.getDescription()+")");
 				// Outputs
 				System.out.println("\t Outputs:");
-				for ( DataPortDescription dpd:ecd.getOutputs()) 
+				for ( DataPortDescription dpd:ecd.getOutputs())
 					System.out.println("\t\t "+dpd.getName()+" ("+dpd.getDescription()+")");
-				
+
 				System.out.println();
 			}
 			else {
@@ -464,7 +464,7 @@ public class ZigZagConsole {
 	}
 
 	/** Search the components or flows in the current repository.
-	 * 
+	 *
 	 * @param saLine The processed command line
 	 */
 	private void searchComponentsFlows(String[] saLine) {
@@ -475,9 +475,9 @@ public class ZigZagConsole {
 			for ( int i=1, iMax=saLine.length ; i<iMax ; i++ )
 				sQuery += saLine[i]+" ";
 			sQuery = sQuery.trim();
-			
+
 			QueryableRepository qr = fg.getRepository();
-			
+
 			// List Components
 			System.out.println("Components:");
 			for ( Resource res:qr.getAvailableExecutableComponents(sQuery) ) {
@@ -485,7 +485,7 @@ public class ZigZagConsole {
 				System.out.println("\t "+ecd.getName()+" ("+ecd.getExecutableComponent()+")");
 			}
 			System.out.println();
-		
+
 			// List flows
 			System.out.println("Flows:");
 			for ( Resource res:qr.getAvailableFlows(sQuery) ) {
@@ -493,17 +493,17 @@ public class ZigZagConsole {
 				System.out.println("\t "+fd.getName()+" ("+fd.getFlowComponent()+")");
 			}
 			System.out.println();
-			
+
 		}
 	}
 
 	/** List the components or flows in the current repository.
-	 * 
+	 *
 	 * @param saLine The processed command line
 	 */
 	private void listCommand(String[] saLine) {
 		String sCmd = (saLine.length>1)?saLine[1]:"";
-		
+
 		QueryableRepository qr = fg.getRepository();
 		System.out.println();
 		boolean bError = true;
@@ -550,9 +550,9 @@ public class ZigZagConsole {
 		if ( saLine.length==2 && bError ) {
 			String sInsName = saLine[1];
 			if ( fg.getInstances().keySet().contains(sInsName) ) {
-				
+
 				System.out.println(sInsName+" instance-of "+fg.getInstances().get(sInsName));
-				
+
 				ExecutableComponentInstanceDescription ecid = fg.getInstance(sInsName);
 				PropertiesDescription pd = ecid.getProperties();
 				if ( pd!=null ) {
@@ -560,10 +560,10 @@ public class ZigZagConsole {
 						System.out.println(sInsName+"."+sKey+" = "+pd.getValue(sKey));
 					System.out.println();
 				}
-				
+
 				FlowDescription fd = fg.getCurrentFlowDescription(false);
 				Resource resIns = ecid.getExecutableComponentInstance();
-				
+
 				for ( ConnectorDescription cd:fd.getConnectorDescriptions() )
 					if ( cd.getTargetInstance().equals(resIns) )
 						System.out.println(
@@ -586,7 +586,7 @@ public class ZigZagConsole {
 								">-"+
 								fg.getInstanceAliasFromResource(cd.getTargetInstance())
 							);
-				
+
 				System.out.println();
 				bError = false;
 			}
@@ -601,7 +601,7 @@ public class ZigZagConsole {
 	}
 
 	/** Returns the input port name for given instance and port resource.
-	 * 
+	 *
 	 * @param qr The queryable repository to use
 	 * @param fd The flow description
 	 * @param resInstance The resource instance
@@ -615,13 +615,13 @@ public class ZigZagConsole {
 				ecd = qr.getExecutableComponentDescription(ecid.getExecutableComponent());
 				break;
 			}
-				
+
 		DataPortDescription cd = ecd.getInput(resPort);
 		return cd.getName();
 	}
 
 	/** Returns the output port name for given instance and port resource.
-	 * 
+	 *
 	* @param qr The queryable repository to use
 	 * @param fd The flow description
 	 * @param resInstance The resource instance
@@ -635,18 +635,18 @@ public class ZigZagConsole {
 				ecd = qr.getExecutableComponentDescription(ecid.getExecutableComponent());
 				break;
 			}
-				
+
 		DataPortDescription cd = ecd.getOutput(resPort);
 		return cd.getName();
 	}
 
 	/** Print the help for the system console commands.
-	 * 
+	 *
 	 * @param saLine The help request
 	 */
 	private void printHelp(String[] saLine) {
 		String sCmd = (saLine.length>1)?saLine[1]:"";
-		
+
 		System.out.println();
 		if ( saLine.length==1 ) {
 			System.out.println("ZigZag interpreter console help");
@@ -718,12 +718,12 @@ public class ZigZagConsole {
 		else {
 			System.out.println("\t Unknow command "+sCmd+".");
 		}
-		
+
 		System.out.println();
 	}
 
 	/** Parses the command line as part of ZigZag.
-	 * 
+	 *
 	 * @param sLine The command line
 	 * @throws ParseException There was a parser problem
 	 */
@@ -735,7 +735,7 @@ public class ZigZagConsole {
 	}
 
 	/** The entry point to the main.
-	 * 
+	 *
 	 * @param sArgs The command line arguments
 	 * @throws IOException Something when wrong :D
 	 */
@@ -744,9 +744,9 @@ public class ZigZagConsole {
 		KernelLoggerFactory.getCoreLogger().setLevel(Level.SEVERE);
 		for ( Handler h:KernelLoggerFactory.getCoreLogger().getHandlers() )
 			h.setLevel(Level.SEVERE);
-		
+
 		ZigZagConsole zzc = new ZigZagConsole();
 		zzc.start(sArgs);
 	}
-	
+
 }

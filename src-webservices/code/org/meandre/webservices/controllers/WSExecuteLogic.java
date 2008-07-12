@@ -45,7 +45,7 @@ import org.meandre.webui.WebUIFragment;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /** This class wraps the basic logic to execute flows.
- * 
+ *
  * @author Xavier Llor&agrave;
  * -modified by Amit Kumar June 14th 2008 to return a 404 status if a flow does not exist
  */
@@ -55,15 +55,15 @@ public class WSExecuteLogic {
 	private Store store;
 	/** JMX MBean Server -get from the platform*/
 	private MBeanServer mbeanServer;
-	
+
 	private FlowList flowList;
 	/** The core configuraion object ot use */
 	private CoreConfiguration cnf;
 	/**Stores process execute*/
 	private Hashtable<String,JobDetail> executionTokenList;
-	
+
 	/** Creates the execute logic for the given store.
-	 * 
+	 *
 	 * @param store The store to use
 	 */
 	public WSExecuteLogic ( Store store, CoreConfiguration cnf , MBeanServer mbeanServer) {
@@ -76,55 +76,55 @@ public class WSExecuteLogic {
 			ObjectName name = new ObjectName("org.meandre.core.engine.probes.jmx:type=FlowList");
 			flowList = new FlowList();
 			this.mbeanServer.registerMBean(flowList,name);
-			 
+
 		} catch ( Exception e) {
 			WSLoggerFactory.getWSLogger().warning(e.toString());
 		}
 	}
-	
+
 	/** Runs a flow given a URI against the user repository verbosely
-	 * 
+	 *
 	 * @param request The request object
 	 * @param response The response object
-	 * @throws IOException An exception arised while printing 
+	 * @throws IOException An exception arised while printing
 	 * @throws CorruptedDescriptionException
 	 * @throws ConductorException
 	 */
 	public void executeVerboseFlowURI(HttpServletRequest request,
 			HttpServletResponse response) throws IOException,
 			CorruptedDescriptionException, ConductorException {
-		
+
 		String sURI = request.getParameter("uri");
 		boolean bStats = false;
 		boolean bJmx = false;
-		
+
 		String sStats = request.getParameter("statistics");
 		// JMX flag
 		String sJmx = request.getParameter("jmx");
 		// unique identifier sent by the client
-		String token = request.getParameter("token");	
-		
+		String token = request.getParameter("token");
+
 		if ( sStats!=null ) {
 			bStats = sStats.equals("true");
 		}
-		
+
 		if(sJmx != null){
 			bJmx = sJmx.equals("true");
 		}
-		
+
 		if(bJmx && token==null ){
 			// with JMX a token is a requirement
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);	
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
-	
-		
+
+
 		if ( sURI==null ) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		else {
 			//
 			// Executing the flow
-			// 
+			//
 			QueryableRepository qr = store.getRepositoryStore(request.getRemoteUser());
 			Resource resURI = qr.getModel().createResource(sURI);
 			FlowDescription fd = qr.getFlowDescription(resURI);
@@ -138,24 +138,23 @@ public class WSExecuteLogic {
 				//
 				// Executing the flow
 				//
-				
+
 				response.setStatus(HttpServletResponse.SC_OK);
 				OutputStream outStream = response.getOutputStream();
 				PrintStream pw = new PrintStream(outStream);
-				
+
 				pw.println("Meandre Execution Engine version "+Constants.MEANDRE_VERSION);
-				pw.println("All rigths reserved by DITA, NCSA, UofI (2007-2008).");
-				pw.println("2007. All rigths reserved by DITA, NCSA, UofI.");
+				pw.println("All rights reserved by DITA, NCSA, UofI (2007-2008)");
 				pw.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 				pw.println();
 
 				pw.flush();
-				
+
 				// Create the execution
 				pw.println("Preparing flow: "+sURI);
 				Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
 				Executor exec =null;
-				
+
 				// Redirecting the output
 				PrintStream psOUT = System.out;
 				PrintStream psERR = System.err;
@@ -184,7 +183,7 @@ public class WSExecuteLogic {
 						hasToken = Boolean.TRUE;
 						if(this.executionTokenList.containsKey(token)){
 							System.out.println("Error: "+ token +"  already used. The token should be unique." );
-							response.sendError(HttpServletResponse.SC_BAD_REQUEST);		
+							response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 						}
 					}
 					if(hasToken){
@@ -199,13 +198,13 @@ public class WSExecuteLogic {
 						}
 					}
 					/**/
-					
+
 					// Redirecting the streamers
 					System.setOut(pw);
 					System.setErr(pw);
-	
+
 					pw.println("Preparation completed correctly\n");
-					
+
 					pw.print("Execution started at: " + nextPort +" on ");
 					pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
 					pw.println("----------------------------------------------------------------------------");
@@ -231,7 +230,7 @@ public class WSExecuteLogic {
 							pw.println("\t"+sMsg);
 					}
 					pw.flush();
-				
+
 				}
 				catch ( CorruptedDescriptionException cde ) {
 					pw.println("Preparation could not be completed correctly!\n");
@@ -264,10 +263,10 @@ public class WSExecuteLogic {
 					pw.println(te);
 					pw.flush();
 				}finally{
-					
+
 				}
-				
-				if ( bStats && !bJmx) { 
+
+				if ( bStats && !bJmx) {
 					try {
 						JSONObject jsonStats = spi.getSerializedStatistics();
 						pw.println("----------------------------------------------------------------------------");
@@ -281,7 +280,7 @@ public class WSExecuteLogic {
 						pw.println("Total run time (ms)      : "+jsonStats.get("runtime"));
 						pw.println();
 						pw.flush();
-						
+
 						JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
 						for ( int i=0,iMax=jaEXIS.length() ; i<iMax ; i++ ) {
 							JSONObject joEXIS = (JSONObject) jaEXIS.get(i);
@@ -303,7 +302,7 @@ public class WSExecuteLogic {
 						WSLoggerFactory.getWSLogger().warning(e.toString());
 					}
 				}
-				
+
 				// Reset the output redirection
 				System.setOut(psOUT);
 				System.setErr(psERR);
@@ -311,12 +310,12 @@ public class WSExecuteLogic {
 		}
 	}
 
-	/** Runs a flow given a URI against the user repository silently only outputting 
+	/** Runs a flow given a URI against the user repository silently only outputting
 	 * the flow printed elements.
-	 * 
+	 *
 	 * @param request The request object
 	 * @param response The response object
-	 * @throws IOException An exception arised while printing 
+	 * @throws IOException An exception arised while printing
 	 * @throws CorruptedDescriptionException
 	 * @throws ConductorException
 	 */
@@ -324,14 +323,14 @@ public class WSExecuteLogic {
 			HttpServletResponse response) throws IOException,
 			CorruptedDescriptionException, ConductorException {
 		String sURI = request.getParameter("uri");
-		
+
 		if ( sURI==null ) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		else {
 			//
 			// Executing the flow
-			// 
+			//
 			QueryableRepository qr = store.getRepositoryStore(request.getRemoteUser());
 			Resource resURI = qr.getModel().createResource(sURI);
 			FlowDescription fd = qr.getFlowDescription(resURI);
@@ -345,26 +344,26 @@ public class WSExecuteLogic {
 				//
 				// Executing the flow
 				//
-				
+
 				response.setStatus(HttpServletResponse.SC_OK);
 				OutputStream outStream = response.getOutputStream();
 				PrintStream pw = new PrintStream(outStream);
-				
+
 				// Create the execution
 				Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
 				Executor exec = null;
-				
+
 				// Redirecting the output
 				PrintStream psOUT = System.out;
 				PrintStream psERR = System.err;
-				
+
 				try {
 					exec = conductor.buildExecutor(qr, resURI);
-					
+
 					// Redirecting the streamers
 					System.setOut(pw);
 					System.setErr(pw);
-		
+
 					pw.flush();
 					int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
 					/*This needs to be synchronized*/
@@ -375,7 +374,7 @@ public class WSExecuteLogic {
 						hasToken = Boolean.TRUE;
 						if(this.executionTokenList.containsKey(token)){
 							System.out.println("Error: "+ token +"  already used. The token should be unique." );
-							response.sendError(HttpServletResponse.SC_BAD_REQUEST);		
+							response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 						}
 					}
 					if(hasToken){
@@ -395,7 +394,7 @@ public class WSExecuteLogic {
 					WebUI webui=exec.initWebUI(nextPort,token);
 					exec.execute(webui);
 					pw.flush();
-					
+
 					if ( !exec.hadGracefullTermination() ) {
 						//
 						// Aborted execution.
@@ -426,17 +425,17 @@ public class WSExecuteLogic {
 					pw.println(ce);
 					pw.flush();
 				}
-				
+
 				// Reset the output redirection
 				System.setOut(psOUT);
 				System.setErr(psERR);
 			}
-			
+
 		}
 	}
-	
+
 	/** Returns the list of running flows.
-	 * 
+	 *
 	 * @param request The request object
 	 * @param response The response object
 	 * @return The JSON object containing the results
@@ -446,7 +445,7 @@ public class WSExecuteLogic {
 		JSONObject joRes = new JSONObject();
 		JSONArray ja = new JSONArray();
 		String sHostName = "http://"+request.getLocalName()+":";
-		
+
 		try {
 			for ( String sID:WebUIFactory.getFlows() )  {
 				WebUI webuiTmp = WebUIFactory.getExistingWebUI(sID);
@@ -458,18 +457,18 @@ public class WSExecuteLogic {
 				ja.put(jo);
 			}
 			joRes.put("meandre_running_flows",ja);
-			
+
 		}
 		catch ( Exception e ) {
 			throw new IOException(e.toString());
-		}		
-		
+		}
+
 		return joRes;
 	}
-	
-	
+
+
 	/** Returns the list of running flows.
-	 * 
+	 *
 	 * @param request The request object
 	 * @param response The response object
 	 * @return The JSON object containing the results
@@ -480,7 +479,7 @@ public class WSExecuteLogic {
 		JSONArray ja = new JSONArray();
 		String sHostName = "http://"+request.getLocalName()+":";
 		PrintWriter pw = response.getWriter();
-		
+
 		try {
 			for ( String sID:WebUIFactory.getFlows() )  {
 				WebUI webuiTmp = WebUIFactory.getExistingWebUI(sID);
@@ -492,17 +491,17 @@ public class WSExecuteLogic {
 				ja.put(jo);
 			}
 			joRes.put("meandre_running_flows",ja);
-			
+
 		}
 		catch ( Exception e ) {
 			throw new IOException(e.toString());
-		}		
-		
+		}
+
 		return joRes;
 	}
-	
+
 	/**Returns the flow url
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 * @throws IOException
@@ -523,13 +522,13 @@ public class WSExecuteLogic {
 			}else{
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			}
-		
+
 		}
-		
+
 	}
-	
+
 	/**Returns the list of component web urls.
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 * @throws IOException
@@ -542,7 +541,7 @@ public class WSExecuteLogic {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}else {
 			WebUI webuiTmp = WebUIFactory.getExistingWebUI(sURI);
-			
+
 			PrintWriter pw = response.getWriter();
 			if(webuiTmp!=null){
 				String port = webuiTmp.getPort()+"";
@@ -558,21 +557,21 @@ public class WSExecuteLogic {
 			}else{
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			}
-		
+
 		}
-		
-	
+
+
 	}
-	
+
 	/**For a given token submitted by the client initially upon the start of the flow
 	 * return the flowInstanceID -this function is useful when the flow is web based
 	 * flow.
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 * @throws IOException
 	 */
-	public void getFlowURIFromToken(HttpServletRequest request, HttpServletResponse response) 
+	public void getFlowURIFromToken(HttpServletRequest request, HttpServletResponse response)
 	throws IOException{
 		String token = request.getParameter("token");
 		if(token==null){
@@ -581,7 +580,7 @@ public class WSExecuteLogic {
 		}
 		JobDetail jobdetail = this.executionTokenList.get(token);
 		if(jobdetail==null){
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);	
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}else{
 			PrintWriter pw = response.getWriter();
 			pw.println("port="+ jobdetail.getPort());
@@ -591,9 +590,9 @@ public class WSExecuteLogic {
 			pw.flush();
 		}
 	}
-	
+
 	/**return the host ip address
-	 * 
+	 *
 	 * @return
 	 */
 	public String getHostName() {
@@ -605,5 +604,5 @@ public class WSExecuteLogic {
 		};
 		return "127.0.0.1";
 	}
-	
+
 }

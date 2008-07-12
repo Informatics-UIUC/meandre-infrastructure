@@ -25,9 +25,9 @@ import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.ServletHolder;
 
 /**This class provides a basic factory for managing plugins.
- * 
+ *
  * @author Xavier Llor&agrave;
- * @modified Amit Kumar -added support for Filters and getter Method for 
+ * @modified Amit Kumar -added support for Filters and getter Method for
  * plugin information June 27th 2008
  */
 public class PluginFactory {
@@ -40,7 +40,7 @@ public class PluginFactory {
 
 	/** The plugins logger */
 	private Logger log = PluginsLoggerFactory.getPluginsLogger();
-	
+
 	/** The plugin factory store */
 	private static Properties propPluginFactoryConfig;
 
@@ -48,21 +48,21 @@ public class PluginFactory {
 	private CoreConfiguration cnf;
 
 	/** Creates an unitialized plugin factory and avoids other to instantiate it.
-	 * 
+	 *
 	 */
 	private PluginFactory (CoreConfiguration crcnf) {
 		cnf = crcnf;
 		sConfigPath = cnf.getHomeDirectory();
 	}
-	
+
 	/** Store the plugin information**/
 	private static HashMap<String,MeandrePlugin> pluginMap = new HashMap<String,MeandrePlugin>(5);
-	
+
 	/** Stores the PluginFactory**/
 	private static HashMap<CoreConfiguration, PluginFactory> pluginFactoryList = new HashMap<CoreConfiguration, PluginFactory>(5);
 
 	/** Initialize the plugin factory given a certain core configuration.
-	 * 
+	 *
 	 * @param cnf The core configuration object
 	 */
 	public static PluginFactory getPluginFactory ( CoreConfiguration cnf ) {
@@ -71,7 +71,7 @@ public class PluginFactory {
 			return pluginFactoryList.get(cnf);
 		}
 		PluginFactory pf = new PluginFactory(cnf);
-		
+
 		PluginFactory.propPluginFactoryConfig = new Properties();
 	    FileInputStream fis;
 	    String sConfigFilePath = pf.sConfigPath + File.separator + pf.sConfigFile;
@@ -102,7 +102,7 @@ public class PluginFactory {
 						sConfigFilePath+
 					    " could not be written to disk!");
 			}
-			
+
 		}
 
 		// Create the run file
@@ -114,12 +114,12 @@ public class PluginFactory {
 	}
 
 	/** Initialize the default properties. The default properties include the global VFS.
-	 * 
+	 *
 	 * @param pf  The plugin factory being initialized
 	 */
 	private static void initializePluginsDefaultProperties(PluginFactory pf) {
-		PluginFactory.propPluginFactoryConfig.setProperty("VFS", VFSServlet.class.getName());	
-		PluginFactory.propPluginFactoryConfig.setProperty("JARTOOL", JarToolServlet.class.getName());		
+		PluginFactory.propPluginFactoryConfig.setProperty("VFS", VFSServlet.class.getName());
+		PluginFactory.propPluginFactoryConfig.setProperty("JARTOOL", JarToolServlet.class.getName());
 	}
 
 	/** Initialize the public file server for shared resources
@@ -139,16 +139,15 @@ public class PluginFactory {
 			try {
 				PrintStream ps = new PrintStream(new FileOutputStream(file.getAbsolutePath()+File.separator+"readme.txt"));
 				ps.println("Meandre Execution Engine version "+Constants.MEANDRE_VERSION);
-				ps.println("All rigths reserved by DITA, NCSA, UofI (2008).");
-				ps.println("2007-2008. All rigths reserved by DITA, NCSA, UofI.");
+				ps.println("All rights reserved by DITA, NCSA, UofI (2007-2008)");
 				ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 				ps.println();
 				ps.println("This directory contains all the publicly available implementations for the Meandre components.");
 				ps.println();
 				ps.println("Created on "+new Date());
-				log.warning("Resource directory not existing. Initializing a new one.");
+				log.warning("The resource directory does not exist - creating a new one...");
 			} catch (FileNotFoundException e) {
-				log.warning("Could not initialize the resource directory");
+				log.warning("Could not create the resource directory");
 			}
 		}
 
@@ -158,9 +157,9 @@ public class PluginFactory {
 		contextResources.setHandler(resource_handler);
 	}
 
-	
+
 	/** Initialize the engine plugins to use.
-	 * 
+	 *
 	 * @param server The server where the engine plugins run
 	 * @param cntxGlobal The global context for the web services
 	 * @param log The logger to use
@@ -169,7 +168,7 @@ public class PluginFactory {
 		//
 		// Initializing the public file server
 		//
-		
+
 		for ( Object oKey:propPluginFactoryConfig.keySet()) {
 			try {
 				String sClassName = propPluginFactoryConfig.getProperty(oKey.toString());
@@ -190,13 +189,13 @@ public class PluginFactory {
 			} catch (ClassNotFoundException e) {
 				log.warning("Pluggin "+oKey+" could not be initialized\n"+e);
 			}
-			
+
 		}
 	}
 
-	 
+
 	/** Return the plugin give its ID
-	 * 
+	 *
 	 * @param sID The id of the plugin
 	 * @return Returns the plugin
 	 */
@@ -205,7 +204,7 @@ public class PluginFactory {
 	}
 
 	/** Returns the properties of the plugin factory.
-	 * 
+	 *
 	 * @return The properties of the factory
 	 */
 	public Properties getPropPluginFactoryConfig() {

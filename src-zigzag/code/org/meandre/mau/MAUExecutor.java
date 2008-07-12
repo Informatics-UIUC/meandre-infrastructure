@@ -44,32 +44,32 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
  * This class runs Meandre's MAU files.
- * 
+ *
  * @author Xavier Llor&agrave;
- * 
+ *
  */
 public class MAUExecutor {
 
 	/** The current version of the MAU executor */
 	private static final String ZMAU_VERSION = "1.0.1vcli";
-	
+
 	/** The run temp dir */
 	private static final String MAU_RUN_DIR = "run";
 
 	/** The output print stream to use */
 	protected PrintStream ps;
-	
+
 	/** The executor object */
 	protected Executor exec;
-	
+
 	/** The statistics probe object */
 	protected StatisticsProbeImpl spi;
 
 	/** The filename to execute */
 	private String sFileName;
-	
+
 	/** The main method that runs the the MAU file.
-	 * 
+	 *
 	 * @param sArgs The command line arguments
 	 * @throws FileNotFoundException The file could not be found
 	 */
@@ -78,7 +78,7 @@ public class MAUExecutor {
 		KernelLoggerFactory.getCoreLogger().setLevel(Level.WARNING);
 		for ( Handler h:KernelLoggerFactory.getCoreLogger().getHandlers() )
 			h.setLevel(Level.WARNING);
-		
+
 		if ( sArgs.length!=1 ) {
 			System.err.println("Wrong syntax!!!\nThe MAU executor requires one .mau file");
 		}
@@ -87,46 +87,46 @@ public class MAUExecutor {
 			mau.run();
 		}
 	}
-	
+
 	/** Creates a new MAU execution object for the given filename.
-	 * 
+	 *
 	 * @param sFileName The file name
 	 */
 	public MAUExecutor ( String sFileName ) {
 		ps = System.out;
 		this.sFileName = sFileName;
 	}
-	
+
 	/** Set the output stream to use.
-	 * 
+	 *
 	 * @param os The output stream
 	 */
 	public void setOutpuStream ( OutputStream os ) {
 		ps  = new PrintStream(os);
 	}
-	
+
 	/** Get the abort messages if any
-	 * 
+	 *
 	 * @return The abort messages
 	 */
 	public Set<String> getAbortMessages () {
 		if ( exec!=null )
 			return exec.getAbortMessage();
-		else 
+		else
 			return new HashSet<String>();
 	}
-	
+
 	/** Returns the statistics for the MAU run using a JSONObject.
-	 * 
+	 *
 	 * @return The JSONObject containing the statistics
 	 * @throws ProbeException The statistics could not be retrieved
 	 */
 	public JSONObject getStatistics () throws ProbeException {
 		return spi.getSerializedStatistics();
 	}
-	
+
 	/** Returns the termination status for the execution
-	 * 
+	 *
 	 * @return True if the flow finished without errors, false otherwise
 	 */
 	public boolean hadGracefullTermination() {
@@ -135,15 +135,15 @@ public class MAUExecutor {
 		else
 			return false;
 	}
-		
+
 	/** Runs the MAU file.
-	 * 
+	 *
 	 * @throws FileNotFoundException The file could not be found
-	 */ 
+	 */
 	public void run () throws FileNotFoundException {
-		
+
 		ps.println("Meandre MAU Executor [" + MAUExecutor.ZMAU_VERSION + "/" + Constants.MEANDRE_VERSION + "]");
-		ps.println("All rigths reserved by DITA, NCSA, UofI (2007-2008).");
+		ps.println("All rights reserved by DITA, NCSA, UofI (2007-2008)");
 		ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		ps.println();
 		ps.flush();
@@ -153,31 +153,31 @@ public class MAUExecutor {
 		ps.println("Creating temp dir " + fTmp.toString());
 		fTmp.mkdir();
 		ps.println();
-		
+
 		QueryableRepository qr = processModelFromMAU();
-		
+
 		Resource resURI = qr.getAvailableFlows().iterator().next();
 		ps.println("Preparing flow: "+resURI);
 		CoreConfiguration cnf = new CoreConfiguration();
 		Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
-		
+
 		exec =null;
 		spi = null;
-		
-		
+
+
 		try {
 			spi = new StatisticsProbeImpl();
 			MrProbe mrProbe = new MrProbe(KernelLoggerFactory.getCoreLogger(),spi,false,false);
 			exec = conductor.buildExecutor(qr, resURI, mrProbe);
-			
+
 			ps.flush();
-			
+
 			// Redirecting the streamers
 			System.setOut(ps);
 			System.setErr(ps);
 
 			ps.println("Preparation completed correctly\n");
-			
+
 			ps.print("Execution started at: ");
 			ps.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
 			ps.println("----------------------------------------------------------------------------");
@@ -205,7 +205,7 @@ public class MAUExecutor {
 					ps.println("\t"+sMsg);
 			}
 			ps.flush();
-		
+
 		}
 		catch ( CorruptedDescriptionException cde ) {
 			ps.println("Preparation could not be completed correctly!\n");
@@ -238,20 +238,20 @@ public class MAUExecutor {
 			ps.println(te);
 			ps.flush();
 		}
-		
+
 		printStatistics();
-		
+
 		// Cleaning the tmp run dir
 		ps.println("Cleaning temp dir " + fTmp.toString());
 		for ( String sFileName:fTmp.list() )
 			new File(fTmp.getAbsoluteFile()+File.separator+sFileName).delete();
 		fTmp.delete();
 		ps.println();
-		
+
 	}
 
 	/** Process the model contained on the MAU file and rearrenge the contexts URIs.
-	 * 
+	 *
 	 * @return The edited model
 	 * @throws FileNotFoundException The file could not be retrieved
 	 */
@@ -263,7 +263,7 @@ public class MAUExecutor {
 			URL url = new URL("jar:file:"+file.getAbsolutePath()+"!/repository/repository.ttl");
 			mod.read(url.openStream(), null,"TTL");
 			QueryableRepository qr = new RepositoryImpl(mod);
-			
+
 			// Edit the contexts URI
 			JarFile jar = new JarFile(sFileName);
 			Enumeration<JarEntry> iterJE = jar.entries();
@@ -278,11 +278,11 @@ public class MAUExecutor {
 		} catch (IOException e) {
 			throw new FileNotFoundException(e.toString());
 		}
-		
+
 	}
 
 	/** Edit the context URI to point to the ones contained in the jar.
-	 * 
+	 *
 	 * @param qr The queryable repository to edit
 	 * @param sJarName The name of the jar
 	 * @param sNewURI The new URI to set
@@ -310,21 +310,21 @@ public class MAUExecutor {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
+
 				}
-				else 
+				else
 					setNew.add(rdfNode);
 			}
 			Set<RDFNode> set = ecd.getContext();
 			set.clear();
 			set.addAll(setNew);
 		}
-		
-		
+
+
 	}
 
 	/** Print the output statistics to the output stream.
-	 * 
+	 *
 	 */
 	protected void printStatistics() {
 		try {
@@ -340,7 +340,7 @@ public class MAUExecutor {
 			ps.println("Total run time (ms)      : "+jsonStats.get("runtime"));
 			ps.println();
 			ps.flush();
-			
+
 			JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
 			for ( int i=0,iMax=jaEXIS.length() ; i<iMax ; i++ ) {
 				JSONObject joEXIS = (JSONObject) jaEXIS.get(i);

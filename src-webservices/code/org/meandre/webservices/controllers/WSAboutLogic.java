@@ -52,12 +52,12 @@ public class WSAboutLogic {
 
 	/** The store the use */
 	private  Store store;
-	
+
 	/*XStream used for plugin serialization**/
 	static XStream xstream = new  XStream(new JettisonMappedXmlDriver());
-	
+
 	/** The about logic for the store.
-	 * 
+	 *
 	 * @param store The store
 	 */
 	public WSAboutLogic(Store store) {
@@ -197,8 +197,7 @@ public class WSAboutLogic {
 		response.setContentType("text/plain");
 
 		pw.println("Meandre Execution Engine version "+Constants.MEANDRE_VERSION);
-		pw.println("All rigths reserved by DITA, NCSA, UofI (2007).");
-		pw.println("2007. All rigths reserved by DITA, NCSA, UofI.");
+		pw.println("All rights reserved by DITA, NCSA, UofI (2007-2008)");
 		pw.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		pw.println();
 
@@ -352,8 +351,8 @@ public class WSAboutLogic {
 	}
 
 	/** Get the global list of plugins.
-	 * 
-	 * @param request The request object 
+	 *
+	 * @param request The request object
 	 * @param response The response object
 	 * @param cnf The core configuration object
 	 * @return The JSON string containing the list
@@ -362,7 +361,7 @@ public class WSAboutLogic {
 	public static String globalPluginsJSON(HttpServletRequest request,
 			HttpServletResponse response, CoreConfiguration cnf) throws IOException {
 		//JSONObject joRes = new JSONObject();
-		
+
 		ArrayList<Plugin> alist = new ArrayList<Plugin>(5);
 		Properties properties=PluginFactory.getPluginFactory(cnf).getPropPluginFactoryConfig();
 		for ( Object oKey:properties.keySet()) {
@@ -375,11 +374,11 @@ public class WSAboutLogic {
 				plugin.setKey(oKey.toString());
 				plugin.setServlet(mpPlugin.isServlet());
 				alist.add(plugin);
-				
+
 			}catch(Exception ex){
 				throw new IOException(ex.toString());
 			}
-			
+
 		}
 		String jsonString=xstream.toXML(alist);
 		return jsonString;
