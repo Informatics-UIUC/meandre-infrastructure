@@ -35,6 +35,7 @@ import java.util.logging.Logger;
  * which will eventually execute the flow.
  *
  * @author Xavier Llor&agrave;
+ * @modified Amit Kumar -added support for parentClassloader
  *
  */
 public class Conductor {
@@ -71,6 +72,8 @@ public class Conductor {
 
 	/** The core configuration object */
 	private CoreConfiguration cnf;
+	
+	private ClassLoader parentClassloader;
 	
 	/** Initialize a conductor with a set of valid URLs.
 	 *
@@ -512,13 +515,21 @@ public class Conductor {
 			} catch (MalformedURLException e) {
 				throw new CorruptedDescriptionException("Context URL "+sURL+" is not a valid URL");
 			}
-		// Initializing the java class loader
-		URLClassLoader urlCL = new URLClassLoader(ua);
+			// Initializing the java class loader
+			URLClassLoader urlCL=null;
+			if(this.getParentClassloader()==null){
+	    	 urlCL= new URLClassLoader(ua);	
+			}else{
+	    	 urlCL = new URLClassLoader(ua, this.getParentClassloader());
+			}
+		 
+	
 		for ( String sClassName:setURLLocations ) {
 			try {
 				if ( htMapResourceToRunnable.get(htMapNameToResource.get(sClassName)).equals("java") ) {
 					log.info("Loading java component "+sClassName);
-					htMapNameToClass.put(sClassName,Class.forName(sClassName,true,urlCL));
+					Class clazz = Class.forName(sClassName, true, urlCL);
+					htMapNameToClass.put(sClassName,clazz);
 				}
 			} catch (ClassNotFoundException e) {
 				log.severe("Class "+sClassName+" could not be loaded");
@@ -527,5 +538,21 @@ public class Conductor {
 		}
 		return urlCL;
 
+	}
+
+
+	/**
+	 * @return the parentClassloader
+	 */
+	public ClassLoader getParentClassloader() {
+		return parentClassloader;
+	}
+
+
+	/**
+	 * @param parentClassloader the parentClassloader to set
+	 */
+	public void setParentClassloader(ClassLoader parentClassloader) {
+		this.parentClassloader = parentClassloader;
 	}
 }

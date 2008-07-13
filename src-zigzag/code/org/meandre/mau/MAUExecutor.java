@@ -68,6 +68,8 @@ public class MAUExecutor {
 	/** The filename to execute */
 	private String sFileName;
 
+	private ClassLoader parentClassloader;
+	
 	/** The main method that runs the the MAU file.
 	 *
 	 * @param sArgs The command line arguments
@@ -168,6 +170,7 @@ public class MAUExecutor {
 		try {
 			spi = new StatisticsProbeImpl();
 			MrProbe mrProbe = new MrProbe(KernelLoggerFactory.getCoreLogger(),spi,false,false);
+			conductor.setParentClassloader(this.getParentClassloader());
 			exec = conductor.buildExecutor(qr, resURI, mrProbe);
 
 			ps.flush();
@@ -359,4 +362,21 @@ public class MAUExecutor {
 			KernelLoggerFactory.getCoreLogger().warning("This exception should have never been thrown\n"+e);
 		}
 	}
+	
+	
+
+	/**
+	 * @return the parentClassloader
+	 */
+	public ClassLoader getParentClassloader() {
+		return parentClassloader;
+	}
+
+	/**
+	 * @param parentClassloader the parentClassloader to set
+	 */
+	public void setParentClassloader(ClassLoader parentClassloader) {
+		this.parentClassloader = parentClassloader;
+	}
+
 }
