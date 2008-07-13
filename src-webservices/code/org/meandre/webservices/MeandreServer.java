@@ -8,6 +8,7 @@ import java.lang.management.ManagementFactory;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Handler;
@@ -240,7 +241,7 @@ public class MeandreServer {
 		            return;
 		        }
 		}
-		
+	
 	}
 
 	/** Joins the main Jetty server.
@@ -264,8 +265,9 @@ public class MeandreServer {
 		} catch (IOException e) {
 			log.warning(e.toString());
 		}finally{
-		server.stop();
+			server.stop();
 		}
+		UnicastRemoteObject.unexportObject(registry, true);
 	}
 
 	/** Initialize the webservices
@@ -344,7 +346,7 @@ public class MeandreServer {
 		//
 		// Start the MBeanServer
 		//
-		
+		try{
 		JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi");
 		
 	     mBeanServer= ManagementFactory.getPlatformMBeanServer();
@@ -357,6 +359,9 @@ public class MeandreServer {
 
 
 		 cs.start();
+		}catch(Exception ex){
+			
+		}
 
 		//
 		// Adding restrictedly provided services
