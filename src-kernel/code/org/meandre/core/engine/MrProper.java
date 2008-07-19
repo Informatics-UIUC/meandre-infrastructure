@@ -124,7 +124,7 @@ public class MrProper extends Thread {
 		
 		// Propagate termination
 		if ( bStop )  {
-			log.info("No data available, no coponent executing, requesting graceful finalization" );
+			log.info("No data available, no component executing, requesting graceful finalization" );
 			for ( WrappedComponent wc:setWC ) {
 				synchronized (wc.baStatusFlags) {
 					wc.baStatusFlags[WrappedComponent.RUNNING] = false;
