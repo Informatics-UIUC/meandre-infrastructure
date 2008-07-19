@@ -8,10 +8,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
+
 /** This class implements a disposable logger factory for demo components and flows.
  * 
  * @author Xavier Llor&agrave;
- *
+ * @modified Amit Kumar -Added Formatter
  */
 public class WSLoggerFactory {
 	
@@ -34,7 +35,20 @@ public class WSLoggerFactory {
 		logWS.setLevel(Level.WARNING);
 		try {
 			new File("."+File.separator+"log").mkdir();
-			logWS.addHandler(handlerWS = new FileHandler("."+File.separator+"log"+File.separator+"meandre-webservices.log",LOG_FILE_SIZE,LOG_NUM_ROTATING_FILES));
+			handlerWS = new FileHandler("."+File.separator+"log"+File.separator+"meandre-webservices.log",LOG_FILE_SIZE,LOG_NUM_ROTATING_FILES);
+			handlerWS.setFormatter(new ShortFormatter());
+			logWS.addHandler(handlerWS);
+			Logger logger=logWS.getParent();
+			if(logger!=null){
+				Handler[] handlerList=logger.getHandlers();
+				for(int i=0;i< handlerList.length;i++){
+					handlerList[i].setFormatter(new ShortFormatter());
+				}	
+			}
+			Handler[] handlerList=logWS.getHandlers();
+			for(int i=0;i< handlerList.length;i++){
+				handlerList[i].setFormatter(new ShortFormatter());
+			}
 		} catch (SecurityException e) {
 			System.err.println("Could not initialize "+"."+File.separator+"log"+File.separator+"meandre-webservices.log");
 			System.exit(1);
