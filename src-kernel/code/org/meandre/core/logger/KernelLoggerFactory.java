@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 /** This class implements the basic factory for loggers.
  * 
  * @author Xavier Llor&agrave;
- *
+ * @modified -Amit Kumar added Formatter
  */
 public class KernelLoggerFactory {
 
@@ -32,7 +32,20 @@ public class KernelLoggerFactory {
 		logCore.setLevel(Level.INFO);
 		try {
 			new File("."+File.separator+"log").mkdir();
-			logCore.addHandler(handlerCore = new FileHandler("."+File.separator+"log"+File.separator+"meandre-kernel.log",LOG_FILE_SIZE,LOG_NUM_ROTATING_FILES));
+			handlerCore = new FileHandler("."+File.separator+"log"+File.separator+"meandre-kernel.log",LOG_FILE_SIZE,LOG_NUM_ROTATING_FILES);
+			handlerCore.setFormatter(new ShortFormatter());
+			logCore.addHandler(handlerCore);
+			Logger logger=logCore.getParent();
+			if(logger!=null){
+				Handler[] handlerList=logger.getHandlers();
+				for(int i=0;i< handlerList.length;i++){
+					handlerList[i].setFormatter(new ShortFormatter());
+				}	
+			}
+			Handler[] handlerList=logCore.getHandlers();
+			for(int i=0;i< handlerList.length;i++){
+				handlerList[i].setFormatter(new ShortFormatter());
+			}
 		} catch (SecurityException e) {
 			System.err.println("Could not initialize "+"."+File.separator+"log"+File.separator+"meandre-kernel.log");
 			System.exit(1);
