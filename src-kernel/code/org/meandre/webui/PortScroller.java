@@ -60,7 +60,7 @@ public final class  PortScroller {
 	 * @param cnf The core configuration object
 	 * @return The port scroller
 	 */
-	public static PortScroller getInstance(CoreConfiguration cnf){
+	public synchronized static PortScroller getInstance(CoreConfiguration cnf){
 		PortScroller ps = getMappingForConfigurationObject(cnf);
 		if ( ps!=null )
 			return ps;
@@ -106,8 +106,9 @@ public final class  PortScroller {
 				iThisPort = portQueue.remove();
 				this.flowPortMap.put(sFlowUniqueExecutionID, iThisPort);	
 			}
+			return iThisPort;
 		}
-		return iThisPort;
+	
 	}
 	
 	/**Call this at the end of the flow
