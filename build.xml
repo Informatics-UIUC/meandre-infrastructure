@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Meandre-Core" basedir="." default="dist">
+<project name="Meandre-Infrastructure" basedir="." default="dist">
     <!-- Check whether Java 1.5 is being used -->
     <condition property="using.java.1.5">
         <or>
