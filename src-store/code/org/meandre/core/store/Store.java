@@ -163,7 +163,7 @@ public class Store {
      * specified directory. The resources are the store's config file
      * and jena database files.
      * 
-     * @sInstallDir The base install directory
+     * @param sInstallDir The base install directory
      */
     public Store(String sInstallDir) {
         sConfigPath = sInstallDir;

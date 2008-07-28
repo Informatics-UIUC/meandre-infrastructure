@@ -25,7 +25,6 @@
     <property name="plugins.src" value="src-plugins/code"/>
     <property name="ws.src" value="src-webservices/code"/>
     <property name="store.src" value="src-store/code"/>
-    <property name="terracotta.src" value="src-terracotta/code"/>
     <property name="client.src" value="src-client/code"/>
 	<property name="annotation.src" value="src-annotation/code"/>
 	
@@ -36,7 +35,6 @@
 	<property name="plugins.test" value="src-plugins/test"/>
 	<property name="ws.test" value="src-webservices/test"/>
 	<property name="store.test" value="src-store/test"/>
-	<property name="terracotta.test" value="src-terracotta/test"/>
 	<property name="client.test" value="src-client/test"/>
 	
 	<!-- The generic classpath to all the code (includes code and tests) -->
