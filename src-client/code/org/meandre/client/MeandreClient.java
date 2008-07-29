@@ -17,6 +17,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import org.meandre.core.repository.*;
+import org.meandre.core.security.Role;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
@@ -76,6 +77,7 @@ public class MeandreClient extends MeandreBaseClient{
      * @throws TransmissionException
      *
      * TODO: Need java object to represent valid roles
+     * @deprecated use retrieveRoles instead
      */
 
     public Set<String> retrieveUserRoles() throws TransmissionException {
@@ -86,7 +88,46 @@ public class MeandreClient extends MeandreBaseClient{
         Set<String> ss = unpackJSONArray(jtRoles, jArrayKey, jElementKey);
         return ss;
     }
-
+    
+    /**
+     * requests a list of assigned roles of the calling user (the user related
+     * to the credentials of this MeandreClient).
+     *
+     * @return a list of roles
+     *
+     *<p> calls:
+     * http://<meandre_host>:<meandre_port>/services/about/user_roles.json
+     * @throws TransmissionException
+     * 
+     *TODO: update this and the webservices call to use Role.toJSON and
+     *Role.fromJSON. That change will break the webservices api, however.
+     */
+    public Set<Role> retrieveRoles() throws TransmissionException {
+        String sRestCommand = "services/about/user_roles.json";
+        JSONTokener jtRoles = executeGetRequestJSON(sRestCommand, null);
+        String jArrayKey = "meandre_user_role";
+        String jElementKey = "meandre_role";
+        Set<String> ss = unpackJSONArray(jtRoles, jArrayKey, jElementKey);
+        Set<Role> roles = new HashSet<Role>();
+        for(String sRoleUrl: ss){
+            roles.add(Role.fromUrl(sRoleUrl));
+        }
+        return roles;
+    }
+    
+    /**
+     * requests the list of roles of the calling user and checks if the
+     * input role is in it.
+     * @param role the Role to test for
+     * @return whether the user has the role
+     * @throws TransmissionException
+     */
+    public boolean hasRoleGranted(Role role) throws TransmissionException {
+        Set<Role> roles = this.retrieveRoles();
+        boolean hasRole = roles.contains(role);
+        return hasRole;
+    }
+    
     /**
      * requests the list of all valid roles the server supports. the roles
      * are returned in their url form.
@@ -98,13 +139,17 @@ public class MeandreClient extends MeandreBaseClient{
      *
      * @return list of all valid roles
      */
-    public Set<String> retrieveValidRoles() throws TransmissionException{
+    public Set<Role> retrieveValidRoles() throws TransmissionException{
         String sRestCommand = "services/about/valid_roles.json";
         JSONTokener jtRoles = executeGetRequestJSON(sRestCommand, null);
         String jArrayKey = "meandre_user_role";
         String jElementKey = "meandre_role";
         Set<String> ss = unpackJSONArray(jtRoles, jArrayKey, jElementKey);
-        return ss;
+        Set<Role> roles = new HashSet<Role>();
+        for(String sRoleUrl: ss){
+            roles.add(Role.fromUrl(sRoleUrl));
+        }
+        return roles;
 
     }
 

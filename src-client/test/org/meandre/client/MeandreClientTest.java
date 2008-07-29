@@ -148,7 +148,7 @@ public class MeandreClientTest {
     }
 
     /**
-     * Test method for {@link org.meandre.client.MeandreClient#retrieveRoles()}.
+     * Test method for {@link org.meandre.client.MeandreClient#retrieveUserRoles()}.
      */
     @Test
     public void testRetrieveUserRoles() {
@@ -167,12 +167,32 @@ public class MeandreClientTest {
         return;
     }
     /**
+     * Test method for {@link org.meandre.client.MeandreClient#retrieveRoles()}.
+     */
+    @Test
+    public void testRetrieveRoles() {
+        Set<Role> roles = null;
+        try{
+           roles = _meandreClient.retrieveRoles();
+           
+        }catch(TransmissionException e){
+            fail("Transmission failure: " + e.toString());
+        }
+        //test to see that they all appear to be valid properties
+        String expectedPrefix = Role.BASE_ROLE_URL;
+        for(Role observedRole: roles){            
+            assertTrue(observedRole.getUrl().startsWith(expectedPrefix));
+        }
+        return;
+    }
+    
+    /**
      * Test method for 
      * {@link org.meandre.client.MeandreClient#retrieveValidRoles()}.
      */
     @Test
     public void testRetrieveValidRoles() {
-        Set<String> roles = null;
+        Set<Role> roles = null;
         try{
            roles = _meandreClient.retrieveValidRoles();
            
@@ -180,10 +200,7 @@ public class MeandreClientTest {
             fail("Transmission failure: " + e.toString());
         }
         Set<Role> expectedRoles = Role.getStandardRoles();
-        Set<Role> observedRoles = new HashSet<Role>();
-        for(String observedRoleUrl: roles){
-            observedRoles.add(Role.fromUrl(observedRoleUrl));
-        }
+        Set<Role> observedRoles = roles;
         assertTrue(observedRoles.equals(expectedRoles));
         return;
     }
