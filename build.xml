@@ -151,6 +151,9 @@
         <delete file="meandre-config-store.xml"/>
         <delete file="meandre-config-core.xml"/>
         <delete file="meandre-realm.properties"/>
+        <delete file="jmxremote.access"/>
+        <delete file="jmxremote.password"/>
+        <delete file="java.policy"/>
         <delete>
             <fileset dir="${data.dir}/test/zigzag/">
                 <include name="*.mau"/>
