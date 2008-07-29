@@ -1,8 +1,10 @@
 package org.meandre.core.store;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
@@ -382,7 +384,9 @@ public class Store {
     	try {
     		sHostName = InetAddress.getLocalHost().getCanonicalHostName();
 		} catch (UnknownHostException e) {
-			log.warning(e.getMessage());
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.warning(baos.toString());
 		}
         return new SystemStoreImpl(
         		getMaker().createModel(BASE_SYSTEM_STORE_URL + sNickName),
