@@ -75,11 +75,12 @@ public class MeandreServer {
 		MEANDRE_HOME = ".";
 		
 		// Get the core configuration
-		File propFileCore = new File(MEANDRE_HOME+File.separator+"meandre-config-store.xml");
+		File propFileCore = new File(MEANDRE_HOME+File.separator+"meandre-config-core.xml");
 		if ( propFileCore.exists() ) {
 			Properties propsCore = new Properties();
 			try {
-				propsCore.load(new FileInputStream(propFileCore));
+				propsCore.loadFromXML(new FileInputStream(propFileCore));
+				System.out.println(propsCore);
 			} catch (FileNotFoundException e) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				e.printStackTrace(new PrintStream(baos));
@@ -99,7 +100,7 @@ public class MeandreServer {
 		if ( propFileStore.exists() ) {
 			Properties propStore = new Properties();
 			try {
-				propStore.load(new FileInputStream(propFileStore));
+				propStore.loadFromXML(new FileInputStream(propFileStore));
 			} catch (FileNotFoundException e) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				e.printStackTrace(new PrintStream(baos));
