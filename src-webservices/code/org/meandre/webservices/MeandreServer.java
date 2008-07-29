@@ -75,7 +75,7 @@ public class MeandreServer {
 		MEANDRE_HOME = ".";
 		
 		// Get the core configuration
-		File propFileCore = new File(cnf.getBasePort()+File.separator+"meandre-config-store.xml");
+		File propFileCore = new File(MEANDRE_HOME+File.separator+"meandre-config-store.xml");
 		if ( propFileCore.exists() ) {
 			Properties propsCore = new Properties();
 			try {
@@ -95,7 +95,7 @@ public class MeandreServer {
 			cnf = new CoreConfiguration();
 		
 		// Get the store
-		File propFileStore = new File(cnf.getBasePort()+File.separator+"meandre-config-store.xml");
+		File propFileStore = new File(MEANDRE_HOME+File.separator+"meandre-config-store.xml");
 		if ( propFileStore.exists() ) {
 			Properties propStore = new Properties();
 			try {
