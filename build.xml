@@ -117,7 +117,6 @@
     	<javac srcdir="${plugins.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
 		<javac srcdir="${ws.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
     	<javac srcdir="${store.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-    	<javac srcdir="${terracotta.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
     	<javac srcdir="${client.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
     </target>
 
@@ -193,10 +192,6 @@
                     <include name="**/*Test.java"/>
                 </fileset>
             	
-            	<fileset dir="${terracotta.test}">
-                    <include name="**/*Test.java"/>
-                </fileset>
-                
                 <fileset dir="${client.test}">
                     <include name="**/*Test.java"/>
                 </fileset>
@@ -414,7 +409,7 @@
     	<jar destfile="${dist.dir}/${app.name}-server-${build.version}.jar" >
     		<manifest>
 	            <attribute name="Build-Version" value="${build.version}"/>
-	            <attribute name="Main-Class" value="org.meandre.webservices.WSCoreBootstrapper"/>
+	            <attribute name="Main-Class" value="org.meandre.webservices.WSInfrastructureBootstrapper"/>
 	        </manifest>
 	        <fileset dir="${dist.dir}/tmp/">
 	            <include name="**"/>

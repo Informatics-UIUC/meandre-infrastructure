@@ -80,19 +80,13 @@ implements MeandrePlugin{
 		    }
 		    PUBLIC_RESOURCES_DIR = vfsProperties.getProperty("mount_dir", "mnt");
 
-		    log.info("Mounting from folder: " + PUBLIC_RESOURCES_DIR );
+		    log.finest("Mounting from folder: " + PUBLIC_RESOURCES_DIR );
 		    File file = new File( PUBLIC_RESOURCES_DIR);
 
 		    if(!file.exists()){
-		    	log.info("Creating the folder... "+ file.getAbsolutePath());
+		    	log.fine("Creating the folder... "+ file.getAbsolutePath());
 		    	file.mkdirs();
 		    }
-
-		    String[] fileName = file.list();
-		    for(int i=0; i < fileName.length; i++){
-		    	log.info("Mounting file: "+fileName[i]);
-		    }
-
 	}
 
 	/** Responds to a get request.
@@ -169,17 +163,17 @@ implements MeandrePlugin{
 	private java.io.File getFile(File file, String sFileName) {
 		// check of jar file exists
 		File compressedFileSystem = new File(file,sFileName+".jar");
-		log.info("Checking: "+ compressedFileSystem.getAbsolutePath());
+		log.finest("Checking: "+ compressedFileSystem.getAbsolutePath());
 		if(compressedFileSystem.exists()){
 			return compressedFileSystem;
 		}
 
-		log.info("Checking: "+ compressedFileSystem.getAbsolutePath());
+		log.finest("Checking: "+ compressedFileSystem.getAbsolutePath());
 		compressedFileSystem = new File(file,sFileName+".zip");
 		if(compressedFileSystem.exists()){
 			return compressedFileSystem;
 		}
-		log.info("Not found returning... null");
+		log.finest("Not found returning... null");
 		return null;
 	}
 

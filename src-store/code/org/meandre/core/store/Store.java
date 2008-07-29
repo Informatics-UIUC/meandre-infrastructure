@@ -232,29 +232,29 @@ public class Store {
         }
 
         // Report the current configuration to the log file
-        log.info("JENA RBM driver: " + getDriverClassName());
-        log.info("JENA RBM database: " + getDBName());
-        log.info("JENA RBM user: " + getUserName());
-        log.info("JENA RBM password: " + getPassword());
-        log.info("JENA RBM URL: " + getURL());
+        log.config("JENA RBM driver: " + getDriverClassName());
+        log.config("JENA RBM database: " + getDBName());
+        log.config("JENA RBM user: " + getUserName());
+        log.config("JENA RBM password: " + getPassword());
+        log.config("JENA RBM URL: " + getURL());
 
         // Loads the default database driver for Jena storage
         try {
-            log.info("Loading connection driver " + getDriverClassName());
+            log.config("Loading connection driver " + getDriverClassName());
             Class.forName(getDriverClassName());
         }
         catch (ClassNotFoundException e) {
-            log.info("Driver " + getDriverClassName() + " could not be loaded");
+            log.warning("Driver " + getDriverClassName() + " could not be loaded");
         }
 
         // Initializes the model maker
-        log.info("Initializing JENA RDBModelMaker");
+        log.config("Initializing JENA RDBModelMaker");
 
         // Create database connection
         IDBConnection conn = new DBConnection(getURL(), getUserName(), getPassword(), getDBName());
         makerJenaModel = ModelFactory.createModelRDBMaker(conn);
 
-        log.info("Initialization of JENA RDBModelMaker done");
+        log.config("Initialization of JENA RDBModelMaker done");
         initializeSecurityStore();
         
 

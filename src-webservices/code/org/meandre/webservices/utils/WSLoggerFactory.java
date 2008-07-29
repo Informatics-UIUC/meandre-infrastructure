@@ -32,7 +32,7 @@ public class WSLoggerFactory {
 	// Initializing the logger and its handlers
 	static {
 		logWS = Logger.getLogger(WSLoggerFactory.class.getName());
-		logWS.setLevel(Level.WARNING);
+		logWS.setLevel(Level.INFO);
 		try {
 			new File("."+File.separator+"log").mkdir();
 			handlerWS = new FileHandler("."+File.separator+"log"+File.separator+"meandre-webservices.log",LOG_FILE_SIZE,LOG_NUM_ROTATING_FILES);
@@ -56,7 +56,7 @@ public class WSLoggerFactory {
 			System.err.println("Could not initialize "+"."+File.separator+"log"+File.separator+"meandre-webservices.log");
 			System.exit(1);
 		}
-		handlerWS.setLevel(Level.WARNING);
+		handlerWS.setLevel(Level.INFO);
 	}
 	
 	/** Returns the core main logger.

@@ -1,8 +1,33 @@
--Updated Xstream library to 1.3 July 19th 2008
--Added simple formatter for the logger July 19th 2008
+1.4.0-vcli-alpha Sara
+
+* Fix to the store properties to avoid overriding the existing file
+
+* Update the version number to 1.4.0-vcli-alpha 
+
+* Changed added some info login on the MeandreServer operations
+
+* Fixed VFServlet nonsensical login message levels
+
+* Fixed the JarToolServlet login of the exceptions
+
+* Reshaping the logger to make it leaner:
+	- most conductor messages move to fine
+	- store messages moved to config when possible
+	- wrapped component toned down a bit
+
+* Removing JMX and the rmi registry to avoid problems on concurrent testing
+
+* Removing terracota test
 
 
-1.3.0 Xuixo
+1.3.1cli Xuixo
+
+* Updated Xstream library to 1.3 July 19th 2008
+
+* Added simple formatter for the logger July 19th 2008
+
+
+1.3.1cli Xuixo
 
 * Changed the software revision string to be of the format ##.##.##
 

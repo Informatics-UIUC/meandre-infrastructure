@@ -469,8 +469,7 @@ public class SecurityStore implements SecurityManager {
     }
     
     private void log(String msg){
-        //_log.finer(msg);
-        _log.info(msg + "\n");
+        _log.info(msg);
     }
     
     /** Flushes the current system model to disk.

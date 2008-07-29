@@ -13,8 +13,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,13 +23,11 @@ import org.meandre.core.engine.Conductor;
 import org.meandre.core.engine.ConductorException;
 import org.meandre.core.engine.Executor;
 import org.meandre.core.engine.MrProbe;
-import org.meandre.core.engine.probes.jmx.FlowList;
-import org.meandre.core.engine.probes.jmx.JMXProbeImpl;
 import org.meandre.core.engine.probes.StatisticsProbeImpl;
-import org.meandre.core.store.Store;
 import org.meandre.core.repository.CorruptedDescriptionException;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
+import org.meandre.core.store.Store;
 import org.meandre.core.utils.Constants;
 import org.meandre.webservices.beans.JobDetail;
 import org.meandre.webservices.utils.WSLoggerFactory;
@@ -40,7 +36,6 @@ import org.meandre.webui.WebUI;
 import org.meandre.webui.WebUIException;
 import org.meandre.webui.WebUIFactory;
 import org.meandre.webui.WebUIFragment;
-
 
 import com.hp.hpl.jena.rdf.model.Resource;
 
@@ -53,10 +48,6 @@ public class WSExecuteLogic {
 
 	/** The store to be used */
 	private Store store;
-	/** JMX MBean Server -get from the platform*/
-	private MBeanServer mbeanServer;
-
-	private FlowList flowList;
 	/** The core configuraion object ot use */
 	private CoreConfiguration cnf;
 	/**Stores process execute*/
@@ -65,21 +56,12 @@ public class WSExecuteLogic {
 	/** Creates the execute logic for the given store.
 	 *
 	 * @param store The store to use
+	 * @param cnf The core configuration object
 	 */
-	public WSExecuteLogic ( Store store, CoreConfiguration cnf , MBeanServer mbeanServer) {
+	public WSExecuteLogic ( Store store, CoreConfiguration cnf ) {
 		this.store = store;
 		this.cnf = cnf;
 		this.executionTokenList = new Hashtable<String,JobDetail>();
-		this.mbeanServer = mbeanServer;
-		// Construct the ObjectName for the MBean we will register
-		try {
-			ObjectName name = new ObjectName("org.meandre.core.engine.probes.jmx:type=FlowList");
-			flowList = new FlowList();
-			this.mbeanServer.registerMBean(flowList,name);
-
-		} catch ( Exception e) {
-			WSLoggerFactory.getWSLogger().warning(e.toString());
-		}
 	}
 
 	/** Runs a flow given a URI against the user repository verbosely
@@ -159,21 +141,13 @@ public class WSExecuteLogic {
 				PrintStream psOUT = System.out;
 				PrintStream psERR = System.err;
 				StatisticsProbeImpl spi = null;
-				JMXProbeImpl jpi = null;
 				try {
 					if ( !bStats ){
 						exec = conductor.buildExecutor(qr, resURI);
-					}else {
-						if(!bJmx){
-						spi = new StatisticsProbeImpl();
-						MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),spi,false,false);
+					}
+					else {
+						MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),new StatisticsProbeImpl(),false,false);
 						exec = conductor.buildExecutor(qr, resURI, mrProbe);
-						}else{
-							// USE probe array to support this.
-						jpi = new JMXProbeImpl(this.mbeanServer,flowList,token);
-						MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),jpi,false,false);
-						exec = conductor.buildExecutor(qr, resURI, mrProbe);
-						}
 					}
 					pw.flush();
 					int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());

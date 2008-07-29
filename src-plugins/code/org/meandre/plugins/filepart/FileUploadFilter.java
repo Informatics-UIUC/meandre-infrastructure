@@ -33,7 +33,7 @@ public class FileUploadFilter extends MultiPartFilter implements MeandrePlugin{
 
 	public void init(FilterConfig filterConfig)  throws ServletException{
 		super.init(filterConfig);
-		log.info("Starting the Filter...");
+		log.fine("Starting the Filter...");
 	}
 
 	public String getAlias() {

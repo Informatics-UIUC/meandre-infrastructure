@@ -24,7 +24,7 @@ import org.meandre.core.utils.Constants;
 import org.meandre.plugins.MeandrePlugin;
 import org.meandre.plugins.PluginFactory;
 import org.meandre.plugins.bean.Plugin;
-import org.meandre.webservices.WSCoreBootstrapper;
+import org.meandre.webservices.WSInfrastructureBootstrapper;
 import org.meandre.webservices.utils.WSLoggerFactory;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
@@ -311,27 +311,27 @@ public class WSAboutLogic {
 		model = ModelFactory.createDefaultModel();
 
 		// Setting the name spaces
-		model.setNsPrefix("meandreWS", WSCoreBootstrapper.WS_BASE_URL);
+		model.setNsPrefix("meandreWS", WSInfrastructureBootstrapper.WS_BASE_URL);
 		model.setNsPrefix("meandreSC", Store.BASE_REPSITORY_STORE_CONFIG_URL );
 		model.setNsPrefix("xsd", XSD.getURI());
 		model.setNsPrefix("rdf", RDF.getURI());
 		model.setNsPrefix("rdfs",RDFS.getURI());
 		model.setNsPrefix("dc",DC.getURI());
 
-		Resource resRoot = model.createResource(WSCoreBootstrapper.WS_BASE_URL);
+		Resource resRoot = model.createResource(WSInfrastructureBootstrapper.WS_BASE_URL);
 
 		// Meandre WS ones
 		resRoot.addProperty(ResourceFactory.createProperty(DC.date.getURI()), model.createTypedLiteral(new Date(),XSDDatatype.XSDdateTime));
 		resRoot.addProperty(ResourceFactory.createProperty(DC.creator.getURI()), model.createTypedLiteral(request.getRemoteUser()));
-		resRoot.addProperty(ResourceFactory.createProperty(WSCoreBootstrapper.WS_BASE_URL+"sessionID"), model.createTypedLiteral(request.getSession().getId()));
+		resRoot.addProperty(ResourceFactory.createProperty(WSInfrastructureBootstrapper.WS_BASE_URL+"sessionID"), model.createTypedLiteral(request.getSession().getId()));
 
 		// Meandre ones
-		resRoot.addProperty(ResourceFactory.createProperty(WSCoreBootstrapper.WS_BASE_URL+"version"), model.createTypedLiteral(Constants.MEANDRE_VERSION));
+		resRoot.addProperty(ResourceFactory.createProperty(WSInfrastructureBootstrapper.WS_BASE_URL+"version"), model.createTypedLiteral(Constants.MEANDRE_VERSION));
 		for ( Object oKey:prop.keySet() ) {
 			String sKey = oKey.toString();
 			if ( sKey.startsWith("MEANDRE")) {
 				String sValue = prop.getProperty(sKey.toString());
-				resRoot.addProperty(ResourceFactory.createProperty(WSCoreBootstrapper.WS_BASE_URL+sKey.toString().toLowerCase()), model.createTypedLiteral(sValue));
+				resRoot.addProperty(ResourceFactory.createProperty(WSInfrastructureBootstrapper.WS_BASE_URL+sKey.toString().toLowerCase()), model.createTypedLiteral(sValue));
 			}
 		}
 

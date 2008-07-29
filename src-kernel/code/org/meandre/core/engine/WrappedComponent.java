@@ -267,7 +267,7 @@ extends Thread {
 			}
 			//thdMrProper.awake();
 		}
-		log.info("Disposing WebUI if any." );
+		log.fine("Disposing WebUI if any." );
 		cc.stopAllWebUIFragments();
 		log.info("Finalizing the execution of the wrapping component "+ec.toString());
 		try {

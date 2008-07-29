@@ -1,23 +1,17 @@
 package org.meandre.webservices;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.management.ManagementFactory;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
+import java.io.PrintStream;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
-import javax.management.MBeanServer;
-import javax.management.remote.JMXConnectorServer;
-import javax.management.remote.JMXConnectorServerFactory;
-import javax.management.remote.JMXServiceURL;
 import javax.servlet.Servlet;
 
 import org.meandre.configuration.CoreConfiguration;
@@ -32,6 +26,7 @@ import org.meandre.webservices.servlets.WSPublish;
 import org.meandre.webservices.servlets.WSRepository;
 import org.meandre.webservices.servlets.WSSecurity;
 import org.meandre.webservices.utils.WSLoggerFactory;
+import org.meandre.core.utils.Constants;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
@@ -39,7 +34,6 @@ import org.mortbay.jetty.security.HashUserRealm;
 import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
-import org.mortbay.management.MBeanContainer;
 
 
 /**
@@ -71,15 +65,6 @@ public class MeandreServer {
 	/** The main Jetty server */
 	private Server server;
 
-	@SuppressWarnings("unused")
-	private Registry registry;
-	
-	private int REG_PORT = 1099;
-	
-	private JMXConnectorServer cs =null;
-	private  MBeanServer mBeanServer =null;
-	private  MBeanContainer mBeanContainer=null;
-
 	private boolean bStop = false;
 	
 	/** Creates a Meandre server with the default configuration.
@@ -88,9 +73,26 @@ public class MeandreServer {
 	public MeandreServer () {
 		log = WSLoggerFactory.getWSLogger();
 		MEANDRE_HOME = ".";
-		store = new Store();
 		cnf = new CoreConfiguration();
-		initJMXProperties();
+		File propFile = new File(cnf.getBasePort()+File.separator+"meandre-config-store.xml");
+		if ( propFile.exists() ) {
+			Properties prop = new Properties();
+			try {
+				prop.load(new FileInputStream(propFile));
+			} catch (FileNotFoundException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				log.warning(baos.toString());
+			} catch (IOException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				log.warning(baos.toString());
+			}
+			store = new Store(prop);
+		}
+		else
+			store = new Store();
+		
 	}
 	
 	/**
@@ -104,7 +106,6 @@ public class MeandreServer {
         MEANDRE_HOME = sInstallDir;
         store = new Store(sInstallDir);
         cnf = new CoreConfiguration(port, sInstallDir);	    
-        initJMXProperties();
 	}
 	
 	/** Creates a Meandre server running on the provided home directory and store.
@@ -118,53 +119,8 @@ public class MeandreServer {
 		MEANDRE_HOME = sMeandreHome;
 		store = storeMS;
 		cnf = config;
-		initJMXProperties();
 	}
 	
-	/** Sets the basic policies for the JMX to work.
-	 * 
-	 * 
-	 */
-	private void initJMXProperties() {
-		
-		try {
-			// Dumping the required jmxremote.access file
-			File fja = new File(cnf.getHomeDirectory()+File.separator+"jmxremote.access");
-			PrintWriter pwa = new PrintWriter(new FileWriter(fja));
-			pwa.println("monitorRole readonly");
-			pwa.println("controlRole readwrite"); 
-			pwa.close();
-			
-			// Dumping the required jmxremote.password file
-			File fjp = new File(cnf.getHomeDirectory()+File.separator+"jmxremote.password");
-			PrintWriter pwp = new PrintWriter(new FileWriter(fjp));
-			pwp.println("monitorRole  jmxAdmin");
-			pwp.println("controlRole  jmxAdmin"); 
-			pwp.close();
-			
-			// Dumping the policy file
-			String sJavaHome = System.getProperty("java.home");
-			File fjpf = new File(cnf.getHomeDirectory()+File.separator+"java.policy");
-			PrintWriter pwpf = new PrintWriter(new FileWriter(fjpf));
-			pwpf.println("grant codeBase \"file:"+sJavaHome+"/lib/ext/*\" {"); 
-			pwpf.println("        permission java.security.AllPermission;"); 
-			pwpf.println("};"); 
-			pwpf.println(); 
-			pwpf.println("grant {"); 
-			pwpf.println("        permission java.security.AllPermission;"); 
-			pwpf.println("};"); 
-			pwpf.close();
-			
-			//System.setProperty("com.sun.management.jmxremote", com.sun.management.jmx)
-			System.setProperty("com.sun.management.jmxremote.password.file", "jmxremote.password");
-			System.setProperty("java.security.policy","java.policy");
-		}
-		catch ( IOException e ) {
-			log.warning("Could not initialize the JMX properties: "+e.getMessage());
-		}
-		
-	}
-
 	/** Sets the Meandre core configuration to use for this server.
 	 * 
 	 * @param config The Meandre core configuration
@@ -206,7 +162,8 @@ public class MeandreServer {
 	 * @throws Exception Jetty could not be started or joined
 	 */
 	public void start (boolean bJoin) throws Exception {
-		startRMIRegistry();
+		log.info("Starting Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+")");
+		
 		server = new Server(cnf.getBasePort());
 
 		// Initialize global file server
@@ -222,26 +179,7 @@ public class MeandreServer {
 		// Launch the server
 		server.start();
 		if ( bJoin )
-			server.join();
-	}
-	
-	/**Start the RMIRegistry used by the JMX server
-	 * 
-	 */
-	private void startRMIRegistry() {
-		try {
-			registry= LocateRegistry.createRegistry(REG_PORT);
-			WSLoggerFactory.getWSLogger().info("Starting RMI registry");
-		} catch (Exception e) {
-			System.out.println("Error creating RMI registry");
-			   try {
-		            registry = LocateRegistry.getRegistry(REG_PORT);
-		        } catch (RemoteException rex) {
-		        	WSLoggerFactory.getWSLogger().warning("Error creating RMI registry");
-		            return;
-		        }
-		}
-	
+			join();
 	}
 
 	/** Joins the main Jetty server.
@@ -250,6 +188,7 @@ public class MeandreServer {
 	 * 
 	 */
 	public void join () throws InterruptedException {
+		log.info("Joining Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+") at port ");
 		server.join();
 		
 	}
@@ -259,15 +198,9 @@ public class MeandreServer {
 	 * 
 	 */
 	public void stop () throws Exception {
+		log.info("Stoping Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+") at port ");
 		bStop  = true;
-		try {
-			cs.stop();
-		} catch (IOException e) {
-			log.warning(e.toString());
-		}finally{
-			server.stop();
-		}
-		UnicastRemoteObject.unexportObject(registry, true);
+		server.stop();
 	}
 
 	/** Initialize the webservices
@@ -344,32 +277,12 @@ public class MeandreServer {
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublic(store)), "/public/services/*");
 		
 		//
-		// Start the MBeanServer
-		//
-		try{
-		JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi");
-		
-	     mBeanServer= ManagementFactory.getPlatformMBeanServer();
-	     mBeanContainer = new MBeanContainer(mBeanServer);
-	     server.getContainer().addEventListener(mBeanContainer);
-		 mBeanContainer.start();
-		
-		 
-		 cs=JMXConnectorServerFactory.newJMXConnectorServer(url, null, mBeanServer);
-
-
-		 cs.start();
-		}catch(Exception ex){
-			
-		}
-
-		//
 		// Adding restrictedly provided services
 		//
 		contextWS.addServlet(new ServletHolder((Servlet) new WSAbout(store,cnf)), 		"/services/about/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSLocations(store,cnf)),	"/services/locations/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository(store,cnf)),	"/services/repository/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSExecute(store,cnf,mBeanServer)),		"/services/execute/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSExecute(store,cnf)),		"/services/execute/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublish(store)),		"/services/publish/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurity(store)),		"/services/security/*");
 	

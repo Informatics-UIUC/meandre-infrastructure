@@ -14,7 +14,7 @@ import org.meandre.webservices.utils.WSLoggerFactory;
  * @modified Amit Kumar: Added plugins.
  *
  */
-public class WSCoreBootstrapper {
+public class WSInfrastructureBootstrapper {
 
 	/** The base URL for Meandre WS */
 	public final static String WS_BASE_URL = "http://meandre.org/services/";

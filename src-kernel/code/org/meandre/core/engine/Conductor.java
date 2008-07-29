@@ -135,12 +135,14 @@ public class Conductor {
 		// Get the description
 		FlowDescription fd = qr.getFlowDescription(res);
 
+		log.info("Preparing flow for execution");
+		
 		// STEP 0: Gather all the required contexts and load them
-		log.info("STEP 0: Plugging the required contexts");
+		log.fine("STEP 0: Plugging the required contexts");
 		URLClassLoader urlFlowCL = plugRequiredContexts(qr, htMapNameToClass, htMapResourceToName,fd);
 
 		// STEP 1: Instantiate the flow instances
-		log.info("STEP 1: Instantiate the flow instances");
+		log.fine("STEP 1: Instantiate the flow instances");
 		Hashtable<Resource,ExecutableComponent> htECInstances = new Hashtable<Resource,ExecutableComponent>();
 		for ( ExecutableComponentInstanceDescription ec:fd.getExecutableComponentInstances() ) {
 			Resource   ins = ec.getExecutableComponentInstance();
@@ -211,7 +213,7 @@ public class Conductor {
 		}
 
 		// STEP 2: Create empty active buffers
-		log.info("STEP 2: Create empty active buffers");
+		log.fine("STEP 2: Create empty active buffers");
 		Hashtable<String,ActiveBuffer> htMapInAB = new Hashtable<String,ActiveBuffer>();
 		for ( ConnectorDescription cd:fd.getConnectorDescriptions() ) {
 			Resource resCSIns = cd.getTargetInstance();
@@ -226,7 +228,7 @@ public class Conductor {
 		}
 
 		// STEP 3: Per instance create and input/output set
-		log.info("STEP 3: Per instance create and input/output set");
+		log.fine("STEP 3: Per instance create and input/output set");
 		Hashtable<String,Set<ActiveBuffer>> htInsInputSet = new Hashtable<String,Set<ActiveBuffer>>();
 		Hashtable<String,Set<ActiveBuffer>> htInsOutputSet = new Hashtable<String,Set<ActiveBuffer>>();
 		for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() ) {
@@ -236,7 +238,7 @@ public class Conductor {
 		}
 
 		// STEP 4: Populate input/output instance sets
-		log.info("STEP 4: Populate input/output instance sets");
+		log.fine("STEP 4: Populate input/output instance sets");
 		// The output <--> input port translation
 		Hashtable<Resource,Hashtable<String,String>> htMapOutputTranslation = new Hashtable<Resource,Hashtable<String,String>>();
 		// Logic to real input port translation
@@ -284,7 +286,7 @@ public class Conductor {
 		}
 
 		// STEP 5: Reconstruct properties per instance set
-		log.info("STEP 5: Reconstruct properties per instance set");
+		log.fine("STEP 5: Reconstruct properties per instance set");
 		Hashtable<Resource,Hashtable<String,String>> htInstaceProperties =  new Hashtable<Resource,Hashtable<String,String>>();
 		for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() ) {
 			PropertiesDescriptionDefinition  ecdProp = qr.getExecutableComponentDescription(ecid.getExecutableComponent()).getProperties();
@@ -300,11 +302,11 @@ public class Conductor {
 		}
 
 		// STEP 6: Create thread groups
-		log.info("STEP 6: Create thread groups");
+		log.fine("STEP 6: Create thread groups");
 		ThreadGroup tgFlow = new ThreadGroup(res.toString());
 
 		// STEP 7: Create wrapping components and add the wrapping components to the execution set
-		log.info("STEP 7: Create wrapping components and add the wrapping components to the execution set");
+		log.fine("STEP 7: Create wrapping components and add the wrapping components to the execution set");
 		Set<WrappedComponent> setWC = new HashSet<WrappedComponent>();
 		for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() ) {
 			Resource resECI = ecid.getExecutableComponentInstance();
@@ -359,7 +361,9 @@ public class Conductor {
 		// STEP 8: reate the executor
 		log.info("STEP 8: Create the executor");
 		try {
-			return new Executor(sFlowUniqueExecutionID,tgFlow,setWC, null);
+			Executor exec = new Executor(sFlowUniqueExecutionID,tgFlow,setWC, null);
+			log.info("Flow prepared");
+			return exec;
 		} catch (InterruptedException e) {
 			thdMrProbe.done();
 			throw new ConductorException("Condcuctor could not create the executor object\n"+e);
@@ -394,7 +398,7 @@ public class Conductor {
 
 
 		// Preparing the URLs for the class loader
-		log.info("Processing executable components contexts and locations");
+		log.fine("Processing executable components contexts and locations");
 		Set<ExecutableComponentInstanceDescription> setIns = fd.getExecutableComponentInstances();
 		for ( ExecutableComponentInstanceDescription ins:setIns ) {
 			ExecutableComponentDescription comp = qr.getExecutableComponentDescription(ins.getExecutableComponent());
@@ -506,7 +510,7 @@ public class Conductor {
 			Hashtable<Resource, String> htMapResourceToRunnable,
 			Hashtable<Resource, String> htMapResourceToFormat )
 	throws CorruptedDescriptionException {
-		log.info("Preparing the class loader");
+		log.fine("Preparing the class loader");
 		int iCnt = 0;
 		URL [] ua = new URL[setURLContext.size()];
 		for ( String sURL:setURLContext )
@@ -527,7 +531,7 @@ public class Conductor {
 		for ( String sClassName:setURLLocations ) {
 			try {
 				if ( htMapResourceToRunnable.get(htMapNameToResource.get(sClassName)).equals("java") ) {
-					log.info("Loading java component "+sClassName);
+					log.fine("Loading java component "+sClassName);
 					Class clazz = Class.forName(sClassName, true, urlCL);
 					htMapNameToClass.put(sClassName,clazz);
 				}
