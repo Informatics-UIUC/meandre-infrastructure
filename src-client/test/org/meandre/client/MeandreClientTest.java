@@ -29,6 +29,7 @@ import org.meandre.core.repository.LocationBean;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.security.Role;
+import org.meandre.core.utils.NetworkTools;
 import org.meandre.demo.repository.DemoRepositoryGenerator;
 import org.meandre.webservices.MeandreServer;
 
@@ -42,10 +43,11 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
  * can make, one per test case.
  *
  * @author pgroves
+ * Modified by Xavier Llor&agrave;s
  */
 public class MeandreClientTest {
 
-    private static String _serverUrl = "localhost";
+    private static String _serverUrl = NetworkTools.getLocalHostName();
     private static int _serverPort = 1704;
     
     private static String _workingDir = 
@@ -71,10 +73,7 @@ public class MeandreClientTest {
     public static void setUpBeforeClass() throws Exception {
         System.out.println("MeandreClientTest: setupBeforeClass begin");
         
-        try {
-        	_serverUrl = InetAddress.getLocalHost().getCanonicalHostName();
-		} catch (UnknownHostException e) {
-		}
+        _serverUrl = NetworkTools.getLocalHostName();
         
         File fWorkDir = new File(_workingDir);
         if(!fWorkDir.exists()){

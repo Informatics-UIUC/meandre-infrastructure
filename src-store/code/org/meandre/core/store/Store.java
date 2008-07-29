@@ -20,6 +20,7 @@ import org.meandre.core.store.security.SecurityStore;
 import org.meandre.core.store.system.SystemStore;
 import org.meandre.core.store.system.SystemStoreImpl;
 import org.meandre.core.utils.Constants;
+import org.meandre.core.utils.NetworkTools;
 
 import com.hp.hpl.jena.db.DBConnection;
 import com.hp.hpl.jena.db.IDBConnection;
@@ -380,14 +381,8 @@ public class Store {
      * @return The system store for the given user
      */
     public SystemStore getSystemStore(CoreConfiguration cnf, String sNickName) {
-    	String sHostName = "127.0.0.1";
-    	try {
-    		sHostName = InetAddress.getLocalHost().getCanonicalHostName();
-		} catch (UnknownHostException e) {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			e.printStackTrace(new PrintStream(baos));
-			log.warning(baos.toString());
-		}
+    	String sHostName = NetworkTools.getLocalHostName();
+    	
         return new SystemStoreImpl(
         		getMaker().createModel(BASE_SYSTEM_STORE_URL + sNickName),
         		sHostName,

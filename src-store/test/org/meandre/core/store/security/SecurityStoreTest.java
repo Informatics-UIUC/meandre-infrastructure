@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.meandre.webservices.MeandreServer;
 import org.meandre.core.security.SecurityManager;
 import org.meandre.core.store.security.SecurityStore;
+import org.meandre.core.utils.NetworkTools;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
@@ -37,10 +38,7 @@ public class SecurityStoreTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         log("setupBeforeClass begin");
-        try {
-            _serverUrl = InetAddress.getLocalHost().getCanonicalHostName();
-        } catch (UnknownHostException e) {
-        }
+        _serverUrl = NetworkTools.getLocalHostName();
         
         File fWorkDir = new File(_workingDir);
         if(!fWorkDir.exists()){

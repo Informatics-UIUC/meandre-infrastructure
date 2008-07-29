@@ -1,5 +1,7 @@
 package org.meandre.core.engine;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashSet;
@@ -9,6 +11,7 @@ import java.util.logging.Logger;
 
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.logger.KernelLoggerFactory;
+import org.meandre.core.utils.NetworkTools;
 import org.meandre.webui.WebUI;
 import org.meandre.webui.WebUIException;
 import org.meandre.webui.WebUIFactory;
@@ -144,17 +147,10 @@ public class Executor {
 	 * @return
 	 */
 	private String getHostWebUrl(int nextPortForUse) {
-			try {
-				return 	"http://"+InetAddress.getLocalHost().getCanonicalHostName()+":"+ nextPortForUse+"/";
-			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			};
-			return "http://127.0.0.1:"+nextPortForUse+"/";
-		}
-		
-		
-
+			String sServer = NetworkTools.getLocalHostName();
+			return "http://"+sServer+":"+nextPortForUse+"/";
+	}
+	
 	/** Fires the execution of a given MeandreFlow.
 	 * 
 	 * 

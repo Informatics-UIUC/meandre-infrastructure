@@ -36,7 +36,7 @@ public class MrProper extends Thread {
 	 * @throws InterruptedException The controlling flow semaphore was interrupted
 	 */
 	public MrProper(ThreadGroup tg, Set<? extends WrappedComponent> setWC) throws InterruptedException {
-		super(tg,tg.getName()+"-mr-proper");
+		super(tg,tg.getName()+"mr-proper");
 		
 		this.bNotDone    = false;
 		this.tg          = tg;

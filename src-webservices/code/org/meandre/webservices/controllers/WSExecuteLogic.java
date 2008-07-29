@@ -29,6 +29,7 @@ import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.store.Store;
 import org.meandre.core.utils.Constants;
+import org.meandre.core.utils.NetworkTools;
 import org.meandre.webservices.beans.JobDetail;
 import org.meandre.webservices.utils.WSLoggerFactory;
 import org.meandre.webui.PortScroller;
@@ -78,27 +79,13 @@ public class WSExecuteLogic {
 
 		String sURI = request.getParameter("uri");
 		boolean bStats = false;
-		boolean bJmx = false;
-
+		
 		String sStats = request.getParameter("statistics");
-		// JMX flag
-		String sJmx = request.getParameter("jmx");
-		// unique identifier sent by the client
 		String token = request.getParameter("token");
 
 		if ( sStats!=null ) {
 			bStats = sStats.equals("true");
 		}
-
-		if(sJmx != null){
-			bJmx = sJmx.equals("true");
-		}
-
-		if(bJmx && token==null ){
-			// with JMX a token is a requirement
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-		}
-
 
 		if ( sURI==null ) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -146,7 +133,8 @@ public class WSExecuteLogic {
 						exec = conductor.buildExecutor(qr, resURI);
 					}
 					else {
-						MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),new StatisticsProbeImpl(),false,false);
+						spi = new StatisticsProbeImpl();
+						MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),spi,false,false);
 						exec = conductor.buildExecutor(qr, resURI, mrProbe);
 					}
 					pw.flush();
@@ -240,7 +228,7 @@ public class WSExecuteLogic {
 
 				}
 
-				if ( bStats && !bJmx) {
+				if ( bStats ) {
 					try {
 						JSONObject jsonStats = spi.getSerializedStatistics();
 						pw.println("----------------------------------------------------------------------------");
@@ -273,7 +261,7 @@ public class WSExecuteLogic {
 						WSLoggerFactory.getWSLogger().warning("This exception should have never been thrown\n"+e);
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
 						e.printStackTrace(new PrintStream(baos));
-						WSLoggerFactory.getWSLogger().warning(e.toString());
+						WSLoggerFactory.getWSLogger().warning(baos.toString());
 					}
 				}
 
@@ -567,16 +555,10 @@ public class WSExecuteLogic {
 
 	/**return the host ip address
 	 *
-	 * @return
+	 * @return The host name
 	 */
 	public String getHostName() {
-		try {
-			return 	InetAddress.getLocalHost().getCanonicalHostName();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		};
-		return "127.0.0.1";
+		return NetworkTools.getLocalHostName();
 	}
 
 }

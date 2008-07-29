@@ -17,6 +17,7 @@ import org.meandre.core.engine.MrProbe;
 import org.meandre.core.engine.MrProper;
 import org.meandre.core.engine.WrappedComponent;
 import org.meandre.core.logger.KernelLoggerFactory;
+import org.meandre.core.utils.NetworkTools;
 import org.meandre.plugins.MeandrePlugin;
 import org.meandre.plugins.PluginFactory;
 import org.meandre.webui.PortScroller;
@@ -357,21 +358,9 @@ implements ComponentContext {
 	 */
 	public URL getWebUIUrl ( boolean bName ) throws ComponentContextException {
 		URL urlRes = null;
-
+		
 		try {
-
-			InetAddress addr = InetAddress.getLocalHost();
-			String sHostName = null;
-
-			if ( bName )
-				sHostName = "http://"+addr.getCanonicalHostName()+":"+webui.getPort()+"/";
-			else
-				sHostName = "http://"+addr.toString()+":"+webui.getPort()+"/";
-
-			urlRes = new URL(sHostName);
-
-		} catch ( UnknownHostException e ) {
-			throw new ComponentContextException(e);
+			urlRes = new URL("http://"+NetworkTools.getLocalHostName()+":"+webui.getPort()+"/");
 		} catch (MalformedURLException e) {
 			throw new ComponentContextException(e);
 		}

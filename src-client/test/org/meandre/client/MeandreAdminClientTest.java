@@ -13,6 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.meandre.core.security.SecurityManager;
 import org.meandre.core.store.security.SecurityManagerProctor;
+import org.meandre.core.utils.NetworkTools;
 import org.meandre.webservices.MeandreServer;
 
 
@@ -42,10 +43,7 @@ public class MeandreAdminClientTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         log("setupBeforeClass begin");
-        try {
-            _serverUrl = InetAddress.getLocalHost().getCanonicalHostName();
-        } catch (UnknownHostException e) {
-        }
+        _serverUrl = NetworkTools.getLocalHostName();
         
         File fWorkDir = new File(_workingDir);
         if(!fWorkDir.exists()){

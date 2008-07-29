@@ -18,14 +18,14 @@ class ShortFormatter extends Formatter {
 			  }
 		  }
 		String threadName= Thread.currentThread().getName();
-		if(threadName!=null){
-			String split[] = threadName.split("/");
-			if(split!=null && split.length>2){
-				String componentName = split[split.length-2];
-				String flowName = split[split.length -1];
-				threadName = flowName +":"+componentName;
-			}
-		}
+//		if(threadName!=null){
+//			String split[] = threadName.split("/");
+//			if(split!=null && split.length>2){
+//				String componentName = split[split.length-2];
+//				String flowName = split[split.length -1];
+//				threadName = flowName +":"+componentName;
+//			}
+//		}
 	     return record.getLevel() + " ["+threadName+":"+record.getThreadID()+"]"+" [" +
 	         className+":"+record.getSourceMethodName() + "] " +
 	         record.getMessage() + "\n";
