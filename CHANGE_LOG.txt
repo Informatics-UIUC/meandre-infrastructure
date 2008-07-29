@@ -1,6 +1,8 @@
 1.4.0-vcli-alpha Sara
 
-* Fix to the store properties to avoid overriding the existing file
+* Fix to avoiding the core config file to be overwritten
+
+* Fix to the store properties to avoid overwriting the existing file
 
 * Update the version number to 1.4.0-vcli-alpha 
 
