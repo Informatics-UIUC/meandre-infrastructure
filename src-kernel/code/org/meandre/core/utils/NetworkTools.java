@@ -28,4 +28,32 @@ public class NetworkTools {
 		};
 		return "localhost";
 	}
+	
+	/** Returns the numeric version of the IP of the box where the server 
+	 * is running
+	 * 
+	 * @return The numeric value
+	 */
+	public static String getNumericIPValue() {
+		String sRes = "unknown";
+		try {
+			InetAddress ip = InetAddress.getLocalHost();
+			byte [] ba = ip.getAddress();
+			sRes = "";
+			for ( byte b:ba ) {
+				String sTmp = Integer.toHexString(b);
+				if ( sTmp.length()<2 )
+					sTmp = "0"+sTmp;
+				else 
+					sTmp = sTmp.substring(sTmp.length()-2);
+				sRes += sTmp;
+			}
+		} catch (UnknownHostException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			KernelLoggerFactory.getCoreLogger().warning(baos.toString());
+		}
+		
+		return sRes;
+	}
 }

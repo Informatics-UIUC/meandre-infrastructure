@@ -146,7 +146,7 @@ extends Thread {
 	 *
 	 */
 	public void run () {
-		log.info("Initializing a the wrapping component "+ec.toString());
+		log.fine("Initializing a the wrapping component "+ec.toString());
 		
 		// Initialize the executable component
 		try {
@@ -267,9 +267,9 @@ extends Thread {
 			}
 			//thdMrProper.awake();
 		}
-		log.fine("Disposing WebUI if any." );
+		log.finer("Disposing WebUI if any." );
 		cc.stopAllWebUIFragments();
-		log.info("Finalizing the execution of the wrapping component "+ec.toString());
+		log.fine("Finalizing the execution of the wrapping component "+ec.toString());
 		try {
 			ec.dispose(cc);
 		} catch (ComponentExecutionException e) {

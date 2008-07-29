@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
@@ -136,6 +134,7 @@ public class WSExecuteLogic {
 						spi = new StatisticsProbeImpl();
 						MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),spi,false,false);
 						exec = conductor.buildExecutor(qr, resURI, mrProbe);
+						mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
 					}
 					pw.flush();
 					int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());

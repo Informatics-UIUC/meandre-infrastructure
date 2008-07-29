@@ -1,5 +1,9 @@
 1.4.0-vcli-alpha Sara
 
+* More rearranging of the log levels 
+
+* Modified the log formatter. Beside rearranging the info fields, not it displays properly on different OS
+
 * Fix to avoiding the core config file to be overwritten
 
 * Fix to the store properties to avoid overwriting the existing file

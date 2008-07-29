@@ -209,7 +209,7 @@ public class MeandreServer {
 	 * 
 	 */
 	public void join () throws InterruptedException {
-		log.info("Joining Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+") at port ");
+		log.info("Joining Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+")");
 		server.join();
 		
 	}
@@ -219,7 +219,7 @@ public class MeandreServer {
 	 * 
 	 */
 	public void stop () throws Exception {
-		log.info("Stoping Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+") at port ");
+		log.info("Stoping Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+")");
 		bStop  = true;
 		server.stop();
 	}

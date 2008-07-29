@@ -172,7 +172,8 @@ public class MAUExecutor {
 			MrProbe mrProbe = new MrProbe(KernelLoggerFactory.getCoreLogger(),spi,false,false);
 			conductor.setParentClassloader(this.getParentClassloader());
 			exec = conductor.buildExecutor(qr, resURI, mrProbe);
-
+			mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
+			
 			ps.flush();
 
 			// Redirecting the streamers

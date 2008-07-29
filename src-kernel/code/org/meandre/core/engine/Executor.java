@@ -1,9 +1,5 @@
 package org.meandre.core.engine;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -68,6 +64,7 @@ public class Executor {
 	 * @param iPriority The execution priority
 	 */
 	public void execute ( int iPriority, WebUI webui ) {
+		log.info("Executing flow "+sFlowUniqueExecutionID);
 		// Setting up MrProbe info
 		WrappedComponent wcTmp = setWC.iterator().next();
 		MrProbe thdMrProbe = wcTmp.thdMrProbe;
@@ -202,6 +199,14 @@ public class Executor {
 	 */
 	public String getFlowUniqueExecutionID() {
 		return sFlowUniqueExecutionID;
+	}
+
+	/** Returns the name of the thread groups.
+	 * 
+	 * @return The name of the thread group
+	 */
+	public String getThreadGroupName() {
+		return tg.getName();
 	}
 
 }

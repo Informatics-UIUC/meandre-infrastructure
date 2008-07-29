@@ -14,6 +14,7 @@ import org.meandre.core.environments.python.jython.JythonExecutableComponentAdap
 import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.repository.*;
 import org.meandre.core.utils.HexConverter;
+import org.meandre.core.utils.NetworkTools;
 import org.meandre.webui.PortScroller;
 
 import java.io.File;
@@ -81,7 +82,7 @@ public class Conductor {
 	public Conductor( int iActiveBufferSize, CoreConfiguration cnf ) {
 		this.cnf = cnf;
 		
-		log.info("Creating a conductor object");
+		log.fine("Creating a conductor object");
 		this.iActiveBufferSize = iActiveBufferSize;
 		setLoadableLanguages = new HashSet<String>();
 		for ( String sLang:saExecutableComponentLanguages )
@@ -105,6 +106,7 @@ public class Conductor {
 	throws CorruptedDescriptionException, ConductorException {
 		MrProbe thdMrProbe = new MrProbe(log,new NullProbeImpl(),false,false);
 		Executor exec = buildExecutor(qr, res,thdMrProbe);
+		thdMrProbe.setName(exec.getThreadGroupName()+"mr-probe");
 		exec.initWebUI(PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID()), "XStreamTest");
 		return exec;
 	}
@@ -122,7 +124,7 @@ public class Conductor {
 	public Executor buildExecutor(QueryableRepository qr, Resource res, MrProbe thdMrProbe)
 	throws CorruptedDescriptionException, ConductorException {
 		// The unique execution flow ID
-		String sFlowUniqueExecutionID = res.toString()+"/"+""+"/"+System.currentTimeMillis()+"/"+(Math.abs(new Random().nextInt()));
+		String sFlowUniqueExecutionID = res.toString()+NetworkTools.getNumericIPValue()+"/"+System.currentTimeMillis()+"/"+(Math.abs(new Random().nextInt()))+"/";
 		String flowID = res.toString();
 		// Map class names to classes
 		Hashtable<String,Class> htMapNameToClass = new Hashtable<String,Class>();
@@ -135,7 +137,7 @@ public class Conductor {
 		// Get the description
 		FlowDescription fd = qr.getFlowDescription(res);
 
-		log.info("Preparing flow for execution");
+		log.info("Preparing flow "+sFlowUniqueExecutionID);
 		
 		// STEP 0: Gather all the required contexts and load them
 		log.fine("STEP 0: Plugging the required contexts");
@@ -303,7 +305,7 @@ public class Conductor {
 
 		// STEP 6: Create thread groups
 		log.fine("STEP 6: Create thread groups");
-		ThreadGroup tgFlow = new ThreadGroup(res.toString());
+		ThreadGroup tgFlow = new ThreadGroup(sFlowUniqueExecutionID);
 
 		// STEP 7: Create wrapping components and add the wrapping components to the execution set
 		log.fine("STEP 7: Create wrapping components and add the wrapping components to the execution set");
@@ -359,10 +361,10 @@ public class Conductor {
 		}
 
 		// STEP 8: reate the executor
-		log.info("STEP 8: Create the executor");
+		log.fine("STEP 8: Create the executor");
 		try {
 			Executor exec = new Executor(sFlowUniqueExecutionID,tgFlow,setWC, null);
-			log.info("Flow prepared");
+			log.info("Flow prepared. "+sFlowUniqueExecutionID+" waiting for execution");
 			return exec;
 		} catch (InterruptedException e) {
 			thdMrProbe.done();
