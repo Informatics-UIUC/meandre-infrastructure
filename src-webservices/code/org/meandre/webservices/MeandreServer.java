@@ -80,7 +80,6 @@ public class MeandreServer {
 			Properties propsCore = new Properties();
 			try {
 				propsCore.loadFromXML(new FileInputStream(propFileCore));
-				System.out.println(propsCore);
 			} catch (FileNotFoundException e) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				e.printStackTrace(new PrintStream(baos));
