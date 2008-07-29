@@ -73,12 +73,13 @@ public class MeandreServer {
 	public MeandreServer () {
 		log = WSLoggerFactory.getWSLogger();
 		MEANDRE_HOME = ".";
-		cnf = new CoreConfiguration();
-		File propFile = new File(cnf.getBasePort()+File.separator+"meandre-config-store.xml");
-		if ( propFile.exists() ) {
-			Properties prop = new Properties();
+		
+		// Get the core configuration
+		File propFileCore = new File(cnf.getBasePort()+File.separator+"meandre-config-store.xml");
+		if ( propFileCore.exists() ) {
+			Properties propsCore = new Properties();
 			try {
-				prop.load(new FileInputStream(propFile));
+				propsCore.load(new FileInputStream(propFileCore));
 			} catch (FileNotFoundException e) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				e.printStackTrace(new PrintStream(baos));
@@ -88,7 +89,27 @@ public class MeandreServer {
 				e.printStackTrace(new PrintStream(baos));
 				log.warning(baos.toString());
 			}
-			store = new Store(prop);
+			cnf = new CoreConfiguration(propsCore);
+		}
+		else
+			cnf = new CoreConfiguration();
+		
+		// Get the store
+		File propFileStore = new File(cnf.getBasePort()+File.separator+"meandre-config-store.xml");
+		if ( propFileStore.exists() ) {
+			Properties propStore = new Properties();
+			try {
+				propStore.load(new FileInputStream(propFileStore));
+			} catch (FileNotFoundException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				log.warning(baos.toString());
+			} catch (IOException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				log.warning(baos.toString());
+			}
+			store = new Store(propStore);
 		}
 		else
 			store = new Store();

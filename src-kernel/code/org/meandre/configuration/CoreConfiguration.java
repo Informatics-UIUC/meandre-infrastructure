@@ -59,6 +59,20 @@ public class CoreConfiguration {
         initializeConfiguration();    	
 	}
 	
+
+	/** Creates a core configuration object with the default property values.
+	 * It uses the existing property file and uses those values if it exists.
+	 * 
+	 * @props The properties to use
+	 */
+	public CoreConfiguration ( Properties props ) {
+		log = KernelLoggerFactory.getCoreLogger();
+		
+		propsCore = props;   
+        
+        initializeConfiguration();    	
+	}
+	
 	/**
 	 * Creates a core configuration where all file resources will be in
 	 * the specified sInstallDir and the server will run on the specified
@@ -81,15 +95,6 @@ public class CoreConfiguration {
         initializeConfiguration();    
 	}
 	
-	
-	/** Creates a core configuration object with the default property values.
-	 * 
-	 * @param props The properties to use
-	 */
-	public CoreConfiguration ( Properties props ) {
-		propsCore = props;
-		initializeConfiguration();
-	}
 	
 	/** Initialize the supporting file structures for the given configuration.
 	 * 
