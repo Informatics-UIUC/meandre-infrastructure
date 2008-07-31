@@ -118,6 +118,7 @@ public class MeandreProxy{
 	 * 
 	 * @return The set of granted role for the proxy user
 	 */
+	@SuppressWarnings("deprecation")
 	public Set<String> getRoles() {
 		if ( mapRoles==null ) {
             try{
