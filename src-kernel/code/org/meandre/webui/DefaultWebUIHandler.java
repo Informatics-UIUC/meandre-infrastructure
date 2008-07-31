@@ -43,7 +43,9 @@ public class DefaultWebUIHandler extends AbstractHandler {
 		Request base_request = (request instanceof Request) ? 
 				                  (Request) request : 
 				                  HttpConnection.getCurrentConnection().getRequest();
-				                  
+		
+        if (response.isCommitted() || base_request.isHandled())
+		      return;
 		base_request.setHandled(true);
 
 		response.setContentType("text/html");

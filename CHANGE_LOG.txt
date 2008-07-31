@@ -1,5 +1,7 @@
 1.4.0-vcli-alpha Sara
 
+* Fix to the webuidispatcher set done.
+
 * More rearranging of the log levels 
 
 * Modified the log formatter. Beside rearranging the info fields, not it displays properly on different OS
