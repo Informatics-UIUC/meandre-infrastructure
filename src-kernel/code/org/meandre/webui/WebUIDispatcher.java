@@ -90,6 +90,14 @@ public class WebUIDispatcher extends AbstractHandler {
 			HttpServletResponse response, int dispatch) throws IOException,
 			ServletException {
 		
+		Request base_request = (request instanceof Request) ? 
+                (Request) request : 
+                HttpConnection.getCurrentConnection().getRequest();
+
+		if (response.isCommitted() || base_request.isHandled())
+			return;
+		base_request.setHandled(true);
+		
 		if ( target.startsWith("/admin/") )
 			processAdminRequest(target,request,response,dispatch);
 		else if ( target.startsWith("/public/resources") ) {
@@ -99,10 +107,6 @@ public class WebUIDispatcher extends AbstractHandler {
 		
 			if (lstHandlers.size() > 0) {
 				// Seting the request and response status
-				Request base_request = (request instanceof Request) ? (Request) request
-						: HttpConnection.getCurrentConnection().getRequest();
-				base_request.setHandled(true);
-				
 				response.setStatus(HttpServletResponse.SC_OK);
 				response.setContentType("text/html");
 				
