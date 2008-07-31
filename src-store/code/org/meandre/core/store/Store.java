@@ -1,8 +1,12 @@
 package org.meandre.core.store;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -19,7 +23,6 @@ import org.meandre.core.utils.Constants;
 import org.meandre.core.utils.NetworkTools;
 
 import com.hp.hpl.jena.db.DBConnection;
-import com.hp.hpl.jena.db.IDBConnection;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
@@ -149,6 +152,11 @@ public class Store {
      */
     private Hashtable<String, RepositoryImpl> htMapRepImpl = new Hashtable<String, RepositoryImpl>();
 
+    /**
+     * The Jena database connection object
+     */
+	private DBConnection dbConn = null;
+
     /** Initialize a default store.
      * 
      */
@@ -250,8 +258,8 @@ public class Store {
         log.config("Initializing JENA RDBModelMaker");
 
         // Create database connection
-        IDBConnection conn = new DBConnection(getURL(), getUserName(), getPassword(), getDBName());
-        makerJenaModel = ModelFactory.createModelRDBMaker(conn);
+        dbConn = new DBConnection(getURL(), getUserName(), getPassword(), getDBName());
+        makerJenaModel = ModelFactory.createModelRDBMaker(dbConn);
 
         log.config("Initialization of JENA RDBModelMaker done");
         initializeSecurityStore();
@@ -439,16 +447,47 @@ public class Store {
 	}
 
 	/**
-	 * @return the sConfigPath
+	 * Returns the paths to the configuration files
+	 * 
+	 * @return The path to the configuration files
 	 */
-	public String getSConfigPath() {
+	public String getConfigurationPath() {
 		return sConfigPath;
 	}
 
 	/**
-	 * @return the sConfigPath
+	 * Sets the paths to the configuration files.
+	 * 
+	 * @param sPath The path to the configuration files
 	 */
-	public void setSConfigPath(String configPath) {
-		sConfigPath = configPath;
+	public void setConfigurationPath(String sPath) {
+		sConfigPath = sPath;
+	}
+	
+	/** Returns the JDBC connection to the database backend. This call should
+	 * be used carefully. Just access the database backend if your really know
+	 * your way around. Otherwise you could end rendering the store in inconsitent
+	 * states or even worst.
+	 * 
+	 * @return The JDBC database connection object. Returns null if the connection 
+	 *         object could not be retrieved.
+	 */
+	public Connection getConnectionToDB () {
+		try {
+			return dbConn.getConnection();
+		} catch (SQLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.warning("Could not retrieve the connection to the database backend. "+baos.toString());
+			return null;
+		}
+	}
+	
+	/** Returns the database flavor of the backend currently used.
+	 * 
+	 * @return The database flavour
+	 */
+	public String getDatabaseFlavor () {
+		return dbConn.getDatabaseType();
 	}
 }

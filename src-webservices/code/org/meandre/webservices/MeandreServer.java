@@ -265,26 +265,8 @@ public class MeandreServer {
 		sh.setUserRealm(hur);
 		sh.setConstraintMappings(new ConstraintMapping[]{cm});
 
-		// Force the refresh of the realm
-		bStop = false;
-		new Thread (
-				new Runnable () {
-
-					public void run() {
-						while (!bStop ) {
-							try {
-								HashUserRealm hur = new HashUserRealm("Meandre Flow Execution Engine",store.getRealmFilename());
-								sh.setUserRealm(hur);
-								Thread.sleep(10000);
-							} catch (InterruptedException e) {
-								log.warning(e.toString());
-							} catch (IOException e) {
-								log.warning(e.toString());
-							}
-						}						
-					}					
-				}
-			).start();
+		// Start the security service sync between meandre and jetty
+		fireSecuritySyncService(sh);
 	
 		contextWS.addHandler(sh);
 
@@ -308,6 +290,34 @@ public class MeandreServer {
 		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurity(store)),		"/services/security/*");
 	
 		return contextWS;
+	}
+
+	/** Fires the Security Sync Service. This services syncs the meandre-realm.xml used 
+	 * by the Jetty authentication to the Meandre security information.
+	 * 
+	 * @param sh The security handle	
+	 */
+	private void fireSecuritySyncService(final SecurityHandler sh) {
+		// Force the refresh of the realm
+		bStop = false;
+		new Thread (
+				new Runnable () {
+
+					public void run() {
+						while (!bStop ) {
+							try {
+								HashUserRealm hur = new HashUserRealm("Meandre Flow Execution Engine",store.getRealmFilename());
+								sh.setUserRealm(hur);
+								Thread.sleep(10000);
+							} catch (InterruptedException e) {
+								log.warning(e.toString());
+							} catch (IOException e) {
+								log.warning(e.toString());
+							}
+						}						
+					}					
+				}
+			).start();
 	}
 
 	/** get the Store this server is using. 
