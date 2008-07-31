@@ -269,6 +269,9 @@
         <jar destfile="${dist.dir}/lib/${app.name}-core-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/*.class"/>
@@ -281,6 +284,9 @@
         <jar destfile="${dist.dir}/lib/${app.name}-kernel-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/configuration/**/*.class"/>
@@ -303,6 +309,9 @@
         <jar destfile="${dist.dir}/lib/${app.name}-plugins-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/plugins/**/*.class"/>
@@ -315,6 +324,9 @@
         <jar destfile="${dist.dir}/lib/${app.name}-demo-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/demo/**/*.class"/>
@@ -327,6 +339,9 @@
         <jar destfile="${dist.dir}/lib/${app.name}-zigzag-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/zigzag/**/*.class"/>
@@ -339,6 +354,9 @@
         <jar destfile="${dist.dir}/lib/${app.name}-mau-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/mau/**/*.class"/>
@@ -351,6 +369,9 @@
         <jar destfile="${dist.dir}/lib/${app.name}-webservices-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/webservices/**/*.class"/>
@@ -363,6 +384,9 @@
         <jar destfile="${dist.dir}/lib/${app.name}-store-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/store/**/*.class"/>
@@ -375,6 +399,9 @@
         <jar destfile="${dist.dir}/lib/${app.name}-terracotta-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/terracotta/**/*.class"/>
@@ -387,6 +414,9 @@
         <jar destfile="${dist.dir}/lib/${app.name}-client-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/client/**/*.class"/>
@@ -400,6 +430,9 @@
     	<jar destfile="${dist.dir}/lib/${app.name}-annotation-${build.version}.jar">
     		<manifest>
     	        <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
     	    </manifest>
     	    <fileset dir="${build.dir}">
     	        <include name="**/annotations/**/*.class"/>
@@ -426,6 +459,9 @@
     		<manifest>
 	            <attribute name="Build-Version" value="${build.version}"/>
 	            <attribute name="Main-Class" value="org.meandre.webservices.WSCoreBootstrapper"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
 	        </manifest>
 	        <fileset dir="${dist.dir}/tmp/">
 	            <include name="**"/>
@@ -437,6 +473,9 @@
     		<manifest>
 	            <attribute name="Build-Version" value="${build.version}"/>
 	            <attribute name="Main-Class" value="org.meandre.zigzag.parser.ZigZag"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
 	        </manifest>
 	        <fileset dir="${dist.dir}/tmp/">
 	            <include name="**"/>
@@ -448,6 +487,9 @@
     		<manifest>
 	            <attribute name="Build-Version" value="${build.version}"/>
 	            <attribute name="Main-Class" value="org.meandre.mau.MAUExecutor"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
 	        </manifest>
 	        <fileset dir="${dist.dir}/tmp/">
 	            <include name="**"/>
@@ -459,6 +501,9 @@
     		<manifest>
 	            <attribute name="Build-Version" value="${build.version}"/>
 	            <attribute name="Main-Class" value="org.meandre.zigzag.console.ZigZagConsole"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
 	        </manifest>
 	        <fileset dir="${dist.dir}/tmp/">
 	            <include name="**"/>
@@ -480,6 +525,9 @@
     	        <jar destfile="${dist.dir}/src-jars/${app.name}-core-${build.version}-src.jar">
     	        	<manifest>
     	        	 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
     	        	 </manifest>
     	        	            <fileset dir="${annotation.src}">
     	        	                <include name="**/*"/>
@@ -516,6 +564,9 @@
         <jar destfile="${dist.dir}/src-jars/meandre-annotation-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${annotation.src}">
                 <include name="**/*"/>
@@ -526,6 +577,9 @@
         <jar destfile="${dist.dir}/src-jars/meandre-kernel-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${kernel.src}">
                 <include name="**/*"/>
@@ -536,6 +590,9 @@
         <jar destfile="${dist.dir}/src-jars/meandre-zigzag-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${zigzag.src}">
                 <include name="**/*"/>
@@ -546,6 +603,9 @@
         <jar destfile="${dist.dir}/src-jars/meandre-plugins-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${plugins.src}">
                 <include name="**/*"/>
@@ -555,6 +615,9 @@
         <jar destfile="${dist.dir}/src-jars/meandre-demo-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${demo.src}">
                 <include name="**/*"/>
@@ -564,6 +627,9 @@
         <jar destfile="${dist.dir}/src-jars/meandre-ws-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${ws.src}">
                 <include name="**/*"/>
@@ -573,6 +639,9 @@
         <jar destfile="${dist.dir}/src-jars/meandre-store-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${store.src}">
                 <include name="**/*"/>
@@ -582,6 +651,9 @@
         <jar destfile="${dist.dir}/src-jars/meandre-terracotta-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${terracotta.src}">
                 <include name="**/*"/>
@@ -591,6 +663,9 @@
         <jar destfile="${dist.dir}/src-jars/meandre-client-${build.version}-src.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${client.src}">
                 <include name="**/*"/>

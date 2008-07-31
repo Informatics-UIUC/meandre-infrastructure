@@ -8,8 +8,8 @@ package org.meandre.core.utils;
 public class Constants {
 
 	/** The engine version */
-        public final static String MEANDRE_RELEASE_TAG ="Xuixo";
-	public final static String MEANDRE_VERSION = "1.3.1";
-        public final static String MEANDRE_QUALIFIER = "v20080627";
+        public final static String MEANDRE_RELEASE_TAG ="Dev";
+	public final static String MEANDRE_VERSION = "svn";
+        public final static String MEANDRE_QUALIFIER = "v20080731";
 
 }
