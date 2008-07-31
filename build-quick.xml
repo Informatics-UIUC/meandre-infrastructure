@@ -271,6 +271,9 @@ bundle -->
         <jar destfile="${dist.dir}/lib/${app.name}-core-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/*.class"/>
@@ -283,6 +286,9 @@ bundle -->
         <jar destfile="${dist.dir}/lib/${app.name}-kernel-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/configuration/**/*.class"/>
@@ -305,6 +311,9 @@ bundle -->
         <jar destfile="${dist.dir}/lib/${app.name}-plugins-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/plugins/**/*.class"/>
@@ -317,6 +326,9 @@ bundle -->
         <jar destfile="${dist.dir}/lib/${app.name}-demo-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/demo/**/*.class"/>
@@ -329,6 +341,9 @@ bundle -->
         <jar destfile="${dist.dir}/lib/${app.name}-zigzag-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/zigzag/**/*.class"/>
@@ -341,6 +356,9 @@ bundle -->
         <jar destfile="${dist.dir}/lib/${app.name}-mau-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/mau/**/*.class"/>
@@ -353,6 +371,9 @@ bundle -->
         <jar destfile="${dist.dir}/lib/${app.name}-webservices-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/webservices/**/*.class"/>
@@ -365,6 +386,9 @@ bundle -->
         <jar destfile="${dist.dir}/lib/${app.name}-store-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/store/**/*.class"/>
@@ -377,6 +401,9 @@ bundle -->
         <jar destfile="${dist.dir}/lib/${app.name}-terracotta-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/terracotta/**/*.class"/>
@@ -389,6 +416,9 @@ bundle -->
         <jar destfile="${dist.dir}/lib/${app.name}-client-${build.version}.jar">
             <manifest>
                 <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
             </manifest>
             <fileset dir="${build.dir}">
                 <include name="**/client/**/*.class"/>
@@ -402,6 +432,9 @@ bundle -->
     	<jar destfile="${dist.dir}/lib/${app.name}-annotation-${build.version}.jar">
     		<manifest>
     	        <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="SVN-Revision" value="${svn.revision}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Built-By-User" value="${user.name}"/>
     	    </manifest>
     	    <fileset dir="${build.dir}">
     	        <include name="**/annotations/**/*.class"/>
