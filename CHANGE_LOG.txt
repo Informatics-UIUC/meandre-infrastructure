@@ -1,5 +1,7 @@
 1.4.0-vcli-alpha Sara
 
+* Starting the backend addapters to allow consistent backend storage usage
+
 * Fix to the webuidispatcher set done.
 
 * More rearranging of the log levels 

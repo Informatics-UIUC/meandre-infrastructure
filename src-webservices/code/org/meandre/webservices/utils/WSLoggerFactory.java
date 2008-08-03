@@ -7,6 +7,8 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.meandre.core.logger.ShortFormatter;
+
 
 
 /** This class implements a disposable logger factory for demo components and flows.
