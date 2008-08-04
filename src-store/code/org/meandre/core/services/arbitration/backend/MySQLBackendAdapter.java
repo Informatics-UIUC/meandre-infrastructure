@@ -15,14 +15,14 @@ import org.meandre.core.logger.KernelLoggerFactory;
  * @author Xavier Llorˆ
  *
  */
-public class DerbyBackendAdapter 
+public class MySQLBackendAdapter 
 extends BackendAdapter {
 	
 	/** The name of the resource file containing the query mapping */
-	static final String QUERY_MAP_FILE = "query_map_derby.xml";
+	static final String QUERY_MAP_FILE = "query_map_mysql.xml";
 
 	/** Initialize the query map */
-	public DerbyBackendAdapter() {
+	public MySQLBackendAdapter() {
 		super();
 		try {
 			Properties props = new Properties();
@@ -34,4 +34,6 @@ extends BackendAdapter {
 			KernelLoggerFactory.getCoreLogger().severe("Derby query map missing! "+baos.toString());
 		}
 	}
+
+
 }
