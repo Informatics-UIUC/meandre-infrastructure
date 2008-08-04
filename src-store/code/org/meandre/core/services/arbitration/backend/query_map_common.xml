@@ -3,5 +3,7 @@
 <properties>
 <comment>Query mapping for MySQL</comment>
 	<entry key="MARKER">@@@</entry>
-	<entry key="CREATE_SERVER_STATUS_TABLE">CREATE ...;</entry>
+	<entry key="CREATE_SERVER_STATUS_TABLE">CREATE TABLE IF NOT EXISTS meandre_server_status (ID CHAR(16), status CHAR(1) default 'D', updated BIGINT default 0, primary key(ID));</entry>
+	<entry key="INSERT_SERVER_STATUS">INSERT INTO meandre_server_status (ID,status,updated) VALUES (?,?,?) ON DUPLICATE KEY UPDATE status=?, updated=?;</entry>
+	<entry key="DELETE_SERVER_STATUS">DELETE FROM meandre_server_status WHERE ID=?;</entry>
 </properties>

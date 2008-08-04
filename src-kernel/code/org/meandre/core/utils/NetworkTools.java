@@ -54,6 +54,6 @@ public class NetworkTools {
 			KernelLoggerFactory.getCoreLogger().warning(baos.toString());
 		}
 		
-		return sRes;
+		return sRes.toUpperCase();
 	}
 }

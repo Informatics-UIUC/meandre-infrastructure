@@ -490,4 +490,5 @@ public class Store {
 	public String getDatabaseFlavor () {
 		return dbConn.getDatabaseType();
 	}
+	
 }

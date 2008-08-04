@@ -27,7 +27,7 @@ extends BackendAdapter {
 		try {
 			Properties props = new Properties();
 			props.loadFromXML(DerbyBackendAdapter.class.getResourceAsStream(QUERY_MAP_FILE));
-			super.propMapping.putAll(props);
+			super.propQueryMapping.putAll(props);
 		} catch (Exception e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));

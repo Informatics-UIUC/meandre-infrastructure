@@ -6,6 +6,8 @@ import java.io.InputStream;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.meandre.configuration.CoreConfiguration;
+import org.meandre.core.store.Store;
 
 
 /** This class implements test for the Derby Backend Adapter.
@@ -67,7 +69,7 @@ public class BackendAdapterTest {
 	 * 
 	 * @param The class name to check
 	 */
-	public void instantiateBackendAdapter ( String sCN ) {
+	private void instantiateBackendAdapter ( String sCN ) {
 		
 		try {
 			BackendAdapter ba = (BackendAdapter) Class.forName(sCN).newInstance();
@@ -82,4 +84,53 @@ public class BackendAdapterTest {
 			fail("This exception should have not be thrown!!!\n"+e.toString());
 		}
 	}
+	
+	/** Test the creation of the required database schema.
+	 * 
+	 */
+	@Test
+	public void testCreateSchema () {
+		BackendAdapter ba = createBackendAdaptorFromStore();
+		
+		// Try to create the schema
+		try {
+			ba.createSchema();
+		} catch (BackendAdapterException e) {
+			fail("The schema could not be created! "+e.toString());
+		}
+		
+	}
+	
+	/** Gets and adapter based on the current store configuration object.
+	 * 
+	 */
+	private BackendAdapter createBackendAdaptorFromStore () {
+		CoreConfiguration cnf = new CoreConfiguration();
+		Store store = new Store();
+		
+		try {
+			// Instantiate the adaptor
+			BackendAdapter ba = (BackendAdapter) Class.forName(
+					"org.meandre.core.services.arbitration.backend."+store.getDatabaseFlavor()+"BackendAdapter"
+				).newInstance();
+			
+			// Link it to a store
+			ba.linkToCoreAndStore(cnf,store);
+			
+			assertNotNull(ba);
+			
+			return ba;
+			
+		} catch (InstantiationException e) {
+			fail("Backend adapter could not be instantiated for backend flavor "+store.getDatabaseFlavor()+". "+e.toString());
+		} catch (IllegalAccessException e) {
+			fail("Illigal access exception to access backend adapter flavor "+store.getDatabaseFlavor()+". "+e.toString());
+		} catch (ClassNotFoundException e) {
+			fail("The backend adapter for flavor "+store.getDatabaseFlavor()+" could not be found. "+e.toString());
+		}
+		
+		return null;
+	}
+	
+	
 }
