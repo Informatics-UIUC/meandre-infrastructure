@@ -1,5 +1,9 @@
 1.4.0-vcli-alpha Sara
 
+* Writing designing the tables for the meandre server tracking
+
+* Adding shutdown hooks for proper cleaning of service status
+
 * Starting the backend addapters to allow consistent backend storage usage
 
 * Fix to the webuidispatcher set done.
