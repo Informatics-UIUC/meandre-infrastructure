@@ -44,8 +44,20 @@ public abstract class BackendAdapter {
 	/** The constant to pull the create server status table query */
 	protected final static String QUERY_CREATE_SERVER_STATUS_TABLE = "CREATE_SERVER_STATUS_TABLE";
 	
+	/** The constant to pull the create server information table query */
+	protected final static String QUERY_CREATE_SERVER_INFO_TABLE = "CREATE_SERVER_INFO_TABLE";
+
+	/** The constant to pull the drop server status table query */
+	protected final static String QUERY_DROP_SERVER_STATUS_TABLE = "DROP_SERVER_STATUS_TABLE";
+	
+	/** The constant to pull the drop server information table query */
+	protected final static String QUERY_DROP_SERVER_INFO_TABLE = "DROP_SERVER_INFO_TABLE";
+
 	/** The constant to pull the insert server status query */
 	protected final static String QUERY_REGISTER_SERVER_STATUS = "INSERT_SERVER_STATUS";
+	
+	/** The constant to pull the insert info status i */
+	protected final static String QUERY_REGISTER_SERVER_INFO = "INSERT_SERVER_INFO";
 	
 	/** The constant to pull the delete server status query */
 	protected final static String QUERY_UNREGISTER_SERVER_STATUS = "DELETE_SERVER_STATUS";
@@ -84,11 +96,31 @@ public abstract class BackendAdapter {
 	public void createSchema() 
 	throws BackendAdapterException {
 		
-		// Create the status table
+		// Create the server status table
 		String sQueryCSST = propQueryMapping.getProperty(QUERY_CREATE_SERVER_STATUS_TABLE);
 		executeUpdateQuery(sQueryCSST);
 		
+		// Create the server info table
+		String sQueryCSIT = propQueryMapping.getProperty(QUERY_CREATE_SERVER_INFO_TABLE);
+		executeUpdateQuery(sQueryCSIT);
+		
 		registerServer();
+		
+	}
+	
+	/** Deletes the tables created after the schema.
+	 * 
+	 * @throws BackendAdapterException The tables in the schema could not be dropped
+	 */
+	public void dropSchema () throws BackendAdapterException {
+
+		// Create the server status table
+		String sQueryCSST = propQueryMapping.getProperty(QUERY_DROP_SERVER_STATUS_TABLE);
+		executeUpdateQuery(sQueryCSST);
+		
+		// Create the server info table
+		String sQueryCSIT = propQueryMapping.getProperty(QUERY_DROP_SERVER_INFO_TABLE);
+		executeUpdateQuery(sQueryCSIT);
 		
 	}
 
@@ -97,6 +129,25 @@ public abstract class BackendAdapter {
 	 * @throws BackendAdapterException The server could not be registered
 	 */
 	public void registerServer() throws BackendAdapterException {
+		updateServerStatus();
+		
+		String sQueryICSS = propQueryMapping.getProperty(QUERY_REGISTER_SERVER_INFO);
+		long lTimestamp = System.currentTimeMillis();
+		Object [] oaValues = {
+				NetworkTools.getNumericIPValue()+Integer.toHexString(cnf.getBasePort()).toUpperCase(),
+				NetworkTools.getStringIPValue(),
+				cnf.getBasePort(),
+				// TODO FINISH THIS LIST
+			};
+		executeUpdateQueryWithParams(sQueryICSS, oaValues);
+	}
+	
+
+	/** Update the server status to the backend store
+	 * 
+	 * @throws BackendAdapterException The server could not be registered
+	 */
+	public void updateServerStatus() throws BackendAdapterException {
 		// Update the server status
 		String sQueryICSS = propQueryMapping.getProperty(QUERY_REGISTER_SERVER_STATUS);
 		long lTimestamp = System.currentTimeMillis();
@@ -104,11 +155,13 @@ public abstract class BackendAdapter {
 				NetworkTools.getNumericIPValue()+Integer.toHexString(cnf.getBasePort()).toUpperCase(),
 				"U",
 				lTimestamp,
+				Runtime.getRuntime().freeMemory(),
 				"U",
 				lTimestamp
 			};
 		executeUpdateQueryWithParams(sQueryICSS, oaValues);
 	}
+
 	
 	/** Unregisters the server from the backend store
 	 * 
@@ -121,6 +174,8 @@ public abstract class BackendAdapter {
 				NetworkTools.getNumericIPValue()+Integer.toHexString(cnf.getBasePort()).toUpperCase()
 			};
 		executeUpdateQueryWithParams(sQueryDCSS, oaValues);
+		
+		// TODO Unregister the information of the server
 	}
 	
 	/** Fetch the current connection object to the backend storage.

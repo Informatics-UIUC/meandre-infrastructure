@@ -56,4 +56,24 @@ public class NetworkTools {
 		
 		return sRes.toUpperCase();
 	}
+	
+	/** Returns the string version of the IP of the box where the server 
+	 * is running
+	 * 
+	 * @return The numeric value
+	 */
+	public static String getStringIPValue() {
+		String sRes = "unknown";
+		try {
+			InetAddress ip = InetAddress.getLocalHost();
+			sRes = ip.toString();
+		} catch (UnknownHostException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			KernelLoggerFactory.getCoreLogger().warning(baos.toString());
+		}
+		
+		return sRes;
+	}
+	
 }

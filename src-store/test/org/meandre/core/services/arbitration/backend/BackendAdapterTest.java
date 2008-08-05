@@ -85,22 +85,6 @@ public class BackendAdapterTest {
 		}
 	}
 	
-	/** Test the creation of the required database schema.
-	 * 
-	 */
-	@Test
-	public void testCreateSchema () {
-		BackendAdapter ba = createBackendAdaptorFromStore();
-		
-		// Try to create the schema
-		try {
-			ba.createSchema();
-		} catch (BackendAdapterException e) {
-			fail("The schema could not be created! "+e.toString());
-		}
-		
-	}
-	
 	/** Gets and adapter based on the current store configuration object.
 	 * 
 	 */
@@ -132,5 +116,55 @@ public class BackendAdapterTest {
 		return null;
 	}
 	
+	
+	/** Test the creation of the required database schema.
+	 * 
+	 */
+	@Test
+	public void testCreateAndDropSchema () {
+		BackendAdapter ba = createBackendAdaptorFromStore();
+		
+		// Try to create the schema
+		try {
+			ba.createSchema();
+			ba.dropSchema();
+		} catch (BackendAdapterException e) {
+			fail("The schema could not be created and dropped! "+e.toString());
+		}
+		
+	}
+	
+	/** Test the creation of the required database schema.
+	 * 
+	 */
+	@Test
+	public void testRegisterServer () {
+		int iRepetitions = 100;
+		BackendAdapter ba = createBackendAdaptorFromStore();
+		
+		// Try to create the schema
+		try {
+			// Create the schema
+			ba.createSchema();
+			
+			for ( ; iRepetitions>=0 ; iRepetitions-- ) {
+				// Register the server
+				ba.updateServerStatus();
+				
+				// Sleep a bit so I can check the table contents
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					fail("The sleep operation was interrupted! "+e.toString());
+				}
+			}
+			
+			// Drop the schema
+			ba.dropSchema();
+		} catch (BackendAdapterException e) {
+			fail("The schema could not be created and dropped! "+e.toString());
+		}
+		
+	}
 	
 }

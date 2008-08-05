@@ -3,7 +3,51 @@
 <properties>
 <comment>Query mapping for MySQL</comment>
 	<entry key="MARKER">@@@</entry>
-	<entry key="CREATE_SERVER_STATUS_TABLE">CREATE TABLE IF NOT EXISTS meandre_server_status (ID CHAR(16), status CHAR(1) default 'D', updated BIGINT default 0, primary key(ID));</entry>
-	<entry key="INSERT_SERVER_STATUS">INSERT INTO meandre_server_status (ID,status,updated) VALUES (?,?,?) ON DUPLICATE KEY UPDATE status=?, updated=?;</entry>
-	<entry key="DELETE_SERVER_STATUS">DELETE FROM meandre_server_status WHERE ID=?;</entry>
+	<entry key="CREATE_SERVER_STATUS_TABLE">
+			CREATE TABLE IF NOT EXISTS meandre_server_status 
+				(ID CHAR(16), 
+				 status CHAR(1) default 'D', 
+				 updated BIGINT default 0, 
+				 previous_updated BIGINT default 0, 
+				 uptime REAL default 0, 
+				 free_memory REAL default 0, 
+				 failed_updates INTEGER default 0, 
+				 primary key(ID));
+	</entry>
+	<entry key="CREATE_SERVER_INFO_TABLE">
+			CREATE TABLE IF NOT EXISTS meandre_server_info 
+				(ID CHAR(16), 
+				 ip CHAR(15) default '127.0.0.1', 
+				 port INTEGER default 1714, 
+				 memory_available BIGINT,
+				 number_processores INTEGER,
+				 os_arch VARCHAR(40), 
+				 os_name VARCHAR(40), 
+				 os_version VARCHAR(40), 
+				 java_version VARCHAR(20),
+				 java_vm_version VARCHAR(20),
+				 java_vm_vendor VARCHAR(20),
+				 user_name VARCHAR(20),
+				 user_home VARCHAR(255),
+				 primary key(ID));
+	</entry>
+	<entry key="DROP_SERVER_STATUS_TABLE">
+		DROP TABLE meandre_server_status;
+	</entry>
+	<entry key="DROP_SERVER_INFO_TABLE">
+		DROP TABLE meandre_server_info;
+	</entry>
+	<entry key="INSERT_SERVER_STATUS">
+			INSERT INTO meandre_server_status (ID,status,updated,free_memory) 
+			VALUES (?,?,?,?) 
+			ON DUPLICATE KEY UPDATE status=?, previous_updated=updated, updated=?, uptime=updated-previous_updated;
+	</entry>
+	<entry key="INSERT_SERVER_INFO">
+			INSERT INTO meandre_server_info (ID,ip,port,memory_available,number_processors,os_arch,os_name,os_version,java_version,java_vm_version,java_vm_vendor,user_name,user_home) 
+			VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) 
+			ON DUPLICATE KEY UPDATE;
+	</entry>
+	<entry key="DELETE_SERVER_STATUS">
+			DELETE FROM meandre_server_status WHERE ID=?;
+	</entry>
 </properties>
