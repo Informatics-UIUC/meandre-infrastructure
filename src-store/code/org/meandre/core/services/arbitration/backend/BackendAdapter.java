@@ -129,15 +129,28 @@ public abstract class BackendAdapter {
 	 * @throws BackendAdapterException The server could not be registered
 	 */
 	public void registerServer() throws BackendAdapterException {
+		// Update the status
 		updateServerStatus();
 		
+		// Update the server info
+		Runtime rt = Runtime.getRuntime();
 		String sQueryICSS = propQueryMapping.getProperty(QUERY_REGISTER_SERVER_INFO);
-		long lTimestamp = System.currentTimeMillis();
+		String [] sNameAndIP = NetworkTools.getStringNameAndIPValue().split("/");
 		Object [] oaValues = {
 				NetworkTools.getNumericIPValue()+Integer.toHexString(cnf.getBasePort()).toUpperCase(),
-				NetworkTools.getStringIPValue(),
+				sNameAndIP[1],
+				sNameAndIP[0],
 				cnf.getBasePort(),
-				// TODO FINISH THIS LIST
+				rt.maxMemory(),
+				rt.availableProcessors(),
+				System.getProperty("os.arch"),
+				System.getProperty("os.name"),
+				System.getProperty("os.version"),
+				System.getProperty("java.version"),
+				System.getProperty("java.vm.version"),
+				System.getProperty("java.vm.vendor"),
+				System.getProperty("user.name"),
+				System.getProperty("user.home")
 			};
 		executeUpdateQueryWithParams(sQueryICSS, oaValues);
 	}

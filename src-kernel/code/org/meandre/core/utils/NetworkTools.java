@@ -62,7 +62,7 @@ public class NetworkTools {
 	 * 
 	 * @return The numeric value
 	 */
-	public static String getStringIPValue() {
+	public static String getStringNameAndIPValue() {
 		String sRes = "unknown";
 		try {
 			InetAddress ip = InetAddress.getLocalHost();
