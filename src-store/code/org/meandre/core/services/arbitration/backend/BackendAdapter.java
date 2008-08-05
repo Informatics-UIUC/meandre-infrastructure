@@ -36,6 +36,7 @@ public abstract class BackendAdapter {
 	protected final Properties propQueryMapping = new Properties();
 	
 	/** The store to be used with this backend adapter */
+	@SuppressWarnings("unused")
 	private Store store  = null;
 
 	/** The core configuration object used by this backend adapter */
@@ -43,24 +44,42 @@ public abstract class BackendAdapter {
 	
 	/** The constant to pull the create server status table query */
 	protected final static String QUERY_CREATE_SERVER_STATUS_TABLE = "CREATE_SERVER_STATUS_TABLE";
-	
+
 	/** The constant to pull the create server information table query */
 	protected final static String QUERY_CREATE_SERVER_INFO_TABLE = "CREATE_SERVER_INFO_TABLE";
 
+	/** The constant to pull the create server log table query */
+	protected final static String QUERY_CREATE_SERVER_LOG_TABLE = "CREATE_SERVER_LOG_TABLE";
+
 	/** The constant to pull the drop server status table query */
 	protected final static String QUERY_DROP_SERVER_STATUS_TABLE = "DROP_SERVER_STATUS_TABLE";
-	
+
 	/** The constant to pull the drop server information table query */
 	protected final static String QUERY_DROP_SERVER_INFO_TABLE = "DROP_SERVER_INFO_TABLE";
+
+	/** The constant to pull the drop server log table query */
+	protected final static String QUERY_DROP_SERVER_LOG_TABLE = "DROP_SERVER_LOG_TABLE";
 
 	/** The constant to pull the insert server status query */
 	protected final static String QUERY_REGISTER_SERVER_STATUS = "INSERT_SERVER_STATUS";
 	
 	/** The constant to pull the insert info status i */
 	protected final static String QUERY_REGISTER_SERVER_INFO = "INSERT_SERVER_INFO";
-	
+
 	/** The constant to pull the delete server status query */
 	protected final static String QUERY_UNREGISTER_SERVER_STATUS = "DELETE_SERVER_STATUS";
+
+	/** The constant to pull the delete server status query */
+	protected final static String QUERY_UNREGISTER_SERVER_INFO = "DELETE_SERVER_INFO";
+	
+	/** The constant to pull the unreister log entry query */
+	protected final static String QUERY_UNREGISTER_SERVER_LOG = "LOG_SERVER_UNREGISTER";
+	
+	/** The connection to the data base backend */
+	private Connection conn = null;
+
+	/** True if the connection is not on auto commit */
+	private boolean bTransactional = false;
 	
 	/** Initialize the query map */
 	public BackendAdapter() {
@@ -83,6 +102,16 @@ public abstract class BackendAdapter {
 		this.cnf = cnf;
 		this.store = store;
 		
+		// Get the connection object and the transaction mode
+		try {
+			this.conn = store.getConnectionToDB();
+			this.bTransactional = !conn.getAutoCommit();
+		} catch (Exception e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			KernelLoggerFactory.getCoreLogger().severe("Error stablishind connection and transaction check! "+baos.toString());
+		}
+		
 		// Add the shutdown hook
 		Runtime.getRuntime().addShutdownHook(
 				new BackendAdapterShutdownHook(this)
@@ -96,16 +125,40 @@ public abstract class BackendAdapter {
 	public void createSchema() 
 	throws BackendAdapterException {
 		
-		// Create the server status table
-		String sQueryCSST = propQueryMapping.getProperty(QUERY_CREATE_SERVER_STATUS_TABLE);
-		executeUpdateQuery(sQueryCSST);
-		
-		// Create the server info table
-		String sQueryCSIT = propQueryMapping.getProperty(QUERY_CREATE_SERVER_INFO_TABLE);
-		executeUpdateQuery(sQueryCSIT);
-		
-		registerServer();
-		
+		try {
+			// Create the server status table
+			String sQueryCSST = propQueryMapping.getProperty(QUERY_CREATE_SERVER_STATUS_TABLE);
+			executeUpdateQuery(sQueryCSST);
+			
+			// Create the server info table
+			String sQueryCSIT = propQueryMapping.getProperty(QUERY_CREATE_SERVER_INFO_TABLE);
+			executeUpdateQuery(sQueryCSIT);
+			
+			// Create the server info table
+			String sQueryCSLT = propQueryMapping.getProperty(QUERY_CREATE_SERVER_LOG_TABLE);
+			executeUpdateQuery(sQueryCSLT);
+			
+			registerServer();
+			
+			// Commit the transaction
+			if ( bTransactional ) conn.commit();
+			
+		} catch (SQLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			KernelLoggerFactory.getCoreLogger().severe("Commit operation failed! "+baos.toString());
+		}
+		catch ( BackendAdapterException bae ) {
+			try {
+				// Roll it back
+				if ( bTransactional ) conn.rollback();
+				throw bae;
+			} catch (SQLException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				KernelLoggerFactory.getCoreLogger().severe("Rollback operation failed! "+baos.toString());
+			}
+		}
 	}
 	
 	/** Deletes the tables created after the schema.
@@ -114,14 +167,71 @@ public abstract class BackendAdapter {
 	 */
 	public void dropSchema () throws BackendAdapterException {
 
-		// Create the server status table
-		String sQueryCSST = propQueryMapping.getProperty(QUERY_DROP_SERVER_STATUS_TABLE);
-		executeUpdateQuery(sQueryCSST);
-		
-		// Create the server info table
-		String sQueryCSIT = propQueryMapping.getProperty(QUERY_DROP_SERVER_INFO_TABLE);
-		executeUpdateQuery(sQueryCSIT);
-		
+		try {
+			// Drop the server status and info table
+			dropSchemaLeavingLogsBehind();
+			
+			// Drop the server log table
+			String sQueryCSLT = propQueryMapping.getProperty(QUERY_DROP_SERVER_LOG_TABLE);
+			executeUpdateQuery(sQueryCSLT);
+
+			// Commit the transaction
+			if ( bTransactional ) conn.commit();
+			
+		} catch (SQLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			KernelLoggerFactory.getCoreLogger().severe("Commit operation failed! "+baos.toString());
+		}
+		catch ( BackendAdapterException bae ) {
+			try {
+				// Roll it back
+				if ( bTransactional ) conn.rollback();
+				throw bae;
+			} catch (SQLException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				KernelLoggerFactory.getCoreLogger().severe("Rollback operation failed! "+baos.toString());
+			}
+		}
+	
+	}
+	
+	/** Deletes the tables created after the schema except the login tables so they 
+	 * can be used for diagnostics.
+	 * 
+	 * @throws BackendAdapterException The tables in the schema could not be dropped
+	 */
+	public void dropSchemaLeavingLogsBehind () throws BackendAdapterException {
+
+		try {
+			// Drop the server status table
+			String sQueryCSST = propQueryMapping.getProperty(QUERY_DROP_SERVER_STATUS_TABLE);
+			executeUpdateQuery(sQueryCSST);
+			
+			// Drop the server info table
+			String sQueryCSIT = propQueryMapping.getProperty(QUERY_DROP_SERVER_INFO_TABLE);
+			executeUpdateQuery(sQueryCSIT);
+			
+			// Commit the transaction
+			if ( bTransactional ) conn.commit();
+			
+		} catch (SQLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			KernelLoggerFactory.getCoreLogger().severe("Commit operation failed! "+baos.toString());
+		}
+		catch ( BackendAdapterException bae ) {
+			try {
+				// Roll it back
+				if ( bTransactional ) conn.rollback();
+				throw bae;
+			} catch (SQLException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				KernelLoggerFactory.getCoreLogger().severe("Rollback operation failed! "+baos.toString());
+			}
+		}
 	}
 
 	/** Registers the server to the backend store
@@ -129,30 +239,53 @@ public abstract class BackendAdapter {
 	 * @throws BackendAdapterException The server could not be registered
 	 */
 	public void registerServer() throws BackendAdapterException {
-		// Update the status
-		updateServerStatus();
 		
-		// Update the server info
-		Runtime rt = Runtime.getRuntime();
-		String sQueryICSS = propQueryMapping.getProperty(QUERY_REGISTER_SERVER_INFO);
-		String [] sNameAndIP = NetworkTools.getStringNameAndIPValue().split("/");
-		Object [] oaValues = {
-				NetworkTools.getNumericIPValue()+Integer.toHexString(cnf.getBasePort()).toUpperCase(),
-				sNameAndIP[1],
-				sNameAndIP[0],
-				cnf.getBasePort(),
-				rt.maxMemory(),
-				rt.availableProcessors(),
-				System.getProperty("os.arch"),
-				System.getProperty("os.name"),
-				System.getProperty("os.version"),
-				System.getProperty("java.version"),
-				System.getProperty("java.vm.version"),
-				System.getProperty("java.vm.vendor"),
-				System.getProperty("user.name"),
-				System.getProperty("user.home")
-			};
-		executeUpdateQueryWithParams(sQueryICSS, oaValues);
+		try {	
+			// Update the status
+			updateServerStatus();
+			
+			// Update the server info
+			Runtime rt = Runtime.getRuntime();
+			String sQueryICSS = propQueryMapping.getProperty(QUERY_REGISTER_SERVER_INFO);
+			String [] sNameAndIP = NetworkTools.getStringNameAndIPValue().split("/");
+			Object [] oaValues = {
+					NetworkTools.getNumericIPValue()+Integer.toHexString(cnf.getBasePort()).toUpperCase(),
+					sNameAndIP[1],
+					sNameAndIP[0],
+					cnf.getBasePort(),
+					rt.maxMemory(),
+					rt.availableProcessors(),
+					System.getProperty("os.arch"),
+					System.getProperty("os.name"),
+					System.getProperty("os.version"),
+					System.getProperty("java.version"),
+					System.getProperty("java.vm.version"),
+					System.getProperty("java.vm.vendor"),
+					System.getProperty("user.name"),
+					System.getProperty("user.home")
+				};
+			executeUpdateQueryWithParams(sQueryICSS, oaValues);
+			
+
+			// Commit the transaction
+			if ( bTransactional ) conn.commit();
+			
+		} catch (SQLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			KernelLoggerFactory.getCoreLogger().severe("Commit operation failed! "+baos.toString());
+		}
+		catch ( BackendAdapterException bae ) {
+			try {
+				// Roll it back
+				if ( bTransactional ) conn.rollback();
+				throw bae;
+			} catch (SQLException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				KernelLoggerFactory.getCoreLogger().severe("Rollback operation failed! "+baos.toString());
+			}
+		}
 	}
 	
 
@@ -161,18 +294,39 @@ public abstract class BackendAdapter {
 	 * @throws BackendAdapterException The server could not be registered
 	 */
 	public void updateServerStatus() throws BackendAdapterException {
-		// Update the server status
-		String sQueryICSS = propQueryMapping.getProperty(QUERY_REGISTER_SERVER_STATUS);
-		long lTimestamp = System.currentTimeMillis();
-		Object [] oaValues = {
-				NetworkTools.getNumericIPValue()+Integer.toHexString(cnf.getBasePort()).toUpperCase(),
-				"U",
-				lTimestamp,
-				Runtime.getRuntime().freeMemory(),
-				"U",
-				lTimestamp
-			};
-		executeUpdateQueryWithParams(sQueryICSS, oaValues);
+		try {
+			// Update the server status
+			String sQueryICSS = propQueryMapping.getProperty(QUERY_REGISTER_SERVER_STATUS);
+			long lTimestamp = System.currentTimeMillis();
+			Object [] oaValues = {
+					NetworkTools.getNumericIPValue()+Integer.toHexString(cnf.getBasePort()).toUpperCase(),
+					"R",
+					lTimestamp,
+					Runtime.getRuntime().freeMemory(),
+					"R",
+					lTimestamp
+				};
+			executeUpdateQueryWithParams(sQueryICSS, oaValues);
+			
+			// Commit the transaction
+			if ( bTransactional ) conn.commit();
+			
+		} catch (SQLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			KernelLoggerFactory.getCoreLogger().severe("Commit operation failed! "+baos.toString());
+		}
+		catch ( BackendAdapterException bae ) {
+			try {
+				// Roll it back
+				if ( bTransactional ) conn.rollback();
+				throw bae;
+			} catch (SQLException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				KernelLoggerFactory.getCoreLogger().severe("Rollback operation failed! "+baos.toString());
+			}
+		}
 	}
 
 	
@@ -181,29 +335,48 @@ public abstract class BackendAdapter {
 	 * @throws BackendAdapterException The server could not be unregistered
 	 */
 	public void unregisterServer() throws BackendAdapterException {
-		// Update the server status
-		String sQueryDCSS = propQueryMapping.getProperty(QUERY_UNREGISTER_SERVER_STATUS);
-		Object [] oaValues = {
-				NetworkTools.getNumericIPValue()+Integer.toHexString(cnf.getBasePort()).toUpperCase()
-			};
-		executeUpdateQueryWithParams(sQueryDCSS, oaValues);
 		
-		// TODO Unregister the information of the server
+		try {
+			
+			// Get server ID
+			Object [] oaValues = {
+					NetworkTools.getNumericIPValue()+Integer.toHexString(cnf.getBasePort()).toUpperCase()
+				};
+			
+			// Log the unregister operation
+			String sQueryLUO = propQueryMapping.getProperty(QUERY_UNREGISTER_SERVER_LOG);
+			executeUpdateQueryWithParams(sQueryLUO, oaValues);
+				
+			// Delete the server status
+			String sQueryDCSS = propQueryMapping.getProperty(QUERY_UNREGISTER_SERVER_STATUS);
+			executeUpdateQueryWithParams(sQueryDCSS, oaValues);
+			
+			// Delete server information
+			String sQueryDCSI = propQueryMapping.getProperty(QUERY_UNREGISTER_SERVER_INFO);
+			executeUpdateQueryWithParams(sQueryDCSI, oaValues);	
+
+			// Commit the transaction
+			if ( bTransactional ) conn.commit();
+			
+		} catch (SQLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			KernelLoggerFactory.getCoreLogger().severe("Commit operation failed! "+baos.toString());
+		}
+		catch ( BackendAdapterException bae ) {
+			try {
+				// Roll it back
+				if ( bTransactional ) conn.rollback();
+				throw bae;
+			} catch (SQLException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				KernelLoggerFactory.getCoreLogger().severe("Rollback operation failed! "+baos.toString());
+			}
+		}
+	
 	}
 	
-	/** Fetch the current connection object to the backend storage.
-	 * 
-	 * @return The connection object
-	 * @throws BackendAdapterException Thrown when the connection object could not be retrieved
-	 */
-	private Connection getConnectionObject () 
-	throws BackendAdapterException {
-		Connection conn = store.getConnectionToDB();
-		if ( conn==null )
-			throw new BackendAdapterException("The connection to the store backend could not be retrieved");
-		return conn;
-	}
-
 	/** Runs and update query against the backend.
 	 * 
 	 * @param sQuery The query to run the update
@@ -211,9 +384,6 @@ public abstract class BackendAdapter {
 	 */
 	private void executeUpdateQuery(String sQuery)
 	throws BackendAdapterException {
-		
-		// Get the connection and check it is OK
-		Connection conn = getConnectionObject();
 		
 		// Run the update
 		try {
@@ -232,8 +402,6 @@ public abstract class BackendAdapter {
 	 */
 	private void executeUpdateQueryWithParams(String sQuery, Object[] oaValues ) 
 	throws BackendAdapterException {
-		// Get the connection and check it is OK
-		Connection conn = getConnectionObject();
 		
 		// Run the update
 		try {
@@ -270,6 +438,20 @@ public abstract class BackendAdapter {
 	 */
 	public int getNumberOfQueries () {
 		return propQueryMapping.size()-2;
+	}
+
+	/** This methos is only provided to the shutdown hook to allow it
+	 * to properly close the connection to the backend storage system.
+	 * 
+	 * @throws BackendAdapterException The connection could not be properly closed
+	 * 
+	 */
+	void close() throws BackendAdapterException {
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			throw new BackendAdapterException(e);
+		}
 	}
 	
 	

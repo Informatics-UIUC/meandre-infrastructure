@@ -1,5 +1,11 @@
 1.4.0-vcli-alpha Sara
 
+* Added a transactional layer to the operations
+
+* Added a log table to handle events
+
+* Split the server info in two tables (status and info to separate dynamic versus static content)
+
 * Writing designing the tables for the meandre server tracking
 
 * Adding shutdown hooks for proper cleaning of service status

@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -466,15 +467,22 @@ public class Store {
 	
 	/** Returns the JDBC connection to the database backend. This call should
 	 * be used carefully. Just access the database backend if your really know
-	 * your way around. Otherwise you could end rendering the store in inconsitent
-	 * states or even worst.
+	 * your way around. Otherwise you could end rendering the store in inconsistent
+	 * states or even worst. Derby is left on auto commit since its embedded usage.
+	 * For all other database types it returns a new connection with auto commit off.
 	 * 
 	 * @return The JDBC database connection object. Returns null if the connection 
 	 *         object could not be retrieved.
 	 */
 	public Connection getConnectionToDB () {
 		try {
-			return dbConn.getConnection();
+			if ( dbConn.getDatabaseType().equalsIgnoreCase("Derby") )
+				return dbConn.getConnection();
+			else {
+				Connection connNew = DriverManager.getConnection(getURL(), getUserName(), getPassword());
+				connNew.setAutoCommit(false);
+				return connNew;
+			}
 		} catch (SQLException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));

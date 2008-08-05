@@ -33,6 +33,7 @@ extends Thread {
 	public void run () {
 		try {
 			ba.unregisterServer();
+			ba.close();
 		} catch (BackendAdapterException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));

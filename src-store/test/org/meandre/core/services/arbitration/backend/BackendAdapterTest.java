@@ -139,7 +139,7 @@ public class BackendAdapterTest {
 	 */
 	@Test
 	public void testRegisterServer () {
-		int iRepetitions = 100;
+		int iRepetitions = 5;
 		BackendAdapter ba = createBackendAdaptorFromStore();
 		
 		// Try to create the schema
@@ -160,7 +160,7 @@ public class BackendAdapterTest {
 			}
 			
 			// Drop the schema
-			ba.dropSchema();
+			//ba.dropSchemaLeavingLogsBehind();
 		} catch (BackendAdapterException e) {
 			fail("The schema could not be created and dropped! "+e.toString());
 		}
