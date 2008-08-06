@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.meandre.core.services.arbitration.backend;
+package org.meandre.core.services.coordinator.backend;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;

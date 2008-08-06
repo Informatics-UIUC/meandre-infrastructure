@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.meandre.core.services.arbitration.backend;
+package org.meandre.core.services.coordinator.backend;
 
 /** This exception is thrown when the backend adapter runs into a problem.
  * 

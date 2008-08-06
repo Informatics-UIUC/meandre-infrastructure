@@ -1,4 +1,4 @@
-package org.meandre.core.services.arbitration.backend;
+package org.meandre.core.services.coordinator.backend;
 
 import static org.junit.Assert.*;
 
@@ -7,6 +7,10 @@ import java.io.InputStream;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.meandre.configuration.CoreConfiguration;
+import org.meandre.core.services.coordinator.backend.BackendAdapter;
+import org.meandre.core.services.coordinator.backend.BackendAdapterException;
+import org.meandre.core.services.coordinator.backend.DerbyBackendAdapter;
+import org.meandre.core.services.coordinator.backend.MySQLBackendAdapter;
 import org.meandre.core.store.Store;
 
 

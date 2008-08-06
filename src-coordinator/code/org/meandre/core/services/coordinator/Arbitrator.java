@@ -1,4 +1,4 @@
-package org.meandre.core.services.arbitration;
+package org.meandre.core.services.coordinator;
 
 /** This class implements the main arbitration to the main
  * data backend store.
