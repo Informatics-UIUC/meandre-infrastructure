@@ -90,7 +90,6 @@ extends Thread {
 	 * @param cnf The core configuration object
 	 * @throws InterruptedException The semaphore could not be adquired twice
 	 */
-	@SuppressWarnings("unchecked")
 	public WrappedComponent(String sFlowUniqueID, String flowID,String sComponentInstanceID,
 			ExecutableComponent ec, Set<ActiveBuffer> setInputs,
 			Set<ActiveBuffer> setOutputs,
@@ -361,7 +360,6 @@ extends Thread {
 	 *
 	 * @param sInput The updated input active buffer
 	 */
-	@SuppressWarnings("unchecked")
 	public void awake(String sInput) {
 		semBlocking.release();
 	}
@@ -369,7 +367,6 @@ extends Thread {
 	/** Awakes the modules due a termination request.
 	 *
 	 */
-	@SuppressWarnings("unchecked")
 	public void awake() {
 		semBlocking.release();
 	}

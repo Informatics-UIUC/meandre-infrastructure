@@ -1084,7 +1084,6 @@ public class WSRepositoryLogic {
 	 * @return The model containing the flow
 	 * @throws FileUploadException An exception araised while uploading the model
 	 */
-	@SuppressWarnings("unchecked")
 	public Model addFlowsToRepository(HttpServletRequest request, String sExtension)
 	throws IOException, FileUploadException {
 

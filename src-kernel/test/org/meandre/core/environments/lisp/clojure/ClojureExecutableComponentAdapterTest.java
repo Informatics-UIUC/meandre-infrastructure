@@ -66,7 +66,6 @@ public class ClojureExecutableComponentAdapterTest {
 					new Hashtable<String, String> (), null,
 					"nothing", new Hashtable<String, String> (), thdMrProbe, cnf);
 					
-			@SuppressWarnings("unused")
 			ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf);
 			ceca.initialize(cc);
 			ceca.untrapOutputAndErrorStreams();

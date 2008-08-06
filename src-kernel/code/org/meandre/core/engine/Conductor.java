@@ -101,7 +101,6 @@ public class Conductor {
 	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
 	 * @throws ConductorException The counductor could not create an executable flow
 	 */
-	@SuppressWarnings("unchecked")
 	public Executor buildExecutor(QueryableRepository qr, Resource res )
 	throws CorruptedDescriptionException, ConductorException {
 		MrProbe thdMrProbe = new MrProbe(log,new NullProbeImpl(),false,false);

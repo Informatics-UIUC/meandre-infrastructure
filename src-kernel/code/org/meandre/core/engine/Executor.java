@@ -30,7 +30,6 @@ public class Executor {
 	private Set<? extends WrappedComponent> setWC = null;
 
 	/** The monitoring and cleaning thread for this Meandre Flow */
-	@SuppressWarnings("unused")
 	private MrProper thdMrPropper = null;
 
 	/** The flow unique execution ID */

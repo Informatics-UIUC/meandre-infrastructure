@@ -34,7 +34,6 @@ import org.mortbay.jetty.servlet.Context;
 public class WebUIDispatcher extends AbstractHandler {
 
 	/** The parent of this handler */
-	@SuppressWarnings("unused")
 	private WebUI webUIParent = null;
 
 	/** The list of attached UI handlers */
