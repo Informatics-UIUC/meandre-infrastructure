@@ -577,7 +577,9 @@ extends Thread {
 			
 			// TODO Do something
 			if ( bNotDone )  {
-				
+				// If smaller than a certain prob
+				// 1. run the update
+				// 2. ping dead guys
 			}
 		}
 		log.info("Coordinator "+super.getName()+" has stopped");
