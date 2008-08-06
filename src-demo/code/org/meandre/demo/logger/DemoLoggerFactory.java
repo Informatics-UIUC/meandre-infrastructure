@@ -1,4 +1,4 @@
-package org.meandre.demo.utils;
+package org.meandre.demo.logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +50,15 @@ public class DemoLoggerFactory {
 	 */
 	public static Logger getDemoLogger() {
 		return logDemo;
+	}
+	
+	/** Set the level to use on for the logger and handler.
+	 * 
+	 * @param level The requested level
+	 */
+	public static void setLevel ( Level level ) {
+		logDemo.setLevel(level);
+		handlerDemo.setLevel(level);
 	}
 	
 }

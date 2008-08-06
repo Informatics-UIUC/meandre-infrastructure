@@ -25,7 +25,7 @@ import org.meandre.plugins.MeandrePlugin;
 import org.meandre.plugins.PluginFactory;
 import org.meandre.plugins.bean.Plugin;
 import org.meandre.webservices.WSInfrastructureBootstrapper;
-import org.meandre.webservices.utils.WSLoggerFactory;
+import org.meandre.webservices.logger.WSLoggerFactory;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Model;

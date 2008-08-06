@@ -15,7 +15,7 @@ import org.meandre.core.security.SecurityStoreException;
 import org.meandre.core.security.User;
 import org.meandre.core.store.Store;
 import org.meandre.webservices.controllers.WSPublishLogic;
-import org.meandre.webservices.utils.WSLoggerFactory;
+import org.meandre.webservices.logger.WSLoggerFactory;
 
 /** A basic handler to handle the publishing facility.
  * 

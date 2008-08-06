@@ -30,7 +30,7 @@ import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.store.system.SystemStore;
-import org.meandre.webservices.utils.WSLoggerFactory;
+import org.meandre.webservices.logger.WSLoggerFactory;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.query.Query;

@@ -20,6 +20,7 @@
 				 ip CHAR(15) default '127.0.0.1', 
 				 name CHAR(40) default 'localhost', 
 				 port INTEGER default 1714, 
+				 description CHAR(80) default 'unknown',
 				 memory_available BIGINT,
 				 number_processors INTEGER,
 				 os_arch VARCHAR(40), 
@@ -40,6 +41,7 @@
 				 ip CHAR(15) default '127.0.0.1', 
 				 name CHAR(40) default 'localhost', 
 				 port INTEGER default 1714, 
+				 description CHAR(80) default 'unknown',
 				 memory_available BIGINT,
 				 number_processors INTEGER,
 				 os_arch VARCHAR(40), 
@@ -64,11 +66,15 @@
 	<entry key="INSERT_SERVER_STATUS">
 			INSERT INTO meandre_server_status (ID,status,updated,free_memory) 
 				VALUES (?,?,?,?) 
-				ON DUPLICATE KEY UPDATE status=?, previous_updated=updated, updated=?, uptime=uptime+updated-previous_updated
+	</entry>
+	<entry key="UPDATE_SERVER_STATUS">
+			UPDATE meandre_server_status 
+				SET status=?, previous_updated=updated, updated=?, uptime=uptime+updated-previous_updated
+				WHERE ID=?
 	</entry>
 	<entry key="INSERT_SERVER_INFO">
-			INSERT INTO meandre_server_info (ID,ip,name,port,memory_available,number_processors,os_arch,os_name,os_version,java_version,java_vm_version,java_vm_vendor,user_name,user_home) 
-				VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) 
+			INSERT INTO meandre_server_info (ID,ip,name,port,description,memory_available,number_processors,os_arch,os_name,os_version,java_version,java_vm_version,java_vm_vendor,user_name,user_home) 
+				VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) 
 	</entry>
 	<entry key="DELETE_SERVER_STATUS">
 			DELETE FROM meandre_server_status WHERE ID=?
@@ -85,6 +91,7 @@
 					ip,
 					name,
 					port,
+					description,
 					memory_available,
 					number_processors,
 					os_arch, 
@@ -103,6 +110,7 @@
 				       i.ip,
 				       i.name,
 				       i.port,
+				       i.description,
 				       i.memory_available,
 				       i.number_processors,
 				       i.os_arch,i.os_name,

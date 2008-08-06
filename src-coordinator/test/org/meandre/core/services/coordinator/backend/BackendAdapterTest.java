@@ -3,6 +3,8 @@ package org.meandre.core.services.coordinator.backend;
 import static org.junit.Assert.*;
 
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,7 +13,9 @@ import org.meandre.core.services.coordinator.backend.BackendAdapter;
 import org.meandre.core.services.coordinator.backend.BackendAdapterException;
 import org.meandre.core.services.coordinator.backend.DerbyBackendAdapter;
 import org.meandre.core.services.coordinator.backend.MySQLBackendAdapter;
+import org.meandre.core.services.coordinator.logger.CoordinatorLoggerFactory;
 import org.meandre.core.store.Store;
+import org.meandre.core.utils.Constants;
 
 
 /** This class implements test for the Derby Backend Adapter.
@@ -21,6 +25,9 @@ import org.meandre.core.store.Store;
  */
 public class BackendAdapterTest {
 
+	/** The logger to use */
+	public final static Logger log = CoordinatorLoggerFactory.getCoordinatorLogger();
+	
 	/** Contains the list of backend addapters to test */
 	protected static String [] sbaNames = { 
 		DerbyBackendAdapter.class.getName(), 
@@ -33,6 +40,12 @@ public class BackendAdapterTest {
 	@SuppressWarnings("unchecked")
 	@BeforeClass
 	public static void testClassPreparation () {
+		
+		log.info("Running test class preparation");
+		
+		// Reseting the logging level
+		CoordinatorLoggerFactory.setLevel(Level.FINEST);
+		
 		// Check the base adapter
 		try {
 			InputStream dis = BackendAdapter.class.getResourceAsStream(BackendAdapter.COMMON_MAP_FILE);
@@ -58,6 +71,9 @@ public class BackendAdapterTest {
 				fail("This exception should have not be thrown!!!\n"+e.toString());
 			}
 		}
+		
+		log.info("Test class preparation done");
+		
 	}
 	
 	/** Check that the instantiations works properly.
@@ -65,8 +81,14 @@ public class BackendAdapterTest {
 	 */
 	@Test
 	public void testBackendAdapterInstantiation () {
+
+		log.info("Running test backend adapter instantiation");
+		
 		for ( String sCN:sbaNames )
 			instantiateBackendAdapter(sCN);
+		
+		log.info("Test backend adapter instantiation done");
+		
 	}
 	
 	/** Tries to instanciate a backend of the given class.
@@ -74,7 +96,7 @@ public class BackendAdapterTest {
 	 * @param The class name to check
 	 */
 	private void instantiateBackendAdapter ( String sCN ) {
-		
+
 		try {
 			BackendAdapter ba = (BackendAdapter) Class.forName(sCN).newInstance();
 			String[] sCNa = sCN.split("\\"+".");
@@ -99,11 +121,11 @@ public class BackendAdapterTest {
 		try {
 			// Instantiate the adaptor
 			BackendAdapter ba = (BackendAdapter) Class.forName(
-					"org.meandre.core.services.arbitration.backend."+store.getDatabaseFlavor()+"BackendAdapter"
+					"org.meandre.core.services.coordinator.backend."+store.getDatabaseFlavor()+"BackendAdapter"
 				).newInstance();
 			
 			// Link it to a store
-			ba.linkToConnectionAndPort(store.getConnectionToDB(),cnf.getBasePort());
+			ba.linkToService(store.getConnectionToDB(),cnf.getBasePort(),"Meandre Server "+Constants.MEANDRE_VERSION);
 			
 			assertNotNull(ba);
 			
@@ -126,15 +148,23 @@ public class BackendAdapterTest {
 	 */
 	@Test
 	public void testCreateAndDropSchema () {
+
+		log.info("Running test create and drop schema" );
+		
 		BackendAdapter ba = createBackendAdaptorFromStore();
 		
 		// Try to create the schema
 		try {
 			ba.createSchema();
 			ba.dropSchema();
+
+			// Remove the installed shutdown hook
+			Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
 		} catch (BackendAdapterException e) {
 			fail("The schema could not be created and dropped! "+e.toString());
 		}
+	
+		log.info("Test create and drop schema done" );
 		
 	}
 	
@@ -143,6 +173,9 @@ public class BackendAdapterTest {
 	 */
 	@Test
 	public void testRegisterServer () {
+		
+		log.info("Running test register server");
+		
 		int iRepetitions = 5;
 		BackendAdapter ba = createBackendAdaptorFromStore();
 		
@@ -153,21 +186,67 @@ public class BackendAdapterTest {
 			
 			for ( ; iRepetitions>=0 ; iRepetitions-- ) {
 				// Register the server
-				ba.updateServerStatus();
+				ba.updateServerStatus(BackendAdapter.STATUS_RUNNING);
 				
 				// Sleep a bit so I can check the table contents
 				try {
-					Thread.sleep(500);
+					Thread.sleep(50);
 				} catch (InterruptedException e) {
 					fail("The sleep operation was interrupted! "+e.toString());
 				}
 			}
 			
+			// Unregister the server
+			ba.unregisterServer();
+			
 			// Drop the schema
-			//ba.dropSchemaLeavingLogsBehind();
+			ba.dropSchemaLeavingLogsBehind();
+			
+			// Remove the installed shutdown hook
+			Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
 		} catch (BackendAdapterException e) {
 			fail("The schema could not be created and dropped! "+e.toString());
 		}
+		
+		log.info("Test register server done");
+		
+	}
+		
+	/** Test the backend adapter thread
+	 * 
+	 */
+	@Test
+	public void testUpdateThread () {
+		
+		log.info("Running test update thread");
+		
+		long lSleepDuration = 15000;
+		
+		BackendAdapter ba = createBackendAdaptorFromStore();
+		
+		// Try to create the schema
+		try {
+			// Create the schema
+			ba.createSchema();
+			ba.start();
+			
+			// Sleep a bit so I can check the table contents
+			try {
+				Thread.sleep(lSleepDuration);
+			} catch (InterruptedException e) {
+				fail("The sleep operation was interrupted! "+e.toString());
+			}
+			
+			// Close the server
+			ba.close();
+			
+			// Remove the installed shutdown hook
+			Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
+		} catch (BackendAdapterException e) {
+			fail("The schema could not be created and dropped! "+e.toString());
+		}
+	
+		log.info("Test update thread done");
 		
 	}
 	

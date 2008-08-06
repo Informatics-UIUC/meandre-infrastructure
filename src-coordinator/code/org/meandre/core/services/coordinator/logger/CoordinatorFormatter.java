@@ -1,4 +1,4 @@
-package org.meandre.core.logger;
+package org.meandre.core.services.coordinator.logger;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -11,7 +11,7 @@ import java.util.logging.LogRecord;
  * Created on Jul 18, 2008 11:53:22 PM
  *
  */
-public class ShortFormatter extends Formatter {
+public class CoordinatorFormatter extends Formatter {
 	
 	/** The maximum lenght of a thread name */
 	private final static int MAX_THREAD_NAME_LENGTH = 40;

@@ -9,9 +9,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Hashtable;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import org.meandre.core.logger.KernelLoggerFactory;
+import org.meandre.core.services.coordinator.logger.CoordinatorLoggerFactory;
 import org.meandre.core.utils.NetworkTools;
 
 /** The base class for the backend adapters.
@@ -19,7 +22,20 @@ import org.meandre.core.utils.NetworkTools;
  * @author Xavier Llor&agrave;
  *
  */
-public abstract class BackendAdapter {
+public abstract class BackendAdapter 
+extends Thread {
+
+	/** The server was just registered */
+	public static final String STATUS_INITIALIZED = "I";
+
+	/** The server is running */
+	public static final String STATUS_RUNNING = "R";
+	
+	/** The server was unregistered */
+	public static final String STATUS_UNREGISTERED = "U";
+	
+	/** The server was shutdown */
+	public static final String STATUS_SHUTDOWN = "D";
 
 	/** The database flavour property name */
 	public final static String DB = "DB";
@@ -54,6 +70,9 @@ public abstract class BackendAdapter {
 	/** The constant to pull the insert server status query */
 	protected final static String QUERY_REGISTER_SERVER_STATUS = "INSERT_SERVER_STATUS";
 	
+	/** The constant to pull the update server status query */
+	protected final static String QUERY_UPDATE_SERVER_STATUS = "UPDATE_SERVER_STATUS";
+	
 	/** The constant to pull the insert info status i */
 	protected final static String QUERY_REGISTER_SERVER_INFO = "INSERT_SERVER_INFO";
 
@@ -78,8 +97,26 @@ public abstract class BackendAdapter {
 	/** The server ID */
 	private String sServerID = null;
 	
+	/** The service description */
+	private String sDesc = null;
+
+	/** The shutdown hook */
+	private static Hashtable<BackendAdapter,BackendAdapterShutdownHook> beashMap = new Hashtable<BackendAdapter,BackendAdapterShutdownHook>();
+
+	/** The flag that controls the finalization of the thread process. */
+	private boolean bNotDone = true;
+
+	/** The update period for the thread process. */
+	private long lUpdatePeriod = 5000;
+
+	/** The logger to use */
+	private Logger log = null;
+	
 	/** Initialize the query map */
 	public BackendAdapter() {
+		
+		log = CoordinatorLoggerFactory.getCoordinatorLogger();
+		
 		try {
 			propQueryMapping.loadFromXML(DerbyBackendAdapter.class.getResourceAsStream(COMMON_MAP_FILE));
 		} catch (Exception e) {
@@ -93,26 +130,43 @@ public abstract class BackendAdapter {
 	 * 
 	 * @param conn The connection to the backend store
 	 * @param iPort The port number where the coordinated service runs
+	 * @param sDesc
 	 */
-	public void linkToConnectionAndPort(Connection conn, int iPort) {
-		// Store the configuration objects
-		
+	public void linkToService(Connection conn, int iPort, String sDesc) {
+				
 		// Get the connection object and the transaction mode
 		try {
 			this.conn = conn;
 			this.bTransactional = !conn.getAutoCommit();
 			this.iPort = iPort;
 			this.sServerID = NetworkTools.getNumericIPValue()+Integer.toHexString(iPort).toUpperCase();
+			this.sDesc = sDesc;
+
+			// Set the thread name
+			super.setName("COORD:"+sServerID);
+			
+			log.info(sServerID+" linked to "+sDesc);
+			
 		} catch (Exception e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
-			KernelLoggerFactory.getCoreLogger().severe("Error stablishind connection and transaction check! "+baos.toString());
+			log.severe("Error stablishind connection and transaction check! "+baos.toString());
 		}
 		
 		// Add the shutdown hook
-		Runtime.getRuntime().addShutdownHook(
-				new BackendAdapterShutdownHook(this)
-			);
+		if ( beashMap.get(this)==null ) {
+			BackendAdapterShutdownHook beash = new BackendAdapterShutdownHook(this);
+			beashMap.put(this, beash);
+			Runtime.getRuntime().addShutdownHook(beash);
+		}
+	}
+	
+	/** Return the shutdown hook for this adapter.
+	 * 
+	 * @return The back end adapter shutdown hook
+	 */
+	public BackendAdapterShutdownHook getShutdownHook() {
+		return beashMap.get(this);
 	}
 	
 	/** Creates the required schema if it does not exist. 
@@ -140,10 +194,12 @@ public abstract class BackendAdapter {
 			// Commit the transaction
 			if ( bTransactional ) conn.commit();
 			
+			log.fine(sServerID+" created schema");
+			
 		} catch (SQLException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
-			KernelLoggerFactory.getCoreLogger().severe("Commit operation failed! "+baos.toString());
+			log.severe("Commit operation failed! "+baos.toString());
 		}
 		catch ( BackendAdapterException bae ) {
 			try {
@@ -153,7 +209,7 @@ public abstract class BackendAdapter {
 			} catch (SQLException e) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				e.printStackTrace(new PrintStream(baos));
-				KernelLoggerFactory.getCoreLogger().severe("Rollback operation failed! "+baos.toString());
+				log.severe("Rollback operation failed! "+baos.toString());
 			}
 		}
 	}
@@ -175,10 +231,12 @@ public abstract class BackendAdapter {
 			// Commit the transaction
 			if ( bTransactional ) conn.commit();
 			
+			log.fine(sServerID+" droped the schema");
+			
 		} catch (SQLException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
-			KernelLoggerFactory.getCoreLogger().severe("Commit operation failed! "+baos.toString());
+			log.severe("Commit operation failed! "+baos.toString());
 		}
 		catch ( BackendAdapterException bae ) {
 			try {
@@ -188,7 +246,7 @@ public abstract class BackendAdapter {
 			} catch (SQLException e) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				e.printStackTrace(new PrintStream(baos));
-				KernelLoggerFactory.getCoreLogger().severe("Rollback operation failed! "+baos.toString());
+				log.severe("Rollback operation failed! "+baos.toString());
 			}
 		}
 	
@@ -213,10 +271,12 @@ public abstract class BackendAdapter {
 			// Commit the transaction
 			if ( bTransactional ) conn.commit();
 			
+			log.fine(sServerID+" droped the schema leaving the log behind");
+			
 		} catch (SQLException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
-			KernelLoggerFactory.getCoreLogger().severe("Commit operation failed! "+baos.toString());
+			log.severe("Commit operation failed! "+baos.toString());
 		}
 		catch ( BackendAdapterException bae ) {
 			try {
@@ -226,7 +286,7 @@ public abstract class BackendAdapter {
 			} catch (SQLException e) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				e.printStackTrace(new PrintStream(baos));
-				KernelLoggerFactory.getCoreLogger().severe("Rollback operation failed! "+baos.toString());
+				log.severe("Rollback operation failed! "+baos.toString());
 			}
 		}
 	}
@@ -239,7 +299,7 @@ public abstract class BackendAdapter {
 		
 		try {	
 			// Update the status
-			updateServerStatus();
+			updateServerStatus(STATUS_INITIALIZED);
 			
 			// Update the server info
 			Runtime rt = Runtime.getRuntime();
@@ -250,6 +310,7 @@ public abstract class BackendAdapter {
 					sNameAndIP[1],
 					sNameAndIP[0],
 					iPort,
+					sDesc,
 					rt.maxMemory(),
 					rt.availableProcessors(),
 					System.getProperty("os.arch"),
@@ -267,10 +328,12 @@ public abstract class BackendAdapter {
 			// Commit the transaction
 			if ( bTransactional ) conn.commit();
 			
+			log.fine(sServerID+" server registered");
+			
 		} catch (SQLException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
-			KernelLoggerFactory.getCoreLogger().severe("Commit operation failed! "+baos.toString());
+			log.severe("Commit operation failed! "+baos.toString());
 		}
 		catch ( BackendAdapterException bae ) {
 			try {
@@ -280,7 +343,7 @@ public abstract class BackendAdapter {
 			} catch (SQLException e) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				e.printStackTrace(new PrintStream(baos));
-				KernelLoggerFactory.getCoreLogger().severe("Rollback operation failed! "+baos.toString());
+				log.severe("Rollback operation failed! "+baos.toString());
 			}
 		}
 	}
@@ -288,30 +351,40 @@ public abstract class BackendAdapter {
 
 	/** Update the server status to the backend store
 	 * 
+	 * @param sStatus The status value to update
 	 * @throws BackendAdapterException The server could not be registered
 	 */
-	public void updateServerStatus() throws BackendAdapterException {
+	public void updateServerStatus( String sStatus ) throws BackendAdapterException {
 		try {
 			// Update the server status
-			String sQueryICSS = propQueryMapping.getProperty(QUERY_REGISTER_SERVER_STATUS);
+			String sQueryUCSS = propQueryMapping.getProperty(QUERY_UPDATE_SERVER_STATUS);
 			long lTimestamp = System.currentTimeMillis();
-			Object [] oaValues = {
-					sServerID,
-					"R",
+			Object [] oaValuesUpdate = {
+					STATUS_RUNNING,
 					lTimestamp,
-					Runtime.getRuntime().freeMemory(),
-					"R",
-					lTimestamp
+					sServerID
 				};
-			executeUpdateQueryWithParams(sQueryICSS, oaValues);
+			if ( executeUpdateQueryWithParams(sQueryUCSS, oaValuesUpdate) <= 0 ) {
+				//Server does not exist
+				String sQueryICSS = propQueryMapping.getProperty(QUERY_REGISTER_SERVER_STATUS);
+				Object [] oaValues = {
+						sServerID,
+						STATUS_INITIALIZED,
+						lTimestamp,
+						Runtime.getRuntime().freeMemory()
+					};
+				executeUpdateQueryWithParams(sQueryICSS, oaValues);
+			}
 			
 			// Commit the transaction
 			if ( bTransactional ) conn.commit();
 			
+			log.fine(sServerID+" updated its status");
+			
 		} catch (SQLException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
-			KernelLoggerFactory.getCoreLogger().severe("Commit operation failed! "+baos.toString());
+			log.severe("Commit operation failed! "+baos.toString());
 		}
 		catch ( BackendAdapterException bae ) {
 			try {
@@ -321,7 +394,7 @@ public abstract class BackendAdapter {
 			} catch (SQLException e) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				e.printStackTrace(new PrintStream(baos));
-				KernelLoggerFactory.getCoreLogger().severe("Rollback operation failed! "+baos.toString());
+				log.severe("Rollback operation failed! "+baos.toString());
 			}
 		}
 	}
@@ -340,6 +413,9 @@ public abstract class BackendAdapter {
 					sServerID
 				};
 			
+			// Update the server status before going down
+			updateServerStatus(STATUS_UNREGISTERED);
+			
 			// Log the unregister operation
 			String sQueryLUO = propQueryMapping.getProperty(QUERY_UNREGISTER_SERVER_LOG);
 			executeUpdateQueryWithParams(sQueryLUO, oaValues);
@@ -355,10 +431,12 @@ public abstract class BackendAdapter {
 			// Commit the transaction
 			if ( bTransactional ) conn.commit();
 			
+			log.fine(sServerID+" unregistered himself");
+						
 		} catch (SQLException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
-			KernelLoggerFactory.getCoreLogger().severe("Commit operation failed! "+baos.toString());
+			log.severe("Commit operation failed! "+baos.toString());
 		}
 		catch ( BackendAdapterException bae ) {
 			try {
@@ -368,7 +446,7 @@ public abstract class BackendAdapter {
 			} catch (SQLException e) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				e.printStackTrace(new PrintStream(baos));
-				KernelLoggerFactory.getCoreLogger().severe("Rollback operation failed! "+baos.toString());
+				log.severe("Rollback operation failed! "+baos.toString());
 			}
 		}
 	
@@ -397,7 +475,7 @@ public abstract class BackendAdapter {
 	 * @param oaValues The values to use for the update
 	 * @throws BackendAdapterException Something when wrong running the update
 	 */
-	private void executeUpdateQueryWithParams(String sQuery, Object[] oaValues ) 
+	private int executeUpdateQueryWithParams(String sQuery, Object[] oaValues ) 
 	throws BackendAdapterException {
 		
 		// Run the update
@@ -405,7 +483,7 @@ public abstract class BackendAdapter {
 			PreparedStatement pstm = conn.prepareStatement(sQuery);
 			for ( int i=1,iMax=oaValues.length ; i<=iMax ; i++ )
 				pstm.setObject(i, oaValues[i-1]);
-			pstm.execute();
+			return pstm.executeUpdate();
 		} catch (SQLException e) {
 			throw new BackendAdapterException(e);
 		}
@@ -437,19 +515,73 @@ public abstract class BackendAdapter {
 		return propQueryMapping.size()-2;
 	}
 
+	/** Sets the update period of the heart beat
+	 * 
+	 * @param iUpdatePeriod The period to set
+	 */
+	public void setUpdatePeriod(long iUpdatePeriod) {
+		this.lUpdatePeriod = iUpdatePeriod;
+	}
+
+	/** Gets the update period of the heart beat
+	 * 
+	 * @return the iUpdatePeriod The period to set
+	 */
+	public long getUpdatePeriod() {
+		return lUpdatePeriod;
+	}
+
 	/** This methos is only provided to the shutdown hook to allow it
 	 * to properly close the connection to the backend storage system.
 	 * 
 	 * @throws BackendAdapterException The connection could not be properly closed
 	 * 
 	 */
-	void close() throws BackendAdapterException {
+	void close() 
+	throws BackendAdapterException {
 		try {
+			this.bNotDone = false;
+			unregisterServer();
 			conn.close();
+			log.info(sServerID+" shutdown");
 		} catch (SQLException e) {
 			throw new BackendAdapterException(e);
 		}
 	}
 	
+	/** The thread process that handles the distribution via the backend
+	 * connection to the data store. This thread periodically updates the
+	 * status (heart beat) and also does consistency check if unresponsive 
+	 * nodes arise.
+	 */
+	public void run () {
+		log.info("Starting "+super.getName());
+		while ( bNotDone ) {
+			// Sleep
+			try {
+				try {
+					updateServerStatus(STATUS_RUNNING);
+				} catch (BackendAdapterException e) {
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					e.printStackTrace(new PrintStream(baos));
+					log.warning(sServerID+" deamon thread could not update its status. "+baos.toString());
+				}
+				
+				Thread.sleep(this.lUpdatePeriod);
+				
+			} catch (InterruptedException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				log.warning(sServerID+" deamon thread was abruptly interrupted. "+baos.toString());
+			}
+			
+			// TODO Do something
+			if ( bNotDone )  {
+				
+			}
+		}
+		log.info("Coordinator "+super.getName()+" has stopped");
+		
+	}
 	
 }

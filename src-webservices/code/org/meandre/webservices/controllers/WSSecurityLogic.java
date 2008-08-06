@@ -11,8 +11,8 @@ import org.meandre.core.security.Role;
 import org.meandre.core.security.SecurityManager;
 import org.meandre.core.security.SecurityStoreException;
 import org.meandre.core.security.User;
+import org.meandre.webservices.logger.WSLoggerFactory;
 import org.meandre.webservices.servlets.WSSecurity;
-import org.meandre.webservices.utils.WSLoggerFactory;
 
 
 

@@ -19,7 +19,7 @@ import org.meandre.core.security.SecurityStoreException;
 import org.meandre.core.security.User;
 import org.meandre.core.store.Store;
 import org.meandre.webservices.controllers.WSRepositoryLogic;
-import org.meandre.webservices.utils.WSLoggerFactory;
+import org.meandre.webservices.logger.WSLoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.DC;

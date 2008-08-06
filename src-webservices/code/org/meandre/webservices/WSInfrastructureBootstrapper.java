@@ -3,7 +3,7 @@ package org.meandre.webservices;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
-import org.meandre.webservices.utils.WSLoggerFactory;
+import org.meandre.webservices.logger.WSLoggerFactory;
 
 
 /**

@@ -21,7 +21,7 @@ import org.meandre.demo.components.ConcatenateStringsComponent;
 import org.meandre.demo.components.ForkByReference;
 import org.meandre.demo.components.PrintObjectComponent;
 import org.meandre.demo.components.PushStringComponent;
-import org.meandre.demo.utils.DemoLoggerFactory;
+import org.meandre.demo.logger.DemoLoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;

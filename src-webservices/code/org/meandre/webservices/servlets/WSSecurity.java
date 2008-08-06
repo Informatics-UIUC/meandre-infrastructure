@@ -15,7 +15,7 @@ import org.meandre.core.security.SecurityStoreException;
 import org.meandre.core.security.User;
 import org.meandre.core.store.Store;
 import org.meandre.webservices.controllers.WSSecurityLogic;
-import org.meandre.webservices.utils.WSLoggerFactory;
+import org.meandre.webservices.logger.WSLoggerFactory;
 
 /** 
  * A Handler for role management calls that affect the local security store.

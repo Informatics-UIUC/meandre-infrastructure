@@ -29,7 +29,7 @@ import org.meandre.core.store.Store;
 import org.meandre.core.utils.Constants;
 import org.meandre.core.utils.NetworkTools;
 import org.meandre.webservices.beans.JobDetail;
-import org.meandre.webservices.utils.WSLoggerFactory;
+import org.meandre.webservices.logger.WSLoggerFactory;
 import org.meandre.webui.PortScroller;
 import org.meandre.webui.WebUI;
 import org.meandre.webui.WebUIException;

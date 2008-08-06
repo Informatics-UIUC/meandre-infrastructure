@@ -20,7 +20,7 @@ import org.meandre.core.security.SecurityStoreException;
 import org.meandre.core.security.User;
 import org.meandre.core.store.Store;
 import org.meandre.webservices.controllers.WSExecuteLogic;
-import org.meandre.webservices.utils.WSLoggerFactory;
+import org.meandre.webservices.logger.WSLoggerFactory;
 import org.meandre.webui.WebUIException;
 
 /** A basic handler to execute flows.

@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import org.meandre.core.logger.KernelLoggerFactory;
+import org.meandre.core.services.coordinator.logger.CoordinatorLoggerFactory;
 
 
 /** This class implements a shutdown hook for the backend adapter. This hook
@@ -32,7 +33,7 @@ extends Thread {
 	 */
 	public void run () {
 		try {
-			ba.unregisterServer();
+			CoordinatorLoggerFactory.getCoordinatorLogger().info("Shutdown hook for "+ba.getName()+" called");
 			ba.close();
 		} catch (BackendAdapterException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();

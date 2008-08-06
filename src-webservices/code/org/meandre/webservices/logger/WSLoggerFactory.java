@@ -1,4 +1,4 @@
-package org.meandre.webservices.utils;
+package org.meandre.webservices.logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.core.logger.ShortFormatter;
+import org.meandre.core.logger.MeandreCoordinatorFormatter;
 
 
 
@@ -38,18 +38,18 @@ public class WSLoggerFactory {
 		try {
 			new File("."+File.separator+"log").mkdir();
 			handlerWS = new FileHandler("."+File.separator+"log"+File.separator+"meandre-webservices.log",LOG_FILE_SIZE,LOG_NUM_ROTATING_FILES);
-			handlerWS.setFormatter(new ShortFormatter());
+			handlerWS.setFormatter(new MeandreCoordinatorFormatter());
 			logWS.addHandler(handlerWS);
 			Logger logger=logWS.getParent();
 			if(logger!=null){
 				Handler[] handlerList=logger.getHandlers();
 				for(int i=0;i< handlerList.length;i++){
-					handlerList[i].setFormatter(new ShortFormatter());
+					handlerList[i].setFormatter(new MeandreCoordinatorFormatter());
 				}	
 			}
 			Handler[] handlerList=logWS.getHandlers();
 			for(int i=0;i< handlerList.length;i++){
-				handlerList[i].setFormatter(new ShortFormatter());
+				handlerList[i].setFormatter(new MeandreCoordinatorFormatter());
 			}
 		} catch (SecurityException e) {
 			System.err.println("Could not initialize "+"."+File.separator+"log"+File.separator+"meandre-webservices.log");
@@ -69,4 +69,12 @@ public class WSLoggerFactory {
 		return logWS;
 	}
 	
+	/** Set the level to use on for the logger and handler.
+	 * 
+	 * @param level The requested level
+	 */
+	public static void setLevel ( Level level ) {
+		logWS.setLevel(level);
+		handlerWS.setLevel(level);
+	}
 }
