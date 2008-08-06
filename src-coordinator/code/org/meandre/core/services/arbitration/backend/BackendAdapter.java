@@ -11,9 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.logger.KernelLoggerFactory;
-import org.meandre.core.store.Store;
 import org.meandre.core.utils.NetworkTools;
 
 /** The base class for the backend adapters.
@@ -34,13 +32,6 @@ public abstract class BackendAdapter {
 
 	/** The porperty map containing the mapping */
 	protected final Properties propQueryMapping = new Properties();
-	
-	/** The store to be used with this backend adapter */
-	@SuppressWarnings("unused")
-	private Store store  = null;
-
-	/** The core configuration object used by this backend adapter */
-	private CoreConfiguration cnf = null;
 	
 	/** The constant to pull the create server status table query */
 	protected final static String QUERY_CREATE_SERVER_STATUS_TABLE = "CREATE_SERVER_STATUS_TABLE";
@@ -81,6 +72,12 @@ public abstract class BackendAdapter {
 	/** True if the connection is not on auto commit */
 	private boolean bTransactional = false;
 	
+	/** The port where the coordinated service runs */
+	private int iPort = -1;
+	
+	/** The server ID */
+	private String sServerID = null;
+	
 	/** Initialize the query map */
 	public BackendAdapter() {
 		try {
@@ -94,18 +91,18 @@ public abstract class BackendAdapter {
 	
 	/** Links this backend adapter to the given store.
 	 * 
-	 * @param cnf The core configuration object
-	 * @param store The store to use
+	 * @param conn The connection to the backend store
+	 * @param iPort The port number where the coordinated service runs
 	 */
-	public void linkToCoreAndStore( CoreConfiguration cnf, Store store ) {
+	public void linkToConnectionAndPort(Connection conn, int iPort) {
 		// Store the configuration objects
-		this.cnf = cnf;
-		this.store = store;
 		
 		// Get the connection object and the transaction mode
 		try {
-			this.conn = store.getConnectionToDB();
+			this.conn = conn;
 			this.bTransactional = !conn.getAutoCommit();
+			this.iPort = iPort;
+			this.sServerID = NetworkTools.getNumericIPValue()+Integer.toHexString(iPort).toUpperCase();
 		} catch (Exception e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
@@ -249,10 +246,10 @@ public abstract class BackendAdapter {
 			String sQueryICSS = propQueryMapping.getProperty(QUERY_REGISTER_SERVER_INFO);
 			String [] sNameAndIP = NetworkTools.getStringNameAndIPValue().split("/");
 			Object [] oaValues = {
-					NetworkTools.getNumericIPValue()+Integer.toHexString(cnf.getBasePort()).toUpperCase(),
+					sServerID,
 					sNameAndIP[1],
 					sNameAndIP[0],
-					cnf.getBasePort(),
+					iPort,
 					rt.maxMemory(),
 					rt.availableProcessors(),
 					System.getProperty("os.arch"),
@@ -299,7 +296,7 @@ public abstract class BackendAdapter {
 			String sQueryICSS = propQueryMapping.getProperty(QUERY_REGISTER_SERVER_STATUS);
 			long lTimestamp = System.currentTimeMillis();
 			Object [] oaValues = {
-					NetworkTools.getNumericIPValue()+Integer.toHexString(cnf.getBasePort()).toUpperCase(),
+					sServerID,
 					"R",
 					lTimestamp,
 					Runtime.getRuntime().freeMemory(),
@@ -340,7 +337,7 @@ public abstract class BackendAdapter {
 			
 			// Get server ID
 			Object [] oaValues = {
-					NetworkTools.getNumericIPValue()+Integer.toHexString(cnf.getBasePort()).toUpperCase()
+					sServerID
 				};
 			
 			// Log the unregister operation

@@ -39,7 +39,7 @@
             <include name="${demo.src}/**/*.java"/>
             <include name="${ws.src}/**/*.java"/>
             <include name="${store.src}/**/*.java"/>
-            <include name="${terracotta.src}/**/*.java"/>
+            <include name="${coordinator.src}/**/*.java"/>
             <include name="${client.src}/**/*.java"/>
         	<include name="${annotation.src}/**/*.java"/>
         </javac>
@@ -106,6 +106,15 @@
                 <include name="**/*.list"/>
             </fileset>
         </copy>
+
+        <copy todir="${build.dir}" includeEmptyDirs="no">
+            <fileset dir="${coordinator.src}">
+                <include name="**/*.properties"/>
+                <include name="**/*.xml"/>
+                <include name="**/*.vm"/>
+                <include name="**/*.list"/>
+            </fileset>
+        </copy>
     	
     </target>
 
@@ -118,6 +127,7 @@
 		<javac srcdir="${ws.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
     	<javac srcdir="${store.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
     	<javac srcdir="${client.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
+    	<javac srcdir="${coordinator.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
     </target>
 
 	<!-- clean -->
@@ -169,31 +179,35 @@
 
             <batchtest todir="${test.dir}/xml">
                 <fileset dir="${kernel.test}">
-                    <include name="**/*Test.java"/>
+                    <include name="**/*.java"/>
                 </fileset>
 
             	<fileset dir="${plugins.test}">
-                    <include name="**/*Test.java"/>
+                    <include name="**/*.java"/>
                 </fileset>
 
             	<fileset dir="${demo.test}">
-                    <include name="**/*Test.java"/>
+                    <include name="**/*.java"/>
                 </fileset>
 
             	<fileset dir="${zigzag.test}">
-                    <include name="**/*Test.java"/>
+                    <include name="**/*.java"/>
                 </fileset>
 
             	<fileset dir="${ws.test}">
-                    <include name="**/*Test.java"/>
+                    <include name="**/*.java"/>
                 </fileset>
 
             	<fileset dir="${store.test}">
-                    <include name="**/*Test.java"/>
+                    <include name="**/*.java"/>
                 </fileset>
-            	
+
                 <fileset dir="${client.test}">
-                    <include name="**/*Test.java"/>
+                    <include name="**/*.java"/>
+                </fileset>
+
+                <fileset dir="${coordinator.test}">
+                    <include name="**/*.java"/>
                 </fileset>
             
             	
@@ -236,6 +250,7 @@
 	    	      <include name="${terracotta.src}/**"/>
                   <include name="${client.src}/**"/>
 	    		  <include name="${annotation.src}/**"/>
+	    		  <include name="${coordinator.src}/**"/>
 	    		  <exclude name="**/*.properties" />
 	    		  <exclude name="**/*.jj" />
 	    	</fileset>
@@ -378,8 +393,7 @@
                 <include name="**/client/**/*.xml"/>
             </fileset>
         </jar>  
-    	
-    	
+
     	<!-- Create annotation jar -->
     	<jar destfile="${dist.dir}/lib/${app.name}-annotation-${build.version}.jar">
     		<manifest>
@@ -389,6 +403,18 @@
     	        <include name="**/annotations/**/*.class"/>
     	        <include name="**/annotations/**/*.properties"/>
     	        <include name="**/annotations/**/*.xml"/>
+    	    </fileset>
+    	</jar>  
+
+    	<!-- Create coordinator jar -->
+    	<jar destfile="${dist.dir}/lib/${app.name}-coordinator-${build.version}.jar">
+    		<manifest>
+    	        <attribute name="Build-Version" value="${build.version}"/>
+    	    </manifest>
+    	    <fileset dir="${build.dir}">
+    	        <include name="**/coordinator/**/*.class"/>
+    	        <include name="**/coordinator/**/*.properties"/>
+    	        <include name="**/coordinator/**/*.xml"/>
     	    </fileset>
     	</jar>  
     	
@@ -437,7 +463,7 @@
 	            <include name="**"/>
 	        </fileset>
 	    </jar>
-    	
+
     	<!-- Creating the Meandre interpreter console jar distribution -->
     	<jar destfile="${dist.dir}/zz-${build.version}.jar" >
     		<manifest>

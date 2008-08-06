@@ -27,6 +27,7 @@
     <property name="store.src" value="src-store/code"/>
     <property name="client.src" value="src-client/code"/>
 	<property name="annotation.src" value="src-annotation/code"/>
+	<property name="coordinator.src" value="src-coordinator/code"/>
 	
 	<!-- Test code locations -->
 	<property name="kernel.test" value="src-kernel/test"/>
@@ -36,11 +37,26 @@
 	<property name="ws.test" value="src-webservices/test"/>
 	<property name="store.test" value="src-store/test"/>
 	<property name="client.test" value="src-client/test"/>
+	<property name="coordinator.test" value="src-coordinator/test"/>
 	
 	<!-- The generic classpath to all the code (includes code and tests) -->
 	<path id="meandre.javadoc.src">
 		<fileset dir="${kernel.src}" includes="*"/>
 		<fileset dir="${kernel.test}" includes="*"/>
+		<fileset dir="${zigzagl.src}" includes="*"/>
+		<fileset dir="${zigzag.test}" includes="*"/>
+		<fileset dir="${demo.src}" includes="*"/>
+		<fileset dir="${demo.test}" includes="*"/>
+		<fileset dir="${plugins.src}" includes="*"/>
+		<fileset dir="${plugins.test}" includes="*"/>
+		<fileset dir="${ws.src}" includes="*"/>
+		<fileset dir="${ws.test}" includes="*"/>
+		<fileset dir="${store.src}" includes="*"/>
+		<fileset dir="${store.test}" includes="*"/>
+		<fileset dir="${client.src}" includes="*"/>
+		<fileset dir="${client.test}" includes="*"/>
+		<fileset dir="${coordinator.src}" includes="*"/>
+		<fileset dir="${coordinator.test}" includes="*"/>
     </path>
 		
     <!-- Default options for code-generation, compiling and junit-testing -->

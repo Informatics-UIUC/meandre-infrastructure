@@ -99,7 +99,7 @@ public class BackendAdapterTest {
 				).newInstance();
 			
 			// Link it to a store
-			ba.linkToCoreAndStore(cnf,store);
+			ba.linkToConnectionAndPort(store.getConnectionToDB(),cnf.getBasePort());
 			
 			assertNotNull(ba);
 			

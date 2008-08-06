@@ -1,5 +1,7 @@
 1.4.0-vcli-alpha Sara
 
+* Refactoring to create the selfcontained coordinator
+
 * Added a transactional layer to the operations
 
 * Added a log table to handle events
@@ -40,14 +42,14 @@
 * Removing terracota test
 
 
-1.3.1cli Xuixo
+1.3.1vcli Xuixo
 
 * Updated Xstream library to 1.3 July 19th 2008
 
 * Added simple formatter for the logger July 19th 2008
 
 
-1.3.1cli Xuixo
+1.3.1vcli Xuixo
 
 * Changed the software revision string to be of the format ##.##.##
 
@@ -313,6 +315,5 @@ Which is the address where the flow with instance id as the parameter value for 
 * Plain all mixed together (engine, web app demo, and basic publishing services)
 
 ___
-Edited by Xavier Llor�.
-	- Contributed update: Amit Kumar on Feb 16th 2008
-    - Last updated: Amit Kumar on July 08 2008
+Edited by Xavier Llora.
+	- Contributed update: Amit Kumar on Feb 16th 2008, July 08 2008
