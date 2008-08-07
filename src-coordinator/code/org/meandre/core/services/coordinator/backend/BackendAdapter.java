@@ -104,7 +104,7 @@ extends Thread {
 	protected final static String QUERY_UNREGISTER_SERVER_INFO = "DELETE_SERVER_INFO";
 	
 	/** The constant to pull the unregister log entry query */
-	protected final static String QUERY_UNREGISTER_SERVER_LOG = "LOG_SERVER_UNREGISTER";
+	protected final static String QUERY_LOG_SERVER_EVENT = "LOG_SERVER_EVENT";
 	
 	/** The constant to pull the query that marks out of sync servers */
 	protected final static String QUERY_MARK_OUTOFSYNC_SERVERS = "MARK_OUTOFSYNC_SERVERS";
@@ -233,6 +233,7 @@ extends Thread {
 			executeUpdateQuery(sQueryCSLT);
 			
 			registerServer();
+			logServerStatusEventUncommited(sServerID);
 			
 			// Commit the transaction
 			if ( bTransactional ) conn.commit();
@@ -247,7 +248,7 @@ extends Thread {
 			catch ( BackendAdapterException bae ) {
 				// Roll it back
 				if ( bTransactional ) conn.rollback();
-				log.warning("Default properties already defined. Skipping adding them again");
+				log.warning(getName()+" found that default properties are already defined. Skipping adding them again");
 			}
 			
 			log.fine(sServerID+" created schema");
@@ -504,7 +505,7 @@ extends Thread {
 		log.fine(sServerID+" dirty updated "+sSID+" status");
 		
 		// Log the unregister operation
-		String sQueryLUO = propQueryMapping.getProperty(QUERY_UNREGISTER_SERVER_LOG);
+		String sQueryLUO = propQueryMapping.getProperty(QUERY_LOG_SERVER_EVENT);
 		Object [] oaValues = {
 				sSID
 			};
@@ -518,7 +519,7 @@ extends Thread {
 	 */
 	public void unregisterServer() throws BackendAdapterException {
 		try {
-			unregisterServer(sServerID,STATUS_UNREGISTERED);
+			unregisterServerUncommited(sServerID,STATUS_UNREGISTERED);
 			
 			// Commit the transaction
 			if ( bTransactional ) conn.commit();
@@ -547,7 +548,7 @@ extends Thread {
 	 * 
 	 * @throws BackendAdapterException The server could not be unregistered
 	 */
-	protected void unregisterServer( String sID, String sStatus ) throws BackendAdapterException {
+	protected void unregisterServerUncommited( String sID, String sStatus ) throws BackendAdapterException {
 					
 		// Get server ID
 		Object [] oaValues = {
@@ -558,7 +559,7 @@ extends Thread {
 		updateServerStatus(sStatus);
 		
 		// Log the unregister operation
-		String sQueryLUO = propQueryMapping.getProperty(QUERY_UNREGISTER_SERVER_LOG);
+		String sQueryLUO = propQueryMapping.getProperty(QUERY_LOG_SERVER_EVENT);
 		executeUpdateQueryWithParams(sQueryLUO, oaValues);
 			
 		// Delete the server status
@@ -569,6 +570,25 @@ extends Thread {
 		String sQueryDCSI = propQueryMapping.getProperty(QUERY_UNREGISTER_SERVER_INFO);
 		executeUpdateQueryWithParams(sQueryDCSI, oaValues);	
 	
+	}
+	
+	
+	/** Logs a server event to the backend store
+	 * 
+	 * @param sID The server ID
+	 * @throws BackendAdapterException The server could not be unregistered
+	 */
+	protected void logServerStatusEventUncommited( String sID ) throws BackendAdapterException {
+					
+		// Get server ID
+		Object [] oaValues = {
+				sID
+			};
+		
+		// Log the server status operation
+		String sQueryLUO = propQueryMapping.getProperty(QUERY_LOG_SERVER_EVENT);
+		executeUpdateQueryWithParams(sQueryLUO, oaValues);
+		
 	}
 	
 	/** Runs and update query against the backend.

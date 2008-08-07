@@ -248,11 +248,10 @@ public class BackendAdapterTest {
 				fail("The sleep operation was interrupted! "+e.toString());
 			}
 			
-			// Close the server
-			ba.close();
+			// Drop the schema
+			ba.dropSchema();
 			
-			// Remove the installed shutdown hook
-			Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
+			
 		} catch (BackendAdapterException e) {
 			fail("The schema could not be created and dropped! "+e.toString());
 		}

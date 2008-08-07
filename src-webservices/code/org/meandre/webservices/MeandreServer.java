@@ -5,7 +5,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.io.PrintStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
@@ -16,7 +20,11 @@ import javax.servlet.Servlet;
 
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.security.Role;
+import org.meandre.core.services.coordinator.CoordinatorServiceCallBack;
+import org.meandre.core.services.coordinator.backend.BackendAdapter;
+import org.meandre.core.services.coordinator.backend.BackendAdapterException;
 import org.meandre.core.store.Store;
+import org.meandre.core.utils.Constants;
 import org.meandre.plugins.PluginFactory;
 import org.meandre.webservices.logger.WSLoggerFactory;
 import org.meandre.webservices.servlets.WSAbout;
@@ -26,7 +34,6 @@ import org.meandre.webservices.servlets.WSPublic;
 import org.meandre.webservices.servlets.WSPublish;
 import org.meandre.webservices.servlets.WSRepository;
 import org.meandre.webservices.servlets.WSSecurity;
-import org.meandre.core.utils.Constants;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
@@ -43,6 +50,9 @@ import org.mortbay.jetty.servlet.ServletHolder;
  *
  */
 public class MeandreServer {
+
+	/** The rate at which the realm sync file will be kept synchronized with the store */
+	private static final int SECURITY_REALM_SYNC = 20000;
 
 	/** The base URL for Meandre WS */
 	public final static String WS_BASE_URL = "http://meandre.org/services/";
@@ -267,6 +277,9 @@ public class MeandreServer {
 
 		// Start the security service sync between meandre and jetty
 		fireSecuritySyncService(sh);
+		
+		// Register the server to the back end
+		registerAndFireBackendAdapter();
 	
 		contextWS.addHandler(sh);
 
@@ -308,7 +321,7 @@ public class MeandreServer {
 							try {
 								HashUserRealm hur = new HashUserRealm("Meandre Flow Execution Engine",store.getRealmFilename());
 								sh.setUserRealm(hur);
-								Thread.sleep(10000);
+								Thread.sleep(SECURITY_REALM_SYNC);
 							} catch (InterruptedException e) {
 								log.warning(e.toString());
 							} catch (IOException e) {
@@ -319,6 +332,79 @@ public class MeandreServer {
 				}
 			).start();
 	}
+
+	/** Registers and fires the backend adapter.
+	 * 
+	 */
+	private void registerAndFireBackendAdapter() {
+		// Instantiate the adaptor
+		final BackendAdapter ba;
+		try {
+			ba = (BackendAdapter) Class.forName(
+					"org.meandre.core.services.coordinator.backend."+store.getDatabaseFlavor()+"BackendAdapter"
+				).newInstance();
+			
+			// Link it to a store
+			ba.linkToService(store.getConnectionToDB(),cnf.getBasePort(), new CoordinatorServiceCallBack() {
+
+				public String getDescription() {
+					return "Meandre Server "+Constants.MEANDRE_VERSION;
+				}
+
+				public boolean ping(String sIP,int iPort) {
+					String sURL = "http://"+sIP+":"+iPort+"/public/services/ping.txt";
+					try {
+						URL url = new URL(sURL);
+						
+						LineNumberReader lnr = new LineNumberReader(new InputStreamReader(url.openStream()));
+						
+						boolean bRes = false;
+						if ( lnr.readLine().equals("Pong"))
+							bRes =  true;
+						
+						return bRes;
+					} catch (MalformedURLException e) {
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						e.printStackTrace(new PrintStream(baos));
+						log.warning(ba.getName()+" found a malformed URL "+sURL);
+					} catch (IOException e) {
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						e.printStackTrace(new PrintStream(baos));
+						log.warning(ba.getName()+" could not ping "+sIP+" running at port "+iPort);
+					}
+					return false;
+				}
+				
+			});
+			
+			// Create the backend schema if needed
+			ba.createSchema();
+			
+			// Start the service
+			ba.start();
+			
+		} catch (InstantiationException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Backend adapter could not be instantiated for flavor "+store.getDatabaseFlavor());
+		} catch (IllegalAccessException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Backend adapter could not be reached for flavor "+store.getDatabaseFlavor());
+		} catch (ClassNotFoundException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Unknow required back end adapter for flavor "+store.getDatabaseFlavor());
+		} catch (BackendAdapterException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Backend adaptor could not create the default schema for the "+store.getDatabaseFlavor()+" backend flavor");
+		}
+		
+		
+		
+	}
+
 
 	/** get the Store this server is using. 
 	 *
