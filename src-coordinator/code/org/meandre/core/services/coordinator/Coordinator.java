@@ -6,7 +6,7 @@ package org.meandre.core.services.coordinator;
  * @author Xavier Llor&agrave;
  *
  */
-public class Arbitrator {
+public class Coordinator {
 	
 	
 

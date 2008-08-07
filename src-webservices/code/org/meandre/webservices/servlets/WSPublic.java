@@ -106,6 +106,20 @@ public class WSPublic extends HttpServlet {
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			}
     	}
+    	else if ( sTarget.endsWith("/ping") )  {
+    		if ( sExtension.endsWith("txt") ) {
+    			response.setStatus(HttpServletResponse.SC_OK);
+    			response.setContentType("text/plain");
+    			response.getWriter().println("Pong");
+			}
+			else  {
+				// 
+				// Invalid request found
+				//
+				log.info("Uknown public service requested "+sTarget);
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			}
+    	}
     	else {
     		// 
 			// Invalid request found

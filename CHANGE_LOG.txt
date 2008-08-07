@@ -1,5 +1,9 @@
 1.4.0-vcli-alpha Sara
 
+* Added /public/services/ping.txt which return "Pong" for pinguin live servers
+
+* Added the automatic marking of out of sync to the backend adapter thread service
+
 * Modified the test to remove the shutdown hooks (so test do not pile a bunch of them up all fired at once)
 
 * Added a setLevel method to all factory logger objects

@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.meandre.configuration.CoreConfiguration;
+import org.meandre.core.services.coordinator.CoordinatorServiceCallBack;
 import org.meandre.core.services.coordinator.backend.BackendAdapter;
 import org.meandre.core.services.coordinator.backend.BackendAdapterException;
 import org.meandre.core.services.coordinator.backend.DerbyBackendAdapter;
@@ -125,7 +126,17 @@ public class BackendAdapterTest {
 				).newInstance();
 			
 			// Link it to a store
-			ba.linkToService(store.getConnectionToDB(),cnf.getBasePort(),"Meandre Server "+Constants.MEANDRE_VERSION);
+			ba.linkToService(store.getConnectionToDB(),cnf.getBasePort(), new CoordinatorServiceCallBack() {
+
+				public String getDescription() {
+					return "Meandre Server "+Constants.MEANDRE_VERSION;
+				}
+
+				public boolean ping(String sIP,int iPort) {
+					return false;
+				}
+				
+				});
 			
 			assertNotNull(ba);
 			

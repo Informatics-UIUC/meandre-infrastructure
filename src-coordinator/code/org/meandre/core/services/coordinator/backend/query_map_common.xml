@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-<properties>
+<properties>	
 <comment>Query mapping for MySQL</comment>
 	<entry key="MARKER">@@@</entry>
 	<entry key="CREATE_SERVER_STATUS_TABLE">
@@ -11,8 +11,10 @@
 				 previous_updated BIGINT default 0, 
 				 uptime REAL default 0, 
 				 free_memory REAL default 0, 
-				 failed_updates INTEGER default 0, 
-				 primary key(ID))
+				 failed_updates INTEGER default 0,
+				 ts timestamp,
+				 INDEX USING HASH(status),
+				 PRIMARY KEY(ID))
 	</entry>
 	<entry key="CREATE_SERVER_INFO_TABLE">
 			CREATE TABLE IF NOT EXISTS meandre_server_info 
@@ -30,7 +32,8 @@
 				 java_vm_version VARCHAR(20),
 				 java_vm_vendor VARCHAR(40),
 				 user_name VARCHAR(20),
-				 user_home VARCHAR(255))
+				 user_home VARCHAR(255),
+				 PRIMARY KEY(ID))
 	</entry>
 	<entry key="CREATE_SERVER_LOG_TABLE">
 			CREATE TABLE IF NOT EXISTS meandre_server_log 
@@ -52,13 +55,30 @@
 				 java_vm_vendor VARCHAR(40),
 				 user_name VARCHAR(20),
 				 user_home VARCHAR(255),
+				 INDEX USING BTREE(ts),
 				 ts TIMESTAMP)
+	</entry>
+	<entry key="CREATE_SERVER_PROPERTIES_TABLE">
+			CREATE TABLE IF NOT EXISTS meandre_server_properties
+				(ID CHAR(40),
+				 value VARCHAR(128),
+				 PRIMARY KEY (ID))
+	</entry>
+	<entry key="INSERT_DEFAULT_SERVER_PROPERTIES">
+			INSERT INTO meandre_server_properties VALUES ( "HEARTBEAT_RATE", 5000 )
+	</entry>
+	<entry key="GET_SERVER_PROPERTIES">
+			SELECT * 
+			FROM meandre_server_properties
 	</entry>
 	<entry key="DROP_SERVER_STATUS_TABLE">
 			DROP TABLE meandre_server_status
 	</entry>
 	<entry key="DROP_SERVER_INFO_TABLE">
 			DROP TABLE meandre_server_info
+	</entry>
+	<entry key="DROP_SERVER_PROPERTIES_TABLE">
+			DROP TABLE meandre_server_properties
 	</entry>
 	<entry key="DROP_SERVER_LOG_TABLE">
 			DROP TABLE meandre_server_log
@@ -104,7 +124,7 @@
 				 	user_home
 				)
 				SELECT s.ID,
-				       'U',
+				       s.status,
 				       s.uptime,
 				       s.failed_updates,
 				       i.ip,
@@ -122,5 +142,20 @@
 				       i.user_home 
 			       FROM meandre_server_status AS s LEFT JOIN meandre_server_info AS i ON s.ID=i.ID
 			       WHERE s.ID=?
+	</entry>
+	<entry key="MARK_OUTOFSYNC_SERVERS">
+			UPDATE meandre_server_status 
+				SET status="D"
+				WHERE CURRENT_TIMESTAMP()-ts>? and status!="D"
+	</entry>
+	<entry key="DUMP_LOG_ENTRIES">
+			SELECT * 
+				FROM meandre_server_log
+				ORDER ORDER BY ts DESC
+	</entry>
+	<entry key="LIST_DIRTY_NODES">
+			SELECT i.ID,i.ip, i.port 
+				FROM meandre_server_info AS i LEFT JOIN meandre_server_status AS s ON i.id=s.id 
+				WHERE s.status="D"
 	</entry>
 </properties>
