@@ -195,9 +195,9 @@ extends Thread {
 			BackendAdapterShutdownHook beash = new BackendAdapterShutdownHook(this);
 			beashMap.put(this, beash);
 			Runtime.getRuntime().addShutdownHook(beash);
+			log.info(getName()+" registered shutdown hook");
 		}
 		
-		// TODO load the properties
 	}
 	
 	/** Return the shutdown hook for this adapter.

@@ -2,6 +2,7 @@ package org.meandre.core.services.coordinator.backend;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.logging.Logger;
 
 import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.services.coordinator.logger.CoordinatorLoggerFactory;
@@ -19,6 +20,9 @@ extends Thread {
 
 	/** The backend adapter assocciated to the shutdown hook */
 	private BackendAdapter ba = null;
+	
+	/** The logger to use */
+	private Logger log = CoordinatorLoggerFactory.getCoordinatorLogger();
 
 	/** Creates a shutdown hook for a backend adapter.
 	 * 
@@ -33,8 +37,8 @@ extends Thread {
 	 */
 	public void run () {
 		try {
-			CoordinatorLoggerFactory.getCoordinatorLogger().info("Shutdown hook for "+ba.getName()+" called");
 			ba.close();
+			log.info("Shutdown hook for "+ba.getName()+" exiting");
 		} catch (BackendAdapterException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
