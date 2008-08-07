@@ -28,7 +28,7 @@
 				 os_version VARCHAR(40), 
 				 java_version VARCHAR(20),
 				 java_vm_version VARCHAR(20),
-				 java_vm_vendor VARCHAR(20),
+				 java_vm_vendor VARCHAR(40),
 				 user_name VARCHAR(20),
 				 user_home VARCHAR(255))
 	</entry>
@@ -49,7 +49,7 @@
 				 os_version VARCHAR(40), 
 				 java_version VARCHAR(20),
 				 java_vm_version VARCHAR(20),
-				 java_vm_vendor VARCHAR(20),
+				 java_vm_vendor VARCHAR(40),
 				 user_name VARCHAR(20),
 				 user_home VARCHAR(255),
 				 ts TIMESTAMP)
