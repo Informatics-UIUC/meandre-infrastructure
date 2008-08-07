@@ -1,5 +1,7 @@
 1.4.0-vcli-alpha Sara
 
+* Added a properties table that gets read everytime and status update by the service is preformed.
+
 * Added /public/services/ping.txt which return "Pong" for pinguin live servers
 
 * Added the automatic marking of out of sync to the backend adapter thread service
