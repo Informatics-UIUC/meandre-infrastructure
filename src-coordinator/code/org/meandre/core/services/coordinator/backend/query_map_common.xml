@@ -66,7 +66,8 @@
 				 PRIMARY KEY (ID))
 	</entry>
 	<entry key="INSERT_DEFAULT_SERVER_PROPERTIES">
-			INSERT INTO meandre_server_properties VALUES ( "HEARTBEAT_RATE", 5000 )
+			INSERT INTO meandre_server_properties 
+				VALUES ( "HEARTBEAT_RATE", 5000 ), ("MAX_UPDATE_FAILURES", 5)
 	</entry>
 	<entry key="GET_SERVER_PROPERTIES">
 			SELECT * 
@@ -88,6 +89,10 @@
 			INSERT INTO meandre_server_status (ID,status,updated,free_memory) 
 				VALUES (?,?,?,?) 
 	</entry>
+	<entry key="DELETE_SERVER_STATUS">
+			DELETE FROM meandre_server_status  
+				WHERE ID=? 
+	</entry>
 	<entry key="UPDATE_SERVER_STATUS">
 			UPDATE meandre_server_status 
 				SET status=?, 
@@ -96,9 +101,22 @@
 				    uptime=uptime+updated-previous_updated
 				WHERE ID=?
 	</entry>
+	<entry key="UPDATE_SERVER_STATUS_FAILURE">
+			UPDATE meandre_server_status 
+				SET status=?, 
+				    previous_updated=updated, 
+				    updated=?, 
+				    uptime=uptime+updated-previous_updated,
+				    failed_updates = failed_updates+1
+				WHERE ID=?
+	</entry>
 	<entry key="INSERT_SERVER_INFO">
 			INSERT INTO meandre_server_info (ID,ip,name,port,description,memory_available,number_processors,os_arch,os_name,os_version,java_version,java_vm_version,java_vm_vendor,user_name,user_home) 
 				VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) 
+	</entry>
+	<entry key="DELETE_SERVER_INFO">
+			DELETE FROM meandre_server_info 
+				WHERE ID=? 
 	</entry>
 	<entry key="UPDATE_SERVER_INFO">
 			UPDATE meandre_server_info 
@@ -167,8 +185,13 @@
 	</entry>
 	<entry key="MARK_OUTOFSYNC_SERVERS">
 			UPDATE meandre_server_status 
-				SET status="D"
-				WHERE CURRENT_TIMESTAMP()-ts>? and status!="D"
+				SET status="D",failed_updates=failed_updates+1
+				WHERE CURRENT_TIMESTAMP()-ts>? and status!="D" 
+	</entry>
+	<entry key="SELECT_FAILED_UPDATE_COUNTS">
+			SELECT failed_updates
+				FROM meandre_server_status
+				WHERE ID=?
 	</entry>
 	<entry key="DUMP_LOG_ENTRIES">
 			SELECT * 

@@ -359,7 +359,6 @@ public class MeandreServer {
 					String sURL = "http://"+sIP+":"+iPort+"/public/services/ping.txt";
 					try {
 						URL url = new URL(sURL);
-						
 						LineNumberReader lnr = new LineNumberReader(new InputStreamReader(url.openStream()));
 						
 						boolean bRes = false;
@@ -370,13 +369,14 @@ public class MeandreServer {
 					} catch (MalformedURLException e) {
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
 						e.printStackTrace(new PrintStream(baos));
-						log.warning(baToStore.getName()+" found a malformed URL "+sURL);
+						log.fine(baToStore.getName()+" found a malformed URL "+sURL);
+						return false;
 					} catch (IOException e) {
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
 						e.printStackTrace(new PrintStream(baos));
-						log.warning(baToStore.getName()+" could not ping "+sIP+" running at port "+iPort);
+						log.fine(baToStore.getName()+" could not ping "+sIP+" running at port "+iPort);
+						return false;
 					}
-					return false;
 				}
 				
 			});

@@ -31,6 +31,9 @@ extends Thread {
 
 	/** The heartbeat update rate */
 	private static final String PROP_HEARTBEAT_RATE = "HEARTBEAT_RATE";
+	
+	/** The maximun number of update failures */
+	private static final String PROP_MAX_UPDATE_FAILURES = "MAX_UPDATE_FAILURES";
 
 	/** The server was just registered */
 	public static final String STATUS_INITIALIZED = "I";
@@ -91,12 +94,21 @@ extends Thread {
 	/** The constant to pull the insert server status query */
 	protected final static String QUERY_REGISTER_SERVER_STATUS = "INSERT_SERVER_STATUS";
 	
+	/** The constant to pull the delete server status query */
+	protected final static String QUERY_DELETE_SERVER_STATUS = "DELETE_SERVER_STATUS";
+
 	/** The constant to pull the update server status query */
 	protected final static String QUERY_UPDATE_SERVER_STATUS = "UPDATE_SERVER_STATUS";
+	
+	/** The constant to pull the update server status in presence of a failure query */
+	protected final static String QUERY_UPDATE_SERVER_STATUS_FAILURE = "UPDATE_SERVER_STATUS_FAILURE";
 	
 	/** The constant to pull the insert info status */
 	protected final static String QUERY_REGISTER_SERVER_INFO = "INSERT_SERVER_INFO";
 	
+	/** The constant to pull the delete server status query */
+	protected final static String QUERY_DELETE_SERVER_INFO = "DELETE_SERVER_INFO";
+
 	/** The constant to pull the update info  */
 	protected final static String QUERY_UPDATE_SERVER_INFO = "UPDATE_SERVER_INFO";
 
@@ -115,8 +127,11 @@ extends Thread {
 	/** The constant to pull all the entries in the query table */
 	protected final static String QUERY_DUMP_LOG_ENTRIES = "DUMP_LOG_ENTRIES";
 	
-	/** he constant to pull the list the dead nodes */
+	/** The constant to pull the list the dead nodes */
 	protected final static String QUERY_LIST_DIRTY_NODES = "LIST_DIRTY_NODES";
+	
+	/** Selects the number of failed updates */
+	protected final static String QUERY_SELECT_FAILED_UPDATE_COUNTS = "SELECT_FAILED_UPDATE_COUNTS";
 	
 	/** The connection to the data base backend */
 	private Connection conn = null;
@@ -141,6 +156,9 @@ extends Thread {
 
 	/** The update period for the thread process. */
 	private long lUpdatePeriod = 5000;
+	
+	/** The maximum number of failures allows */
+	private int iMaxFailures = 5;
 	
 	/** The server properties */
 	private Properties propsServer = new Properties();
@@ -236,7 +254,7 @@ extends Thread {
 			executeUpdateQuery(sQueryCSLT);
 			
 			registerServer(true);
-			logServerStatusEventUncommited(sServerID);
+			logServerStatusEventUncommited(sServerID,STATUS_INITIALIZED);
 			
 			// Commit the transaction
 			if ( bTransactional ) conn.commit();
@@ -372,6 +390,7 @@ extends Thread {
 			}
 			// Update the properties
 			lUpdatePeriod = Long.parseLong(propsServer.getProperty(PROP_HEARTBEAT_RATE));
+			iMaxFailures = Integer.parseInt(propsServer.getProperty(PROP_MAX_UPDATE_FAILURES));
 		} catch (SQLException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
@@ -389,7 +408,7 @@ extends Thread {
 		
 		try {	
 			// Log the status to dirty if status was left behind
-			logServerStatusEventUncommited(STATUS_DIRTY_SHUTDOWN);
+			logServerStatusEventUncommited(sServerID,STATUS_DIRTY_SHUTDOWN);
 			
 			// Update the status
 			updateServerStatus(STATUS_INITIALIZED);
@@ -549,27 +568,42 @@ extends Thread {
 	 * @param sStatus The status value to update
 	 * @throws BackendAdapterException The server could not be registered
 	 */
-	protected void updateDirtyServerStatusUncommitedTransaction( String sSID, String sStatus ) 
+	protected void updateDirtyServerStatusUncommitedTransaction( String sServerID, String sStatus ) 
 	throws BackendAdapterException {
 		// Update the server status
-		String sQueryUCSS = propQueryMapping.getProperty(QUERY_UPDATE_SERVER_STATUS);
+		String sQueryUCSS = propQueryMapping.getProperty(QUERY_UPDATE_SERVER_STATUS_FAILURE);
 		long lTimestamp = System.currentTimeMillis();
 		Object [] oaValuesUpdate = {
 				sStatus,
 				lTimestamp,
-				sSID
-			};
-			
+				sServerID
+			};			
 		executeUpdateQueryWithParams(sQueryUCSS, oaValuesUpdate);
-		log.fine(sServerID+" dirty updated "+sSID+" status");
 		
-		// Log the unregister operation
-		String sQueryLUO = propQueryMapping.getProperty(QUERY_LOG_SERVER_EVENT);
-		Object [] oaValues = {
-				sSID
-			};
-		executeUpdateQueryWithParams(sQueryLUO, oaValues);
 		
+		// Check if it is beyond the maximum allowed failures
+		String sQuerySFUC = propQueryMapping.getProperty(QUERY_SELECT_FAILED_UPDATE_COUNTS);
+		Object [] oaValuesSelect = { sServerID };
+		List<List<String>> lst = selectTextColumns(sQuerySFUC,oaValuesSelect);
+		
+		if ( lst.size()>0 ) {
+			if ( iMaxFailures<Integer.parseInt(lst.get(0).get(0)) ) {
+				String sQueryLUO = propQueryMapping.getProperty(QUERY_LOG_SERVER_EVENT);
+				String sQueryDSS = propQueryMapping.getProperty(QUERY_DELETE_SERVER_STATUS);
+				String sQueryDSI = propQueryMapping.getProperty(QUERY_DELETE_SERVER_INFO);
+				Object [] oaValues = {
+						sServerID
+					};
+				// Log the unregister operation
+				executeUpdateQueryWithParams(sQueryLUO, oaValues);
+				// Delete the entries for status and info
+				executeUpdateQueryWithParams(sQueryDSS, oaValues);
+				executeUpdateQueryWithParams(sQueryDSI, oaValues);
+				
+				log.warning("Server "+sServerID+" marked as unreacheble");
+			}
+		}
+			
 	}
 
 	/** Unregisters the server from the backend store
@@ -635,10 +669,20 @@ extends Thread {
 	/** Logs a server event to the backend store
 	 * 
 	 * @param sID The server ID
+	 * @param sStatus The status to log
 	 * @throws BackendAdapterException The server could not be unregistered
 	 */
-	protected void logServerStatusEventUncommited( String sID ) throws BackendAdapterException {
-					
+	protected void logServerStatusEventUncommited( String sID, String sStatus ) throws BackendAdapterException {
+		
+		String sQueryUCSS = propQueryMapping.getProperty(QUERY_UPDATE_SERVER_STATUS);
+		long lTimestamp = System.currentTimeMillis();
+		Object [] oaValuesUpdate = {
+				sStatus,
+				lTimestamp,
+				sServerID
+			};
+		executeUpdateQueryWithParams(sQueryUCSS, oaValuesUpdate);
+				
 		// Get server ID
 		Object [] oaValues = {
 				sID
@@ -686,7 +730,7 @@ extends Thread {
 			throw new BackendAdapterException(e);
 		}
 	}
-	
+
 	/** Return a list of list with the results of select query in text form.
 	 * 
 	 * @param sQuery The query to run
@@ -698,6 +742,37 @@ extends Thread {
 		try {
 			Statement pstm = conn.createStatement();
 			ResultSet rs = pstm.executeQuery(sQuery);
+			int iColCount = rs.getMetaData().getColumnCount();
+			
+			while(rs.next()) {
+				List<String> lstRow = new LinkedList<String>();
+				for( int j=1 ; j<=iColCount ; j++) { 
+					lstRow.add(rs.getString(j));
+				}
+				lstRes.add(lstRow);
+			}
+		} catch (SQLException e) {
+			throw new BackendAdapterException(e);
+		}
+		return lstRes;
+	}
+
+
+	/** Return a list of list with the results of select query in text form.
+	 * 
+	 * @param sQuery The query to run
+	 * @param oaValues The values to use for the query
+	 * @return The resulting list of lists of text
+	 * @throws BackendAdapterException Something when wrong running the select
+	 */
+	private List<List<String>> selectTextColumns (String sQuery, Object [] oaValues) 
+	throws BackendAdapterException {
+		List<List<String>> lstRes = new LinkedList<List<String>>();
+		try {
+			PreparedStatement pstm = conn.prepareStatement(sQuery);
+			for ( int i=1,iMax=oaValues.length ; i<=iMax ; i++ )
+				pstm.setObject(i, oaValues[i-1]);
+			ResultSet rs = pstm.executeQuery();
 			int iColCount = rs.getMetaData().getColumnCount();
 			
 			while(rs.next()) {
@@ -740,14 +815,6 @@ extends Thread {
 		return propQueryMapping.size()-2;
 	}
 
-	/** Sets the update period of the heart beat
-	 * 
-	 * @param iUpdatePeriod The period to set
-	 */
-	public void setUpdatePeriod(long iUpdatePeriod) {
-		this.lUpdatePeriod = iUpdatePeriod;
-	}
-
 	/** Gets the update period of the heart beat
 	 * 
 	 * @return the iUpdatePeriod The period to set
@@ -756,6 +823,14 @@ extends Thread {
 		return lUpdatePeriod;
 	}
 
+	/** Returns the maximum number of allowed failures.
+	 * 
+	 * @return The maximum number of failures
+	 */
+	public int getMaximunNumberOfFailures() {
+		return iMaxFailures;
+	}
+	
 	/** This methos is only provided to the shutdown hook to allow it
 	 * to properly close the connection to the backend storage system.
 	 * 
@@ -801,7 +876,7 @@ extends Thread {
 						
 						String sQueryUOS = propQueryMapping.getProperty(QUERY_MARK_OUTOFSYNC_SERVERS);
 						Object[] oaValues = { lUpdatePeriod/100 };
-						executeUpdateQueryWithParams(sQueryUOS, oaValues);
+						int iUpdated = executeUpdateQueryWithParams(sQueryUOS, oaValues);
 						
 						// Commit the transaction
 						if ( bTransactional ) conn.commit();
@@ -812,7 +887,7 @@ extends Thread {
 						for ( List<String> lst:lstDirty )
 							if ( !aspcbCallBack.ping(lst.get(1), Integer.parseInt(lst.get(2)))) {
 								updateDirtyServerStatusUncommitedTransaction(lst.get(0),STATUS_DIRTY_SHUTDOWN);
-								log.info(sServerID+" unregistering "+lst.get(0)+" as dirty");
+								log.fine(sServerID+" marking "+lst.get(0)+" as dirty");
 							}
 								
 						// Commit the transaction
