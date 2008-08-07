@@ -703,7 +703,7 @@ extends Thread {
 	 * @throws BackendAdapterException The connection could not be properly closed
 	 * 
 	 */
-	void close() 
+	public void close() 
 	throws BackendAdapterException {
 		try {
 			this.bNotDone = false;

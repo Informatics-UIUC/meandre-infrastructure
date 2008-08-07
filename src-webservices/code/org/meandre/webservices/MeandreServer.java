@@ -75,6 +75,10 @@ public class MeandreServer {
 	/** The main Jetty server */
 	private Server server;
 
+	/** The backend adapter linked to this server */
+	private BackendAdapter baToStore = null;
+	
+	/** Should the server be stoped? */
 	private boolean bStop = false;
 	
 	/** Creates a Meandre server with the default configuration.
@@ -231,6 +235,7 @@ public class MeandreServer {
 	public void stop () throws Exception {
 		log.info("Stoping Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+")");
 		bStop  = true;
+		baToStore.close();
 		server.stop();
 	}
 
@@ -338,14 +343,13 @@ public class MeandreServer {
 	 */
 	private void registerAndFireBackendAdapter() {
 		// Instantiate the adaptor
-		final BackendAdapter ba;
 		try {
-			ba = (BackendAdapter) Class.forName(
+			baToStore = (BackendAdapter) Class.forName(
 					"org.meandre.core.services.coordinator.backend."+store.getDatabaseFlavor()+"BackendAdapter"
 				).newInstance();
 			
 			// Link it to a store
-			ba.linkToService(store.getConnectionToDB(),cnf.getBasePort(), new CoordinatorServiceCallBack() {
+			baToStore.linkToService(store.getConnectionToDB(),cnf.getBasePort(), new CoordinatorServiceCallBack() {
 
 				public String getDescription() {
 					return "Meandre Server "+Constants.MEANDRE_VERSION;
@@ -366,11 +370,11 @@ public class MeandreServer {
 					} catch (MalformedURLException e) {
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
 						e.printStackTrace(new PrintStream(baos));
-						log.warning(ba.getName()+" found a malformed URL "+sURL);
+						log.warning(baToStore.getName()+" found a malformed URL "+sURL);
 					} catch (IOException e) {
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
 						e.printStackTrace(new PrintStream(baos));
-						log.warning(ba.getName()+" could not ping "+sIP+" running at port "+iPort);
+						log.warning(baToStore.getName()+" could not ping "+sIP+" running at port "+iPort);
 					}
 					return false;
 				}
@@ -378,10 +382,10 @@ public class MeandreServer {
 			});
 			
 			// Create the backend schema if needed
-			ba.createSchema();
+			baToStore.createSchema();
 			
 			// Start the service
-			ba.start();
+			baToStore.start();
 			
 		} catch (InstantiationException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
