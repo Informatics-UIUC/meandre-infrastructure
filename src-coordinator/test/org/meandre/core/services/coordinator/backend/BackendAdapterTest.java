@@ -249,6 +249,8 @@ public class BackendAdapterTest {
 			}
 			
 			// Drop the schema
+			// Remove the installed shutdown hook
+			Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
 			ba.dropSchema();
 			
 			

@@ -94,8 +94,11 @@ extends Thread {
 	/** The constant to pull the update server status query */
 	protected final static String QUERY_UPDATE_SERVER_STATUS = "UPDATE_SERVER_STATUS";
 	
-	/** The constant to pull the insert info status i */
+	/** The constant to pull the insert info status */
 	protected final static String QUERY_REGISTER_SERVER_INFO = "INSERT_SERVER_INFO";
+	
+	/** The constant to pull the update info  */
+	protected final static String QUERY_UPDATE_SERVER_INFO = "UPDATE_SERVER_INFO";
 
 	/** The constant to pull the delete server status query */
 	protected final static String QUERY_UNREGISTER_SERVER_STATUS = "DELETE_SERVER_STATUS";
@@ -232,7 +235,7 @@ extends Thread {
 			String sQueryCSLT = propQueryMapping.getProperty(QUERY_CREATE_SERVER_LOG_TABLE);
 			executeUpdateQuery(sQueryCSLT);
 			
-			registerServer();
+			registerServer(true);
 			logServerStatusEventUncommited(sServerID);
 			
 			// Commit the transaction
@@ -379,37 +382,20 @@ extends Thread {
 
 	/** Registers the server to the backend store
 	 * 
+	 * @param bCreate Create the entry if needed, update otherwise
 	 * @throws BackendAdapterException The server could not be registered
 	 */
-	public void registerServer() throws BackendAdapterException {
+	public void registerServer ( boolean bCreate ) throws BackendAdapterException {
 		
 		try {	
+			// Log the status to dirty if status was left behind
+			logServerStatusEventUncommited(STATUS_DIRTY_SHUTDOWN);
+			
 			// Update the status
 			updateServerStatus(STATUS_INITIALIZED);
 			
 			// Update the server info
-			Runtime rt = Runtime.getRuntime();
-			String sQueryICSS = propQueryMapping.getProperty(QUERY_REGISTER_SERVER_INFO);
-			String [] sNameAndIP = NetworkTools.getStringNameAndIPValue().split("/");
-			Object [] oaValues = {
-					sServerID,
-					sNameAndIP[1],
-					sNameAndIP[0],
-					iPort,
-					sDesc,
-					rt.maxMemory(),
-					rt.availableProcessors(),
-					System.getProperty("os.arch"),
-					System.getProperty("os.name"),
-					System.getProperty("os.version"),
-					System.getProperty("java.version"),
-					System.getProperty("java.vm.version"),
-					System.getProperty("java.vm.vendor"),
-					System.getProperty("user.name"),
-					System.getProperty("user.home")
-				};
-			executeUpdateQueryWithParams(sQueryICSS, oaValues);
-			
+			updateServerInfo();			
 
 			// Commit the transaction
 			if ( bTransactional ) conn.commit();
@@ -458,6 +444,79 @@ extends Thread {
 						STATUS_INITIALIZED,
 						lTimestamp,
 						Runtime.getRuntime().freeMemory()
+					};
+				executeUpdateQueryWithParams(sQueryICSS, oaValues);
+			}
+			
+			// Commit the transaction
+			if ( bTransactional ) conn.commit();
+			
+			log.fine(sServerID+" updated its status");
+			
+		} catch (SQLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Commit operation failed! "+baos.toString());
+		}
+		catch ( BackendAdapterException bae ) {
+			try {
+				// Roll it back
+				if ( bTransactional ) conn.rollback();
+				throw bae;
+			} catch (SQLException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				log.severe("Rollback operation failed! "+baos.toString());
+			}
+		}
+	}
+
+	/** Update the server status to the backend store
+	 *
+	 * @throws BackendAdapterException The server could not be registered
+	 */
+	public void updateServerInfo() throws BackendAdapterException {
+		try {
+			// Update the server status
+			Runtime rt = Runtime.getRuntime();
+			String sQueryUCSI = propQueryMapping.getProperty(QUERY_UPDATE_SERVER_INFO);
+			String [] sNameAndIP = NetworkTools.getStringNameAndIPValue().split("/");
+			Object [] oaValuesUpdate = {
+					sNameAndIP[1],
+					sNameAndIP[0],
+					iPort,
+					sDesc,
+					rt.maxMemory(),
+					rt.availableProcessors(),
+					System.getProperty("os.arch"),
+					System.getProperty("os.name"),
+					System.getProperty("os.version"),
+					System.getProperty("java.version"),
+					System.getProperty("java.vm.version"),
+					System.getProperty("java.vm.vendor"),
+					System.getProperty("user.name"),
+					System.getProperty("user.home"),
+					sServerID
+				};
+			if ( executeUpdateQueryWithParams(sQueryUCSI, oaValuesUpdate) <= 0 ) {
+				//Server does not exist
+				String sQueryICSS = propQueryMapping.getProperty(QUERY_REGISTER_SERVER_INFO);
+				Object [] oaValues = {
+						sServerID,
+						sNameAndIP[1],
+						sNameAndIP[0],
+						iPort,
+						sDesc,
+						rt.maxMemory(),
+						rt.availableProcessors(),
+						System.getProperty("os.arch"),
+						System.getProperty("os.name"),
+						System.getProperty("os.version"),
+						System.getProperty("java.version"),
+						System.getProperty("java.vm.version"),
+						System.getProperty("java.vm.vendor"),
+						System.getProperty("user.name"),
+						System.getProperty("user.home")
 					};
 				executeUpdateQueryWithParams(sQueryICSS, oaValues);
 			}
@@ -741,7 +800,7 @@ extends Thread {
 						// 1. run the update
 						
 						String sQueryUOS = propQueryMapping.getProperty(QUERY_MARK_OUTOFSYNC_SERVERS);
-						Object[] oaValues = { lUpdatePeriod };
+						Object[] oaValues = { lUpdatePeriod/100 };
 						executeUpdateQueryWithParams(sQueryUOS, oaValues);
 						
 						// Commit the transaction
