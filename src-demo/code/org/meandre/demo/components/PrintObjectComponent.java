@@ -1,5 +1,7 @@
 package org.meandre.demo.components;
 
+import java.io.PrintStream;
+
 import org.meandre.core.ComponentContext;
 import org.meandre.core.ComponentContextException;
 import org.meandre.core.ComponentContextProperties;
@@ -20,6 +22,9 @@ public class PrintObjectComponent implements ExecutableComponent {
 	/** The should the count be printed */
 	boolean bPrintCount;
 	
+	/** The print stream to use */
+	PrintStream ps = null;
+	
 	/** This method is invoked when the Meandre Flow is being prepared for 
 	 * getting run.
 	 *
@@ -39,6 +44,7 @@ public class PrintObjectComponent implements ExecutableComponent {
 		sCount = sCount.trim();
 		if ( sCount.equalsIgnoreCase("true") )
 			this.bPrintCount = true;
+		ps = ccp.getOutputConsole();
 	}
 
 	/** This method just pushes a concatenated version of the entry to the
@@ -58,9 +64,9 @@ public class PrintObjectComponent implements ExecutableComponent {
 		++lObjectsPrinted;
 		
 		if ( bPrintCount )
-			System.out.print("P"+lObjectsPrinted+"\t");
-		System.out.println(sObject);
-		System.out.flush();		
+			ps.print("P"+lObjectsPrinted+"\t");
+		ps.println(sObject);
+		ps.flush();		
 	}
 
 	/** This method is called when the Menadre Flow execution is completed.
@@ -76,6 +82,7 @@ public class PrintObjectComponent implements ExecutableComponent {
 	throws ComponentExecutionException, ComponentContextException {
 		this.lObjectsPrinted = 0;
 		this.bPrintCount = false;
+		this.ps = null;
 	}
 
 }

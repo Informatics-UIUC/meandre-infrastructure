@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -97,14 +98,15 @@ public class Conductor {
 	 *
 	 * @param qr The queryable repository containing component descriptions
 	 * @param res The resource identifying the flow to prepare for execution
+	 * @param console The output console
 	 * @return The executor object
 	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
 	 * @throws ConductorException The counductor could not create an executable flow
 	 */
-	public Executor buildExecutor(QueryableRepository qr, Resource res )
+	public Executor buildExecutor(QueryableRepository qr, Resource res, PrintStream console )
 	throws CorruptedDescriptionException, ConductorException {
 		MrProbe thdMrProbe = new MrProbe(log,new NullProbeImpl(),false,false);
-		Executor exec = buildExecutor(qr, res,thdMrProbe);
+		Executor exec = buildExecutor(qr, res,thdMrProbe,console);
 		thdMrProbe.setName(exec.getThreadGroupName()+"mr-probe");
 		exec.initWebUI(PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID()), "XStreamTest");
 		return exec;
@@ -115,12 +117,13 @@ public class Conductor {
 	 * @param qr The queryable repository containing component descriptions
 	 * @param res The resource identifying the flow to prepare for execution
 	 * @param thdMrProbe The MrProbe to use
+	 * @param console The output console
 	 * @return The executor object
 	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
 	 * @throws ConductorException The conductor could not create an executable flow
 	 */
 	@SuppressWarnings("unchecked")
-	public Executor buildExecutor(QueryableRepository qr, Resource res, MrProbe thdMrProbe)
+	public Executor buildExecutor(QueryableRepository qr, Resource res, MrProbe thdMrProbe, PrintStream console)
 	throws CorruptedDescriptionException, ConductorException {
 		// The unique execution flow ID
 		String sFlowUniqueExecutionID = res.toString()+NetworkTools.getNumericIPValue()+"/"+System.currentTimeMillis()+"/"+(Math.abs(new Random().nextInt()))+"/";
@@ -330,7 +333,8 @@ public class Conductor {
 									sResECI,
 									htInstaceProperties.get(resECI),
 									thdMrProbe,
-									cnf
+									cnf,
+									console
 								)
 						);
 				else if ( firing.equals("any") )
@@ -349,7 +353,8 @@ public class Conductor {
 									sResECI,
 									htInstaceProperties.get(resECI),
 									thdMrProbe,
-									cnf
+									cnf,
+									console
 								)
 						);
 			} catch (InterruptedException e) {

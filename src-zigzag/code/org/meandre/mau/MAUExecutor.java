@@ -171,7 +171,7 @@ public class MAUExecutor {
 			spi = new StatisticsProbeImpl();
 			MrProbe mrProbe = new MrProbe(KernelLoggerFactory.getCoreLogger(),spi,false,false);
 			conductor.setParentClassloader(this.getParentClassloader());
-			exec = conductor.buildExecutor(qr, resURI, mrProbe);
+			exec = conductor.buildExecutor(qr, resURI, mrProbe, System.out);
 			mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
 			
 			ps.flush();

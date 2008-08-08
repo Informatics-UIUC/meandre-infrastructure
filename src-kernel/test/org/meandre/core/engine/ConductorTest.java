@@ -36,7 +36,7 @@ public class ConductorTest {
 			QueryableRepository qr) throws CorruptedDescriptionException,
 			ConductorException {
 		// Create the execution
-		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next());
+		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), System.out);
 		// Redirect the output
 		PrintStream psOut = System.out;
 		PrintStream psErr = System.err;
@@ -68,7 +68,7 @@ public class ConductorTest {
 			QueryableRepository qr) throws CorruptedDescriptionException,
 			ConductorException {
 		// Create the execution
-		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next());
+		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), System.out);
 		// Redirect the output
 		PrintStream psOut = System.out;
 		PrintStream psErr = System.err;
@@ -101,13 +101,13 @@ public class ConductorTest {
 	private void runHelloWorldMoreHetereogenousFlow(Conductor conductor,
 			QueryableRepository qr) throws CorruptedDescriptionException,
 			ConductorException {
-		// Create the execution
-		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next());
 		// Redirect the output
 		PrintStream psOut = System.out;
 		PrintStream psErr = System.err;
 		ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
 		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
+		// Create the execution
+		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), new PrintStream(baosOut));
 		System.setOut(new PrintStream(baosOut));
 		System.setErr(new PrintStream(baosErr));
 		exec.execute(exec.initWebUI(1706,Math.random()+""));
@@ -210,7 +210,7 @@ public class ConductorTest {
 			RepositoryImpl qr = new RepositoryImpl(model);
 			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
 			// Create the execution
-			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next()));
+			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),System.out));
 					
 		} catch (CorruptedDescriptionException e) {
 			fail("Corrupted description encounterd: "+e);
@@ -233,7 +233,7 @@ public class ConductorTest {
 			RepositoryImpl qr = new RepositoryImpl(model);
 			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
 			// Create the execution
-			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next()));
+			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),System.out));
 			
 		} catch (CorruptedDescriptionException e) {
 			fail("Corrupted description encounterd: "+e);
@@ -256,7 +256,7 @@ public class ConductorTest {
 			QueryableRepository qr = new RepositoryImpl(model);
 			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
 			// Create the execution
-			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next()));
+			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),System.out));
 				
 		} catch (CorruptedDescriptionException e) {
 			fail("Corrupted description encounterd: "+e);

@@ -1,6 +1,7 @@
 package org.meandre.core;
 
 
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -28,10 +29,6 @@ import org.meandre.webui.WebUIFragmentCallback;
 /** This class implement the component context for executable components.
  *
  * @author Xavier Llor&agrave;
- * @last-modified: Amit Kumar -added the getter for sFlowUniqueExecutionID
- * @last-modified: Amit Kumar -added support for flowID
- * @last-mofified: Amit Kumar -added support for getPlugin
- *
  *
  */
 public class ComponentContextImpl
@@ -93,9 +90,10 @@ implements ComponentContext {
 
 	/** The wrapped component parent */
 	private CoreConfiguration ccCnf = null;
+
+	/** The output console for the flow */
+	private PrintStream console = null;
 	
-
-
 	/** Create a component context with the given input and output active buffers
 	 * for a given wrapped component.
 	 *
@@ -109,6 +107,7 @@ implements ComponentContext {
 	 * @param htProperties The component properties
 	 * @param thdMrProbe The MrProbe thread
 	 * @param cnf The core configuration
+	 * @param console The output console
 	 */
 	public ComponentContextImpl(String sFlowUniqueID,String flowID,
 			String sComponentInstanceID, Set<ActiveBuffer> setInputs,
@@ -119,7 +118,8 @@ implements ComponentContext {
 			Hashtable<String, String> htProperties,
 			MrProbe thdMrProbe,
 			WrappedComponent wc,
-			CoreConfiguration cnf ) {
+			CoreConfiguration cnf,
+			PrintStream console) {
 
 		// Create the data proxy
 		this.sFlowUniqueExecutionID = sFlowUniqueID;
@@ -128,6 +128,7 @@ implements ComponentContext {
 		this.thdMrProbe = thdMrProbe;
 		this.wcParent = wc;
 		this.ccCnf = cnf;
+		this.console = console;
 
 		this.htInputLogicNameMap = htInputLogicNameMap;
 		this.htOutputLogicNameMap = htOutputLogicNameMap;
@@ -432,10 +433,20 @@ implements ComponentContext {
 	/**Returns the plugin or null if there was a failure initing
 	 * the plugin
 	 * 
+	 * @param id The plugin id
+	 * @return The Meandre plugin
 	 */
 	public MeandrePlugin getPlugin(String id) {
 		PluginFactory  pluginFactory = PluginFactory.getPluginFactory(ccCnf);
 		MeandrePlugin mp=pluginFactory.getPlugin(id);
 		return mp;
+	}
+	
+	/** Returns the output console for the flow.
+	 * 
+	 * @return The output console
+	 */
+	public PrintStream getOutputConsole() {
+		return console;
 	}
 }

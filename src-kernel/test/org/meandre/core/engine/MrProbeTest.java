@@ -110,35 +110,35 @@ public class MrProbeTest {
 			
 			// Basic test running the NullProbeImpl
 			Conductor conductor = new Conductor(10,cnf);
-			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next());
+			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), System.out);
 			runExecutor(exec);
 
 			// Basic test running basic provenance to an RDF model
 			MeandreRDFDialectProbeImpl rdfModProbe = new MeandreRDFDialectProbeImpl();
 			MrProbe mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,false,false);
 			conductor = new Conductor(10,cnf);
-			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, System.out);
 			runExecutor(exec);
 
 			// Basic test running basic provenance and data serialization to an RDF model
 			rdfModProbe = new MeandreRDFDialectProbeImpl();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,true,false);
 			conductor = new Conductor(10,cnf);
-			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, System.out);
 			runExecutor(exec);
 
 			// Basic test running state storage provenance to an RDF model
 			rdfModProbe = new MeandreRDFDialectProbeImpl();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,false,true);
 			conductor = new Conductor(10,cnf);
-			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, System.out);
 			runExecutor(exec);
 
 			// Basic test running state storage provenance to an RDF model
 			rdfModProbe = new MeandreRDFDialectProbeImpl();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,true,true);
 			conductor = new Conductor(10,cnf);
-			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, System.out);
 			runExecutor(exec);
 			
 			// Model mod = rdfModProbe.getModel();
@@ -164,7 +164,7 @@ public class MrProbeTest {
 			Conductor conductor = new Conductor(10,cnf);
 			StatisticsProbeImpl spi = new StatisticsProbeImpl();
 			MrProbe mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),spi,false,false);
-			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
+			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, System.out);
 			runExecutor(exec);
 			
 			// Test the stats are there
@@ -253,7 +253,7 @@ public class MrProbeTest {
 			QueryableRepository qr = new RepositoryImpl(model);
 			CoreConfiguration cnf = new CoreConfiguration();
 			Conductor cnd = new Conductor(10,cnf);
-			Executor exec = cnd.buildExecutor(qr, qr.getAvailableFlowDescriptions().iterator().next().getFlowComponent());
+			Executor exec = cnd.buildExecutor(qr, qr.getAvailableFlowDescriptions().iterator().next().getFlowComponent(), System.out);
 			WrappedComponent wc = exec.getWrappedComponents().iterator().next();
 			// Run the tests
 			//String rands=Math.random()+"";

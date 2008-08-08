@@ -128,12 +128,12 @@ public class WSExecuteLogic {
 				StatisticsProbeImpl spi = null;
 				try {
 					if ( !bStats ){
-						exec = conductor.buildExecutor(qr, resURI);
+						exec = conductor.buildExecutor(qr, resURI,pw);
 					}
 					else {
 						spi = new StatisticsProbeImpl();
 						MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),spi,false,false);
-						exec = conductor.buildExecutor(qr, resURI, mrProbe);
+						exec = conductor.buildExecutor(qr, resURI, mrProbe,pw);
 						mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
 					}
 					pw.flush();
@@ -315,11 +315,11 @@ public class WSExecuteLogic {
 				Executor exec = null;
 
 				// Redirecting the output
-				PrintStream psOUT = System.out;
-				PrintStream psERR = System.err;
+				//PrintStream psOUT = System.out;
+				//PrintStream psERR = System.err;
 
 				try {
-					exec = conductor.buildExecutor(qr, resURI);
+					exec = conductor.buildExecutor(qr, resURI,pw);
 
 					// Redirecting the streamers
 					System.setOut(pw);
@@ -388,8 +388,8 @@ public class WSExecuteLogic {
 				}
 
 				// Reset the output redirection
-				System.setOut(psOUT);
-				System.setErr(psERR);
+				//System.setOut(psOUT);
+				//System.setErr(psERR);
 			}
 
 		}

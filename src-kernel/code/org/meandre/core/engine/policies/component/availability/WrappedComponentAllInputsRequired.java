@@ -1,5 +1,6 @@
 package org.meandre.core.engine.policies.component.availability;
 
+import java.io.PrintStream;
 import java.util.Hashtable;
 import java.util.Set;
 
@@ -40,6 +41,7 @@ public class WrappedComponentAllInputsRequired extends WrappedComponent {
 	 * @param htProperties The component properties
 	 * @param thdMrProbe The MrProbe thread
 	 * @param cnf The core configuration object
+	 * @param console The output console
 	 * @throws InterruptedException The semaphore could not be adquired twice
 	 */
 	public WrappedComponentAllInputsRequired(String sFlowUniqueID,String flowID,
@@ -49,9 +51,9 @@ public class WrappedComponentAllInputsRequired extends WrappedComponent {
 			Hashtable<String, String> htInputLogicNameMap,
 			Hashtable<String, String> htOutputLogicNameMap, ThreadGroup tg,
 			String sThreadName, Hashtable<String, String> htProperties, MrProbe thdMrProbe,
-			CoreConfiguration cnf)
+			CoreConfiguration cnf, PrintStream console )
 			throws InterruptedException {
-		super(sFlowUniqueID,flowID, sComponentInstanceID, ec, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, tg, sThreadName, htProperties, thdMrProbe, cnf);
+		super(sFlowUniqueID,flowID, sComponentInstanceID, ec, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, tg, sThreadName, htProperties, thdMrProbe, cnf, console);
 
 		this.bFirst = true;
 	}

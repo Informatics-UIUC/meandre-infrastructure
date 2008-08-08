@@ -97,14 +97,15 @@ extends Thread {
 			Hashtable<String, String> htInputLogicNameMap,
 			Hashtable<String, String> htOutputLogicNameMap, ThreadGroup tg,
 			String sThreadName, Hashtable<String, String> htProperties, MrProbe thdMrProbe, 
-			CoreConfiguration cnf )
+			CoreConfiguration cnf,
+			PrintStream console )
 			throws InterruptedException {
 		super(tg,sThreadName);
 
 		// Basic initialization
 		this.ec            = ec;
 		this.semBlocking   = new Semaphore(1,true); // With fairness
-		this.cc            = new ComponentContextImpl(sFlowUniqueID,flowID,sComponentInstanceID, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, htProperties, thdMrProbe, this, cnf);
+		this.cc            = new ComponentContextImpl(sFlowUniqueID,flowID,sComponentInstanceID, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, htProperties, thdMrProbe, this, cnf, console);
 		this.hasNInputs     = htInputLogicNameMap.size();
 		// Setting execution flags
 		this.baStatusFlags = new boolean [4];
