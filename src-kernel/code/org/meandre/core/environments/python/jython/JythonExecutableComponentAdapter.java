@@ -27,6 +27,7 @@ implements ExecutableComponent, ScriptingEnvironmentAdapter {
 		fp.mkdir();
 		Properties props = new Properties();
 		props.setProperty("python.path", fp.toString());
+		props.setProperty("python.home", fp.toString());
 		PythonInterpreter.initialize(System.getProperties(), props,
 		                             new String[] {""});
 	}
