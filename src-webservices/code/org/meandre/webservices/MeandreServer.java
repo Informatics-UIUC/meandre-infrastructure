@@ -41,6 +41,7 @@ import org.mortbay.jetty.security.HashUserRealm;
 import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
+import org.mortbay.thread.BoundedThreadPool;
 
 
 /**
@@ -50,6 +51,15 @@ import org.mortbay.jetty.servlet.ServletHolder;
  *
  */
 public class MeandreServer {
+
+	/** Maximum jetty thread idle time */
+	private static final int MAXIMUM_JETTY_THREAD_IDLE_TIME = 3000000;
+
+	/** Maximum number of jetty theads */
+	private static final int MAXIMUM_NUMBER_OF_JETTY_THREADS = 256;
+
+	/** Minimum number of jetty threads */
+	private static final int MINIMUM_NUMBER_OF_JETTY_THREADS = 32;
 
 	/** The rate at which the realm sync file will be kept synchronized with the store */
 	private static final int SECURITY_REALM_SYNC = 20000;
@@ -201,6 +211,13 @@ public class MeandreServer {
 		
 		server = new Server(cnf.getBasePort());
 
+		// Overwrite the default thread pool
+		BoundedThreadPool tp = new BoundedThreadPool();
+		tp.setMinThreads(MINIMUM_NUMBER_OF_JETTY_THREADS);
+		tp.setMaxThreads(MAXIMUM_NUMBER_OF_JETTY_THREADS);
+		tp.setMaxIdleTimeMs(MAXIMUM_JETTY_THREAD_IDLE_TIME);
+		server.setThreadPool(tp);
+		
 		// Initialize global file server
 		PluginFactory pf = PluginFactory.getPluginFactory(cnf);
 		pf.initializeGlobalPublicFileServer(server,log);
