@@ -1,5 +1,11 @@
 1.4.0-vcli-alpha Sara
 
+* Identified and fixed a potential concurrent problem with the consoles and the interactive run facility
+
+* Modified the engine to work with per flow output consoles
+
+* Added a console output call to the ComponentContext properties to isolate consoles during run time
+
 * Hooked the back end adapter to the meandre server
 
 * Added a properties table that gets read everytime and status update by the service is preformed.
