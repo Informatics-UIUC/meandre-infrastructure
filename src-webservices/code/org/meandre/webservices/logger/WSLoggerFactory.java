@@ -7,7 +7,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.core.logger.MeandreCoordinatorFormatter;
+import org.meandre.core.logger.MeandreFormatter;
 
 
 
@@ -38,18 +38,18 @@ public class WSLoggerFactory {
 		try {
 			new File("."+File.separator+"log").mkdir();
 			handlerWS = new FileHandler("."+File.separator+"log"+File.separator+"meandre-webservices.log",LOG_FILE_SIZE,LOG_NUM_ROTATING_FILES);
-			handlerWS.setFormatter(new MeandreCoordinatorFormatter());
+			handlerWS.setFormatter(new MeandreFormatter());
 			logWS.addHandler(handlerWS);
 			Logger logger=logWS.getParent();
 			if(logger!=null){
 				Handler[] handlerList=logger.getHandlers();
 				for(int i=0;i< handlerList.length;i++){
-					handlerList[i].setFormatter(new MeandreCoordinatorFormatter());
+					handlerList[i].setFormatter(new MeandreFormatter());
 				}	
 			}
 			Handler[] handlerList=logWS.getHandlers();
 			for(int i=0;i< handlerList.length;i++){
-				handlerList[i].setFormatter(new MeandreCoordinatorFormatter());
+				handlerList[i].setFormatter(new MeandreFormatter());
 			}
 		} catch (SecurityException e) {
 			System.err.println("Could not initialize "+"."+File.separator+"log"+File.separator+"meandre-webservices.log");

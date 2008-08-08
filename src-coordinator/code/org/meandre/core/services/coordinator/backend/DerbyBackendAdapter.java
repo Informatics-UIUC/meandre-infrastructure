@@ -12,7 +12,7 @@ import org.meandre.core.logger.KernelLoggerFactory;
 /** Implements the Derby backend adapter. This adapter translates
  * the requests into the proper Derby friendly queries.
  * 
- * @author Xavier Llorˆ
+ * @author Xavier Llor&agrave;
  *
  */
 public class DerbyBackendAdapter 

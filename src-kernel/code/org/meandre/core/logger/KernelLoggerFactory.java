@@ -33,18 +33,18 @@ public class KernelLoggerFactory {
 		try {
 			new File("."+File.separator+"log").mkdir();
 			handlerCore = new FileHandler("."+File.separator+"log"+File.separator+"meandre-kernel.log",LOG_FILE_SIZE,LOG_NUM_ROTATING_FILES);
-			handlerCore.setFormatter(new MeandreCoordinatorFormatter());
+			handlerCore.setFormatter(new MeandreFormatter());
 			logCore.addHandler(handlerCore);
 			Logger logger=logCore.getParent();
 			if(logger!=null){
 				Handler[] handlerList=logger.getHandlers();
 				for(int i=0;i< handlerList.length;i++){
-					handlerList[i].setFormatter(new MeandreCoordinatorFormatter());
+					handlerList[i].setFormatter(new MeandreFormatter());
 				}	
 			}
 			Handler[] handlerList=logCore.getHandlers();
 			for(int i=0;i< handlerList.length;i++){
-				handlerList[i].setFormatter(new MeandreCoordinatorFormatter());
+				handlerList[i].setFormatter(new MeandreFormatter());
 			}
 		} catch (SecurityException e) {
 			System.err.println("Could not initialize "+"."+File.separator+"log"+File.separator+"meandre-kernel.log");

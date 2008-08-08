@@ -12,7 +12,7 @@ import java.util.logging.LogRecord;
  * Created on Jul 18, 2008 11:53:22 PM
  *
  */
-public class MeandreCoordinatorFormatter extends Formatter {
+public class MeandreFormatter extends Formatter {
 	
 	/** The maximum lenght of a thread name */
 	private final static int MAX_THREAD_NAME_LENGTH = 40;
