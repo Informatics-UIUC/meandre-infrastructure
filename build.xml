@@ -76,6 +76,7 @@
                 <include name="**/*.properties"/>
                 <include name="**/*.xml"/>
                 <include name="**/*.xlst"/>
+                <include name="**/*.xls"/>
                 <include name="**/*.png"/>
                 <include name="**/*.gif"/>
                 <include name="**/*.jpg"/>
