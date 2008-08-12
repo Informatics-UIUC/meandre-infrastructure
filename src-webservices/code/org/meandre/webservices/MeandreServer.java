@@ -59,7 +59,7 @@ public class MeandreServer {
 	private static final int MAXIMUM_NUMBER_OF_JETTY_THREADS = 256;
 
 	/** Minimum number of jetty threads */
-	private static final int MINIMUM_NUMBER_OF_JETTY_THREADS = 32;
+	private static final int MINIMUM_NUMBER_OF_JETTY_THREADS = 6;
 
 	/** The rate at which the realm sync file will be kept synchronized with the store */
 	private static final int SECURITY_REALM_SYNC = 20000;
@@ -291,6 +291,7 @@ public class MeandreServer {
 		String sJettyHome = System.getProperty("jetty.home");
 		sJettyHome = (sJettyHome==null)?MEANDRE_HOME:sJettyHome;
 
+		// Setup the security sync service
 		final SecurityHandler sh = new SecurityHandler();
 		HashUserRealm hur = new HashUserRealm("Meandre Flow Execution Engine",store.getRealmFilename());
 		sh.setUserRealm(hur);

@@ -80,8 +80,8 @@ public class WebUI {
 	 */
 	public void shutdown() throws Exception {
 		try{
-		this.server.stop();
-		this.server.getGracefulShutdown();
+			this.server.stop();
+			this.server.getGracefulShutdown();
 		}catch(Exception ex){
 			throw new Exception(ex);
 		}finally{

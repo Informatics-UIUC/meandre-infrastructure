@@ -83,8 +83,7 @@ public class Executor {
 		}
 		
 		try {
-			if ( webui!=null )
-				WebUIFactory.disposeWebUI(sFlowUniqueExecutionID);
+			WebUIFactory.disposeWebUI(sFlowUniqueExecutionID);
 		} catch (WebUIException e) {
 			log.warning("WebUI could not be stoped: "+e.getMessage());
 		}

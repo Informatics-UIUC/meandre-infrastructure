@@ -70,7 +70,7 @@ public class WebUIFactory {
 	 * @param sFlowUniqueID The flow execution unique ID
 	 * @throws WebUIException The server could not be shuted down
 	 */
-	static public void disposeWebUI (  String sFlowUniqueID ) throws WebUIException {
+	static public void disposeWebUI ( String sFlowUniqueID ) throws WebUIException {
 		WebUI webui = htActiveWebUI.get(sFlowUniqueID);
 		
 		if ( webui!=null ) {

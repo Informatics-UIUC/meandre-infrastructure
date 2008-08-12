@@ -170,7 +170,7 @@ public class WSExecuteLogic {
 					pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
 					pw.println("----------------------------------------------------------------------------");
 					pw.flush();
-					WebUI webui=exec.initWebUI(nextPort,token);
+					WebUI webui = exec.initWebUI(nextPort,token);
 					exec.execute(webui);
 					pw.flush();
 					pw.println("----------------------------------------------------------------------------");
@@ -352,7 +352,7 @@ public class WSExecuteLogic {
 					/**/
 					// this is where the server actually starts -so populate the hashtable before
 					// starting the server as that takes a bit of time
-					WebUI webui=exec.initWebUI(nextPort,token);
+					WebUI webui = exec.initWebUI(nextPort,token);
 					exec.execute(webui);
 					pw.flush();
 

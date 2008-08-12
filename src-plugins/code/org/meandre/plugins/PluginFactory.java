@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Date;
 import java.util.HashMap;
@@ -47,6 +49,12 @@ public class PluginFactory {
 	/** The core configuration object */
 	private CoreConfiguration cnf;
 
+	/** Files to transfer to the public directory */
+	private String [] saResources = { "logo-meandre.gif" };
+	
+	/** The target directory insed the public resources dir */
+	private String sRescoureDesctination = "system/";
+		
 	/** Creates an unitialized plugin factory and avoids other to instantiate it.
 	 *
 	 */
@@ -145,9 +153,32 @@ public class PluginFactory {
 				ps.println("This directory contains all the publicly available implementations for the Meandre components.");
 				ps.println();
 				ps.println("Created on "+new Date());
+				
 				log.warning("The resource directory does not exist - creating a new one...");
+				
 			} catch (FileNotFoundException e) {
 				log.warning("Could not create the resource directory");
+			}
+		}
+		
+		File fileResDir = new File(file.getAbsolutePath()+File.separator+sRescoureDesctination);
+		if  ( fileResDir.mkdir() )  {
+			try {
+				for ( String sFile:saResources ) {
+					InputStream fis = PluginFactory.class.getResourceAsStream(sFile);
+					FileOutputStream fos = new FileOutputStream(fileResDir.getAbsolutePath()+File.separator+sFile);
+					int iTmp;
+					while ( (iTmp=fis.read())!=-1 )
+						fos.write(iTmp);
+					fos.close();
+					fis.close();
+				}
+				
+				log.warning("The system resources missing. Adding them...");
+			} catch (FileNotFoundException e) {
+				log.warning("Could not create the resource directory");
+			} catch (IOException e) {
+				log.warning("Could not unpack public system resources");
 			}
 		}
 
