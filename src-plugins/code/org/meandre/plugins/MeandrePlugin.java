@@ -3,6 +3,8 @@ package org.meandre.plugins;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import org.meandre.configuration.CoreConfiguration;
+
 /**Interface implemented by the plugins
  *
  * @author Amit Kumar
@@ -68,4 +70,10 @@ public interface MeandrePlugin {
 	 * @return
 	 */
 	public boolean isInited();
+	
+	/** Sets the core configuration object to use.
+	 * 
+	 * @param cnf The core configuration object
+	 */
+	public void setCoreConfiguration ( CoreConfiguration cnf );
 }

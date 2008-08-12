@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.meandre.configuration.CoreConfiguration;
 import org.meandre.plugins.MeandrePlugin;
 
 import de.schlichtherle.io.File;
@@ -24,6 +25,7 @@ import de.schlichtherle.io.FileInputStream;
  * @author Amit Kumar
  * Created on Oct 25, 2007 1:00:45 AM
  * @modified for the core on Feb 23rd 2008
+ * @modified by Xavier Llor&agrave; to fix the directory mismatch + add the setCoreConfig method
  *
  */
 public class VFSServlet  
@@ -34,7 +36,7 @@ implements MeandrePlugin{
 	private static final long serialVersionUID = 1L;
 
 	/** Location of the vfs files*/
-	private static  String PUBLIC_RESOURCES_DIR = "resources/public";
+	private static  String PUBLIC_RESOURCES_DIR = "mnt";
 	
 	/** Unknow mime type */
 	public static final String UNKNOWN_MIME_TYPE = "application/x-unknown-mime-type";
@@ -51,7 +53,12 @@ implements MeandrePlugin{
 	/** Get the plugin logger */
 	protected Logger log;
 	
-	private Boolean inited;
+	/** Flag of already initiated */
+	private Boolean bInited;
+	
+	/** Core configuration object */
+	@SuppressWarnings("unused")
+	private CoreConfiguration cnf = new CoreConfiguration();
 
 	/** Sets the pluggin logger 
 	 * 
@@ -59,6 +66,15 @@ implements MeandrePlugin{
 	 */
 	public void setLogger ( Logger log ) {
 		this.log = log;
+	}
+	
+	
+	/** Sets the core configuration object to use.
+	 * 
+	 * @param cnf The core configuration object
+	 */
+	public void setCoreConfiguration ( CoreConfiguration cnf ) {
+		this.cnf = cnf;
 	}
 	
 	/**Initialize the property file
@@ -255,14 +271,14 @@ implements MeandrePlugin{
 	}
 
 	public void inited(Boolean success) {
-		this.inited= success;
+		this.bInited= success;
 	}
 
 	/**Return the status of the plugin
 	 * 
 	 */
 	public boolean isInited() {
-		return inited;
+		return bInited;
 	}
 	
 	/**This is a servlet not a filter

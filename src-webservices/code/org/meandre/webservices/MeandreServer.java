@@ -140,11 +140,10 @@ public class MeandreServer {
 		
 	}
 	
-	/**
-	 * creates (or uses) a default installation in the given install dir
+	/** Creates (or uses) a default installation in the given install directory
 	 * running on the given port.  
-	 * @param port
-	 * @param sInstallDir
+	 * @param port The port
+	 * @param sInstallDir The directory
 	 */
 	public MeandreServer(int port, String sInstallDir){
         log = WSLoggerFactory.getWSLogger();

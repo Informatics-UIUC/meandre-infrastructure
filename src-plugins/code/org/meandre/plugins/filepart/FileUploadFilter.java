@@ -19,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import org.meandre.configuration.CoreConfiguration;
 import org.meandre.plugins.MeandrePlugin;
 import org.mortbay.servlet.MultiPartFilter;
 
@@ -29,6 +30,19 @@ public class FileUploadFilter extends MultiPartFilter implements MeandrePlugin{
 
 	boolean inited= Boolean.FALSE;
 	String alias = "/*";
+
+	/** Core configuration object */
+	@SuppressWarnings("unused")
+	private CoreConfiguration cnf = new CoreConfiguration();
+
+	
+	/** Sets the core configuration object to use.
+	 * 
+	 * @param cnf The core configuration object
+	 */
+	public void setCoreConfiguration ( CoreConfiguration cnf ) {
+		this.cnf = cnf;
+	}
 
 
 	public void init(FilterConfig filterConfig)  throws ServletException{

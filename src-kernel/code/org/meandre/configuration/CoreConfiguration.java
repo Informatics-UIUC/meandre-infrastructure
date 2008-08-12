@@ -114,7 +114,7 @@ public class CoreConfiguration {
 	            fos.close();
 	            
 	            // Create the run file
-	            new File(getRunResourcesDirectory()).mkdir();
+	            new File(getPublicResourcesDirectory()).mkdir();
 	            new File(getRunResourcesDirectory()).mkdir();
 	
 	        }

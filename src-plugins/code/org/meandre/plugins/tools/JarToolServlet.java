@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.meandre.configuration.CoreConfiguration;
 import org.meandre.plugins.MeandrePlugin;
 
 /**This plugin reads the jar file and returns attributes for
@@ -30,6 +31,7 @@ import org.meandre.plugins.MeandrePlugin;
  * @author Amit Kumar
  * Created on Mar 30, 2008 6:46:54 PM
  * -Used by the eclipse plugin
+ * @modified by Xavier Llor&agrave; to fix the directory mismatch + add the setCoreConfig method
  */
 public class JarToolServlet extends HttpServlet 
 implements MeandrePlugin{
@@ -45,15 +47,28 @@ implements MeandrePlugin{
 	// the directory where java jars are stored
 	private static  String PLUGIN_JAR_DIR = "published_resources"+File.separator+"contexts"+File.separator+"java"; 
 			
-	
 	//alias path
 	private String aliasPath = "/plugins/jar/*";
 
 	/** Get the plugin logger */
 	protected Logger log;
 	
-	private boolean inited = Boolean.FALSE;
+	private boolean bInited = Boolean.FALSE;
 	
+
+	/** Core configuration object */
+	@SuppressWarnings("unused")
+	private CoreConfiguration cnf = new CoreConfiguration();
+
+	
+	/** Sets the core configuration object to use.
+	 * 
+	 * @param cnf The core configuration object
+	 */
+	public void setCoreConfiguration ( CoreConfiguration cnf ) {
+		this.cnf = cnf;
+	}
+
 	public void init() throws ServletException{
 		log.fine("Initing the JarToolServlet...");
 	}
@@ -237,7 +252,7 @@ implements MeandrePlugin{
 }
 
 	public void inited(Boolean success) {
-		this.inited = success;
+		this.bInited = success;
 	}
 
 
@@ -245,7 +260,7 @@ implements MeandrePlugin{
 	 * 
 	 */
 	public boolean isInited() {
-		return inited;
+		return bInited;
 	}
 
 	/**This is a servlet not a filter
