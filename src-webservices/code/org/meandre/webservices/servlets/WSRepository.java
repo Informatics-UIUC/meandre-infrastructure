@@ -1077,7 +1077,8 @@ public class WSRepository extends HttpServlet {
 			HttpServletResponse response, String sTarget, String sExtension) throws IOException {
 
 		if ( sExtension.endsWith("txt") ) {
-			if ( wsRepositoryLogic.regenerateRepository(request.getRemoteUser()) ) {
+			URL urlRequest = new URL(request.getRequestURL().toString());
+			if ( wsRepositoryLogic.regenerateRepository(request.getRemoteUser(),urlRequest.getProtocol(),urlRequest.getHost(),urlRequest.getPort()) ) {
 				//
 				// Repository successfully regenerated
 				//

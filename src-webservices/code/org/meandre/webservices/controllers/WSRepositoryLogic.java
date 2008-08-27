@@ -24,11 +24,11 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.meandre.configuration.CoreConfiguration;
-import org.meandre.core.store.Store;
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
+import org.meandre.core.store.Store;
 import org.meandre.core.store.system.SystemStore;
 import org.meandre.webservices.logger.WSLoggerFactory;
 
@@ -72,10 +72,13 @@ public class WSRepositoryLogic {
 	/** Regenerates a user repository using the current locations for the user.
 	 *
 	 * @param sUser The system store user
+	 * @param sPort The port used for the request
+	 * @param sHost The host name
+	 * @param sProtocol The protocol
 	 * @param sLocation The location to remove
 	 * @return True if the location could be successfully removed
 	 */
-	public boolean regenerateRepository(String sUser) {
+	public boolean regenerateRepository(String sUser, String sProtocol, String sHost, int sPort) {
 		boolean bRes = true;
 
 		//
@@ -113,18 +116,38 @@ public class WSRepositoryLogic {
 				else
 					modelTmp.read(url.openStream(),null);
 
-				//
-				// Test the location
-				//
-				new RepositoryImpl(modelTmp);
+				QueryableRepository qrNew = new RepositoryImpl(modelTmp);
+				
+				// Adding flows
+				Model modUser = qr.getModel();
+				modUser.begin();
+				for ( Resource resFlow:qrNew.getAvailableFlows() ) {
+					if ( qr.getFlowDescription(resFlow)==null ) {
+						// Component does not exist
+						modUser.add(qrNew.getFlowDescription(resFlow).getModel());
+					}
+					else {
+						// Flow does exist
+						log.warning("Flow "+resFlow+" already exist in "+sUser+" repository. Discarding it.");
+					}
+				}
 
-				//
-				// If now exception was thrown, add the location to the list
-				// and update the user repository
-				//
-				mod.begin();
-				mod.add(modelTmp);
-				mod.commit();
+				// Adding the components after adding the contexts
+				for ( ExecutableComponentDescription ecd:qrNew.getAvailableExecutableComponentDescriptions()) {
+					if ( qr.getExecutableComponentDescription(ecd.getExecutableComponent())!=null ) {
+						// Component does exist
+						log.warning("Discarding existing component "+ecd.getExecutableComponent()+".");
+					}
+					else {
+						modUser.add(ecd.getModel());
+					}
+				}
+				//Commiting changes
+				modUser.commit();
+				
+				// Refresh the cache
+				qr.refreshCache();
+				
 			}
 			catch ( Exception e ) {
 				log.warning("WSRepositoryLogic: Failed to load location\n"+e.toString());
