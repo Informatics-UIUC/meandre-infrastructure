@@ -31,7 +31,7 @@ extends BackendAdapter {
 		} catch (Exception e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
-			KernelLoggerFactory.getCoreLogger().severe("Derby query map missing! "+baos.toString());
+			KernelLoggerFactory.getCoreLogger().severe("MySQL query map missing! "+baos.toString());
 		}
 	}
 
