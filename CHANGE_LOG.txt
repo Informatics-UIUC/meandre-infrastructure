@@ -1,5 +1,7 @@
 1.4.0-vcli-alpha Sara
 
+* Revamped the backend adapters to allow the proper schema creation for Derby
+
 * Added method to the plugin interface
 
 	/** Sets the core configuration object to use.
