@@ -134,16 +134,16 @@ extends Thread {
 	protected final static String QUERY_SELECT_FAILED_UPDATE_COUNTS = "SELECT_FAILED_UPDATE_COUNTS";
 	
 	/** The connection to the data base backend */
-	private Connection conn = null;
+	protected Connection conn = null;
 
 	/** True if the connection is not on auto commit */
-	private boolean bTransactional = false;
+	protected boolean bTransactional = false;
 	
 	/** The port where the coordinated service runs */
 	private int iPort = -1;
 	
 	/** The server ID */
-	private String sServerID = null;
+	protected String sServerID = null;
 	
 	/** The service description */
 	private String sDesc = null;
@@ -164,7 +164,7 @@ extends Thread {
 	private Properties propsServer = new Properties();
 
 	/** The logger to use */
-	private Logger log = null;
+	protected Logger log = null;
 
 	/** The coordinated service call back interface */
 	private CoordinatorServiceCallBack aspcbCallBack;
@@ -233,64 +233,7 @@ extends Thread {
 	 * 
 	 * @throws BackendAdapterException Thrown when the connection to the back end could not be retrieved
 	 */
-	public void createSchema() 
-	throws BackendAdapterException {
-		
-		try {
-			// Create the server status table
-			String sQueryCSST = propQueryMapping.getProperty(QUERY_CREATE_SERVER_STATUS_TABLE);
-			executeUpdateQuery(sQueryCSST);
-			
-			// Create the server info table
-			String sQueryCSIT = propQueryMapping.getProperty(QUERY_CREATE_SERVER_INFO_TABLE);
-			executeUpdateQuery(sQueryCSIT);
-
-			// Create the server properties table
-			String sQueryCSPT = propQueryMapping.getProperty(QUERY_CREATE_SERVER_PROPERTIES_TABLE);
-			executeUpdateQuery(sQueryCSPT);
-			
-			// Create the server log table
-			String sQueryCSLT = propQueryMapping.getProperty(QUERY_CREATE_SERVER_LOG_TABLE);
-			executeUpdateQuery(sQueryCSLT);
-			
-			registerServer(true);
-			logServerStatusEventUncommited(sServerID,STATUS_INITIALIZED);
-			
-			// Commit the transaction
-			if ( bTransactional ) conn.commit();
-			
-			// Insert the default properties to the the properties table
-			try {
-				String sQueryCSPI = propQueryMapping.getProperty(QUERY_INSERT_DEFAULT_SERVER_PROPERTIES);
-				executeUpdateQuery(sQueryCSPI);
-				// Commit the transaction
-				if ( bTransactional ) conn.commit();
-			}
-			catch ( BackendAdapterException bae ) {
-				// Roll it back
-				if ( bTransactional ) conn.rollback();
-				log.warning(getName()+" found that default properties are already defined. Skipping adding them again");
-			}
-			
-			log.fine(sServerID+" created schema");
-			
-		} catch (SQLException e) {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			e.printStackTrace(new PrintStream(baos));
-			log.severe("Commit operation failed! "+baos.toString());
-		}
-		catch ( BackendAdapterException bae ) {
-			try {
-				// Roll it back
-				if ( bTransactional ) conn.rollback();
-				throw bae;
-			} catch (SQLException e) {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				e.printStackTrace(new PrintStream(baos));
-				log.severe("Rollback operation failed! "+baos.toString());
-			}
-		}
-	}
+	public abstract void createSchema() throws BackendAdapterException ;
 	
 	/** Deletes the tables created after the schema.
 	 * 
@@ -386,7 +329,7 @@ extends Thread {
 			ResultSet rs = stm.executeQuery(sQuery);
 			propsServer.clear();
 			while ( rs.next() ) {
-				propsServer.put(rs.getString(1), rs.getObject(2).toString());
+				propsServer.put(rs.getString(1).toString().trim(), rs.getObject(2).toString().trim());
 			}
 			// Update the properties
 			lUpdatePeriod = Long.parseLong(propsServer.getProperty(PROP_HEARTBEAT_RATE));
@@ -699,7 +642,7 @@ extends Thread {
 	 * @param sQuery The query to run the update
 	 * @throws BackendAdapterException Thrown when there was a problem with the backend running the update
 	 */
-	private void executeUpdateQuery(String sQuery)
+	protected void executeUpdateQuery(String sQuery)
 	throws BackendAdapterException {
 		
 		// Run the update
@@ -876,7 +819,7 @@ extends Thread {
 						
 						String sQueryUOS = propQueryMapping.getProperty(QUERY_MARK_OUTOFSYNC_SERVERS);
 						Object[] oaValues = { lUpdatePeriod/100 };
-						int iUpdated = executeUpdateQueryWithParams(sQueryUOS, oaValues);
+						executeUpdateQueryWithParams(sQueryUOS, oaValues);
 						
 						// Commit the transaction
 						if ( bTransactional ) conn.commit();

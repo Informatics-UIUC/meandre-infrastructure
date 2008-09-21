@@ -3,4 +3,63 @@
 <properties>
 <comment>Query mapping for Derby</comment>
 	<entry key="DB">Derby</entry>
+	<entry key="CREATE_SERVER_STATUS_TABLE">
+			CREATE TABLE meandre_server_status 
+				(ID CHAR(16), 
+				 status CHAR(1) default 'D', 
+				 updated BIGINT default 0, 
+				 previous_updated BIGINT default 0, 
+				 uptime REAL default 0, 
+				 free_memory REAL default 0, 
+				 failed_updates INTEGER default 0,
+				 ts timestamp,
+				 PRIMARY KEY(ID))
+	</entry>
+	<entry key="CREATE_SERVER_INFO_TABLE">
+			CREATE TABLE meandre_server_info 
+				(ID CHAR(16), 
+				 ip CHAR(15) default '127.0.0.1', 
+				 name CHAR(40) default 'localhost', 
+				 port INTEGER default 1714, 
+				 description CHAR(80) default 'unknown',
+				 memory_available BIGINT,
+				 number_processors INTEGER,
+				 os_arch VARCHAR(40), 
+				 os_name VARCHAR(40), 
+				 os_version VARCHAR(40), 
+				 java_version VARCHAR(20),
+				 java_vm_version VARCHAR(20),
+				 java_vm_vendor VARCHAR(40),
+				 user_name VARCHAR(20),
+				 user_home VARCHAR(255),
+				 PRIMARY KEY(ID))
+	</entry>
+	<entry key="CREATE_SERVER_LOG_TABLE">
+			CREATE TABLE meandre_server_log 
+				(ID CHAR(16), 
+				 status CHAR(1) default 'D', 
+				 uptime REAL default 0, 
+				 failed_updates INTEGER default 0,
+				 ip CHAR(15) default '127.0.0.1', 
+				 name CHAR(40) default 'localhost', 
+				 port INTEGER default 1714, 
+				 description CHAR(80) default 'unknown',
+				 memory_available BIGINT,
+				 number_processors INTEGER,
+				 os_arch VARCHAR(40), 
+				 os_name VARCHAR(40), 
+				 os_version VARCHAR(40), 
+				 java_version VARCHAR(20),
+				 java_vm_version VARCHAR(20),
+				 java_vm_vendor VARCHAR(40),
+				 user_name VARCHAR(20),
+				 user_home VARCHAR(255),
+				 ts TIMESTAMP)
+	</entry>
+	<entry key="CREATE_SERVER_PROPERTIES_TABLE">
+			CREATE TABLE meandre_server_properties
+				(ID CHAR(40),
+				 value VARCHAR(128),
+				 PRIMARY KEY (ID))
+	</entry>
 </properties>
