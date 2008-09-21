@@ -59,6 +59,7 @@
                 <include name="**/*.xml"/>
                 <include name="**/*.vm"/>
                 <include name="**/*.list"/>
+                <include name="**/*.py"/>
             </fileset>
         </copy>
 
@@ -360,6 +361,7 @@
                 <include name="**/webservices/**/*.class"/>
                 <include name="**/webservices/**/*.properties"/>
                 <include name="**/webservices/**/*.xml"/>
+                <include name="**/webui/**/*.py"/>
             </fileset>
         </jar>
 
@@ -374,18 +376,6 @@
                 <include name="**/store/**/*.xml"/>
             </fileset>
         </jar> 	
-
-        <!-- Create terracotta jar -->
-        <jar destfile="${dist.dir}/lib/${app.name}-terracotta-${build.version}.jar">
-            <manifest>
-                <attribute name="Build-Version" value="${build.version}"/>
-            </manifest>
-            <fileset dir="${build.dir}">
-                <include name="**/terracotta/**/*.class"/>
-                <include name="**/terracotta/**/*.properties"/>
-                <include name="**/terracotta/**/*.xml"/>
-            </fileset>
-        </jar>
     	
         <!-- Create client jar -->
         <jar destfile="${dist.dir}/lib/${app.name}-client-${build.version}.jar">

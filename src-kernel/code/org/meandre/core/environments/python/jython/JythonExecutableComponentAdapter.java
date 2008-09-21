@@ -66,7 +66,7 @@ implements ExecutableComponent, ScriptingEnvironmentAdapter {
 
 	/** Process the given script on an already prepared adapter.
 	 *
-	 * @param sScript The scrip to process
+	 * @param sScript The script to process
 	 */
 	public void process ( String sScript ) {
 		pi.exec(sScript);
