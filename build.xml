@@ -6,8 +6,8 @@
             <contains string="${java.version}" substring="1.5"/>
         </or>
     </condition>
-	
-	<!-- Check whether Ant 1.7 is being used -->
+    
+    <!-- Check whether Ant 1.7 is being used -->
     <condition property="using.ant.1.7">
         <contains string="${ant.version}" substring="1.7"/>
     </condition>
@@ -28,7 +28,7 @@
         <mkdir dir="${doc.dir}"/>
     </target>
 
-   <!-- compile -->
+    <!-- compile -->
     <target name="compile" depends="init" description="-> compiles source code">
         <javac srcdir="${basedir}" destdir="${build.dir}/" debug="${compile.debug}"
                deprecation="${compile.deprecation}" optimize="${compile.optimize}"
@@ -41,7 +41,7 @@
             <include name="${store.src}/**/*.java"/>
             <include name="${terracotta.src}/**/*.java"/>
             <include name="${client.src}/**/*.java"/>
-        	<include name="${annotation.src}/**/*.java"/>
+            <include name="${annotation.src}/**/*.java"/>
         </javac>
 
         <copy todir="${build.dir}" includeEmptyDirs="no">
@@ -106,7 +106,7 @@
                 <include name="**/*.list"/>
             </fileset>
         </copy>
-    	
+        
         <copy todir="${build.dir}" includeEmptyDirs="no">
             <fileset dir="${terracotta.src}">
                 <include name="**/*.properties"/>
@@ -119,35 +119,35 @@
 
     <!-- compile-tests -->
     <target name="compile-tests" depends="compile" description="-> compiles test code">
-    	<javac srcdir="${kernel.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-    	<javac srcdir="${zigzag.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-    	<javac srcdir="${demo.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-    	<javac srcdir="${plugins.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${ws.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-    	<javac srcdir="${store.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-    	<javac srcdir="${terracotta.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-    	<javac srcdir="${client.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
+        <javac srcdir="${kernel.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
+        <javac srcdir="${zigzag.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
+        <javac srcdir="${demo.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
+        <javac srcdir="${plugins.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
+        <javac srcdir="${ws.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
+        <javac srcdir="${store.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
+        <javac srcdir="${terracotta.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
+        <javac srcdir="${client.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
     </target>
 
-	<!-- clean -->
-	<target name="clean" description="-> removes build artifacts">
-	    <delete dir="${build.dir}"/>
-	    <delete dir="${doc.dir}"/>
-	    <delete dir="${test.dir}"/>
-	    <delete dir="${dist.dir}"/>
-	    <delete dir="${lib.dir}/jars/cachedir"/>
-	</target>
-    	
-	<!-- clean meandre installation-->
-	<target name="clean-meandre" description="-> removes meandre created files">
-	    <delete dir="MeandreStore"/>
-	    <delete dir="published_resources"/>
-	    <delete dir="run"/>
+    <!-- clean -->
+    <target name="clean" description="-> removes build artifacts">
+        <delete dir="${build.dir}"/>
+        <delete dir="${doc.dir}"/>
+        <delete dir="${test.dir}"/>
+        <delete dir="${dist.dir}"/>
+        <delete dir="${lib.dir}/jars/cachedir"/>
+    </target>
+        
+    <!-- clean meandre installation-->
+    <target name="clean-meandre" description="-> removes meandre created files">
+        <delete dir="MeandreStore"/>
+        <delete dir="published_resources"/>
+        <delete dir="run"/>
         <delete dir="log"/>
         <delete dir="DerbyLog"/>
-		<delete dir="mnt"/>
+        <delete dir="mnt"/>
         <delete file="derby.log"/>
-		<delete file="meandre-config-plugins.xml"/>
+        <delete file="meandre-config-plugins.xml"/>
         <delete file="meandre-config-store.xml"/>
         <delete file="meandre-config-core.xml"/>
         <delete file="meandre-realm.properties"/>
@@ -159,21 +159,21 @@
                 <include name="*.mau"/>
             </fileset>
         </delete>
-	</target>	
-		
+    </target>    
+        
 
     <!-- run-tests -->
     <target name="run-tests" depends="compile-tests" description="-> runs tests">
-    	<mkdir dir="${test.dir}/xml"/>
+        <mkdir dir="${test.dir}/xml"/>
         <junit printsummary="yes" forkmode="once" errorProperty="test.error"
                failureProperty="test.failed" fork="${junit.fork}" showoutput="${junit.showoutput}">
             <jvmarg value="-Duser.language=en"/>
 
             <classpath>
                 <path refid="meandre.test.classpath"/>
-            	<pathelement location="${build.dir}"/>
-            	<pathelement location="${test.dir}"/>
-            	<pathelement path="${java.class.path}"/>
+                <pathelement location="${build.dir}"/>
+                <pathelement location="${test.dir}"/>
+                <pathelement path="${java.class.path}"/>
             </classpath>
 
             <formatter type="xml"/>
@@ -184,41 +184,39 @@
                     <include name="**/*Test.java"/>
                 </fileset>
 
-            	<fileset dir="${plugins.test}">
+                <fileset dir="${plugins.test}">
                     <include name="**/*Test.java"/>
                 </fileset>
 
-            	<fileset dir="${demo.test}">
+                <fileset dir="${demo.test}">
                     <include name="**/*Test.java"/>
                 </fileset>
 
-            	<fileset dir="${zigzag.test}">
+                <fileset dir="${zigzag.test}">
                     <include name="**/*Test.java"/>
                 </fileset>
 
-            	<fileset dir="${ws.test}">
+                <fileset dir="${ws.test}">
                     <include name="**/*Test.java"/>
                 </fileset>
 
-            	<fileset dir="${store.test}">
+                <fileset dir="${store.test}">
                     <include name="**/*Test.java"/>
                 </fileset>
-            	
-            	<fileset dir="${terracotta.test}">
+                
+                <fileset dir="${terracotta.test}">
                     <include name="**/*Test.java"/>
                 </fileset>
                 
                 <fileset dir="${client.test}">
                     <include name="**/*Test.java"/>
                 </fileset>
-            
-            	
             </batchtest>
         </junit>
     </target>
 
   <!-- test-reports -->
-    <target name="test-reports" depends="run-tests" description="-> generates test reports">
+    <target name="test-reports" depends="run-tests, clean-meandre" description="-> generates test reports">
         <mkdir dir="${test.dir}/reports"/>
         <junitreport todir="${test.dir}/xml">
             <fileset dir="${test.dir}/xml">
@@ -229,42 +227,44 @@
         <echo message="Report generated at: file://${test.dir}/reports/junit-noframes.html"/>
     </target>
 
-	<!--- Documentation (Javadocs) -->
-	<target name="javadoc" depends="init"
-	        description="-> generates the documentation (ignore all warnings)">
-	
-	    <javadoc
-	    	    classpathref="meandre.test.classpath"
-	            maxmemory="512m"
-	            access="private"
-	            windowtitle="Meandre Core API"
-	            author="true"
-	            use="true"
-	            destdir="${doc.dir}/">
-	    	
-	    	<fileset dir="." defaultexcludes="yes">
-	    	      <include name="${kernel.src}/**"/>
-	    	      <include name="${plugins.src}/**"/>
-	    	      <include name="${demo.src}/**"/>
-	    	      <include name="${zigzag.src}/**"/>
-	    	      <include name="${ws.src}/**"/>
-	    	      <include name="${store.src}/**"/>
-	    	      <include name="${terracotta.src}/**"/>
+    <!--- Documentation (Javadocs) -->
+    <target name="javadoc" depends="init"
+            description="-> generates the documentation (ignore all warnings)">
+    
+        <javadoc
+                classpathref="meandre.test.classpath"
+                maxmemory="512m"
+                access="private"
+                windowtitle="Meandre Core API"
+                author="true"
+                use="true"
+                destdir="${doc.dir}/">
+            
+            <fileset dir="." defaultexcludes="yes">
+                  <include name="${kernel.src}/**"/>
+                  <include name="${plugins.src}/**"/>
+                  <include name="${demo.src}/**"/>
+                  <include name="${zigzag.src}/**"/>
+                  <include name="${ws.src}/**"/>
+                  <include name="${store.src}/**"/>
+                  <include name="${terracotta.src}/**"/>
                   <include name="${client.src}/**"/>
-	    		  <include name="${annotation.src}/**"/>
-	    		  <exclude name="**/*.properties" />
-	    		  <exclude name="**/*.jj" />
-	    	</fileset>
-	    	
-	    </javadoc>
-	</target>
+                  <include name="${annotation.src}/**"/>
+                  <exclude name="**/*.properties" />
+                  <exclude name="**/*.jj" />
+            </fileset>
+            
+        </javadoc>
+    </target>
 
-	<!-- dist -->
-    <target name="dist" depends="compile,test-reports" description="-> creates jars for distribution">
+    <!-- dist -->
+    <target name="dist" depends="dist-build, test-reports" description="-> creates jars for distribution"/>
 
-    	<mkdir dir="${dist.dir}/lib"/>
-    	<mkdir dir="${dist.dir}/tmp"/>
-    	    	
+    <target name="dist-build" depends="compile" description="-> creates jars for distribution (no testing performed)"> 
+
+        <mkdir dir="${dist.dir}/lib"/>
+        <mkdir dir="${dist.dir}/tmp"/>
+                
         <!-- Create core jar -->
         <jar destfile="${dist.dir}/lib/${app.name}-core-${build.version}.jar">
             <manifest>
@@ -393,7 +393,7 @@
                 <include name="**/store/**/*.properties"/>
                 <include name="**/store/**/*.xml"/>
             </fileset>
-        </jar> 	
+        </jar>     
 
         <!-- Create terracotta jar -->
         <jar destfile="${dist.dir}/lib/${app.name}-terracotta-${build.version}.jar">
@@ -409,7 +409,7 @@
                 <include name="**/terracotta/**/*.xml"/>
             </fileset>
         </jar>
-    	
+        
         <!-- Create client jar -->
         <jar destfile="${dist.dir}/lib/${app.name}-client-${build.version}.jar">
             <manifest>
@@ -424,142 +424,141 @@
                 <include name="**/client/**/*.xml"/>
             </fileset>
         </jar>  
-    	
-    	
-    	<!-- Create annotation jar -->
-    	<jar destfile="${dist.dir}/lib/${app.name}-annotation-${build.version}.jar">
-    		<manifest>
-    	        <attribute name="Build-Version" value="${build.version}"/>
+        
+        
+        <!-- Create annotation jar -->
+        <jar destfile="${dist.dir}/lib/${app.name}-annotation-${build.version}.jar">
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
                 <attribute name="SVN-Revision" value="${svn.revision}"/>
                 <attribute name="Build-Date" value="${TODAY}"/>
                 <attribute name="Built-By-User" value="${user.name}"/>
-    	    </manifest>
-    	    <fileset dir="${build.dir}">
-    	        <include name="**/annotations/**/*.class"/>
-    	        <include name="**/annotations/**/*.properties"/>
-    	        <include name="**/annotations/**/*.xml"/>
-    	    </fileset>
-    	</jar>  
-    	
-    	<!-- Preparations to create the release jars -->
+            </manifest>
+            <fileset dir="${build.dir}">
+                <include name="**/annotations/**/*.class"/>
+                <include name="**/annotations/**/*.properties"/>
+                <include name="**/annotations/**/*.xml"/>
+            </fileset>
+        </jar>  
+        
+        <!-- Preparations to create the release jars -->
         <copy todir="${dist.dir}/tmp" includeEmptyDirs="no">
              <fileset dir="${build.dir}">
                  <include name="**"/>
              </fileset>
         </copy>
-    	<unjar dest="${dist.dir}/tmp" overwrite="true">
-    		 <fileset dir="${lib.dep.dir}">
-    		        <include name="**/*.jar"/>
-    		 </fileset>
-    	</unjar>
-    	<delete file="${dist.dir}/tmp/META-INF/MANIFEST.MF" />
+        <unjar dest="${dist.dir}/tmp" overwrite="true">
+             <fileset dir="${lib.dep.dir}">
+                    <include name="**/*.jar"/>
+             </fileset>
+        </unjar>
+        <delete file="${dist.dir}/tmp/META-INF/MANIFEST.MF" />
 
-    	<!-- Creating the Meandre server jar distribution -->
-    	<jar destfile="${dist.dir}/${app.name}-server-${build.version}.jar" >
-    		<manifest>
-	            <attribute name="Build-Version" value="${build.version}"/>
-	            <attribute name="Main-Class" value="org.meandre.webservices.WSCoreBootstrapper"/>
+        <!-- Creating the Meandre server jar distribution -->
+        <jar destfile="${dist.dir}/${app.name}-server-${build.version}.jar" >
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="Main-Class" value="org.meandre.webservices.WSCoreBootstrapper"/>
                 <attribute name="SVN-Revision" value="${svn.revision}"/>
                 <attribute name="Build-Date" value="${TODAY}"/>
                 <attribute name="Built-By-User" value="${user.name}"/>
-	        </manifest>
-	        <fileset dir="${dist.dir}/tmp/">
-	            <include name="**"/>
-	        </fileset>
-	    </jar>
+            </manifest>
+            <fileset dir="${dist.dir}/tmp/">
+                <include name="**"/>
+            </fileset>
+        </jar>
 
-    	<!-- Creating the Meandre ZigZag compiler jar distribution -->
-    	<jar destfile="${dist.dir}/zzc-${build.version}.jar" >
-    		<manifest>
-	            <attribute name="Build-Version" value="${build.version}"/>
-	            <attribute name="Main-Class" value="org.meandre.zigzag.parser.ZigZag"/>
+        <!-- Creating the Meandre ZigZag compiler jar distribution -->
+        <jar destfile="${dist.dir}/zzc-${build.version}.jar" >
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="Main-Class" value="org.meandre.zigzag.parser.ZigZag"/>
                 <attribute name="SVN-Revision" value="${svn.revision}"/>
                 <attribute name="Build-Date" value="${TODAY}"/>
                 <attribute name="Built-By-User" value="${user.name}"/>
-	        </manifest>
-	        <fileset dir="${dist.dir}/tmp/">
-	            <include name="**"/>
-	        </fileset>
-	    </jar>
+            </manifest>
+            <fileset dir="${dist.dir}/tmp/">
+                <include name="**"/>
+            </fileset>
+        </jar>
 
-    	<!-- Creating the Meandre mau executor jar distribution -->
-    	<jar destfile="${dist.dir}/zzre-${build.version}.jar" >
-    		<manifest>
-	            <attribute name="Build-Version" value="${build.version}"/>
-	            <attribute name="Main-Class" value="org.meandre.mau.MAUExecutor"/>
+        <!-- Creating the Meandre mau executor jar distribution -->
+        <jar destfile="${dist.dir}/zzre-${build.version}.jar" >
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="Main-Class" value="org.meandre.mau.MAUExecutor"/>
                 <attribute name="SVN-Revision" value="${svn.revision}"/>
                 <attribute name="Build-Date" value="${TODAY}"/>
                 <attribute name="Built-By-User" value="${user.name}"/>
-	        </manifest>
-	        <fileset dir="${dist.dir}/tmp/">
-	            <include name="**"/>
-	        </fileset>
-	    </jar>
-    	
-    	<!-- Creating the Meandre interpreter console jar distribution -->
-    	<jar destfile="${dist.dir}/zz-${build.version}.jar" >
-    		<manifest>
-	            <attribute name="Build-Version" value="${build.version}"/>
-	            <attribute name="Main-Class" value="org.meandre.zigzag.console.ZigZagConsole"/>
+            </manifest>
+            <fileset dir="${dist.dir}/tmp/">
+                <include name="**"/>
+            </fileset>
+        </jar>
+        
+        <!-- Creating the Meandre interpreter console jar distribution -->
+        <jar destfile="${dist.dir}/zz-${build.version}.jar" >
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="Main-Class" value="org.meandre.zigzag.console.ZigZagConsole"/>
                 <attribute name="SVN-Revision" value="${svn.revision}"/>
                 <attribute name="Build-Date" value="${TODAY}"/>
                 <attribute name="Built-By-User" value="${user.name}"/>
-	        </manifest>
-	        <fileset dir="${dist.dir}/tmp/">
-	            <include name="**"/>
-	        </fileset>
-	    </jar>
-    	
-    	<delete file="${dist.dir}/tmp/" />
-    	
-	</target>
+            </manifest>
+            <fileset dir="${dist.dir}/tmp/">
+                <include name="**"/>
+            </fileset>
+        </jar>
+       
+        <!-- Remove the temporary folder --> 
+        <delete dir="${dist.dir}/tmp"/>
+        
+    </target>
 
-	<!-- make source jars -->
+    <!-- make source jars -->
     <target name="make-source-jars" 
         depends="" 
         description="-> creates jars of source directories">
 
-    	<mkdir dir="${dist.dir}/src-jars"/>
-    	
-    	    <!-- Create core jar -->
-    	        <jar destfile="${dist.dir}/src-jars/${app.name}-core-${build.version}-src.jar">
-    	        	<manifest>
-    	        	 <attribute name="Build-Version" value="${build.version}"/>
+        <mkdir dir="${dist.dir}/src-jars"/>
+        
+        <!-- Create core jar -->
+        <jar destfile="${dist.dir}/src-jars/${app.name}-core-${build.version}-src.jar">
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
                 <attribute name="SVN-Revision" value="${svn.revision}"/>
                 <attribute name="Build-Date" value="${TODAY}"/>
                 <attribute name="Built-By-User" value="${user.name}"/>
-    	        	 </manifest>
-    	        	            <fileset dir="${annotation.src}">
-    	        	                <include name="**/*"/>
-    	        	            </fileset>
-    	        				<fileset dir="${kernel.src}">
-    	        	                <include name="**/*"/>
-    	        	            </fileset>
-    	        	 			<fileset dir="${zigzag.src}">
-    	        	                <include name="**/*"/>
-    	        	            </fileset>
-    	        	 			 <fileset dir="${plugins.src}">
-    	        	                <include name="**/*"/>
-    	        	            </fileset>
-    	        				 <fileset dir="${demo.src}">
-    	        	                <include name="**/*"/>
-    	        	            </fileset>
-    	        				<fileset dir="${ws.src}">
-    	        	                <include name="**/*"/>
-    	        	            </fileset>
-    	        	 			<fileset dir="${store.src}">
-    	        	                <include name="**/*"/>
-    	        	            </fileset>
-    	        	 			 <fileset dir="${terracotta.src}">
-    	        	                <include name="**/*"/>
-    	        	            </fileset>
-    	        	  			<fileset dir="${client.src}">
-    	        	                <include name="**/*"/>
-    	        	            </fileset>
-    	        </jar>
+            </manifest>
+            <fileset dir="${annotation.src}">
+                <include name="**/*"/>
+            </fileset>
+            <fileset dir="${kernel.src}">
+                <include name="**/*"/>
+            </fileset>
+            <fileset dir="${zigzag.src}">
+                <include name="**/*"/>
+            </fileset>
+            <fileset dir="${plugins.src}">
+                <include name="**/*"/>
+            </fileset>
+            <fileset dir="${demo.src}">
+                <include name="**/*"/>
+            </fileset>
+            <fileset dir="${ws.src}">
+                <include name="**/*"/>
+            </fileset>
+            <fileset dir="${store.src}">
+                <include name="**/*"/>
+            </fileset>
+            <fileset dir="${terracotta.src}">
+                <include name="**/*"/>
+            </fileset>
+            <fileset dir="${client.src}">
+                <include name="**/*"/>
+            </fileset>
+        </jar>
 
-    	
-    	    	
         <!-- Create annotation jar -->
         <jar destfile="${dist.dir}/src-jars/meandre-annotation-${build.version}-src.jar">
             <manifest>
@@ -673,22 +672,81 @@
         </jar>
 
     </target>
+
     <target name="clean-all" 
-        description="->attempts to clean all generated files"
+        description="-> attempts to clean all generated files"
         depends="clean, clean-meandre">
     </target>
 
-    <!-- run-core -->
-    <target name="run" 
-        depends="" 
-        description="-> runs the default Meandre-Core server">
+    <!-- run -->
+    <condition property="server.jar.available">
+        <and>
+            <available file="${dist.dir}/${app.name}-server-${build.version}.jar" />
+            <available classname="org.meandre.webservices.WSCoreBootstrapper" classpathref="meandre.dist.classpath"/>
+        </and>
+    </condition>
+
+    <target name="run" depends="server.jar.check" if="server.jar.available"
+        description="-> runs the default Meandre-Core server; output goes to runtime/ dir">
+        <mkdir dir="runtime"/>
+
         <java classname="org.meandre.webservices.WSCoreBootstrapper" 
-            fork="yes" maxmemory="1024m">
-            <classpath>
-                <pathelement 
-                location="${dist.dir}/${app.name}-server-${build.version}.jar"/>
-                </classpath>
+            fork="yes" maxmemory="1024m" classpathref="meandre.dist.classpath">
             <jvmarg value="-showversion"/>
         </java>
     </target>
+
+   <target name="server.jar.check" unless="server.jar.available">
+        <echo message="${app.name}-server-${build.version}.jar is not available - performing full build"/>
+        <antcall target="dist-build"/>
+
+        <condition property="server.jar.available">
+            <and>
+                <available file="${dist.dir}/${app.name}-server-${build.version}.jar" />
+                <available classname="org.meandre.webservices.WSCoreBootstrapper" classpathref="meandre.dist.classpath"/>
+            </and>
+        </condition>
+    </target>
+
+    <!-- CLOVER targets -->
+
+    <target name="check.clover">
+        <taskdef resource="cloverlib.xml"/>
+        <available property="clover.installed" classname="com.cenqua.clover.CloverInstr" />
+    </target>
+
+    <target name="guard.noclover" depends="check.clover" unless="clover.installed">
+        <fail message="The target you are attempting to run requires Clover, which doesn't appear to be installed"/>
+    </target>
+
+    <target name="with.clover" depends="guard.noclover" description="-> enables code coverage analysis for following tasks">
+        <mkdir dir="${test.dir}/clover"/>
+        <clover-setup/>
+    </target>
+
+    <target name="clover-xml" description="-> generates the code coverage report in XML format">
+        <mkdir dir="${test.dir}/clover/history"/>
+        <clover-historypoint historyDir="${test.dir}/clover/history"/>
+        <clover-report>
+            <current outfile="${test.dir}/clover/coverage.xml">
+                <format type="xml"/>
+            </current>
+        </clover-report>
+    </target>
+
+    <target name="clover-html" description="-> generates the code coverage report in HTML format">
+        <clover-historypoint historyDir="${test.dir}/clover/history"/>
+        <clover-html-report outdir="${test.dir}/clover"/>
+        <echo message="The code coverage report is available at file:///${test.dir}/clover"/>
+    </target>
+
+    <target name="clover-pdf" description="-> generates the code coverage report in PDF format">
+        <clover-historypoint historyDir="${test.dir}/clover/history"/>
+        <clover-pdf-report outfile="${test.dir}/clover/coverage.pdf"/>
+    </target>
+
 </project>
+
+<!-- DO NOT EDIT BELOW THIS LINE PLEASE -->
+<!-- vim:sw=4:softtabstop=4:expandtab
+-->

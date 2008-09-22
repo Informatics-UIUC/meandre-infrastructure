@@ -112,6 +112,15 @@
         <pathelement location="${test.dir}"/>
     </path>
 
+    <!-- =================================== -->
+    <!-- Dist Classpath                      -->
+    <!-- =================================== -->
+    <path id="meandre.dist.classpath">
+        <pathelement location="${dist.dir}/${app.name}-server-${build.version}.jar"/>
+    </path>
+
  </project>
 
-
+<!-- DO NOT EDIT BELOW THIS LINE PLEASE -->
+<!-- vim:sw=4:softtabstop=4:expandtab
+-->
