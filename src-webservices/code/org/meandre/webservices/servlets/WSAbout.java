@@ -131,7 +131,7 @@ public class WSAbout extends HttpServlet {
 			}
     		else if ( sExtension.equals("xml") ) {
     			try {
-    				response.setContentType("text/xml");
+    				response.setContentType("application/xml");
 					response.getWriter().println(XML.toString(wsAboutLogic.rolesInJSON(request,response),"meandre_security"));
 				} catch (JSONException e) {
 					log.warning("XML serialization failure for request "+request.getRequestURL());
@@ -156,7 +156,7 @@ public class WSAbout extends HttpServlet {
             }
             else if ( sExtension.equals("xml") ) {
                 try {
-                    response.setContentType("text/xml");
+                    response.setContentType("application/xml");
                     response.getWriter().println(XML.toString(wsAboutLogic.allRolesInJSON(request,response),"meandre_security"));
                 } catch (JSONException e) {
                     log.warning("XML serialization failure for request "+request.getRequestURL());

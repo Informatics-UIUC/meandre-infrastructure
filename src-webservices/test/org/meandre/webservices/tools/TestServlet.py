@@ -2,19 +2,26 @@
 # The basic dispatching dictionary
 #
 requestMap = {
-    'GET': { 'ping': 'ping' }
+    'GET': { 
+        'ping': 'ping_pong', 
+        'demo': 'demo_rdf'
+    }
 }
 
 #
-# The needed imports
+# The ping pong method
 #
-from javax.servlet.http import HttpServletResponse
-
-#
-# The ping method
-#
-def ping ( request, response, format ):
-    response.setStatus(HttpServletResponse.SC_OK)
-    response.setContentType("text/plain")
-    response.getWriter().print("pong")
+def ping_pong ( request, response, format ):
+    content = [ 'pong' ]
+    statusOK(response)
+    sendTJXContent(response,content,format)
     
+#
+# The demo rdf repository
+#
+from org.meandre.demo.repository import DemoRepositoryGenerator
+
+def demo_rdf ( request, response, format ):
+    content = DemoRepositoryGenerator.getTestHelloWorldRepository()
+    statusOK(response)
+    sendRDFModel(response,content,format)

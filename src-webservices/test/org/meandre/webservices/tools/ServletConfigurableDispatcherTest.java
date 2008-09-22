@@ -1,5 +1,6 @@
 package org.meandre.webservices.tools;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assert.assertEquals;
 
@@ -15,9 +16,13 @@ import javax.servlet.Servlet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.meandre.demo.repository.DemoRepositoryGenerator;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 
 /** This class provides a set of tests to the unified base servlet dispatcher shared 
@@ -67,8 +72,9 @@ public class ServletConfigurableDispatcherTest  {
 			fail("Server failed to stop because "+baos.toString());
 		}
 	}
+
 	
-	/** Pull the content of a get requrest.
+	/** Pull the content of a get request.
 	 * 
 	 * @param sMethod The method to pull
 	 * @return The content pulled
@@ -97,6 +103,33 @@ public class ServletConfigurableDispatcherTest  {
 		}
 	}
 	
+
+	/** Pull the model of a get request.
+	 * 
+	 * @param sMethod The method to pull
+	 * @param sFormat The format of the model
+	 * @return The model pulled
+	 */
+	private Model getGetModel ( String sMethod, String sFormat ) {
+		try {
+			Model mod = ModelFactory.createDefaultModel();
+			URL url = new URL("http://localhost:"+iTestPort+sMethod);
+			InputStream is = url.openStream();
+			mod.read(is, null, sFormat);
+			return mod;
+		} catch (MalformedURLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			fail("Fail to assamble the required URL "+baos.toString());
+			return null;
+		} catch (IOException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			fail("Failed to retrive URL content "+baos.toString());
+			return null;
+		}
+	}
+	
 	/** Simple test of the life cycle of the servlet configurable dispatcher.
 	 * 
 	 */
@@ -105,9 +138,21 @@ public class ServletConfigurableDispatcherTest  {
 		// Set the servlet to test
 		contextWS.addServlet(new ServletHolder((Servlet) new TestServlet()), "/test/*");
 		
-		// Run a request
-		String sContent = getGetRequestContent("/test/ping.txt");
-		assertEquals("pong", sContent);
-		
+		// Run ping request
+		String sContentTXT = getGetRequestContent("/test/ping.txt");
+		assertEquals("pong\n", sContentTXT);
+		String sContentJSON = getGetRequestContent("/test/ping.json");
+		assertEquals("[\"pong\"]", sContentJSON);
+		String sContentXML = getGetRequestContent("/test/ping.xml");
+		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><meandre_response>pong</meandre_response>", sContentXML);
+
+		// Run the demo repository request
+		Model modDemo = DemoRepositoryGenerator.getTestHelloWorldRepository();
+		Model modRDF = getGetModel("/test/demo.rdf", "RDF/XML-ABBREV");
+		assertEquals(modDemo.size(),modRDF.size());
+		Model modTTL = getGetModel("/test/demo.ttl", "TTL");
+		assertEquals(modDemo.size(),modTTL.size());
+		Model modNT = getGetModel("/test/demo.nt", "N-TRIPLE");
+		assertEquals(modDemo.size(),modNT.size());
 	}
 }
