@@ -1,5 +1,7 @@
 1.4.0-vcli-alpha Sara
 
+* Move the MDX branch from the experimental repository to the branch one
+
 * Revamped the backend adapters to allow the proper schema creation for Derby
 
 * Added method to the plugin interface
