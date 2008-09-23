@@ -166,7 +166,7 @@
     <target name="run-tests" depends="compile-tests" description="-> runs tests">
         <mkdir dir="${test.dir}/xml"/>
         <junit printsummary="yes" forkmode="once" errorProperty="test.error"
-               failureProperty="test.failed" fork="${junit.fork}" showoutput="${junit.showoutput}">
+               failureProperty="test.failed" fork="${junit.fork}" showoutput="${junit.showoutput}" maxmemory="1024m">
             <jvmarg value="-Duser.language=en"/>
 
             <classpath>
