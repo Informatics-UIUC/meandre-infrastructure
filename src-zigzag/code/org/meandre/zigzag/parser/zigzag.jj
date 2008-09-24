@@ -121,6 +121,7 @@ TOKEN :
 TOKEN :
 { 
     < SYMBOL: ["a"-"z","A"-"Z"] ( ["a"-"z","A"-"Z","0"-"9","-","_"] )* >
+|   < EXT_SYMBOL: ["a"-"z","A"-"Z"] ( ["a"-"z","A"-"Z","0"-"9","-","_"," "] )* >
 |	< URI: "<" (["a"-"z","A"-"Z"])+ "://"(["a"-"z","A"-"Z","0"-"9"," ","-","_",":","/","%","+","&","=",".","@"])+ ">" >
 |	< VALUE: "\"" (~["\""])* "\"" >
 }
@@ -289,14 +290,14 @@ void port_binding( Token tTargetIns ) :
 	Token tSourcePort;
 }
 {
-	tTargetPort=<SYMBOL>
+	tTargetPort=<EXT_SYMBOL>
 	<COLON>
-	tSourceIns=<SYMBOL> <DOT> tSourcePort=<SYMBOL>
-	{ fg.bindPort(tSourceIns.image,tSourcePort.image,tTargetIns.image,tTargetPort.image,jj_input_stream.getBeginLine()-1); }
+	tSourceIns=<SYMBOL> <DOT> tSourcePort=<EXT_SYMBOL>
+	{ fg.bindPort(tSourceIns.image,tSourcePort.image.trim(),tTargetIns.image,tTargetPort.image.trim(),jj_input_stream.getBeginLine()-1); }
 	(	
 		<COMA>
-		tSourceIns=<SYMBOL> <DOT> tSourcePort=<SYMBOL>
-		{ fg.bindPort(tSourceIns.image,tSourcePort.image,tTargetIns.image,tTargetPort.image,jj_input_stream.getBeginLine()-1); }
+		tSourceIns=<SYMBOL> <DOT> tSourcePort=<EXT_SYMBOL>
+		{ fg.bindPort(tSourceIns.image,tSourcePort.image.trim(),tTargetIns.image,tTargetPort.image.trim(),jj_input_stream.getBeginLine()-1); }
 	)*
 }
 

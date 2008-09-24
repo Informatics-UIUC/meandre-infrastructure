@@ -299,7 +299,7 @@ public class ZigZag implements ZigZagConstants {
     label_6:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case SYMBOL:
+      case EXT_SYMBOL:
         ;
         break;
       default:
@@ -365,12 +365,12 @@ public class ZigZag implements ZigZagConstants {
         Token tTargetPort;
         Token tSourceIns;
         Token tSourcePort;
-    tTargetPort = jj_consume_token(SYMBOL);
+    tTargetPort = jj_consume_token(EXT_SYMBOL);
     jj_consume_token(COLON);
     tSourceIns = jj_consume_token(SYMBOL);
     jj_consume_token(DOT);
-    tSourcePort = jj_consume_token(SYMBOL);
-          fg.bindPort(tSourceIns.image,tSourcePort.image,tTargetIns.image,tTargetPort.image,jj_input_stream.getBeginLine()-1);
+    tSourcePort = jj_consume_token(EXT_SYMBOL);
+          fg.bindPort(tSourceIns.image,tSourcePort.image.trim(),tTargetIns.image,tTargetPort.image.trim(),jj_input_stream.getBeginLine()-1);
     label_9:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -384,8 +384,8 @@ public class ZigZag implements ZigZagConstants {
       jj_consume_token(COMA);
       tSourceIns = jj_consume_token(SYMBOL);
       jj_consume_token(DOT);
-      tSourcePort = jj_consume_token(SYMBOL);
-                  fg.bindPort(tSourceIns.image,tSourcePort.image,tTargetIns.image,tTargetPort.image,jj_input_stream.getBeginLine()-1);
+      tSourcePort = jj_consume_token(EXT_SYMBOL);
+                  fg.bindPort(tSourceIns.image,tSourcePort.image.trim(),tTargetIns.image,tTargetPort.image.trim(),jj_input_stream.getBeginLine()-1);
     }
   }
 
@@ -444,23 +444,29 @@ public class ZigZag implements ZigZagConstants {
                         );}
   }
 
+  /** Generated Token Manager. */
   public ZigZagTokenManager token_source;
   SimpleCharStream jj_input_stream;
-  public Token token, jj_nt;
+  /** Current token. */
+  public Token token;
+  /** Next token. */
+  public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
   final private int[] jj_la1 = new int[19];
   static private int[] jj_la1_0;
   static {
-      jj_la1_0();
+      jj_la1_init_0();
    }
-   private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x2384000,0xb80,0x2384000,0x400000,0x380000,0x80,0x80,0x80,0xa000000,0x80,0xa000000,0x2000000,0x2000,0x8000,0x1800000,0x40000,0x80,0x80,0x80,};
+   private static void jj_la1_init_0() {
+      jj_la1_0 = new int[] {0x2384000,0xb80,0x2384000,0x400000,0x380000,0x80,0x80,0x80,0x12000000,0x80,0x12000000,0x4000000,0x2000,0x8000,0x1800000,0x40000,0x80,0x80,0x80,};
    }
 
+  /** Constructor with InputStream. */
   public ZigZag(java.io.InputStream stream) {
      this(stream, null);
   }
+  /** Constructor with InputStream and supplied encoding */
   public ZigZag(java.io.InputStream stream, String encoding) {
     try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }
     token_source = new ZigZagTokenManager(jj_input_stream);
@@ -470,9 +476,11 @@ public class ZigZag implements ZigZagConstants {
     for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
+  /** Reinitialise. */
   public void ReInit(java.io.InputStream stream) {
      ReInit(stream, null);
   }
+  /** Reinitialise. */
   public void ReInit(java.io.InputStream stream, String encoding) {
     try { jj_input_stream.ReInit(stream, encoding, 1, 1); } catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }
     token_source.ReInit(jj_input_stream);
@@ -482,6 +490,7 @@ public class ZigZag implements ZigZagConstants {
     for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
+  /** Constructor. */
   public ZigZag(java.io.Reader stream) {
     jj_input_stream = new SimpleCharStream(stream, 1, 1);
     token_source = new ZigZagTokenManager(jj_input_stream);
@@ -491,6 +500,7 @@ public class ZigZag implements ZigZagConstants {
     for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
+  /** Reinitialise. */
   public void ReInit(java.io.Reader stream) {
     jj_input_stream.ReInit(stream, 1, 1);
     token_source.ReInit(jj_input_stream);
@@ -500,6 +510,7 @@ public class ZigZag implements ZigZagConstants {
     for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
+  /** Constructor with generated Token Manager. */
   public ZigZag(ZigZagTokenManager tm) {
     token_source = tm;
     token = new Token();
@@ -508,6 +519,7 @@ public class ZigZag implements ZigZagConstants {
     for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
+  /** Reinitialise. */
   public void ReInit(ZigZagTokenManager tm) {
     token_source = tm;
     token = new Token();
@@ -516,7 +528,7 @@ public class ZigZag implements ZigZagConstants {
     for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
-  final private Token jj_consume_token(int kind) throws ParseException {
+  private Token jj_consume_token(int kind) throws ParseException {
     Token oldToken;
     if ((oldToken = token).next != null) token = token.next;
     else token = token.next = token_source.getNextToken();
@@ -530,6 +542,8 @@ public class ZigZag implements ZigZagConstants {
     throw generateParseException();
   }
 
+
+/** Get the next Token. */
   final public Token getNextToken() {
     if (token.next != null) token = token.next;
     else token = token.next = token_source.getNextToken();
@@ -538,6 +552,7 @@ public class ZigZag implements ZigZagConstants {
     return token;
   }
 
+/** Get the specific Token. */
   final public Token getToken(int index) {
     Token t = token;
     for (int i = 0; i < index; i++) {
@@ -547,20 +562,21 @@ public class ZigZag implements ZigZagConstants {
     return t;
   }
 
-  final private int jj_ntk() {
+  private int jj_ntk() {
     if ((jj_nt=token.next) == null)
       return (jj_ntk = (token.next=token_source.getNextToken()).kind);
     else
       return (jj_ntk = jj_nt.kind);
   }
 
-  private java.util.Vector<int[]> jj_expentries = new java.util.Vector<int[]>();
+  private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
   private int[] jj_expentry;
   private int jj_kind = -1;
 
+  /** Generate ParseException. */
   public ParseException generateParseException() {
-    jj_expentries.removeAllElements();
-    boolean[] la1tokens = new boolean[28];
+    jj_expentries.clear();
+    boolean[] la1tokens = new boolean[29];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -574,23 +590,25 @@ public class ZigZag implements ZigZagConstants {
         }
       }
     }
-    for (int i = 0; i < 28; i++) {
+    for (int i = 0; i < 29; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
-        jj_expentries.addElement(jj_expentry);
+        jj_expentries.add(jj_expentry);
       }
     }
     int[][] exptokseq = new int[jj_expentries.size()][];
     for (int i = 0; i < jj_expentries.size(); i++) {
-      exptokseq[i] = jj_expentries.elementAt(i);
+      exptokseq[i] = jj_expentries.get(i);
     }
     return new ParseException(token, exptokseq, tokenImage);
   }
 
+  /** Enable tracing. */
   final public void enable_tracing() {
   }
 
+  /** Disable tracing. */
   final public void disable_tracing() {
   }
 
