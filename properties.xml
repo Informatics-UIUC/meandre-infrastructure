@@ -11,12 +11,12 @@
     <!-- Directory structure of the project -->
     <property name="build.dir" value="${basedir}/bin"/>
     <property name="dist.dir" value="${basedir}/dist"/>
-	<property name="test.dir" value="${basedir}/test"/>
-	<property name="doc.dir" value="${basedir}/docs"/>
-	<property name="data.dir" value="${basedir}/data"/>
+    <property name="test.dir" value="${basedir}/test"/>
+    <property name="doc.dir" value="${basedir}/docs"/>
+    <property name="data.dir" value="${basedir}/data"/>
 
-	<!-- Global required jars folder -->
-	<property name="lib.dep.dir" value="${basedir}/lib/jars"/>
+    <!-- Global required jars folder -->
+    <property name="lib.dep.dir" value="${basedir}/lib/jars"/>
 
     <!-- Source code locations -->
     <property name="kernel.src" value="src-kernel/code"/>
@@ -26,39 +26,39 @@
     <property name="ws.src" value="src-webservices/code"/>
     <property name="store.src" value="src-store/code"/>
     <property name="client.src" value="src-client/code"/>
-	<property name="annotation.src" value="src-annotation/code"/>
-	<property name="coordinator.src" value="src-coordinator/code"/>
-	
-	<!-- Test code locations -->
-	<property name="kernel.test" value="src-kernel/test"/>
-	<property name="zigzag.test" value="src-zigzag/test"/>
-	<property name="demo.test" value="src-demo/test"/>
-	<property name="plugins.test" value="src-plugins/test"/>
-	<property name="ws.test" value="src-webservices/test"/>
-	<property name="store.test" value="src-store/test"/>
-	<property name="client.test" value="src-client/test"/>
-	<property name="coordinator.test" value="src-coordinator/test"/>
-	
-	<!-- The generic classpath to all the code (includes code and tests) -->
-	<path id="meandre.javadoc.src">
-		<fileset dir="${kernel.src}" includes="*"/>
-		<fileset dir="${kernel.test}" includes="*"/>
-		<fileset dir="${zigzagl.src}" includes="*"/>
-		<fileset dir="${zigzag.test}" includes="*"/>
-		<fileset dir="${demo.src}" includes="*"/>
-		<fileset dir="${demo.test}" includes="*"/>
-		<fileset dir="${plugins.src}" includes="*"/>
-		<fileset dir="${plugins.test}" includes="*"/>
-		<fileset dir="${ws.src}" includes="*"/>
-		<fileset dir="${ws.test}" includes="*"/>
-		<fileset dir="${store.src}" includes="*"/>
-		<fileset dir="${store.test}" includes="*"/>
-		<fileset dir="${client.src}" includes="*"/>
-		<fileset dir="${client.test}" includes="*"/>
-		<fileset dir="${coordinator.src}" includes="*"/>
-		<fileset dir="${coordinator.test}" includes="*"/>
+    <property name="annotation.src" value="src-annotation/code"/>
+    <property name="coordinator.src" value="src-coordinator/code"/>
+    
+    <!-- Test code locations -->
+    <property name="kernel.test" value="src-kernel/test"/>
+    <property name="zigzag.test" value="src-zigzag/test"/>
+    <property name="demo.test" value="src-demo/test"/>
+    <property name="plugins.test" value="src-plugins/test"/>
+    <property name="ws.test" value="src-webservices/test"/>
+    <property name="store.test" value="src-store/test"/>
+    <property name="client.test" value="src-client/test"/>
+    <property name="coordinator.test" value="src-coordinator/test"/>
+    
+    <!-- The generic classpath to all the code (includes code and tests) -->
+    <path id="meandre.javadoc.src">
+        <fileset dir="${kernel.src}" includes="*"/>
+        <fileset dir="${kernel.test}" includes="*"/>
+        <fileset dir="${zigzagl.src}" includes="*"/>
+        <fileset dir="${zigzag.test}" includes="*"/>
+        <fileset dir="${demo.src}" includes="*"/>
+        <fileset dir="${demo.test}" includes="*"/>
+        <fileset dir="${plugins.src}" includes="*"/>
+        <fileset dir="${plugins.test}" includes="*"/>
+        <fileset dir="${ws.src}" includes="*"/>
+        <fileset dir="${ws.test}" includes="*"/>
+        <fileset dir="${store.src}" includes="*"/>
+        <fileset dir="${store.test}" includes="*"/>
+        <fileset dir="${client.src}" includes="*"/>
+        <fileset dir="${client.test}" includes="*"/>
+        <fileset dir="${coordinator.src}" includes="*"/>
+        <fileset dir="${coordinator.test}" includes="*"/>
     </path>
-		
+        
     <!-- Default options for code-generation, compiling and junit-testing -->
     <property name="javac.debug" value="true"/>
     <property name="compile.deprecation" value="true"/>
@@ -118,6 +118,16 @@
         <pathelement location="${test.dir}"/>
     </path>
 
+    <!-- =================================== -->
+    <!-- Dist Classpath                      -->
+    <!-- =================================== -->
+    <path id="meandre.dist.classpath">
+        <pathelement location="${dist.dir}/${app.name}-server-${build.version}.jar"/>
+    </path>
+
  </project>
 
+<!-- DO NOT EDIT BELOW THIS LINE PLEASE -->
+<!-- vim:sw=4:softtabstop=4:expandtab
+-->
 
