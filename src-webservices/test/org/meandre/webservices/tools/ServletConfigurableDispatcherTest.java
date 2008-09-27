@@ -1,6 +1,5 @@
 package org.meandre.webservices.tools;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
@@ -10,15 +9,10 @@ import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.servlet.Servlet;
-
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
-import org.meandre.demo.repository.DemoRepositoryGenerator;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -31,7 +25,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
  * @author Xavier Llor&agrave;
  *
  */
-public class ServletConfigurableDispatcherTest  {
+public abstract class ServletConfigurableDispatcherTest  {
 
 	/** The default port for testing */
 	private final static int iTestPort = 6969;
@@ -40,7 +34,7 @@ public class ServletConfigurableDispatcherTest  {
 	private Server server;
 	
 	/** The main context for the webservices */
-	private Context contextWS;
+	protected Context contextWS;
 
 	/** Creates a fixture to run servlet configurations.
 	 * 
@@ -78,7 +72,7 @@ public class ServletConfigurableDispatcherTest  {
 	 * @param sMethod The method to pull
 	 * @return The content pulled
 	 */
-	private String getGetRequestContent ( String sMethod ) {
+	protected String getGetRequestContent ( String sMethod ) {
 		try {
 			
 			URL url = new URL("http://localhost:"+iTestPort+sMethod);
@@ -109,7 +103,7 @@ public class ServletConfigurableDispatcherTest  {
 	 * @param sFormat The format of the model
 	 * @return The model pulled
 	 */
-	private Model getGetModel ( String sMethod, String sFormat ) {
+	protected Model getGetModel ( String sMethod, String sFormat ) {
 		try {
 			Model mod = ModelFactory.createDefaultModel();
 			URL url = new URL("http://localhost:"+iTestPort+sMethod);
@@ -129,29 +123,4 @@ public class ServletConfigurableDispatcherTest  {
 		}
 	}
 	
-	/** Simple test of the life cycle of the servlet configurable dispatcher.
-	 * 
-	 */
-	@Test
-	public void testServletLifeCycle () {
-		// Set the servlet to test
-		contextWS.addServlet(new ServletHolder((Servlet) new TestServlet()), "/test/*");
-		
-		// Run ping request
-		String sContentTXT = getGetRequestContent("/test/ping.txt");
-		assertEquals("pong\n", sContentTXT);
-		String sContentJSON = getGetRequestContent("/test/ping.json");
-		assertEquals("[\"pong\"]", sContentJSON);
-		String sContentXML = getGetRequestContent("/test/ping.xml");
-		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><meandre_response>pong</meandre_response>", sContentXML);
-
-		// Run the demo repository request
-		Model modDemo = DemoRepositoryGenerator.getTestHelloWorldRepository();
-		Model modRDF = getGetModel("/test/demo.rdf", "RDF/XML-ABBREV");
-		assertEquals(modDemo.size(),modRDF.size());
-		Model modTTL = getGetModel("/test/demo.ttl", "TTL");
-		assertEquals(modDemo.size(),modTTL.size());
-		Model modNT = getGetModel("/test/demo.nt", "N-TRIPLE");
-		assertEquals(modDemo.size(),modNT.size());
-	}
 }
