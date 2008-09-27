@@ -85,11 +85,12 @@ def sendTJXContent ( response, content, format ):
     elif format=='xml' :
         contentAppXML(response)
         jc = __content_to_JSON__(content)
-        xmlc = XML.toString(jc,"meandre_response")
-        sendRawContent(response, '<?xml version="1.0" encoding="UTF-8"?>')
+        xmlc = XML.toString(jc,"meandre_item")
+        sendRawContent(response, '<?xml version="1.0" encoding="UTF-8"?><meandre_response>')
         # TODO 
         # Need to add the style sheet transformation to make it look nice
         sendRawContent(response, xmlc)
+        sendRawContent(response, '</meandre_response>')
         
 def sendRDFModel ( response, model, format ) :
     model.setNsPrefix('meandre', Store.MEANDRE_ONTOLOGY_BASE_URL )

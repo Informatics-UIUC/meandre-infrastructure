@@ -72,11 +72,15 @@ public abstract class ServletConfigurableDispatcher extends HttpServlet {
 		// Setup the interpreter
 		pi = new PythonInterpreter();
 		// Run the initialization script
-		pi.execfile(
+		process(
 				ServletConfigurableDispatcher.class.getResourceAsStream(
 						ServletConfigurableDispatcher.class.getSimpleName()+".py"
 					)
 			);
+		// Run the dispatcher definition
+		process(this.getClass().getResourceAsStream(
+				this.getClass().getSimpleName()+".py"
+			));
 	}
 	
 	/** Destroys the servlet and releases the Python interpreter after cleaning it up.
