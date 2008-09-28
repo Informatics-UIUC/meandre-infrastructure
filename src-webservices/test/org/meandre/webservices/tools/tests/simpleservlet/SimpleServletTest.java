@@ -1,12 +1,14 @@
 package org.meandre.webservices.tools.tests.simpleservlet;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashSet;
 import java.util.Properties;
 
 import javax.servlet.Servlet;
@@ -212,4 +214,63 @@ extends ServletConfigurableDispatcherTest {
 		
 	}
 
+	/** Simple test of a call that returns a dictionary of the parameters
+	 * passed to the servlet request.
+	 * 
+	 */
+	@Test
+	public void testServletParameterEcho () {
+		// Set the servlet to test
+		contextWS.addServlet(new ServletHolder((Servlet) new SimpleServlet()), "/test/*");
+
+		// Check passing multiple parameters with unique values
+		try {
+			int iNumberOfParameters = 10;
+			String sParameters = "?param0=value0";
+			for ( int i=1 ; i<iNumberOfParameters ; i++ )
+				sParameters+="&param"+i+"=value"+i;
+			String sContentJSON = getGetRequestContent("/test/request_echo.json"+sParameters);
+			JSONArray jsaResponse = new JSONArray(sContentJSON);
+			assertEquals(1,jsaResponse.length());
+			JSONObject jsoDictionary = jsaResponse.getJSONObject(0);
+			assertEquals(iNumberOfParameters,jsoDictionary.length());
+			for ( int i=0 ; i<iNumberOfParameters ; i++ ) {
+				JSONArray jaValues = jsoDictionary.getJSONArray("param"+i);
+				assertEquals(1, jaValues.length());
+				assertEquals("value"+i,jaValues.getString(0));
+			}
+		} catch (JSONException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			fail("Failed to parse the JSON array content because "+baos.toString());
+		}
+		
+		// Check passing multiple parameters with multiple values
+		try {
+			int iNumberOfParameters = 10;
+			String sParameters = "?param0=value0";
+			for ( int i=1 ; i<iNumberOfParameters ; i++ )
+				sParameters+="&param"+i+"=value"+i;
+			for ( int i=0 ; i<iNumberOfParameters ; i++ )
+				sParameters+="&param"+i+"=value"+(iNumberOfParameters+i);
+			String sContentJSON = getGetRequestContent("/test/request_echo.json"+sParameters);
+			JSONArray jsaResponse = new JSONArray(sContentJSON);
+			assertEquals(1,jsaResponse.length());
+			JSONObject jsoDictionary = jsaResponse.getJSONObject(0);
+			assertEquals(iNumberOfParameters,jsoDictionary.length());
+			for ( int i=0 ; i<iNumberOfParameters ; i++ ) {
+				JSONArray jaValues = jsoDictionary.getJSONArray("param"+i);
+				assertEquals(2, jaValues.length());
+				HashSet<String> hs = new HashSet<String>();
+				hs.add(jaValues.getString(0));
+				hs.add(jaValues.getString(1));
+				assertTrue(hs.contains("value"+i));
+				assertTrue(hs.contains("value"+(iNumberOfParameters+i)));
+			}
+		} catch (JSONException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			fail("Failed to parse the JSON array content because "+baos.toString());
+		}
+	}
 }
