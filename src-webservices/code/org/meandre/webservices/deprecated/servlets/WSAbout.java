@@ -1,4 +1,4 @@
-package org.meandre.webservices.servlets;
+package org.meandre.webservices.deprecated.servlets;
 
 import java.io.IOException;
 import java.net.URL;
@@ -17,7 +17,7 @@ import org.meandre.core.security.SecurityManager;
 import org.meandre.core.security.SecurityStoreException;
 import org.meandre.core.security.User;
 import org.meandre.core.store.Store;
-import org.meandre.webservices.controllers.WSAboutLogic;
+import org.meandre.webservices.deprecated.controller.WSAboutLogic;
 import org.meandre.webservices.logger.WSLoggerFactory;
 
 /** A basic handler to display basic information.

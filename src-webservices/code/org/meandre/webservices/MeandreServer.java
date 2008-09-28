@@ -27,7 +27,7 @@ import org.meandre.core.store.Store;
 import org.meandre.core.utils.Constants;
 import org.meandre.plugins.PluginFactory;
 import org.meandre.webservices.logger.WSLoggerFactory;
-import org.meandre.webservices.servlets.WSAbout;
+import org.meandre.webservices.servlets.WSAboutServlet;
 import org.meandre.webservices.servlets.WSExecute;
 import org.meandre.webservices.servlets.WSLocations;
 import org.meandre.webservices.servlets.WSPublic;
@@ -317,7 +317,7 @@ public class MeandreServer {
 		//
 		// Adding restrictedly provided services
 		//
-		contextWS.addServlet(new ServletHolder((Servlet) new WSAbout(store,cnf)), 		"/services/about/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSAboutServlet(store,cnf)), 		"/services/about/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSLocations(store,cnf)),	"/services/locations/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository(store,cnf)),	"/services/repository/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSExecute(store,cnf)),		"/services/execute/*");
