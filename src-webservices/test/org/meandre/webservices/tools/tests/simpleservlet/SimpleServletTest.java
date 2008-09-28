@@ -7,20 +7,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.StringBufferInputStream;
-import java.io.StringReader;
+import java.util.Properties;
 
 import javax.servlet.Servlet;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
 
-import org.apache.tools.ant.taskdefs.Jar;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.json.JSONTokener;
 import org.junit.Test;
 import org.meandre.demo.repository.DemoRepositoryGenerator;
 import org.meandre.webservices.tools.ServletConfigurableDispatcherTest;
@@ -29,7 +25,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
@@ -78,7 +73,7 @@ extends ServletConfigurableDispatcherTest {
 	}
 
 
-	/** Simple test of the life cycle of the servlet configurable dispatcher.
+	/** Simple test of a call that returns an array of the servlet configurable dispatcher.
 	 * 
 	 */
 	@Test
@@ -88,7 +83,10 @@ extends ServletConfigurableDispatcherTest {
 		
 		// Get an array in text form
 		String sContentTXT = getGetRequestContent("/test/array.txt");
-		assertEquals(10, sContentTXT.split("\n").length);
+		String [] saResponse = sContentTXT.split("\n");
+		assertEquals(10, saResponse.length);
+		for ( int i=0,iMax=saResponse.length ; i<iMax ; i++ )
+			assertEquals("value"+i, saResponse[i]);
 		
 		// Get an array in JSON form
 		try {
@@ -136,4 +134,82 @@ extends ServletConfigurableDispatcherTest {
 			fail("Failed to parse the XML response content because "+baos.toString());
 		}
 	}
+	
+
+	/** Simple test of a call that returns a dictionary of the servlet configurable dispatcher.
+	 * 
+	 */
+	@Test
+	public void testServletDictionary () {
+		// Set the servlet to test
+		contextWS.addServlet(new ServletHolder((Servlet) new SimpleServlet()), "/test/*");
+
+		// Get a dictionary in text form	
+		try {
+			String sContentTXT = getGetRequestContent("/test/dictionary.txt");
+			ByteArrayInputStream baisXML = new ByteArrayInputStream(sContentTXT.getBytes());
+			Properties prop = new Properties();
+			prop.load(baisXML);
+			assertEquals(2,prop.size());
+			assertEquals("SimpleServlet",prop.get("name"));
+			assertEquals("get_dictionary_info",prop.get("method"));
+		} catch (IOException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			fail("Failed to load the text dictionary because "+baos.toString());
+		}
+		
+
+		// Get a dictionary in json form
+		try {
+			String sContentJSON = getGetRequestContent("/test/dictionary.json");
+			JSONArray jsaResponse = new JSONArray(sContentJSON);
+			assertEquals(1, jsaResponse.length());
+			JSONObject joDict = jsaResponse.getJSONObject(0);
+			assertEquals("SimpleServlet",joDict.getString("name"));
+			assertEquals("get_dictionary_info",joDict.getString("method"));
+		} catch (JSONException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			fail("Failed to parse the JSON array content because "+baos.toString());
+		}
+	
+		// Get a dictionary in XML format
+		try {
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			ByteArrayInputStream baisXML = new ByteArrayInputStream(getGetRequestContent("/test/dictionary.xml").getBytes());
+			Document dom = db.parse(baisXML);
+			Element elementResponseRoot = dom.getDocumentElement();
+			// Check the root node
+			assertEquals("meandre_response",elementResponseRoot.getTagName());
+			NodeList nlResponseItems = elementResponseRoot.getElementsByTagName("meandre_item");
+			// Check there are 10 response elements
+			assertEquals(1,nlResponseItems.getLength());
+			//Check the node values
+			Element el = (Element)nlResponseItems.item(0);
+			// Check the values
+			NodeList nlResponseItemsName = el.getElementsByTagName("name");
+			assertEquals(1,nlResponseItemsName.getLength());
+			assertEquals("SimpleServlet",((Element)nlResponseItemsName.item(0)).getFirstChild().getNodeValue());
+			NodeList nlResponseItemsGet  = el.getElementsByTagName("method");
+			assertEquals(1,nlResponseItemsGet.getLength());
+			assertEquals("get_dictionary_info",((Element)nlResponseItemsGet.item(0)).getFirstChild().getNodeValue());
+			
+		} catch (ParserConfigurationException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			fail("Failed to configure XML parser because "+baos.toString());
+		} catch (SAXException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			fail("Failed to parse the XML response content because "+baos.toString());
+		} catch (IOException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			fail("Failed to parse the XML response content because "+baos.toString());
+		}
+		
+	}
+
 }

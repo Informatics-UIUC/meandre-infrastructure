@@ -66,18 +66,30 @@ def __content_to_JSON__ (content) :
         return ja
     elif isinstance(content,dict) :
         jo = JSONObject()
-        for k,c in content:
+        for k,c in content.items():
             jo.put(k,__content_to_JSON__(c))
         return jo
     else :
         return content
     
+def __content_to_TXT__(content,tab):
+    res = ''
+    if isinstance(content,list) :
+        for c in content:
+            res += tab+__content_to_TXT__(c,tab+'\t')+'\n'
+        return res
+    elif isinstance(content,dict) :
+        for k,c in content.items():
+            res += tab+k+' = '+__content_to_TXT__(c,tab+'\t')+'\n'
+        return res
+    else :
+        return content
+        
 def sendTJXContent ( response, content, format ):
     if format=='txt':
         contentTextPlain(response)
-        for c in content :
-            sendRawContent(response,c)
-            sendRawContent(response,'\n')
+        txt = __content_to_TXT__(content,'')
+        sendRawContent(response, txt)
     elif format=='json' :
         contentAppJSON(response)
         jc = __content_to_JSON__(content)
