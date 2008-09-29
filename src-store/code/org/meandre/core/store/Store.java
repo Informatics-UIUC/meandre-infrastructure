@@ -14,6 +14,8 @@ import java.util.logging.Logger;
 
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.logger.KernelLoggerFactory;
+import org.meandre.core.repository.ExecutableComponentDescription;
+import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.security.SecurityStoreException;
@@ -27,6 +29,7 @@ import com.hp.hpl.jena.db.DBConnection;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
+import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
  * This class provides the basic configuration for the Meandre store.
@@ -499,4 +502,81 @@ public class Store {
 		return dbConn.getDatabaseType();
 	}
 	
+	/** Publishes the component described by the URI. If the URI already
+	 * exist, the call returns false not modifying the published description;
+	 * return true otherwise.
+	 * 
+	 * @param sURI The URI to publish
+	 * @param sRemoteUser The publishing user.
+	 */
+	public boolean publishURI(String sURI, String sRemoteUser) {
+		
+		boolean bPublished = false;
+		QueryableRepository qr = getRepositoryStore(sRemoteUser);
+		Resource resURI = qr.getModel().createResource(sURI);
+		Model modToPublish = null;
+		Model modPublic = getPublicRepositoryStore();
+		QueryableRepository qrPublic = new RepositoryImpl(modPublic);
+		
+		if ( qrPublic.getExecutableComponentDescription(resURI)==null && 
+			 qrPublic.getFlowDescription(resURI)==null ) {
+			// The URI does not exist
+			ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(resURI);
+			FlowDescription fd = qr.getFlowDescription(resURI);
+			if ( ecd!=null ) {
+				modToPublish = ecd.getModel();
+			}
+			else if ( fd!=null ) {
+				modToPublish = fd.getModel();
+			}
+			
+			if ( modToPublish!=null ) {	
+				bPublished = true;
+				modPublic.begin();
+				modPublic.add(modToPublish);
+				modPublic.commit();
+			}
+		}
+		
+		return bPublished;
+	}
+	
+
+	/** Unpublishes the component described by the URI. If the URI already
+	 * exist, the call returns false not modifying the published description;
+	 * return true otherwise.
+	 * 
+	 * @param sURI The URI to publish
+	 * @param sRemoteUser The publishing user.
+	 */
+	private void unpublishURI(String sURI, String sRemoteUser) {
+		
+		boolean bUnpublished = false;
+		QueryableRepository qr = getRepositoryStore(sRemoteUser);
+		Resource resURI = qr.getModel().createResource(sURI);
+		Model modToUnpublish = null;
+		Model modPublic = getPublicRepositoryStore();
+		QueryableRepository qrPublic = new RepositoryImpl(modPublic);
+		
+		if ( qrPublic.getExecutableComponentDescription(resURI)!=null || 
+			 qrPublic.getFlowDescription(resURI)!=null ) {
+			// The URI does not exist
+			ExecutableComponentDescription ecd = qrPublic.getExecutableComponentDescription(resURI);
+			FlowDescription fd = qrPublic.getFlowDescription(resURI);
+			if ( ecd!=null ) {
+				modToUnpublish = ecd.getModel();
+			}
+			else if ( fd!=null ) {
+				modToUnpublish = fd.getModel();
+			}
+						
+			if ( modToUnpublish!=null ) {
+				bUnpublished = true;
+				modPublic.begin();
+				modPublic.remove(modToUnpublish);
+				modPublic.commit();
+			}
+		}
+		
+	}
 }

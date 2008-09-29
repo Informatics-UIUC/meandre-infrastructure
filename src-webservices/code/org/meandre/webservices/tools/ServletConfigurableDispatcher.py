@@ -68,6 +68,13 @@ def errorForbidden ( response ):
     
        errorForbidden ( response )'''
     response.sendError(HttpServletResponse.SC_FORBIDDEN)   
+
+def errorBadRequest ( response ):
+    '''Responses with a bad request code
+    
+       errorBadRequest ( response )'''
+    response.sendError(HttpServletResponse.SC_BAD_REQUEST)   
+#
 #
 # Content response function
 #

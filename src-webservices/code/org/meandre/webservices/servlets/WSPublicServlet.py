@@ -30,7 +30,7 @@ def public_repository ( request, response, format ):
     
 
 def public_demo_repository ( request, response, format ):
-    '''Returns a simple hello work demo repository available in this 
+    '''Returns a simple hello world demo repository available in this 
        instance of the Meandre Server.''' 
     content = DemoRepositoryGenerator.getTestHelloWorldMoreHetereogenousRepository()
     statusOK(response)
