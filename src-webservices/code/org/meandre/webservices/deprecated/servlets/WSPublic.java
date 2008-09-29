@@ -1,4 +1,4 @@
-package org.meandre.webservices.servlets;
+package org.meandre.webservices.deprecated.servlets;
 
 import java.io.IOException;
 import java.net.URL;

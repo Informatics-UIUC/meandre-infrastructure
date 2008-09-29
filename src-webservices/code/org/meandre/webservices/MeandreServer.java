@@ -30,7 +30,7 @@ import org.meandre.webservices.logger.WSLoggerFactory;
 import org.meandre.webservices.servlets.WSAboutServlet;
 import org.meandre.webservices.servlets.WSExecute;
 import org.meandre.webservices.servlets.WSLocations;
-import org.meandre.webservices.servlets.WSPublic;
+import org.meandre.webservices.servlets.WSPublicServlet;
 import org.meandre.webservices.servlets.WSPublish;
 import org.meandre.webservices.servlets.WSRepository;
 import org.meandre.webservices.servlets.WSSecurity;
@@ -312,7 +312,7 @@ public class MeandreServer {
 		//
 		// Adding the publicly provided services
 		//
-		contextWS.addServlet(new ServletHolder((Servlet) new WSPublic(store)), "/public/services/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSPublicServlet(store,cnf)), "/public/services/*");
 		
 		//
 		// Adding restrictedly provided services
