@@ -32,6 +32,7 @@ import org.meandre.webservices.servlets.WSExecute;
 import org.meandre.webservices.servlets.WSLocations;
 import org.meandre.webservices.servlets.WSPublicServlet;
 import org.meandre.webservices.servlets.WSPublish;
+import org.meandre.webservices.servlets.WSPublishServlet;
 import org.meandre.webservices.servlets.WSRepository;
 import org.meandre.webservices.servlets.WSSecurity;
 import org.mortbay.jetty.Server;
@@ -322,6 +323,7 @@ public class MeandreServer {
 		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository(store,cnf)),	"/services/repository/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSExecute(store,cnf)),		"/services/execute/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublish(store)),		"/services/publish/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSPublishServlet(store,cnf)),		"/services/publish/new/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurity(store)),		"/services/security/*");
 	
 		return contextWS;

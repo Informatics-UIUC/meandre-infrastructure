@@ -30,7 +30,7 @@ def public_publish ( request, response, format ):
             errorBadRequest(response)
         else :
             content = []
-            for uri in param['uri']:
+            for uri in params['uri']:
                 if meandre_store.publishURI(uri,request.getRemoteUser()) :
                     content.append(uri)
             statusOK(response)
@@ -48,7 +48,7 @@ def public_unpublish ( request, response, format ):
             errorBadRequest(response)
         else :
             content = []
-            for uri in param['uri']:
+            for uri in params['uri']:
                 if meandre_store.unpublishURI(uri,request.getRemoteUser()) :
                     content.append(uri)
             statusOK(response)
