@@ -6,7 +6,7 @@ package org.meandre.webservices.servlets;
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.store.Store;
 
-/** Provides the servlet that serves about requests.
+/** Provides the servlet that serves Location requests.
  * 
  * @author Xavier Llor&agrave;
  *

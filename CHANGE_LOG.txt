@@ -1,5 +1,9 @@
 1.4.0-vcli-alpha Sara
 
+* Migrated the Execution service. Also added the JSON and XML versions to the 
+  calls that Amit added involving tokens and quering information from a running
+  flow.
+
 * Migrated the Locations service to the new Python-based dispatcher
 	(!) Changed the behavior of remove location to only remove the components and
 	    flows existing in that location instead of the current regenerate and add

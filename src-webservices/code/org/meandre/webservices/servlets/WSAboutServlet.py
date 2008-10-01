@@ -23,7 +23,7 @@ from java.util import Date
 from org.meandre.core.utils import Constants
 
 #
-# Provides information about the servers version
+# Services implementation
 #
 
 def about_version ( request, response, format ):

@@ -18,7 +18,7 @@ requestMap = {
 from org.meandre.demo.repository import DemoRepositoryGenerator
 
 #
-# Provides information about the servers version
+# Services implementation
 #
 
 def public_repository ( request, response, format ):

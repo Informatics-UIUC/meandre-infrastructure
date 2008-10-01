@@ -26,9 +26,10 @@ import org.meandre.core.services.coordinator.backend.BackendAdapterException;
 import org.meandre.core.store.Store;
 import org.meandre.core.utils.Constants;
 import org.meandre.plugins.PluginFactory;
+import org.meandre.webservices.deprecated.servlets.WSExecute;
 import org.meandre.webservices.logger.WSLoggerFactory;
 import org.meandre.webservices.servlets.WSAboutServlet;
-import org.meandre.webservices.servlets.WSExecute;
+import org.meandre.webservices.servlets.WSExecuteServlet;
 import org.meandre.webservices.servlets.WSLocationsServlet;
 import org.meandre.webservices.servlets.WSPublicServlet;
 import org.meandre.webservices.servlets.WSPublishServlet;
@@ -321,6 +322,7 @@ public class MeandreServer {
 		contextWS.addServlet(new ServletHolder((Servlet) new WSLocationsServlet(store,cnf)),	"/services/locations/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository(store,cnf)),	"/services/repository/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSExecute(store,cnf)),		"/services/execute/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSExecuteServlet(store,cnf)),		"/services/execute/new/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublishServlet(store,cnf)),		"/services/publish/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurity(store)),		"/services/security/*");
 	

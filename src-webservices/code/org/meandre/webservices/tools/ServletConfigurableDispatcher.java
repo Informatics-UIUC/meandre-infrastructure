@@ -3,7 +3,6 @@ package org.meandre.webservices.tools;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -202,7 +201,7 @@ public abstract class ServletConfigurableDispatcher extends HttpServlet {
 			pi.exec("del("+sReq+")");
 			pi.exec("del("+sRes+")");
 			
-		} catch (MalformedURLException e) {
+		} catch (Exception e) {
 			Logger log = WSLoggerFactory.getWSLogger();
 			log.warning("Could not process request "+
 					    req.getRequestURL().toString()+

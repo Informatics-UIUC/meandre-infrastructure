@@ -1,8 +1,16 @@
 #
 # Machinery for the Meandre servlets
 #
-from org.meandre.core.security import Role
 
+#
+# Basic imports
+#
+from org.meandre.core.security import Role
+from org.meandre.core.utils import NetworkTools
+
+#
+# Support methods
+#
 def checkUserRole ( request, role ):
     '''Checks if the provided user making the resquest has been granted 
        the role requested. If so, return true, false otherwise.
@@ -16,3 +24,11 @@ def getMeandreUser ( request ):
     
     getMeandreUser ( request )'''
     return request.getRemoteUser()
+
+def getHostName () :
+    '''Return the host name.
+    
+       getHostName()'''
+    return NetworkTools.getLocalHostName()
+
+

@@ -18,7 +18,7 @@ requestMap = {
 from org.meandre.core.security import Role
 
 #
-# Provides information about the servers version
+# Services implementation
 #
 
 def publish_publish ( request, response, format ):

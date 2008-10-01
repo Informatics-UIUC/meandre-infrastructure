@@ -20,7 +20,7 @@ from org.meandre.core.security import Role
 from org.meandre.core.store.system import SystemStore
 
 #
-# Provides information about the servers version
+# Services implementation
 #
 
 def locations_list ( request, response, format ):
