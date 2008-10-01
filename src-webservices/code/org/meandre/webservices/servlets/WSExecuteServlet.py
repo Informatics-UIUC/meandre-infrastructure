@@ -74,7 +74,7 @@ def execute_list_running_flows ( request, response, format ):
             if ( webui is not None ) :
                 content.append( {
                         'flow_instance_uri': flow_uri,
-                        'flow_instance_webui_uri': 'http://'+getHostName+':'+webui.getPort()+'/'
+                        'flow_instance_webui_uri': 'http://'+getHostName()+':'+str(webui.getPort())+'/'
                     })
         statusOK(response)
         sendTJXContent(response,[content],format)
@@ -94,7 +94,7 @@ def execute_url ( request, response, format ):
                 if webui is not None :
                     content.append( {
                             'flow_instance_uri': flow_uri,
-                            'flow_instance_webui_uri': 'http://'+getHostName+':'+webui.getPort()+'/'
+                            'flow_instance_webui_uri': 'http://'+getHostName()+':'+str(webui.getPort())+'/'
                         })
             statusOK(response)
             sendTJXContent(response,[content],format)
@@ -115,7 +115,7 @@ def execute_web_component_url ( request, response, format ):
             for flow_uri in uris: 
                 webui = WebUIFactory.getExistingWebUI(flow_uri)
                 if webui is not None :
-                    host_url = 'http://'+getHostName+':'+webui.getPort()+'/'
+                    host_url = 'http://'+getHostName()+':'+str(webui.getPort())+'/'
                     fragments = webuiTmp.getWebUIDispatcher().getLstHandlers()
                     for fragment in fragments:
                         content.append( {

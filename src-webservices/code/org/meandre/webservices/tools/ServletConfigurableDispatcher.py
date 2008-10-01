@@ -141,7 +141,7 @@ def __content_to_TXT__(content,tab):
     res = ''
     if isinstance(content,list) :
         for c in content:
-            res += tab+__content_to_TXT__(c,tab+'\t')+'\n'
+            res += __content_to_TXT__(c,tab+'\t')+'\n'
         return res
     elif isinstance(content,dict) :
         for k,c in content.items():
