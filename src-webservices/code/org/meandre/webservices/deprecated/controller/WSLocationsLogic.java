@@ -1,4 +1,4 @@
-package org.meandre.webservices.controllers;
+package org.meandre.webservices.deprecated.controller;
 
 import java.io.IOException;
 import java.net.URL;
@@ -102,7 +102,7 @@ public class WSLocationsLogic {
 	 */
 	public boolean addLocation(String sUser, String sLocation, String sDescription) {
 		
-		boolean bRes = true;
+		boolean bRes = false;
 		
 		// Retrieve system store
 		SystemStore ss = store.getSystemStore(cnf,sUser);
@@ -164,6 +164,7 @@ public class WSLocationsLogic {
 				
 				qr.getModel().commit();
 				qr.refreshCache();
+				bRes = true;
 			}
 			catch ( Exception e ) {
 				log.warning("WSLocationsLogic.removeLocation: Failed to add location\n"+e.toString());

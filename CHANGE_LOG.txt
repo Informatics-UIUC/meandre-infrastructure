@@ -1,5 +1,25 @@
 1.4.0-vcli-alpha Sara
 
+* Migrated the Locations service to the new Python-based dispatcher
+	(!) Changed the behavior of remove location to only remove the components and
+	    flows existing in that location instead of the current regenerate and add
+	    which has the potential of getting rid of temporary components/flows added 
+	    by a developer
+
+* Migrated the Publish services to the new Python-based dispatcher
+
+* Migrated the Public services to the new Python-based dispatcher
+
+* Migrated the About services to the new Python-based dispatcher
+
+* Created an extension of the base dispatcher adding Meandre related information
+
+* Added a test servlet to test the functionalities provided by the base servlet dispatcher
+
+* Create the Python code to implement the base dispatcher
+
+* Developed a unified base servlet dispatcher 
+
 * Move the MDX branch from the experimental repository to the branch one
 
 * Revamped the backend adapters to allow the proper schema creation for Derby

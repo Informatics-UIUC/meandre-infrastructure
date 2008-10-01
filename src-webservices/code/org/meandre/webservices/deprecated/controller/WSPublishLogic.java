@@ -1,4 +1,4 @@
-package org.meandre.webservices.controllers;
+package org.meandre.webservices.deprecated.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;

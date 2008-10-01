@@ -1,4 +1,4 @@
-package org.meandre.webservices.servlets;
+package org.meandre.webservices.deprecated.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -20,7 +20,7 @@ import org.meandre.core.security.SecurityManager;
 import org.meandre.core.security.SecurityStoreException;
 import org.meandre.core.security.User;
 import org.meandre.core.store.Store;
-import org.meandre.webservices.controllers.WSLocationsLogic;
+import org.meandre.webservices.deprecated.controller.WSLocationsLogic;
 import org.meandre.webservices.logger.WSLoggerFactory;
 	
 /** The class handling the locations interactions.

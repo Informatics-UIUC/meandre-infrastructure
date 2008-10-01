@@ -6,12 +6,12 @@ package org.meandre.webservices.servlets;
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.store.Store;
 
-/** Provides the servlet that serves Public requests.
+/** Provides the servlet that serves about requests.
  * 
  * @author Xavier Llor&agrave;
  *
  */
-public class WSPublicServlet extends MeandreBaseServlet {
+public class WSLocationsServlet extends MeandreBaseServlet {
 
 	/** A default serial ID */
 	private static final long serialVersionUID = 1L;
@@ -21,7 +21,7 @@ public class WSPublicServlet extends MeandreBaseServlet {
 	 * @param store The Meandre store to use
 	 * @param cnf The Meandre configuration to use
 	 */
-	public WSPublicServlet(Store store, CoreConfiguration cnf) {
+	public WSLocationsServlet(Store store, CoreConfiguration cnf) {
 		super(store, cnf);
 	}
 

@@ -5,11 +5,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.meandre.configuration.CoreConfiguration;
@@ -548,8 +550,9 @@ public class Store {
 	 * 
 	 * @param sURI The URI to publish
 	 * @param sRemoteUser The publishing user.
+	 * @return 
 	 */
-	private void unpublishURI(String sURI, String sRemoteUser) {
+	public boolean unpublishURI(String sURI, String sRemoteUser) {
 		
 		boolean bUnpublished = false;
 		QueryableRepository qr = getRepositoryStore(sRemoteUser);
@@ -578,5 +581,212 @@ public class Store {
 			}
 		}
 		
+		return bUnpublished;
+	}
+	
+
+	/** Checks if a location already exist on the users system repository.
+	 * 
+	 * @param ss The users system repository
+	 * @param sLocation The location
+	 * @return True if the location already exist
+	 */
+	private boolean isAlreadyAUsedLocation(SystemStore ss, String sLocation) {
+		boolean bExist = false;
+		Set<Hashtable<String, String>> setProps = ss.getProperty(SystemStore.REPOSITORY_LOCATION);
+		
+		for ( Hashtable<String, String> ht:setProps )
+			if ( ht.get("value").equals(sLocation) ) {
+				bExist = true;
+				break;
+			}
+
+		return bExist;
+	}
+
+	/** Removes a location from the repository.
+	 * 
+	 * @param sUser The system store user
+	 * @param sLocation The location to remove
+	 * @param cnf The core configuration object
+	 * @return True if the location could be successfully removed
+	 */
+	public boolean removeLocation(String sUser, String sLocation, CoreConfiguration cnf) {
+		boolean bRes = true;
+		
+		// Retrieve system store
+		SystemStore ss = getSystemStore(cnf,sUser);
+	    
+		if ( !isAlreadyAUsedLocation(ss, sLocation)) {
+			//
+			// Location does not exist
+			//
+			bRes = false;
+		}
+		else {
+			//
+			// Location does exist
+			//
+			
+			//
+			// Regenerate the users repository
+			//
+			QueryableRepository qr = getRepositoryStore(sUser);
+			Model mod = qr.getModel();
+			
+			try {
+				URL url = new URL(sLocation);
+				Model modelTmp = ModelFactory.createDefaultModel();
+					
+				modelTmp.setNsPrefix("", "http://www.meandre.org/ontology/");
+				modelTmp.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
+					modelTmp.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
+				modelTmp.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
+	    
+				//
+				// Read the location and check its consistency
+				//
+				try{
+					if ( url.toString().endsWith(".ttl"))
+						modelTmp.read(url.openStream(),null,"TTL");
+					else if ( url.toString().endsWith(".nt"))
+						modelTmp.read(url.openStream(),null,"N-TRIPLE");
+					else
+						modelTmp.read(url.openStream(),null);
+				}
+				catch(Exception e){
+                    log.warning("Store failed removing Location: " +
+                            url.toString() + "\n"+
+                            e.toString());
+                    bRes = false;
+                    return bRes;
+                    
+                }
+               
+                // Check the pulled repository consistency
+                QueryableRepository qrTmp = new RepositoryImpl(modelTmp);
+				
+				//
+				// Remove the components provided by the location
+				//
+				mod.begin();
+				// Remove the executable components
+				for ( Resource recd:qrTmp.getAvailableExecutableComponents() ) {
+					ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(recd);
+					mod.remove(ecd.getModel());
+				}
+				for ( Resource rfd:qrTmp.getAvailableFlows() ) {
+					FlowDescription fd = qr.getFlowDescription(rfd);
+					mod.remove(fd.getModel());
+				}
+				mod.commit();
+				qr.refreshCache();
+			}
+			catch ( Exception e ) {
+				log.warning("WSLocationsLogic.removeLocation: Failed to load location\n"+e.toString());
+				bRes = false;
+			}
+			
+			// 
+			// Remove the location form the system properties
+			//
+			ss.removeProperty(SystemStore.REPOSITORY_LOCATION, sLocation);
+			
+		}
+		
+		return bRes;
+	}
+
+
+	/** This method adds a location to the user repository. Also checks that is
+	 * a valid description of it.
+	 * 
+	 * @param The user adding the location
+	 * @param sLocation The location to add
+	 * @param sDescription The description of the location to add
+	 * @param cnf The core configuration object
+	 * @return True if the location could be successfully added
+	 */
+	public boolean addLocation(String sUser, String sLocation, String sDescription, CoreConfiguration cnf) {
+		
+		boolean bRes = false;
+		
+		// Retrieve system store
+		SystemStore ss = getSystemStore(cnf,sUser);
+	    
+		if ( !isAlreadyAUsedLocation(ss,sLocation) ) {
+			//
+			// New location
+			//
+			try {
+					
+				URL url = new URL(sLocation);
+				Model modelTmp = ModelFactory.createDefaultModel();
+					
+				modelTmp.setNsPrefix("", "http://www.meandre.org/ontology/");
+				modelTmp.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
+					modelTmp.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
+				modelTmp.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
+	    
+				//
+				// Read the location and check its consistency
+				//
+			
+				if ( sLocation.endsWith(".ttl"))
+					modelTmp.read(url.openStream(),null,"TTL");
+				else if ( sLocation.endsWith(".nt"))
+					modelTmp.read(url.openStream(),null,"N-TRIPLE");
+				else
+					modelTmp.read(url.openStream(),null);
+
+				
+				//
+				// Test the location
+				//
+				QueryableRepository qrNew = new RepositoryImpl(modelTmp);
+				
+				//
+				// If now exception was thrown, add the location to the list
+				// and update the user repository 
+				//
+				ss.setProperty(SystemStore.REPOSITORY_LOCATION, sLocation, sDescription);
+				QueryableRepository qr = getRepositoryStore(sUser);
+				
+				// Modifying the repository
+				qr.getModel().begin();
+				 
+				// Adding components
+				for ( ExecutableComponentDescription ecd:qrNew.getAvailableExecutableComponentDescriptions())
+					if ( !qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent()))
+						qr.getModel().add(ecd.getModel());
+					else
+						log.warning("Component "+ecd.getExecutableComponent()+" already exist in the current repository. Discarding it.");
+				
+				// Adding flows
+				for ( FlowDescription fd:qrNew.getAvailableFlowDescriptions())
+					if ( !qr.getAvailableFlows().contains(fd.getFlowComponent()))
+						qr.getModel().add(fd.getModel());
+					else
+						log.warning("Flow "+fd.getFlowComponent()+" already exist in the current repository. Discarding it.");
+				
+				qr.getModel().commit();
+				qr.refreshCache();
+				bRes = true;
+			}
+			catch ( Exception e ) {
+				log.warning("WSLocationsLogic.removeLocation: Failed to add location\n"+e.toString());
+				bRes = false;
+			}
+		}
+		else {
+			//
+			// Existing location (update the description)
+			//
+			ss.removeProperty(SystemStore.REPOSITORY_LOCATION, sLocation);
+			ss.setProperty(SystemStore.REPOSITORY_LOCATION, sLocation, sDescription);
+		}
+
+		
+		return bRes;
 	}
 }

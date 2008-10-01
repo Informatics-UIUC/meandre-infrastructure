@@ -10,3 +10,9 @@ def checkUserRole ( request, role ):
        checkUserRole ( request, role )'''
     user = meandre_security.getUser(request.getRemoteUser());
     return meandre_security.hasRoleGranted(user, role);
+
+def getMeandreUser ( request ):
+    '''Returns the user that made the request.
+    
+    getMeandreUser ( request )'''
+    return request.getRemoteUser()

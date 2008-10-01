@@ -1,5 +1,9 @@
 package org.meandre.demo.repository;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -46,7 +50,22 @@ public class DemoRepositoryGenerator {
 	
 	/** The semaphore con implement MUTEX against the unique ID */
 	private static Semaphore semUniqueID = new Semaphore(1,true);
-		
+	
+	/** The simple date formater */
+	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	
+	private static Date baseDate;
+	
+	static {
+		try {
+			baseDate = sdf.parse("2007-09-11 21:06:03");
+		} catch (ParseException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.warning("Could not create date for internal demo components\n"+baos.toString());
+		}
+	}
+	
 	/** Create the description for org.meandre.demo.components.PushStringComponent.
 	 * 
 	 * @param sBaseURL The base URL
@@ -65,7 +84,7 @@ public class DemoRepositoryGenerator {
 		String sDescription = "Pushes the string stored into the properties to the output";
 		String sRights = "University of Illinois/NCSA open source license";
 		String sCreator = "Xavier Llor&agrave;";
-		Date dateCreation = new Date();
+		Date dateCreation = baseDate;
 		
 		// Context
 		Set<RDFNode> setContext = new HashSet<RDFNode>();
@@ -140,7 +159,7 @@ public class DemoRepositoryGenerator {
 		String sDescription = "Pushes the string stored into the properties to the output";
 		String sRights = "University of Illinois/NCSA open source license";
 		String sCreator = "Xavier Llor&agrave;";
-		Date dateCreation = new Date();
+		Date dateCreation = baseDate;
 		
 		// Context
 		Set<RDFNode> setContext = new HashSet<RDFNode>();
@@ -230,7 +249,7 @@ public class DemoRepositoryGenerator {
 		String sDescription = "Concatenates the to input string to the output";
 		String sRights = "University of Illinois/NCSA open source license";
 		String sCreator = "Xavier Llor&agrave;";
-		Date dateCreation = new Date();
+		Date dateCreation = baseDate;
 		
 		// Context
 		Set<RDFNode> setContext = new HashSet<RDFNode>();
@@ -346,7 +365,7 @@ public class DemoRepositoryGenerator {
 		String sDescription = "Turns the input string into an upper case and pushes it to the output";
 		String sRights = "University of Illinois/NCSA open source license";
 		String sCreator = "Xavier Llor&agrave;";
-		Date dateCreation = new Date();
+		Date dateCreation = baseDate;
 		
 		// Context
 		Set<RDFNode> setContext = new HashSet<RDFNode>();
@@ -449,7 +468,7 @@ public class DemoRepositoryGenerator {
 		String sDescription = "Passes the input string to the output string with no modifications";
 		String sRights = "University of Illinois/NCSA open source license";
 		String sCreator = "Xavier Llor&agrave;";
-		Date dateCreation = new Date();
+		Date dateCreation = baseDate;
 		
 		// Context
 		Set<RDFNode> setContext = new HashSet<RDFNode>();
@@ -528,7 +547,7 @@ public class DemoRepositoryGenerator {
 		String sDescription = "Prints the object in the input to the standard output";
 		String sRights = "University of Illinois/NCSA open source license";
 		String sCreator = "Xavier Llor&agrave;";
-		Date dateCreation = new Date();
+		Date dateCreation = baseDate;
 		
 		// Context
 		Set<RDFNode> setContext = new HashSet<RDFNode>();
@@ -600,7 +619,7 @@ public class DemoRepositoryGenerator {
 		String sDescription = "Pushes the input object to its two ports";
 		String sRights = "University of Illinois/NCSA open source license";
 		String sCreator = "Xavier Llor&agrave;";
-		Date dateCreation = new Date();
+		Date dateCreation = baseDate;
 		
 		// Context
 		Set<RDFNode> setContext = new HashSet<RDFNode>();
@@ -680,7 +699,7 @@ public class DemoRepositoryGenerator {
 	public static Model getTestHelloWorldRepository() {
 		return getTestHelloWorldRepository(sTestBaseURL);
 	}
-	
+
 	/** Generates a unique 4 component flow that pushes a string, concatenates it twice
 	 * and it finally prints it to the standard out.
 	 * 
@@ -724,7 +743,7 @@ public class DemoRepositoryGenerator {
 		String sDescription = "A simple hello world test";
 		String sRights = "University of Illinois/NCSA open source license";
 		String sCreator = "Xavier Llor&agrave;";
-		Date dateCreation = new Date();
+		Date dateCreation = baseDate;
 		
 		//
 		// Create the instances
@@ -872,7 +891,7 @@ public class DemoRepositoryGenerator {
 		String sDescription = "A simple hello world test";
 		String sRights = "University of Illinois/NCSA open source license";
 		String sCreator = "Xavier Llor&agrave;";
-		Date dateCreation = new Date();
+		Date dateCreation = baseDate;
 		
 		//
 		// Create the instances
@@ -1050,7 +1069,7 @@ public class DemoRepositoryGenerator {
 		String sDescription = "A simple hello world test";
 		String sRights = "University of Illinois/NCSA open source license";
 		String sCreator = "Xavier Llor&agrave;";
-		Date dateCreation = new Date();
+		Date dateCreation = baseDate;
 		
 		//
 		// Create the instances
@@ -1254,7 +1273,7 @@ public class DemoRepositoryGenerator {
 		String sDescription = "A simple hello world test";
 		String sRights = "University of Illinois/NCSA open source license";
 		String sCreator = "Xavier Llor&agrave;";
-		Date dateCreation = new Date();
+		Date dateCreation = baseDate;
 		
 		//
 		// Create the instances
@@ -1396,7 +1415,7 @@ public class DemoRepositoryGenerator {
 		String sDescription = "A simple hello world test";
 		String sRights = "University of Illinois/NCSA open source license";
 		String sCreator = "Xavier Llor&agrave;";
-		Date dateCreation = new Date();
+		Date dateCreation = baseDate;
 		
 		//
 		// Create the instances
@@ -1573,7 +1592,7 @@ public class DemoRepositoryGenerator {
 		String sDescription = "A simple hello world test";
 		String sRights = "University of Illinois/NCSA open source license";
 		String sCreator = "Xavier Llor&agrave;";
-		Date dateCreation = new Date();
+		Date dateCreation = baseDate;
 		
 		//
 		// Create the instances

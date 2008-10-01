@@ -2,7 +2,7 @@
 # Implements the basic about services
 #
 
-__name__ = 'WSAboutServlet'
+__name__ = 'WSPublishServlet'
 
 requestMap = {
     'GET': { 
@@ -21,7 +21,7 @@ from org.meandre.core.security import Role
 # Provides information about the servers version
 #
 
-def public_publish ( request, response, format ):
+def publish_publish ( request, response, format ):
     '''Publish a component/flow stored in this instance of the 
        Meandre Server.''' 
     if checkUserRole (request,Role.PUBLISH) :
@@ -31,7 +31,7 @@ def public_publish ( request, response, format ):
         else :
             content = []
             for uri in params['uri']:
-                if meandre_store.publishURI(uri,request.getRemoteUser()) :
+                if meandre_store.publishURI(uri,getMeandreUser(request)) :
                     content.append(uri)
             statusOK(response)
             sendTJXContent(response,content,format)
@@ -39,7 +39,7 @@ def public_publish ( request, response, format ):
         errorForbidden(response)
     
 
-def public_unpublish ( request, response, format ):
+def publish_unpublish ( request, response, format ):
     '''Unpublish a component/flow available in this 
        instance of the Meandre Server.''' 
     if checkUserRole (request,Role.PUBLISH) :
@@ -49,7 +49,7 @@ def public_unpublish ( request, response, format ):
         else :
             content = []
             for uri in params['uri']:
-                if meandre_store.unpublishURI(uri,request.getRemoteUser()) :
+                if meandre_store.unpublishURI(uri,getMeandreUser(request)) :
                     content.append(uri)
             statusOK(response)
             sendTJXContent(response,content,format)

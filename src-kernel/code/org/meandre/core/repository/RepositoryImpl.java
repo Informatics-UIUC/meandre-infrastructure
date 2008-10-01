@@ -102,7 +102,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 */
 	public RepositoryImpl ( Model mod ) {
 		// Initializing the repository
-		log.info("Initializing the repository");
+		log.finer("Initializing the repository");
 
 		this.model = mod;
 
@@ -124,7 +124,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 */
 	public void refreshCache () {
 		// Flushing the cache
-		log.info("Flushing the cached descriptions");
+		log.fine("Refreshing cached descriptions");
 		htComDescMap.clear();
 		setComRes.clear();
 		htFlowDescMap.clear();
@@ -134,7 +134,7 @@ public class RepositoryImpl implements QueryableRepository {
 
 		LARQ.removeDefaultIndex();
 
-		log.info("Refreshing cached descriptions");
+		log.finer("Refreshing cached descriptions");
 		// Query all the components
 		setComRes = getAvailableExecutableComponentsFromModel();
 		for ( Resource res:setComRes ) {
