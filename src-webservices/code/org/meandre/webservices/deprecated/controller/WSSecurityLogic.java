@@ -1,4 +1,4 @@
-package org.meandre.webservices.controllers;
+package org.meandre.webservices.deprecated.controller;
 
 import java.io.IOException;
 import java.util.Set;
@@ -11,8 +11,8 @@ import org.meandre.core.security.Role;
 import org.meandre.core.security.SecurityManager;
 import org.meandre.core.security.SecurityStoreException;
 import org.meandre.core.security.User;
+import org.meandre.webservices.deprecated.servlets.WSSecurity;
 import org.meandre.webservices.logger.WSLoggerFactory;
-import org.meandre.webservices.servlets.WSSecurity;
 
 
 

@@ -77,7 +77,7 @@ def execute_list_running_flows ( request, response, format ):
                         'flow_instance_webui_uri': 'http://'+getHostName()+':'+str(webui.getPort())+'/'
                     })
         statusOK(response)
-        sendTJXContent(response,[content],format)
+        sendTJXContent(response,content,format)
     else:
         errorForbidden(response)
  
@@ -97,7 +97,7 @@ def execute_url ( request, response, format ):
                             'flow_instance_webui_uri': 'http://'+getHostName()+':'+str(webui.getPort())+'/'
                         })
             statusOK(response)
-            sendTJXContent(response,[content],format)
+            sendTJXContent(response,content,format)
         else :
             errorExpectationFail(response)
     else:
@@ -123,7 +123,7 @@ def execute_web_component_url ( request, response, format ):
                             'flow_instance_fragment_url': host_url+wfrag.getFragmentID()
                         })
             statusOK(response)
-            sendTJXContent(response,[content],format)
+            sendTJXContent(response,content,format)
         else :
             errorExpectationFail(response)
     else:
@@ -149,7 +149,7 @@ def execute_uri_flow ( request, response, format ):
                         }
                     content.append(job_info)
             statusOK(response)
-            sendTJXContent(response,[content],format)
+            sendTJXContent(response,content,format)
         else :
             errorExpectationFail(response)
     else:

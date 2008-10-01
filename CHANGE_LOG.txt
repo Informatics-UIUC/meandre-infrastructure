@@ -1,5 +1,11 @@
 1.4.0-vcli-alpha Sara
 
+* Migrated the Security service. Also modified the following
+	- assign_roles -> grant_roles (for consistency)
+	- create_user -> create_users (for consistency)
+	- remove_user -> remove_users (for consitency)
+	- Added update_user to allow updating the user profile
+	
 * Migrated the Execution service. Also added the JSON and XML versions to the 
   calls that Amit added involving tokens and quering information from a running
   flow.

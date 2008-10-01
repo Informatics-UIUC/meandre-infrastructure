@@ -79,8 +79,7 @@ def errorExpectationFail ( response ):
     '''Responses with a expectation fail code
     
        errorExpectationFail ( response )'''
-    response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED)   
-
+    response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED)  
 #
 # Content response function
 #

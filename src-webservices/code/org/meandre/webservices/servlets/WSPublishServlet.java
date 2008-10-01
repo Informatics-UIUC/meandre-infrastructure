@@ -16,7 +16,7 @@ public class WSPublishServlet extends MeandreBaseServlet {
 	/** A default serial ID */
 	private static final long serialVersionUID = 1L;
 	
-	/** Creates the servlet to provide About information.
+	/** Creates the servlet to provide Publish information.
 	 * 
 	 * @param store The Meandre store to use
 	 * @param cnf The Meandre configuration to use
