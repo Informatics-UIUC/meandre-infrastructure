@@ -115,12 +115,39 @@ def repository_list_flows ( request, response, format ):
     else:
         errorForbidden(response)
     
+    
 def repository_tags ( request, response, format ):
     '''Returns the tags stored in the current Meandre server.'''
     if checkUserRole (request,Role.REPOSITORY) :
         qr = meandre_store.getRepositoryStore(getMeandreUser(request))
         content = []
         for tag in qr.getTags():
+            content.append({'meandre_tag':tag})
+        statusOK(response)
+        sendTJXContent(response,content,format)
+    else:
+        errorForbidden(response)
+   
+   
+def repository_tags_components ( request, response, format ):
+    '''Returns the component tags stored in the current Meandre server.'''
+    if checkUserRole (request,Role.REPOSITORY) :
+        qr = meandre_store.getRepositoryStore(getMeandreUser(request))
+        content = []
+        for tag in qr.getComponentTags():
+            content.append({'meandre_tag':tag})
+        statusOK(response)
+        sendTJXContent(response,content,format)
+    else:
+        errorForbidden(response)
+  
+  
+def repository_tags_flows ( request, response, format ):
+    '''Returns the component tags stored in the current Meandre server.'''
+    if checkUserRole (request,Role.REPOSITORY) :
+        qr = meandre_store.getRepositoryStore(getMeandreUser(request))
+        content = []
+        for tag in qr.getFlowTags():
             content.append({'meandre_tag':tag})
         statusOK(response)
         sendTJXContent(response,content,format)
