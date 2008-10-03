@@ -117,7 +117,7 @@ public class BackendAdapterTest {
 	 */
 	private BackendAdapter createBackendAdaptorFromStore () {
 		CoreConfiguration cnf = new CoreConfiguration();
-		Store store = new Store();
+		Store store = new Store(cnf);
 		
 		try {
 			// Instantiate the adaptor

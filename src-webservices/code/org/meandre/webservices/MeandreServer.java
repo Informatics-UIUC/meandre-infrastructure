@@ -33,6 +33,7 @@ import org.meandre.webservices.servlets.WSLocationsServlet;
 import org.meandre.webservices.servlets.WSPublicServlet;
 import org.meandre.webservices.servlets.WSPublishServlet;
 import org.meandre.webservices.servlets.WSRepository;
+import org.meandre.webservices.servlets.WSRepositoryServlet;
 import org.meandre.webservices.servlets.WSSecurityServlet;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.security.Constraint;
@@ -133,10 +134,10 @@ public class MeandreServer {
 				e.printStackTrace(new PrintStream(baos));
 				log.warning(baos.toString());
 			}
-			store = new Store(propStore);
+			store = new Store(propStore,cnf);
 		}
 		else
-			store = new Store();
+			store = new Store(cnf);
 		
 	}
 	
@@ -148,7 +149,7 @@ public class MeandreServer {
 	public MeandreServer(int port, String sInstallDir){
         log = WSLoggerFactory.getWSLogger();
         MEANDRE_HOME = sInstallDir;
-        store = new Store(sInstallDir);
+        store = new Store(sInstallDir,cnf);
         cnf = new CoreConfiguration(port, sInstallDir);	    
 	}
 	
@@ -320,6 +321,7 @@ public class MeandreServer {
 		contextWS.addServlet(new ServletHolder((Servlet) new WSAboutServlet(store,cnf)), 		"/services/about/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSLocationsServlet(store,cnf)),	"/services/locations/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository(store,cnf)),	"/services/repository/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSRepositoryServlet(store,cnf)),	"/services/new/repository/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSExecuteServlet(store,cnf)),		"/services/execute/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublishServlet(store,cnf)),		"/services/publish/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurityServlet(store,cnf)),		"/services/security/*");

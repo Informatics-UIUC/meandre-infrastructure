@@ -185,6 +185,8 @@ def sendTJXContent ( response, content, format ):
         # Need to add the style sheet transformation to make it look nice
         sendRawContent(response, xmlc)
         sendRawContent(response, '</meandre_response>')
+    else:
+        errorNotFound(response)
         
 def sendRDFModel ( response, model, format ) :
     ''' Given a model, it serializes it to the response with the proper requested 
@@ -203,9 +205,11 @@ def sendRDFModel ( response, model, format ) :
     elif format=='ttl' :
         contentTextPlain(response)
         model.write(response.getOutputStream(),'TTL')
-    else:
+    elif format=='nt' :
         contentTextPlain(response)
         model.write(response.getOutputStream(),'N-TRIPLE')
+    else:
+        errorNotFound(response)
         
 #
 # Request parameters manipulation methods

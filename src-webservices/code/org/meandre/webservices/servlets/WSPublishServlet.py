@@ -27,7 +27,7 @@ def publish_publish ( request, response, format ):
     if checkUserRole (request,Role.PUBLISH) :
         params = extractRequestParamaters(request)
         if 'uri' not in params:
-            errorBadRequest(response)
+            errorExpectationFail(response)
         else :
             content = []
             for uri in params['uri']:
@@ -45,7 +45,7 @@ def publish_unpublish ( request, response, format ):
     if checkUserRole (request,Role.PUBLISH) :
         params = extractRequestParamaters(request)
         if 'uri' not in params:
-            errorBadRequest(response)
+            errorExpectationFail(response)
         else :
             content = []
             for uri in params['uri']:

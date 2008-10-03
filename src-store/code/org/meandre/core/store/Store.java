@@ -163,10 +163,15 @@ public class Store {
      */
 	private DBConnection dbConn = null;
 
+	/** The core configuration object */
+	private CoreConfiguration cnf;
+
     /** Initialize a default store.
      * 
+     * @param cnf The core configuration object
      */
-    public Store() {
+    public Store(CoreConfiguration cnf) {
+    	this.cnf = cnf;
     	propStoreConfig = new Properties();
     	initializeDefaultProperties();
         initializeStore();
@@ -177,9 +182,11 @@ public class Store {
      * and jena database files.
      * 
      * @param sInstallDir The base install directory
+     * @param cnf The core configuration object
      */
-    public Store(String sInstallDir) {
-        sConfigPath = sInstallDir;
+    public Store(String sInstallDir,CoreConfiguration cnf) {
+        this.cnf = cnf;
+    	sConfigPath = sInstallDir;
         sInstallDirPath = sInstallDir;
         propStoreConfig = new Properties();
         initializeDefaultProperties();
@@ -188,8 +195,10 @@ public class Store {
     /** Initialize a store with the provided properties
      * 
      * @param props The properties for the store
+     * @param cnf The core configuration object
      */
-    public Store ( Properties props ) {
+    public Store ( Properties props,CoreConfiguration cnf ) {
+    	this.cnf = cnf;
     	propStoreConfig = props;
     	initializeStore();
     }
@@ -683,7 +692,7 @@ public class Store {
 				qr.refreshCache();
 			}
 			catch ( Exception e ) {
-				log.warning("WSLocationsLogic.removeLocation: Failed to load location\n"+e.toString());
+				log.warning("Failed to load location\n"+e.toString());
 				bRes = false;
 			}
 			
@@ -753,23 +762,24 @@ public class Store {
 				QueryableRepository qr = getRepositoryStore(sUser);
 				
 				// Modifying the repository
-				qr.getModel().begin();
+				Model model = qr.getModel();
+				model.begin();
 				 
 				// Adding components
 				for ( ExecutableComponentDescription ecd:qrNew.getAvailableExecutableComponentDescriptions())
 					if ( !qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent()))
-						qr.getModel().add(ecd.getModel());
+						model.add(ecd.getModel());
 					else
 						log.warning("Component "+ecd.getExecutableComponent()+" already exist in the current repository. Discarding it.");
 				
 				// Adding flows
 				for ( FlowDescription fd:qrNew.getAvailableFlowDescriptions())
 					if ( !qr.getAvailableFlows().contains(fd.getFlowComponent()))
-						qr.getModel().add(fd.getModel());
+						model.add(fd.getModel());
 					else
 						log.warning("Flow "+fd.getFlowComponent()+" already exist in the current repository. Discarding it.");
 				
-				qr.getModel().commit();
+				model.commit();
 				qr.refreshCache();
 				bRes = true;
 			}
@@ -789,4 +799,92 @@ public class Store {
 		
 		return bRes;
 	}
+	
+	/** Regenerates a user repository using the current locations for the user.
+	 *
+	 * @param sUser The system store user
+	 * @return True if the location could be successfully removed
+	 */
+	public boolean regenerateRepository(String sUser) {
+		boolean bRes = true;
+
+		//
+		// Regenerate the users repository
+		//
+		QueryableRepository qr = getRepositoryStore(sUser);
+
+		// Cleaning the user repository entries
+		Model mod = qr.getModel();
+		mod.begin();
+		mod.removeAll();
+		mod.commit();
+
+		// Regenerating the user repository entries
+		SystemStore ss = getSystemStore(cnf,sUser);
+		Set<Hashtable<String, String>> setProps = ss.getProperty(SystemStore.REPOSITORY_LOCATION);
+		for ( Hashtable<String, String> ht:setProps ) {
+			String sLoc = ht.get("value");
+			try {
+				URL url = new URL(sLoc);
+				Model modelTmp = ModelFactory.createDefaultModel();
+
+				modelTmp.setNsPrefix("", "http://www.meandre.org/ontology/");
+				modelTmp.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
+				modelTmp.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
+				modelTmp.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
+
+				//
+				// Read the location and check its consistency
+				//
+				if ( sLoc.endsWith(".ttl"))
+					modelTmp.read(url.openStream(),null,"TTL");
+				else if ( sLoc.endsWith(".nt"))
+					modelTmp.read(url.openStream(),null,"N-TRIPLE");
+				else
+					modelTmp.read(url.openStream(),null);
+
+				QueryableRepository qrNew = new RepositoryImpl(modelTmp);
+				
+				// Adding flows
+				Model modUser = qr.getModel();
+				modUser.begin();
+				for ( Resource resFlow:qrNew.getAvailableFlows() ) {
+					if ( qr.getFlowDescription(resFlow)==null ) {
+						// Component does not exist
+						modUser.add(qrNew.getFlowDescription(resFlow).getModel());
+					}
+					else {
+						// Flow does exist
+						log.warning("Flow "+resFlow+" already exist in "+sUser+" repository. Discarding it.");
+					}
+				}
+
+				// Adding the components after adding the contexts
+				for ( ExecutableComponentDescription ecd:qrNew.getAvailableExecutableComponentDescriptions()) {
+					if ( qr.getExecutableComponentDescription(ecd.getExecutableComponent())!=null ) {
+						// Component does exist
+						log.warning("Discarding existing component "+ecd.getExecutableComponent()+".");
+					}
+					else {
+						modUser.add(ecd.getModel());
+					}
+				}
+				//Commiting changes
+				modUser.commit();
+				
+				// Refresh the cache
+				qr.refreshCache();
+				
+			}
+			catch ( Exception e ) {
+				log.warning("WSRepositoryLogic: Failed to load location\n"+e.toString());
+				bRes = false;
+			}
+		}
+
+		qr.refreshCache();
+
+		return bRes;
+	}
+
 }
