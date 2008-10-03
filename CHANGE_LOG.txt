@@ -16,7 +16,7 @@
 	- /describe_all_flows
 	- /search_components (still does not allow multiple q parameters)
 	- /search_flows (still does not allow multiple q parameters)
-	- /rename	
+	- /rename	 
 
 * Migrated the Security service. Also modified the following
 	- assign_roles -> grant_roles (for consistency)
