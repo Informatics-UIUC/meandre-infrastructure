@@ -779,8 +779,7 @@ public class WSRepository extends HttpServlet {
 	 */
     private void describeAllComponentsAction(HttpServletRequest request,
 			HttpServletResponse response, String sTarget, String sExtension) throws IOException {
-		// TODO Auto-generated method stub
-    	
+		
     	if ( sExtension.endsWith("rdf") ) {
 			Model mod = wsRepositoryLogic.getAllComponentsDescription(request.getRemoteUser());
 			dumpModel(request,response,mod,"RDF/XML-ABBREV");

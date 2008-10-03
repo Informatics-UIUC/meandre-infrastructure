@@ -1,5 +1,23 @@
 1.4.0-vcli-alpha Sara
 
+* Migrated the repository calls that response to GETs
+	- /dump.txt
+	- /regenerate
+	- /list_components
+	- /list_flows
+	- /tags
+	- /tags_components
+	- /tags_flows
+	- /components_by_tag (changed the parameter from q to tag)
+	- /components_by_flow (changed the parameter from q to tag)
+	- /describe_components
+	- /describe_all_components
+	- /describe_flows
+	- /describe_all_flows
+	- /search_components (still does not allow multiple q parameters)
+	- /search_flows (still does not allow multiple q parameters)
+	- /rename	
+
 * Migrated the Security service. Also modified the following
 	- assign_roles -> grant_roles (for consistency)
 	- create_user -> create_users (for consistency)

@@ -1067,7 +1067,7 @@ public class RepositoryImpl implements QueryableRepository {
             "   ?component dc:date ?date " +
             "} " +
             (sOrder != null ? "ORDER BY " + sOrderBy + " " : "") +
-            (limit > 0 ? "LIMIT " + limit : "");
+            (limit >= 0 ? "LIMIT " + limit : "");
 
         Query query = QueryFactory.create(QUERY) ;
         QueryExecution exec = QueryExecutionFactory.create(query, model, null);
@@ -1239,7 +1239,7 @@ public class RepositoryImpl implements QueryableRepository {
             "   ?flow dc:date ?date " +
             "} " +
             (sOrder != null ? "ORDER BY " + sOrderBy + " " : "") +
-            (limit > 0 ? "LIMIT " + limit : "");
+            (limit >= 0 ? "LIMIT " + limit : "");
 
         Query query = QueryFactory.create(QUERY) ;
         QueryExecution exec = QueryExecutionFactory.create(query, model, null);

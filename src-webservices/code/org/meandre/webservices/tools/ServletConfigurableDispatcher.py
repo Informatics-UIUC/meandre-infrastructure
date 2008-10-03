@@ -194,11 +194,7 @@ def sendRDFModel ( response, model, format ) :
         N-TRIPLE.
         
         sendRDFModel ( response, model, format )'''
-    model.setNsPrefix('meandre', Store.MEANDRE_ONTOLOGY_BASE_URL )
-    model.setNsPrefix('xsd', XSD.getURI())
-    model.setNsPrefix('rdf', RDF.getURI())
-    model.setNsPrefix('rdfs',RDFS.getURI())
-    model.setNsPrefix('dc',DC.getURI())
+    
     if format=='rdf' :
         contentAppXML(response)
         model.write(response.getOutputStream(),'RDF/XML-ABBREV')

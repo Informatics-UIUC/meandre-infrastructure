@@ -5,6 +5,15 @@
 #
 # Basic imports
 #
+
+from com.hp.hpl.jena.rdf.model import Model
+from com.hp.hpl.jena.rdf.model import ModelFactory
+
+from com.hp.hpl.jena.vocabulary import DC
+from com.hp.hpl.jena.vocabulary import RDF
+from com.hp.hpl.jena.vocabulary import RDFS
+from com.hp.hpl.jena.vocabulary import XSD
+
 from org.meandre.core.security import Role
 from org.meandre.core.utils import NetworkTools
 
@@ -31,4 +40,14 @@ def getHostName () :
        getHostName()'''
     return NetworkTools.getLocalHostName()
 
-
+def getEmptyModel() :
+    '''Creates an empty blank model.
+    
+       getEmptykModel() '''
+    model = ModelFactory.createDefaultModel();
+    model.setNsPrefix('meandre', Store.MEANDRE_ONTOLOGY_BASE_URL )
+    model.setNsPrefix('xsd', XSD.getURI())
+    model.setNsPrefix('rdf', RDF.getURI())
+    model.setNsPrefix('rdfs',RDFS.getURI())
+    model.setNsPrefix('dc',DC.getURI())
+    return model
