@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.meandre.configuration.CoreConfiguration;
@@ -34,6 +35,7 @@ public class BackendAdapterTest {
 		DerbyBackendAdapter.class.getName(), 
 		MySQLBackendAdapter.class.getName(),
 	};
+	
 	
 	/** Check that the resource mapping file is there.
 	 * 
@@ -75,6 +77,20 @@ public class BackendAdapterTest {
 		
 		log.info("Test class preparation done");
 		
+	}
+	
+	/** Cleans the schema after each test.
+	 * 
+	 */
+	@After
+	public void cleanAfterTesting() {
+		try {
+			BackendAdapter ba = createBackendAdaptorFromStore();
+			ba.dropSchema();
+		} 
+		catch ( BackendAdapterException bae ) {
+			log.warning("Failed to drop schema after the test");
+		}
 	}
 	
 	/** Check that the instantiations works properly.
@@ -247,12 +263,10 @@ public class BackendAdapterTest {
 			} catch (InterruptedException e) {
 				fail("The sleep operation was interrupted! "+e.toString());
 			}
+			ba.done();
 			
-			// Drop the schema
 			// Remove the installed shutdown hook
 			Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
-			ba.dropSchema();
-			
 			
 		} catch (BackendAdapterException e) {
 			fail("The schema could not be created and dropped! "+e.toString());

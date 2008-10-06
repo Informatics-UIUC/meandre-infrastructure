@@ -243,7 +243,12 @@ extends Thread {
 
 		try {
 			// Drop the server status and info table
-			dropSchemaLeavingLogsBehind();
+			try {
+				dropSchemaLeavingLogsBehind();
+			}
+			catch (BackendAdapterException bae) {
+				log.warning("Schema partially dropped!");
+			}
 			
 			// Drop the server log table
 			String sQueryCSLT = propQueryMapping.getProperty(QUERY_DROP_SERVER_LOG_TABLE);
@@ -864,7 +869,13 @@ extends Thread {
 			
 		}
 		log.info("Coordinator "+super.getName()+" has stopped");
-		
+	}
+	
+	/** Request the backend adapter to stop.
+	 * 
+	 */
+	public void done () {
+		bNotDone = false;
 	}
 	
 }

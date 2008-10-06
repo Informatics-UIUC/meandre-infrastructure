@@ -104,8 +104,8 @@ extends BackendAdapter {
 			}
 			else if  ( iFailures<4 ) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				for ( BackendAdapterException e:bae )
-					e.printStackTrace(new PrintStream(baos));
+				for ( int i=0 ; i<iFailures ; i++ )
+					bae[i].printStackTrace(new PrintStream(baos));
 				log.severe("Rollback operation failed! "+baos.toString());
 				for ( BackendAdapterException e:bae )
 					throw e;
