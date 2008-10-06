@@ -320,8 +320,8 @@ public class MeandreServer {
 		//
 		contextWS.addServlet(new ServletHolder((Servlet) new WSAboutServlet(store,cnf)), 		"/services/about/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSLocationsServlet(store,cnf)),	"/services/locations/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository(store,cnf)),	"/services/repository/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSRepositoryServlet(store,cnf)),	"/services/new/repository/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository(store,cnf)),	"/services/old/repository/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSRepositoryServlet(store,cnf)),	"/services/repository/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSExecuteServlet(store,cnf)),		"/services/execute/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublishServlet(store,cnf)),		"/services/publish/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurityServlet(store,cnf)),		"/services/security/*");

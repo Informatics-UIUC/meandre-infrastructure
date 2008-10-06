@@ -230,7 +230,9 @@ def extractRequestParamaters ( request ):
        
        extractRequestParamaters ( request )'''
     method = request.getMethod()
-    if method=="GET" or method=="get" :
+    log.info(method+' --> '+request.getRequestURL().toString())
+    if method=="GET" or method=="get" or method=="POST" or method=="post" :
         return __dictionary_from_get_request__(request)
     else :
-        log.warning("Request "+method+" method not support for parameter extraction") 
+        log.warning("Request "+method+" method not support for parameter extraction")
+        return {} 

@@ -5,10 +5,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.io.StringReader;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Set;
@@ -887,4 +889,79 @@ public class Store {
 		return bRes;
 	}
 
+	
+	/** Add the given flows in RDF into the the user model.
+	 *
+	 * @param sUser The system store user
+	 * @param sRDF The repository to add
+	 * @param bOverwrite Should components be overwritten 
+	 * @return The set of added flow
+	 */
+	public Set<String> addFlowsToRepository(String sUser, String sRDF, boolean bOverwrite) {
+		QueryableRepository qr = getRepositoryStore(sUser);
+		Model modNew = ModelFactory.createDefaultModel();
+
+		modNew.setNsPrefix("", "http://www.meandre.org/ontology/");
+		modNew.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
+		modNew.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
+		modNew.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
+
+		StringReader srModel = new StringReader(sRDF);
+		boolean bValidModel = true;
+		
+		try {
+			modNew.read(srModel,null,"TTL");
+		}
+		catch ( Exception eTTL ) {
+			try{
+				modNew.read(srModel,null,"N-TRIPLE");
+			}
+			catch ( Exception eNT ) {
+				try{
+					modNew.read(srModel,null);
+				}
+				catch ( Exception eRDF ) {
+					bValidModel = false;
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					eRDF.printStackTrace(new PrintStream(baos));
+					log.warning("Repository could not be read\n"+baos.toString());
+				}
+			}
+		}
+
+		Set<String> setURIs = new HashSet<String>();
+		if ( bValidModel ) {
+			QueryableRepository qrNew = new RepositoryImpl(modNew);
+			Model modUser = qr.getModel();
+			for ( FlowDescription fd:qrNew.getAvailableFlowDescriptions()) {
+				if ( !qr.getAvailableFlows().contains(fd.getFlowComponent())) {
+					// The model for the flow to add
+					Model fdModel = fd.getModel();
+					// Add to the user repository
+					modUser.begin();
+					modUser.add(fdModel);
+					modUser.commit();
+					// Add the URI to modified
+					setURIs.add(fd.getFlowComponent().toString());
+				}
+				else if ( bOverwrite ) {
+					// Flow is there by needs to be overwritten
+					Model modOld = qr.getFlowDescription(fd.getFlowComponent()).getModel();
+					Model modRep = qr.getModel();
+					modRep.begin();
+					modRep.remove(modOld);
+					modRep.add(fd.getModel());
+					modRep.commit();
+					// Add the URI to modified
+					setURIs.add(fd.getFlowComponent().toString());
+				}
+				else {
+					log.info("Flow already exist and the overwrite flag has not been provided. Discading flow update "+fd.getFlowComponent());
+				}
+			}
+			qr.refreshCache();
+		}
+			
+		return setURIs;	
+	}
 }

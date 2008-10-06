@@ -1,5 +1,9 @@
 1.4.0-vcli-alpha Sara
 
+* Migrated teh repository calls that response to POSTs
+	- /add
+	- /add_flow_description
+	
 * Migrated the repository calls that response to GETs
 	- /dump.txt
 	- /regenerate

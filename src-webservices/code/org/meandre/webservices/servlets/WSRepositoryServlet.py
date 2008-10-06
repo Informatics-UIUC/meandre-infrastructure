@@ -2,7 +2,7 @@
 # Implements the basic about services
 #
 
-__name__ = 'WSAboutServlet'
+__name__ = 'WSRepositoryServlet'
 
 requestMap = {
     'GET': { 
@@ -36,6 +36,8 @@ requestMap = {
 from com.hp.hpl.jena.rdf.model import Resource
 
 from org.meandre.core.repository import RepositoryImpl
+
+from org.meandre.webservices.servlets import WSRepositoryServlet
 
 #
 # Services implementation
@@ -373,4 +375,43 @@ def repository_search_flows ( request, response, format ):
             errorExpectationFail(response)
     else:
         errorForbidden(response)
+   
+        
+def repository_add_flow_descriptions ( request, response, format ):
+    '''Add a flow descriptor the user repository stored in the 
+       current Meandre server.'''
+    if checkUserRole (request,Role.REPOSITORY) :
+        params = extractRequestParamaters(request)
+        if 'repository' in params:
+            repositories = params['repository']
+            overwrites = params['overwrite']
+            diff = len(repositories)-len(overwrites)
+            if diff>0 :
+                overwrite.append(['false' for i in range(diff)])
+            user = getMeandreUser(request)
+            content = []
+            for repository,overwrite in zip(repositories,overwrites) :
+                uris = meandre_store.addFlowsToRepository(user, repository, overwrite=='true')
+                for uri in uris :
+                    content.append({'meandre_uri':uri})
+            statusOK(response)
+            sendTJXContent(response,content,format) 
+        else:
+            errorExpectationFail(response)
+    else:
+        errorForbidden(response)
+  
+def repository_add ( request, response, format ):
+    '''Add components and flows to  the user repository stored in the 
+       current Meandre server.'''
+    if checkUserRole (request,Role.REPOSITORY) :
+        uris = WSRepositoryServlet.addToRepository(request,meandre_store,meandre_config,format)
+        content = []
+        for uri in uris :
+            content.append({'meandre_uri':uri})
+        statusOK(response)
+        sendTJXContent(response,content,format) 
+    else:
+        errorForbidden(response) 
+    
     
