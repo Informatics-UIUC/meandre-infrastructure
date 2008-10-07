@@ -256,15 +256,16 @@ public class BackendAdapterTest {
 			// Create the schema
 			ba.createSchema();
 			ba.start();
+			ba.close();
 			
 			// Sleep a bit so I can check the table contents
 			try {
-				Thread.sleep(lSleepDuration);
+				while (ba.isRunning())
+					Thread.sleep(lSleepDuration);
 			} catch (InterruptedException e) {
 				fail("The sleep operation was interrupted! "+e.toString());
 			}
-			ba.done();
-			
+						
 			// Remove the installed shutdown hook
 			Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
 			

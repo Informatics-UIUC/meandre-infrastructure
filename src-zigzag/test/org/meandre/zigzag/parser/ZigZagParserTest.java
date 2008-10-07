@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 
 import org.junit.Test;
+import org.meandre.configuration.CoreConfiguration;
 import org.meandre.webservices.MeandreServer;
 import org.meandre.zigzag.semantic.FlowGenerator;
 
@@ -26,7 +27,9 @@ public class ZigZagParserTest {
 	 */
 	@Test
 	public void testZigZagParserObject () throws Exception {
+		CoreConfiguration cnf = new CoreConfiguration();
 		MeandreServer ms = new MeandreServer();
+		ms.setCoreConfiguration(cnf);
 		ms.start(false);
 		
 		Thread.sleep(10000);
@@ -75,7 +78,9 @@ public class ZigZagParserTest {
 	 */
 	@Test
 	public void testZigZagParserObjectAndMauGenerator () throws Exception {
+		CoreConfiguration cnf = new CoreConfiguration();
 		MeandreServer ms = new MeandreServer();
+		ms.setCoreConfiguration(cnf);
 		ms.start(false);
 		
 		Thread.sleep(10000);

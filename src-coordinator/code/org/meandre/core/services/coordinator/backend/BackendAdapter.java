@@ -168,6 +168,9 @@ extends Thread {
 
 	/** The coordinated service call back interface */
 	private CoordinatorServiceCallBack aspcbCallBack;
+
+	/** Flag to check that the adapter is running */
+	private boolean bRunning;
 	
 	/** Initialize the query map */
 	public BackendAdapter() {
@@ -789,6 +792,12 @@ extends Thread {
 	throws BackendAdapterException {
 		try {
 			this.bNotDone = false;
+			// Allow the backend adapter to stop
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				log.warning("Fail to wait to the backend adapter finishing");
+			}
 			unregisterServer();
 			conn.close();
 			log.info(sServerID+" shutdown");
@@ -804,6 +813,7 @@ extends Thread {
 	 */
 	public void run () {
 		log.info("Starting "+super.getName());
+		bRunning = true;
 		while ( bNotDone ) {
 			// Sleep
 			try {
@@ -869,13 +879,14 @@ extends Thread {
 			
 		}
 		log.info("Coordinator "+super.getName()+" has stopped");
+		bRunning = false;
 	}
 	
-	/** Request the backend adapter to stop.
+	/** Returns the flag indicating if the adapter is running.
 	 * 
+	 * @return True indicates that the adapter is still running.
 	 */
-	public void done () {
-		bNotDone = false;
+	public boolean isRunning() {
+		return bRunning;
 	}
-	
 }
