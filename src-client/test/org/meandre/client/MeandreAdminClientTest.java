@@ -3,8 +3,6 @@ package org.meandre.client;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import org.junit.After;
 import org.junit.AfterClass;

@@ -149,8 +149,8 @@ public class MeandreServer {
 	public MeandreServer(int port, String sInstallDir){
         log = WSLoggerFactory.getWSLogger();
         MEANDRE_HOME = sInstallDir;
+        cnf = new CoreConfiguration(port, sInstallDir);	   
         store = new Store(sInstallDir,cnf);
-        cnf = new CoreConfiguration(port, sInstallDir);	    
 	}
 	
 	/** Creates a Meandre server running on the provided home directory and store.

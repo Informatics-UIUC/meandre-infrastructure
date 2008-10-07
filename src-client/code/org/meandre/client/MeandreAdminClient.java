@@ -6,7 +6,6 @@ import java.util.Set;
 import org.apache.commons.httpclient.NameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.meandre.core.security.Role;
 import org.meandre.core.security.SecurityManager;

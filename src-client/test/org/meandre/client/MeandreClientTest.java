@@ -18,11 +18,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.LocationBean;
@@ -81,6 +83,8 @@ public class MeandreClientTest {
         }
 
         _server = new MeandreServer(_serverPort, _workingDir);
+        CoreConfiguration cnf = new CoreConfiguration(_serverPort,_workingDir);
+        _server.setCoreConfiguration(cnf);
         _server.start(false);
         System.out.println("MeandreClientTest: setupBeforeClass end");
     }
@@ -135,14 +139,14 @@ public class MeandreClientTest {
      */
     @Test
     public void testRetrieveInstallationProperties() {
-        Model mProps = null;
+        JSONObject joProps = null;
         try{
-            mProps = _meandreClient.retrieveInstallationProperties();
+        	joProps = _meandreClient.retrieveInstallationProperties();
             
          }catch(TransmissionException e){
              fail("Transmission failure: " + e.toString());
          }
-         assertFalse(mProps.isEmpty());
+         assertFalse(joProps.length()<=0);
          return;
     }
 

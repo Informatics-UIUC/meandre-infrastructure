@@ -59,7 +59,7 @@ def repository_regenerate ( request, response, format ):
         meandre_store.regenerateRepository(getMeandreUser(request))
         content = {'message':'Repository successfully regenerated'}
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,[content],format)
     else:
         errorForbidden(response)
     

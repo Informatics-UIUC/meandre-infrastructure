@@ -59,10 +59,14 @@ public class MeandreClient extends MeandreBaseClient{
      *
      * TODO: need a java object instance to represent installation properties
      */
-    public Model retrieveInstallationProperties() throws TransmissionException{
-        String sRestCommand = "services/about/installation.nt";
-        Model mRetrieved = executeGetRequestModel(sRestCommand, null);
-        return mRetrieved;
+    public JSONObject retrieveInstallationProperties() throws TransmissionException{
+        String sRestCommand = "services/about/installation.json";
+        try {
+        	JSONTokener jt = executeGetRequestJSON(sRestCommand, null);
+            return (new JSONArray(jt)).getJSONObject(0);
+		} catch (JSONException e) {
+			throw new TransmissionException(e);
+		}
     }
 
     /**
@@ -79,12 +83,21 @@ public class MeandreClient extends MeandreBaseClient{
      */
 
     public Set<String> retrieveUserRoles() throws TransmissionException {
-        String sRestCommand = "services/about/user_roles.json";
-        JSONTokener jtRoles = executeGetRequestJSON(sRestCommand, null);
-        String jArrayKey = "meandre_user_role";
-        String jElementKey = "meandre_role";
-        Set<String> ss = unpackJSONArray(jtRoles, jArrayKey, jElementKey);
-        return ss;
+    	try {
+	        String sRestCommand = "services/about/user_roles.json";
+	        JSONTokener jtRoles = executeGetRequestJSON(sRestCommand, null);
+	//        String jArrayKey = "meandre_user_role";
+	//        String jElementKey = "meandre_role";
+	//        Set<String> ss = unpackJSONArray(jtRoles, jArrayKey, jElementKey);
+	        JSONArray ja = new JSONArray(jtRoles);
+	        Set<String> ss = new HashSet<String>();
+	        for ( int i=0, iMax=ja.length() ; i<iMax ; i++ )
+	        	ss.add(ja.getJSONObject(i).getString("meandre_role_uri"));
+	        return ss;
+    	}
+    	catch ( Exception e ) {
+    		throw new TransmissionException(e);
+    	}
     }
 
     /**
@@ -99,12 +112,21 @@ public class MeandreClient extends MeandreBaseClient{
      * @return list of all valid roles
      */
     public Set<String> retrieveValidRoles() throws TransmissionException{
-        String sRestCommand = "services/about/valid_roles.json";
-        JSONTokener jtRoles = executeGetRequestJSON(sRestCommand, null);
-        String jArrayKey = "meandre_user_role";
-        String jElementKey = "meandre_role";
-        Set<String> ss = unpackJSONArray(jtRoles, jArrayKey, jElementKey);
-        return ss;
+    	try {
+	        String sRestCommand = "services/about/valid_roles.json";
+	        JSONTokener jtRoles = executeGetRequestJSON(sRestCommand, null);
+	//        String jArrayKey = "meandre_user_role";
+	//        String jElementKey = "meandre_role";
+	//        Set<String> ss = unpackJSONArray(jtRoles, jArrayKey, jElementKey);
+	        JSONArray ja = new JSONArray(jtRoles);
+	        Set<String> ss = new HashSet<String>();
+	        for ( int i=0, iMax=ja.length() ; i<iMax ; i++ )
+	        	ss.add(ja.getJSONObject(i).getString("meandre_role_uri"));
+	        return ss;
+    	}
+    	catch ( Exception e ) {
+    		throw new TransmissionException(e);
+    	}
 
     }
 
@@ -121,21 +143,33 @@ public class MeandreClient extends MeandreBaseClient{
      * http://<meandre_host>:<meandre_port>/services/locations/list.json
      */
     public Set<LocationBean> retrieveLocations() throws TransmissionException{
-        String sRestCommand = "services/locations/list.json";
-        JSONTokener jtLocs = executeGetRequestJSON(sRestCommand, null);
-        String jArrayKey = "location_information";
-        String jURLElementKey = "location";
-        String jDescElementKey = "description";
-        Map<String, String> smLocs = unpackJSONMap(jtLocs, jArrayKey, jURLElementKey,
-                jDescElementKey);
-        Iterator<String> locIter = smLocs.keySet().iterator();
-        HashSet<LocationBean> beanSet = new HashSet<LocationBean>();
-        while (locIter.hasNext()){
-            String sLoc = locIter.next();
-            String sDesc = smLocs.get(sLoc);
-            beanSet.add(new LocationBean(sLoc, sDesc));
-        }
-        return beanSet;
+    	try {
+	        String sRestCommand = "services/locations/list.json";
+	        JSONTokener jtLocs = executeGetRequestJSON(sRestCommand, null);
+	//        String jArrayKey = "location_information";
+	//        String jURLElementKey = "location";
+	//        String jDescElementKey = "description";
+	//        Map<String, String> smLocs = unpackJSONMap(jtLocs, jArrayKey, jURLElementKey,
+	//                jDescElementKey);
+	//        Iterator<String> locIter = smLocs.keySet().iterator();
+	//        HashSet<LocationBean> beanSet = new HashSet<LocationBean>();
+	//        while (locIter.hasNext()){
+	//            String sLoc = locIter.next();
+	//            String sDesc = smLocs.get(sLoc);
+	//            beanSet.add(new LocationBean(sLoc, sDesc));
+	//        }
+	        JSONArray ja = new JSONArray(jtLocs);
+	        HashSet<LocationBean> beanSet = new HashSet<LocationBean>();
+	        for ( int i=0, iMax=ja.length() ; i<iMax ; i++ ) {
+	        	JSONObject jo = ja.getJSONObject(i);
+	        	beanSet.add(new LocationBean(jo.getString("location"), jo.getString("description")));
+	        }
+	        	
+	        return beanSet;
+    	}
+    	catch (Exception e) {
+			throw new TransmissionException(e);
+		}
     }
 
     /**
@@ -157,11 +191,17 @@ public class MeandreClient extends MeandreBaseClient{
         nvps.add(new NameValuePair("description", description));
 
         JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
-        if(jtRetrieved == null){
+        JSONArray ja;
+        try {
+			ja = new JSONArray(jtRetrieved);
+		} catch (JSONException e) {
+			ja = null;
+		}
+        if(ja == null){
             return false;
         }
         try{
-            JSONObject joRetrieved = new JSONObject(jtRetrieved);
+            JSONObject joRetrieved = ja.getJSONObject(0);
             String loc = joRetrieved.getString("location");
             String descr = joRetrieved.getString("description");
             return ((loc.equals(sLocationUrl)) && (descr.equals(description)));
@@ -226,13 +266,19 @@ public class MeandreClient extends MeandreBaseClient{
      * of it's peers for information on available components and flows.
      *
      *<p> calls:
-     * http://<meandre_host>:<meandre_port>/services/repository/regenerate.txt
+     * http://<meandre_host>:<meandre_port>/services/repository/regenerate.json
      */
     public boolean regenerate() throws TransmissionException{
-        String sRestCommand = "services/repository/regenerate.txt";
-        String sRetrieved = executeGetRequestString(sRestCommand, null);
-        String sSuccess = "Repository successfully regenerated";
-        return (sRetrieved.equals(sSuccess));
+		try {
+    		String sRestCommand = "services/repository/regenerate.json";
+		    JSONTokener jt = executeGetRequestJSON(sRestCommand, null);
+		    JSONArray ja = new JSONArray(jt);
+		    String sSuccess = "Repository successfully regenerated";
+		    return (sSuccess.equals(ja.getJSONObject(0).getString("message")));
+		}
+		catch ( JSONException e ) {
+			throw new TransmissionException(e);
+		}
     }
 
 
