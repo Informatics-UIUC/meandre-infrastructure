@@ -36,12 +36,12 @@ public class ConductorTest {
 			QueryableRepository qr) throws CorruptedDescriptionException,
 			ConductorException {
 		// Create the execution
-		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), System.out);
 		// Redirect the output
 		PrintStream psOut = System.out;
 		PrintStream psErr = System.err;
 		ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
 		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
+		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), new PrintStream(baosOut));
 		System.setOut(new PrintStream(baosOut));
 		System.setErr(new PrintStream(baosErr));
 		WebUI webui = exec.initWebUI(1704,Math.random()+"");
@@ -67,8 +67,6 @@ public class ConductorTest {
 	private void runHelloWorldHetereogenousFlow(Conductor conductor,
 			QueryableRepository qr) throws CorruptedDescriptionException,
 			ConductorException {
-		// Create the execution
-		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), System.out);
 		// Redirect the output
 		PrintStream psOut = System.out;
 		PrintStream psErr = System.err;
@@ -76,18 +74,21 @@ public class ConductorTest {
 		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(baosOut));
 		System.setErr(new PrintStream(baosErr));
+		// Create the execution
+		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), new PrintStream(baosOut));
 		exec.execute(exec.initWebUI(1705,Math.random()+""));
 		System.setOut(psOut);
 		System.setErr(psErr);
 		// Restore the output
 		assertTrue(exec.hadGracefullTermination());
-		System.out.println(baosErr.toString());
+		//System.out.println(baosErr.toString());
 		assertEquals(0,exec.getAbortMessage().size());
-		System.out.println(baosErr.toString());
-		assertEquals(0,baosErr.size());
+		//System.out.println(baosErr.toString());
+		String sError = baosErr.toString();
+		assertTrue(sError.contains("jetty-"));
+		assertTrue(sError.contains("Started SocketConnector@"));
 		
 		String sResult = "HELLO WORLD!!! HAPPY MEANDRING!!!  (P1,C0123456)  HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C0123456)  \n";
-		System.out.println("***"+baosOut.toString());
 		assertEquals(sResult.length(),baosOut.size());
 	}
 

@@ -110,40 +110,42 @@ public class MrProbeTest {
 			
 			// Basic test running the NullProbeImpl
 			Conductor conductor = new Conductor(10,cnf);
-			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), System.out);
-			runExecutor(exec);
+			ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
+			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), new PrintStream(baosOut));
+			runExecutor(exec,baosOut);
 
 			// Basic test running basic provenance to an RDF model
+			ByteArrayOutputStream baosOutProv = new ByteArrayOutputStream();
 			MeandreRDFDialectProbeImpl rdfModProbe = new MeandreRDFDialectProbeImpl();
 			MrProbe mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,false,false);
 			conductor = new Conductor(10,cnf);
-			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, System.out);
-			runExecutor(exec);
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProv));
+			runExecutor(exec,baosOutProv);
 
 			// Basic test running basic provenance and data serialization to an RDF model
+			ByteArrayOutputStream baosOutProv2 = new ByteArrayOutputStream();
 			rdfModProbe = new MeandreRDFDialectProbeImpl();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,true,false);
 			conductor = new Conductor(10,cnf);
-			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, System.out);
-			runExecutor(exec);
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProv2));
+			runExecutor(exec,baosOutProv2);
 
 			// Basic test running state storage provenance to an RDF model
+			ByteArrayOutputStream baosOutProvSto = new ByteArrayOutputStream();
 			rdfModProbe = new MeandreRDFDialectProbeImpl();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,false,true);
 			conductor = new Conductor(10,cnf);
-			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, System.out);
-			runExecutor(exec);
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProvSto));
+			runExecutor(exec,baosOutProvSto);
 
 			// Basic test running state storage provenance to an RDF model
+			ByteArrayOutputStream baosOutProvSto3 = new ByteArrayOutputStream();
 			rdfModProbe = new MeandreRDFDialectProbeImpl();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,true,true);
 			conductor = new Conductor(10,cnf);
-			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, System.out);
-			runExecutor(exec);
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProvSto3));
+			runExecutor(exec,baosOutProvSto3);
 			
-			// Model mod = rdfModProbe.getModel();
-			// mod.write(System.out,"TTL",null);
-			// System.out.println(mod.size());
 		}
 		catch ( Exception e ) {
 			e.printStackTrace();
@@ -164,8 +166,9 @@ public class MrProbeTest {
 			Conductor conductor = new Conductor(10,cnf);
 			StatisticsProbeImpl spi = new StatisticsProbeImpl();
 			MrProbe mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),spi,false,false);
-			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, System.out);
-			runExecutor(exec);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baos));
+			runExecutor(exec,baos);
 			
 			// Test the stats are there
 			JSONObject jsonStats = spi.getSerializedStatistics();
@@ -197,12 +200,11 @@ public class MrProbeTest {
 	/** Runs an executor for the demo hello world example.
 	 * 
 	 * @param exec The executor to use
-	 * @return
+	 * @param baosOut The output stream
 	 */
-	private void runExecutor(Executor exec) {
+	private void runExecutor(Executor exec, ByteArrayOutputStream baosOut) {
 		PrintStream psOut = System.out;
 		PrintStream psErr = System.err;
-		ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
 		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(baosOut));
 		System.setErr(new PrintStream(baosErr));
