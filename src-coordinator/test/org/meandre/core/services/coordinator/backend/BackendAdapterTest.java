@@ -247,8 +247,6 @@ public class BackendAdapterTest {
 		
 		log.info("Running test update thread");
 		
-		long lSleepDuration = 15000;
-		
 		BackendAdapter ba = createBackendAdaptorFromStore();
 		
 		// Try to create the schema
@@ -256,14 +254,12 @@ public class BackendAdapterTest {
 			// Create the schema
 			ba.createSchema();
 			ba.start();
-			ba.close();
 			
 			// Sleep a bit so I can check the table contents
 			try {
-				while (ba.isRunning())
-					Thread.sleep(lSleepDuration);
-			} catch (InterruptedException e) {
-				fail("The sleep operation was interrupted! "+e.toString());
+				ba.close();
+			} catch (BackendAdapterException e) {
+				fail("The close operation was interrupted! "+e.toString());
 			}
 						
 			// Remove the installed shutdown hook

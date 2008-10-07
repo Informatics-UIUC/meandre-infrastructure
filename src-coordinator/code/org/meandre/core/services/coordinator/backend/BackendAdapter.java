@@ -794,7 +794,8 @@ extends Thread {
 			this.bNotDone = false;
 			// Allow the backend adapter to stop
 			try {
-				Thread.sleep(1000);
+				while (isRunning())
+					Thread.sleep(lUpdatePeriod);
 			} catch (InterruptedException e) {
 				log.warning("Fail to wait to the backend adapter finishing");
 			}
