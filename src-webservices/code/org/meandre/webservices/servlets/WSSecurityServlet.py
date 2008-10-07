@@ -60,8 +60,8 @@ def security_users ( request, response, format ):
         users = meandre_security.getUsers()
         for user in users:
             content.append({
-                    'Nickname': user.getNickName(),
-                    'Name': user.getName()
+                    'user_name': user.getNickName(),
+                    'full_name': user.getName()
                 })
         statusOK(response)
         sendTJXContent(response,content,format)
@@ -79,8 +79,8 @@ def security_user ( request, response, format ):
             for user_name in params['user_name'] :
                 user = meandre_security.getUser(user_name)
                 content.append({
-                    'Nickname': user.getNickName(),
-                    'Name': user.getName()
+                    'user_name': user.getNickName(),
+                    'full_name': user.getName()
                 })
             statusOK(response)
             sendTJXContent(response,content,format)
@@ -117,9 +117,9 @@ def security_revoke_all_roles ( request, response, format ):
                 user = meandre_security.getUser(user_name)
                 meandre_security.revokeAllRoles(user)
                 content.append({
-                    'Nickname': user.getNickName(),
-                    'Name': user.getName(),
-                    'Revoked': 'all'
+                    'user_name': user.getNickName(),
+                    'full_name': user.getName(),
+                    'revoked': 'all'
                 })
             statusOK(response)
             sendTJXContent(response,content,format)
@@ -142,9 +142,9 @@ def security_revoke_roles ( request, response, format ):
                     role = Role.fromUrl(role_url)
                     meandre_security.revokeRole(user,role)
                     content.append({
-                        'Nickname': user.getNickName(),
-                        'Name': user.getName(),
-                        'Revoked': role_url
+                        'user_name': user.getNickName(),
+                        'full_name': user.getName(),
+                        'revoked': role_url
                     })
             statusOK(response)
             sendTJXContent(response,content,format)
@@ -167,9 +167,9 @@ def security_grant_roles ( request, response, format ):
                     role = Role.fromUrl(role_url)
                     meandre_security.grantRole(user,role)
                     content.append({
-                        'Nickname': user.getNickName(),
-                        'Name': user.getName(),
-                        'Revoked': role_url
+                        'user_name': user.getNickName(),
+                        'full_name': user.getName(),
+                        'revoked': role_url
                     })
             statusOK(response)
             sendTJXContent(response,content,format)
@@ -189,8 +189,8 @@ def security_create_users ( request, response, format ):
             for user_name, user_full_name, password in zip(params['user_name'],params['user_full_name'],params['password']) :
                 meandre_security.createUser(user_name,user_full_name,password)
                 content.append({
-                    'Nickname': user_name,
-                    'Name': user_full_name
+                    'user_name': user_name,
+                    'full_name': user_full_name
                 })
             statusOK(response)
             sendTJXContent(response,content,format)
@@ -211,8 +211,8 @@ def security_remove_users ( request, response, format ):
                 user = meandre_security.getUser(user_name)
                 meandre_security.removeUser(user)
                 content.append({
-                    'Nickname': user.getNickName(),
-                    'Name': user.getName()
+                    'user_name': user.getNickName(),
+                    'full_name': user.getName()
                 })
             statusOK(response)
             sendTJXContent(response,content,format)
@@ -234,8 +234,8 @@ def security_update_users ( request, response, format ):
                 meandre_security.removeUser(user)
                 meandre_security.createUser(user_name,user_full_name,password)
                 content.append({
-                    'Nickname': user_name,
-                    'Name': user_full_name
+                    'user_name': user_name,
+                    'full_name': user_full_name
                 })
             statusOK(response)
             sendTJXContent(response,content,format)

@@ -15,6 +15,7 @@ import org.meandre.core.security.SecurityManager;
 import org.meandre.core.store.security.SecurityManagerProctor;
 import org.meandre.core.utils.NetworkTools;
 import org.meandre.webservices.MeandreServer;
+import org.meandre.webservices.logger.WSLoggerFactory;
 
 
 /**
@@ -80,6 +81,7 @@ public class MeandreAdminClientTest {
     @Before
     public void setUp() throws Exception {
         log("setup begin");
+        SecurityManagerProctor.removeAllButAdmin(_secManager);
         log("setup end");
     }
 
@@ -105,12 +107,6 @@ public class MeandreAdminClientTest {
     public void testRemoveUser() {
         SecurityManagerProctor.testRemoveUser(_secManager);
     }
-
- /*   @Test
-    public void testGetUsersNickNames() {
-        SecurityManagerProctor.testGetUsersNickNames(_secManager);
-    }
-    */
 
     @Test
     public void testGetUsers() {
@@ -184,7 +180,7 @@ public class MeandreAdminClientTest {
     }
   */  
     private static void log(String msg){
-        System.out.println("MeandreAdminClientTest." + msg);
+        WSLoggerFactory.getWSLogger().info("MeandreAdminClientTest." + msg);
     }
 
 }

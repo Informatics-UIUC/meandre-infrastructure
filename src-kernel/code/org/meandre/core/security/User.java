@@ -130,12 +130,11 @@ public class User {
 	    
 	}
 	
-	public static Set<User> setFromJSON(JSONObject jo) throws JSONException{
+	public static Set<User> setFromJSON(JSONArray array) throws JSONException{
 		Set<User> users = new HashSet<User>(15);
 		try{
-			JSONArray ja = jo.getJSONArray(FIELD_SET);
-			for(int i = 0; i < ja.length(); i++){
-				JSONObject joUser = ja.getJSONObject(i);
+			for(int i = 0; i < array.length(); i++){
+				JSONObject joUser = array.getJSONObject(i);
 				User usr = fromJSON(joUser);
 				users.add(usr);
 			}

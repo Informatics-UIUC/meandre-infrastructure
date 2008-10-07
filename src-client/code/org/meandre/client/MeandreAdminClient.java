@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.httpclient.NameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -34,10 +35,10 @@ implements SecurityManager{
     public static final String CMD_USERS = "users";
     public static final String CMD_USER = "user";
     public static final String CMD_VALID_ROLES = "valid_roles";
-    public static final String CMD_ASSIGN_ROLE = "assign_role";
-    public static final String CMD_REVOKE_ROLE = "revoke_role";
-    public static final String CMD_CREATE_USER = "create_user";
-    public static final String CMD_REMOVE_USER = "remove_user";
+    public static final String CMD_ASSIGN_ROLE = "assign_roles";
+    public static final String CMD_REVOKE_ROLE = "revoke_roles";
+    public static final String CMD_CREATE_USER = "create_users";
+    public static final String CMD_REMOVE_USER = "remove_users";
     public static final String CMD_REVOKE_ALL_ROLES = "revoke_all_roles";
 
     public static final String PARAM_USER_NAME = "user_name";
@@ -68,7 +69,8 @@ implements SecurityManager{
 			log("calling remote create user");
 	        JSONTokener jtUser = executeGetRequestJSON(sRestCommand, nvps);
 	        log("remote create user done.");
-    	    usr = User.fromJSON(new JSONObject(jtUser));
+	        JSONArray jaUsers = new JSONArray(jtUser);
+    	    usr = User.fromJSON(jaUsers.getJSONObject(0));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -88,7 +90,7 @@ implements SecurityManager{
 		Set<Role> roles = null;
 		try{
 	        JSONTokener jtRoles = executeGetRequestJSON(sRestCommand, nvps);
-    	    roles = Role.setFromJSON(new JSONObject(jtRoles));
+    	    roles = Role.setFromJSON(new JSONArray(jtRoles));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -104,7 +106,8 @@ implements SecurityManager{
 		User usr = null;
 		try{
 	        JSONTokener jtUser = executeGetRequestJSON(sRestCommand, nvps);
-    	    usr = User.fromJSON(new JSONObject(jtUser));
+	        JSONArray ja = new JSONArray(jtUser);
+    	    usr = User.fromJSON(ja.getJSONObject(0));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -120,7 +123,7 @@ implements SecurityManager{
 		Set<User> users = null;
 		try{
 	        JSONTokener jtUsers = executeGetRequestJSON(sRestCommand, null);
-    	    users = User.setFromJSON(new JSONObject(jtUsers));
+    	    users = User.setFromJSON(new JSONArray(jtUsers));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -242,7 +245,8 @@ implements SecurityManager{
 		try{
 	        JSONTokener jtUser = executeGetRequestJSON(sRestCommand, nvps);
 	        //retrievedUsr = User.fromJSON(new JSONObject(jtUser));
-	        User.fromJSON(new JSONObject(jtUser));
+	        JSONArray jaUsers = new JSONArray(jtUser);
+	        User.fromJSON(jaUsers.getJSONObject(0));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -260,7 +264,8 @@ implements SecurityManager{
 		Set<Role> roles = null;
 		try{
 	        JSONTokener jtRoles = executeGetRequestJSON(sRestCommand, null);
-    	    roles = Role.setFromJSON(new JSONObject(jtRoles));
+	        JSONArray jaRoles = new JSONArray(jtRoles);
+    	    roles = Role.setFromJSON(jaRoles);
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
