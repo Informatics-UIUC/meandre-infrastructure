@@ -35,7 +35,7 @@ implements SecurityManager{
     public static final String CMD_USERS = "users";
     public static final String CMD_USER = "user";
     public static final String CMD_VALID_ROLES = "valid_roles";
-    public static final String CMD_ASSIGN_ROLE = "assign_roles";
+    public static final String CMD_ASSIGN_ROLE = "grant_roles";
     public static final String CMD_REVOKE_ROLE = "revoke_roles";
     public static final String CMD_CREATE_USER = "create_users";
     public static final String CMD_REMOVE_USER = "remove_users";
@@ -151,7 +151,8 @@ implements SecurityManager{
 		try{
 	        JSONTokener jtUser = executeGetRequestJSON(sRestCommand, nvps);
     	    //retrievedUsr = User.fromJSON(new JSONObject(jtUser));
-    	    User.fromJSON(new JSONObject(jtUser));
+	        JSONArray jaUsers = new JSONArray(jtUser);
+    	    User.fromJSON(jaUsers.getJSONObject(0));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -193,7 +194,8 @@ implements SecurityManager{
 		try{
 	        JSONTokener jtUser = executeGetRequestJSON(sRestCommand, nvps);
     	    //usr = User.fromJSON(new JSONObject(jtUser));
-    	    User.fromJSON(new JSONObject(jtUser));
+	        JSONArray jaUsers = new JSONArray(jtUser);
+    	    User.fromJSON(jaUsers.getJSONObject(0));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -214,7 +216,8 @@ implements SecurityManager{
 		try{
 	        JSONTokener jtUser = executeGetRequestJSON(sRestCommand, nvps);
 	        //retrievedUsr = User.fromJSON(new JSONObject(jtUser));
-	        User.fromJSON(new JSONObject(jtUser));
+	        JSONArray jaUsers = new JSONArray(jtUser);
+    	    User.fromJSON(jaUsers.getJSONObject(0));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){

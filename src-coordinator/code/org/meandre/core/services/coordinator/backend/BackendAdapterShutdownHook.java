@@ -37,8 +37,10 @@ extends Thread {
 	 */
 	public void run () {
 		try {
-			ba.close();
-			log.info("Shutdown hook for "+ba.getName()+" exiting");
+			if ( ba.isRunning() ) {
+				ba.close();
+				log.info("Shutdown hook for "+ba.getName()+" exiting");
+			}
 		} catch (BackendAdapterException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));

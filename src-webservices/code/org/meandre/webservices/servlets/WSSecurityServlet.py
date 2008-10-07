@@ -169,7 +169,7 @@ def security_grant_roles ( request, response, format ):
                     content.append({
                         'user_name': user.getNickName(),
                         'full_name': user.getName(),
-                        'revoked': role_url
+                        'granted': role_url
                     })
             statusOK(response)
             sendTJXContent(response,content,format)
