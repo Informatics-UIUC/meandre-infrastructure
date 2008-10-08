@@ -1,5 +1,13 @@
 1.4.0-vcli-alpha Sara
 
+* Modified the MDX connection duplications (Derby can support multiple concurrent
+  connections to the DB, as long as they are in the same JVM). This gets rid of the
+  results problem reading and the obscure message for autocommit off.
+
+* Fixed the Meandre Client and it failing tests
+
+* Fixed the Meandre Admin Client and its failing tests
+
 * Fixed non-client related failing tests
 
 * Migrated the repository calls that response to POSTs

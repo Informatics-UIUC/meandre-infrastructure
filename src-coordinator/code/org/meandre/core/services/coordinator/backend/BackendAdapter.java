@@ -702,6 +702,7 @@ extends Thread {
 				}
 				lstRes.add(lstRow);
 			}
+			rs.close();
 		} catch (SQLException e) {
 			throw new BackendAdapterException(e);
 		}
@@ -733,6 +734,7 @@ extends Thread {
 				}
 				lstRes.add(lstRow);
 			}
+			rs.close();
 		} catch (SQLException e) {
 			throw new BackendAdapterException(e);
 		}

@@ -492,13 +492,9 @@ public class Store {
 	 */
 	public Connection getConnectionToDB () {
 		try {
-			if ( dbConn.getDatabaseType().equalsIgnoreCase("Derby") )
-				return dbConn.getConnection();
-			else {
 				Connection connNew = DriverManager.getConnection(getURL(), getUserName(), getPassword());
 				connNew.setAutoCommit(false);
 				return connNew;
-			}
 		} catch (SQLException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
