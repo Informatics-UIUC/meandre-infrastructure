@@ -11,9 +11,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.StringWriter;
-import java.net.InetAddress;
+import java.net.URI;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -114,7 +113,7 @@ public class MeandreClientTest {
         try{
              //boolean ret = _meandreClient.addLocation(_sDemoRepo, "Hello Demo");
         	_meandreClient.addLocation(_sDemoRepo, "Hello Demo");
-            _meandreClient.regenerate();
+            //_meandreClient.regenerate();
              
         }catch(TransmissionException e){
             e.printStackTrace();
@@ -130,7 +129,7 @@ public class MeandreClientTest {
     public void tearDown() throws Exception {
         System.out.println("------begin teardown----------");
         _meandreClient.removeLocation(_sDemoRepo);
-        _meandreClient.regenerate();
+        //_meandreClient.regenerate();
     }
 
     /**
@@ -233,8 +232,9 @@ public class MeandreClientTest {
         
         boolean ret;
         try{
+        	 // Location already added on setup
              ret = _meandreClient.addLocation(sNewLoc, "Hello Demo");
-             assertTrue("!Demo Repo Added.", ret);
+             assertFalse("!Demo Repo Added.", ret);
              
         }catch(TransmissionException e){
             fail("Transmission failure: " + e.toString());
@@ -252,8 +252,7 @@ public class MeandreClientTest {
         sNewLoc += "/public/services/demo_repository.nt";
         boolean ret;
         try{
-            ret = _meandreClient.addLocation(sNewLoc, "Hello Demo");
-            assertTrue("!demo repo was added", ret);
+        	// Location already added on setup
             ret = _meandreClient.removeLocation(sNewLoc);
             assertTrue("!demo repo was removed", ret);
        }catch(TransmissionException e){
@@ -303,21 +302,21 @@ public class MeandreClientTest {
      * Test method for {@link org.meandre.client.MeandreClient#retrieveComponentUrls()}.
      */
     @Test
-    public void testRetrieveComponentUrls() {
-        Set<URL> compUrls = null;
+    public void testRetrieveComponentUris() {
+        Set<URI> compUris = null;
         try{
-            compUrls = _meandreClient.retrieveComponentUrls();
+            compUris = _meandreClient.retrieveComponentUris();
         }catch (TransmissionException e){
             fail("Transmission failure: " + e.toString());
         }
         try{
-            URL expected1 = new URL("http://test.org/component/push-string");
-            URL expected2 = new URL("http://test.org/component/print-object");
+        	URI expected1 = new URI("http://test.org/component/push-string");
+            URI expected2 = new URI("http://test.org/component/print-object");
             /*for(URL comp: compUrls){
                 System.out.println(comp.toString());
             }*/
-            assertTrue("!contains 1", compUrls.contains(expected1));
-            assertTrue("!contains 2", compUrls.contains(expected2));
+            assertTrue("!contains 1", compUris.contains(expected1));
+            assertTrue("!contains 2", compUris.contains(expected2));
 
         }catch(Exception e){
             e.printStackTrace();
@@ -331,18 +330,17 @@ public class MeandreClientTest {
      *
      */
     @Test
-    public void testRetrieveFlowUrls() {
-        Set<URL> flowUrls = null;
-        String sUrl = "http://test.org/flow/test-hello-world-with-python-and-lisp/";
+    public void testRetrieveFlowUris() {
+        Set<URI> flowUris = null;
+        String sUri = "http://test.org/flow/test-hello-world-with-python-and-lisp/";
         try{
-            flowUrls = _meandreClient.retrieveFlowUrls();
+            flowUris = _meandreClient.retrieveFlowUris();
         }catch (TransmissionException e){
             fail("Transmission failure: " + e.toString());
         }
         try{
-            URL expected = 
-                new URL(sUrl);
-            assertTrue("!has hello world", flowUrls.contains(expected));
+            URI expected = new URI(sUri);
+            assertTrue("!has hello world", flowUris.contains(expected));
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -409,29 +407,29 @@ public class MeandreClientTest {
     public void testRetrieveComponentsByTag() {
         //test retrieving "PrintObject" component with tag "print"
         String tag = "print";
-        URL expectedCompUrl = null;
+        URI expectedCompUrl = null;
         try{
-            expectedCompUrl = new URL("http://test.org/component/print-object");
+            expectedCompUrl = new URI("http://test.org/component/print-object");
         }catch(Exception e){
-            fail("url prob");
+            fail("uri prob");
         }
-        Set<URL> compUrls = null;
+        Set<URI> compUris = null;
         try{
-            compUrls = _meandreClient.retrieveComponentsByTag(tag);
+            compUris = _meandreClient.retrieveComponentsByTag(tag);
         }catch(TransmissionException e){
             fail("Transmission failure: " + e.toString());
         }     
-        assertEquals(1, compUrls.size());
-        assertTrue(compUrls.contains(expectedCompUrl));
+        assertEquals(1, compUris.size());
+        assertTrue(compUris.contains(expectedCompUrl));
         
         //test doing a retrieve when there are no components for a tag
         tag = "lkjdklwkeknc";
         try{
-            compUrls = _meandreClient.retrieveComponentsByTag(tag);
+            compUris = _meandreClient.retrieveComponentsByTag(tag);
         }catch(TransmissionException e){
             fail("Transmission failure: " + e.toString());
         }
-        assertEquals(0, compUrls.size());
+        assertEquals(0, compUris.size());
     }
 
     /**
@@ -443,22 +441,22 @@ public class MeandreClientTest {
         
         //test retrieving "hello world" by "demo"
         String tag = "demo";
-        URL expectedFlowUrl = null;
+        URI expectedFlowUri = null;
         try{
-            String sUrl = "http://test.org/flow/";
-            sUrl += "test-hello-world-with-python-and-lisp/";
-            expectedFlowUrl = new URL(sUrl);
+            String sUri = "http://test.org/flow/";
+            sUri += "test-hello-world-with-python-and-lisp/";
+            expectedFlowUri = new URI(sUri);
         }catch(Exception e){
             fail("url prob");
         }
-        Set<URL> flowUrls = null;
+        Set<URI> flowUris = null;
         try{
-            flowUrls = _meandreClient.retrieveFlowsByTag(tag);
+            flowUris = _meandreClient.retrieveFlowsByTag(tag);
         }catch(TransmissionException e){
             fail("Transmission failure: " + e.toString());
         }     
-        assertEquals(1, flowUrls.size());
-        assertTrue(flowUrls.contains(expectedFlowUrl));   
+        assertEquals(1, flowUris.size());
+        assertTrue(flowUris.contains(expectedFlowUri));   
     }
 
     /**
@@ -468,14 +466,14 @@ public class MeandreClientTest {
      */
     @Test
     public void testRetrieveComponentDescriptor() {
-        String sUrl = "http://test.org/component/print-object";
+        String sUri = "http://test.org/component/print-object";
         ExecutableComponentDescription comp = null;
         try{
-            comp = _meandreClient.retrieveComponentDescriptor(sUrl);
+            comp = _meandreClient.retrieveComponentDescriptor(sUri);
         }catch(TransmissionException e){
             fail("Transmission failure: " + e.toString());
         }
-        assertEquals(sUrl, comp.getExecutableComponentAsString());
+        assertEquals(sUri, comp.getExecutableComponentAsString());
     }
 
     /**
@@ -484,15 +482,15 @@ public class MeandreClientTest {
      */
     @Test
     public void testRetrieveFlowDescriptor() {
-        String sUrl = "http://test.org/flow/test-hello-world-with-python-and-lisp/";
+        String sUri = "http://test.org/flow/test-hello-world-with-python-and-lisp/";
         FlowDescription comp = null;
         try{
-            comp = _meandreClient.retrieveFlowDescriptor(sUrl);
+            comp = _meandreClient.retrieveFlowDescriptor(sUri);
         }catch(TransmissionException e){
             fail("Transmission failure: " + e.toString());
         }
         System.out.println(comp.getTags().toString());
-        assertEquals(sUrl, comp.getFlowComponentAsString());
+        assertEquals(sUri, comp.getFlowComponentAsString());
     }
 
     /**
@@ -563,21 +561,21 @@ public class MeandreClientTest {
         String sResourceUrl = flow.getFlowComponentAsString();
         System.out.println(sResourceUrl);
         boolean retStat = false;
-        Set<URL> flowsAfter = null;
+        Set<URI> flowsAfter = null;
         try{
             retStat = _meandreClient.uploadFlow(flow, true);
-            flowsAfter = _meandreClient.retrieveFlowUrls();
+            flowsAfter = _meandreClient.retrieveFlowUris();
         }catch(Exception e){
             fail("TransmissionFailure: " + e.toString());
         }
         System.out.println("Retrieved Flows:");
-        for(URL flowUrl: flowsAfter){
-            System.out.println(flowUrl.toString());
+        for(URI flowUri: flowsAfter){
+            System.out.println(flowUri.toString());
         }
         assertTrue("!upload return code", retStat);
         try{
-        assertTrue("!Contains resource URL", 
-                   flowsAfter.contains(new URL(sResourceUrl)));
+        assertTrue("!Contains resource URI", 
+                   flowsAfter.contains(new URI(sResourceUrl)));
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -619,7 +617,7 @@ public class MeandreClientTest {
         String sResourceUrl = flow.getFlowComponentAsString();
         System.out.println(sResourceUrl);
         boolean retStat = false;
-        Set<URL> flowsAfter = null;
+        Set<URI> flowsAfter = null;
         try{
             //Set<URL> flowsBefore = _meandreClient.retrieveFlowUrls();
             retStat = _meandreClient.uploadFlow(flow, true);
@@ -627,7 +625,7 @@ public class MeandreClientTest {
             //Set<URL> flowsMid = _meandreClient.retrieveFlowUrls();
             retStat =  _meandreClient.removeResource(sResourceUrl);
             assertTrue(retStat);
-            flowsAfter = _meandreClient.retrieveFlowUrls();
+            flowsAfter = _meandreClient.retrieveFlowUris();
         }catch(Exception e){
             fail("TransmissionFailure: " + e.toString());
         }

@@ -101,12 +101,24 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 				//
 				// Read the location and check its consistency
 				//
-				if ( sExtension.equals("ttl"))
+				try {
 					modelTmp.read(bais,null,"TTL");
-				else if ( sExtension.equals("nt"))
-					modelTmp.read(bais,null,"N-TRIPLE");
-				else
-					modelTmp.read(bais,null);
+				}
+				catch ( Exception eTTL ) {
+					try {
+						modelTmp.read(bais,null,"N-TRIPLE");
+					}
+					catch ( Exception eNT ) {
+						try {
+							modelTmp.read(bais,null);
+						}
+						catch ( Exception eRDF ) {
+							IOException ioe = new IOException();
+							ioe.setStackTrace(eRDF.getStackTrace());
+							throw ioe;
+						}
+					}
+				}
 
 				//
 				// Accumulate the models

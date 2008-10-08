@@ -680,22 +680,32 @@ public class Store {
 				//
 				// Remove the components provided by the location
 				//
-				mod.begin();
 				// Remove the executable components
 				for ( Resource recd:qrTmp.getAvailableExecutableComponents() ) {
 					ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(recd);
-					mod.remove(ecd.getModel());
+					if ( ecd!=null ) {
+						mod.begin();
+						mod.remove(ecd.getModel());
+						mod.commit();
+					}
 				}
+				
 				for ( Resource rfd:qrTmp.getAvailableFlows() ) {
 					FlowDescription fd = qr.getFlowDescription(rfd);
-					mod.remove(fd.getModel());
+					if ( fd!=null ) {
+						mod.begin();
+						mod.remove(fd.getModel());
+						mod.commit();
+					}
 				}
-				mod.commit();
+				
 				qr.refreshCache();
+				bRes = true;
 			}
 			catch ( Exception e ) {
 				log.warning("Failed to load location\n"+e.toString());
 				bRes = false;
+				qr.refreshCache();
 			}
 			
 			// 
@@ -788,6 +798,7 @@ public class Store {
 			catch ( Exception e ) {
 				log.warning("WSLocationsLogic.removeLocation: Failed to add location\n"+e.toString());
 				bRes = false;
+				getRepositoryStore(sUser).refreshCache();
 			}
 		}
 		else {
@@ -849,11 +860,12 @@ public class Store {
 				
 				// Adding flows
 				Model modUser = qr.getModel();
-				modUser.begin();
 				for ( Resource resFlow:qrNew.getAvailableFlows() ) {
 					if ( qr.getFlowDescription(resFlow)==null ) {
 						// Component does not exist
+						modUser.begin();
 						modUser.add(qrNew.getFlowDescription(resFlow).getModel());
+						modUser.commit();
 					}
 					else {
 						// Flow does exist
@@ -868,11 +880,13 @@ public class Store {
 						log.warning("Discarding existing component "+ecd.getExecutableComponent()+".");
 					}
 					else {
+						modUser.begin();
 						modUser.add(ecd.getModel());
+						modUser.commit();
 					}
 				}
 				//Commiting changes
-				modUser.commit();
+				
 				
 				// Refresh the cache
 				qr.refreshCache();
@@ -880,11 +894,11 @@ public class Store {
 			}
 			catch ( Exception e ) {
 				log.warning("WSRepositoryLogic: Failed to load location\n"+e.toString());
+				qr.refreshCache();
 				bRes = false;
 			}
 		}
 
-		qr.refreshCache();
 
 		return bRes;
 	}

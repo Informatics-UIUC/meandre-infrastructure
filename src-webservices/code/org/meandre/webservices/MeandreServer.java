@@ -32,7 +32,6 @@ import org.meandre.webservices.servlets.WSExecuteServlet;
 import org.meandre.webservices.servlets.WSLocationsServlet;
 import org.meandre.webservices.servlets.WSPublicServlet;
 import org.meandre.webservices.servlets.WSPublishServlet;
-import org.meandre.webservices.servlets.WSRepository;
 import org.meandre.webservices.servlets.WSRepositoryServlet;
 import org.meandre.webservices.servlets.WSSecurityServlet;
 import org.mortbay.jetty.Server;
@@ -197,7 +196,11 @@ public class MeandreServer {
 	 * @throws Exception Jetty could not be started or joined
 	 */
 	public void start () throws Exception {
+		log.info("Starting the WS endpoint...");
 		start(true);
+		Thread.sleep(1000);
+		log.info("Endpoint successfully started");
+		
 	}
 	
 	/**
@@ -320,7 +323,6 @@ public class MeandreServer {
 		//
 		contextWS.addServlet(new ServletHolder((Servlet) new WSAboutServlet(store,cnf)), 		"/services/about/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSLocationsServlet(store,cnf)),	"/services/locations/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository(store,cnf)),	"/services/old/repository/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSRepositoryServlet(store,cnf)),	"/services/repository/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSExecuteServlet(store,cnf)),		"/services/execute/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublishServlet(store,cnf)),		"/services/publish/*");

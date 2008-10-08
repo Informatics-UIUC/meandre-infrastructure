@@ -1,27 +1,37 @@
 package org.meandre.client;
 
-import java.util.*;
-import java.util.Map.Entry;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Map.Entry;
 
-import org.json.*;
-
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-
-import org.meandre.core.repository.*;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.PartSource;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+import org.meandre.core.repository.ExecutableComponentDescription;
+import org.meandre.core.repository.FlowDescription;
+import org.meandre.core.repository.LocationBean;
+import org.meandre.core.repository.QueryableRepository;
+import org.meandre.core.repository.RepositoryImpl;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 
 /**
@@ -228,12 +238,15 @@ public class MeandreClient extends MeandreBaseClient{
 
         JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
         try{
-            JSONObject joRetrieved = new JSONObject(jtRetrieved);
-            if(jtRetrieved == null){
+        	JSONArray ja = new JSONArray(jtRetrieved);
+            if( ja.length()!=1 ){
                 return false;
             }
-            String loc = joRetrieved.getString("location");
-            return (loc.equals(sUrl));
+            String loc = ja.getJSONObject(0).getString("location");
+            if ( loc!=null )
+            	return (loc.equals(sUrl));
+            else
+            	return false;
         }catch(JSONException je){
             return false;
         }
@@ -289,14 +302,19 @@ public class MeandreClient extends MeandreBaseClient{
      * http://<meandre_host>:<meandre_port>/services/repository/list_components.json
      * @throws TransmissionException
      */
-    public Set<URL> retrieveComponentUrls() throws TransmissionException {
-        String sRestCommand = "services/repository/list_components.json";
-        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, null);
-        String jArrayKey = "meandre_executable_component";
-        String jObjectKey = "meandre_uri";
-        Set<String> sCompUrls = unpackJSONArray(jtRetrieved, jArrayKey, jObjectKey);
-        Set<URL> componentUrls = convertStringSetToUrls(sCompUrls);
-        return componentUrls;
+    public Set<URI> retrieveComponentUris() throws TransmissionException {
+    	try {
+	        String sRestCommand = "services/repository/list_components.json";
+	        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, null);
+	        JSONArray ja = new JSONArray(jtRetrieved);
+	        Set<URI> setCompURIs = new HashSet<URI>();
+	        for ( int i=0, iMax=ja.length() ; i<iMax ; i++ )
+	        	setCompURIs.add(new URI(ja.getJSONObject(i).getString("meandre_uri")));
+	        return setCompURIs;
+    	}
+    	catch ( Exception e ) {
+    		throw new TransmissionException(e);
+    	}
     }
 
     /**
@@ -306,14 +324,19 @@ public class MeandreClient extends MeandreBaseClient{
      * http://<meandre_host>:<meandre_port>/services/repository/list_flows.json
      * @throws TransmissionException
      */
-    public Set<URL> retrieveFlowUrls() throws TransmissionException {
-        String sRestCommand = "services/repository/list_flows.json";
-        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, null);
-        String jArrayKey = "meandre_flow_component";
-        String jObjectKey = "meandre_uri";
-        Set<String> sFlowUrls = unpackJSONArray(jtRetrieved, jArrayKey, jObjectKey);
-        Set<URL> uFlows = convertStringSetToUrls(sFlowUrls);
-        return uFlows;
+    public Set<URI> retrieveFlowUris() throws TransmissionException {
+    	try {
+	        String sRestCommand = "services/repository/list_flows.json";
+	        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, null);
+	        JSONArray ja = new JSONArray(jtRetrieved);
+	        Set<URI> setCompURIs = new HashSet<URI>();
+	        for ( int i=0, iMax=ja.length() ; i<iMax ; i++ )
+	        	setCompURIs.add(new URI(ja.getJSONObject(i).getString("meandre_uri")));
+	        return setCompURIs;
+    	}
+    	catch ( Exception e ) {
+    		throw new TransmissionException(e);
+    	}
     }
 
 
@@ -327,13 +350,18 @@ public class MeandreClient extends MeandreBaseClient{
      * TODO:return tag objects instead of strings
      */
     public Set<String> retrieveAllTags() throws TransmissionException {
-        String sRestCommand = "services/repository/tags.json";
-        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, null);
-        String jArrayKey = "meandre_tags";
-        String jObjectKey = "tag";
-        Set<String> sTags = unpackJSONArray(jtRetrieved, jArrayKey, jObjectKey);
-        return sTags;
-
+    	try {
+	        String sRestCommand = "services/repository/tags.json";
+	        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, null);
+	        JSONArray ja = new JSONArray(jtRetrieved);
+	        Set<String> setTags = new HashSet<String>();
+	        for ( int i=0,iMax=ja.length() ; i<iMax ; i++ )
+	        	setTags.add(ja.getJSONObject(i).getString("meandre_tag"));
+	        return setTags;
+    	}
+    	catch ( Exception  e ) {
+    		throw new TransmissionException(e);
+    	}
     }
 
     /**
@@ -345,12 +373,18 @@ public class MeandreClient extends MeandreBaseClient{
      * TODO:return tag objects instead of strings
      */
     public Set<String> retrieveComponentTags() throws TransmissionException {
-        String sRestCommand = "services/repository/tags_components.json";
-        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, null);
-        String jArrayKey = "meandre_tags";
-        String jObjectKey = "tag";
-        Set<String> sTags = unpackJSONArray(jtRetrieved, jArrayKey, jObjectKey);
-        return sTags;
+    	try {
+	        String sRestCommand = "services/repository/tags_components.json";
+	        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, null);
+	        JSONArray ja = new JSONArray(jtRetrieved);
+	        Set<String> setTags = new HashSet<String>();
+	        for ( int i=0,iMax=ja.length() ; i<iMax ; i++ )
+	        	setTags.add(ja.getJSONObject(i).getString("meandre_tag"));
+	        return setTags;
+    	}
+    	catch ( Exception e ) {
+    		throw new TransmissionException(e);
+    	}
     }
 
     /**
@@ -362,12 +396,18 @@ public class MeandreClient extends MeandreBaseClient{
      * TODO:return tag objects instead of strings
      */
     public Set<String> retrieveFlowTags() throws TransmissionException {
-        String sRestCommand = "services/repository/tags_flows.json";
-        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, null);
-        String jArrayKey = "meandre_tags";
-        String jObjectKey = "tag";
-        Set<String> sTags = unpackJSONArray(jtRetrieved, jArrayKey, jObjectKey);
-        return sTags;
+    	try {
+	        String sRestCommand = "services/repository/tags_flows.json";
+	        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, null);
+	        JSONArray ja = new JSONArray(jtRetrieved);
+	        Set<String> setTags = new HashSet<String>();
+	        for ( int i=0,iMax=ja.length() ; i<iMax ; i++ )
+	        	setTags.add(ja.getJSONObject(i).getString("meandre_tag"));
+	        return setTags;
+    	}
+    	catch ( Exception e ) {
+    		throw new TransmissionException(e);
+    	}
     }
 
     /**
@@ -378,17 +418,22 @@ public class MeandreClient extends MeandreBaseClient{
      * @throws TransmissionException
      * TODO:input a tag object instead of string
      */
-    public Set<URL> retrieveComponentsByTag(String sTag) throws TransmissionException {
-        String sRestCommand = "services/repository/components_by_tag.json";
-
-        Set<NameValuePair> nvps = new HashSet<NameValuePair>();
-        nvps.add(new NameValuePair("q", sTag));
-        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
-        String jArrayKey = "meandre_executable_component";
-        String jObjectKey = "meandre_uri";
-        Set<String> sCompUrls = unpackJSONArray(jtRetrieved, jArrayKey, jObjectKey);
-        Set<URL> componentUrls = convertStringSetToUrls(sCompUrls);
-        return componentUrls;
+    public Set<URI> retrieveComponentsByTag(String sTag) throws TransmissionException {
+    	try {
+	        String sRestCommand = "services/repository/components_by_tag.json";
+	
+	        Set<NameValuePair> nvps = new HashSet<NameValuePair>();
+	        nvps.add(new NameValuePair("tag", sTag));
+	        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
+	        JSONArray ja = new JSONArray(jtRetrieved);
+	        Set<URI> setURIs = new HashSet<URI>();
+	        for ( int i=0,iMax=ja.length() ; i<iMax ; i++ )
+	        	setURIs.add(new URI(ja.getJSONObject(i).getString("meandre_uri")));
+	        return setURIs;
+    	}
+    	catch ( Exception e ) {
+    		throw new TransmissionException(e);
+    	}
     }
 
     /**
@@ -399,16 +444,22 @@ public class MeandreClient extends MeandreBaseClient{
      * @throws TransmissionException
      * TODO:input a tag object instead of string
      */
-    public Set<URL> retrieveFlowsByTag(String sTag) throws TransmissionException {
-        String sRestCommand = "services/repository/flows_by_tag.json";
-        Set<NameValuePair> nvps = new HashSet<NameValuePair>();
-        nvps.add(new NameValuePair("q", sTag));
-        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
-        String jArrayKey = "meandre_flow_component";
-        String jObjectKey = "meandre_uri";
-        Set<String> sFlowUrls = unpackJSONArray(jtRetrieved, jArrayKey, jObjectKey);
-        Set<URL> uFlows = convertStringSetToUrls(sFlowUrls);
-        return uFlows;
+    public Set<URI> retrieveFlowsByTag(String sTag) throws TransmissionException {
+    	try {
+	        String sRestCommand = "services/repository/flows_by_tag.json";
+	
+	        Set<NameValuePair> nvps = new HashSet<NameValuePair>();
+	        nvps.add(new NameValuePair("tag", sTag));
+	        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
+	        JSONArray ja = new JSONArray(jtRetrieved);
+	        Set<URI> setURIs = new HashSet<URI>();
+	        for ( int i=0,iMax=ja.length() ; i<iMax ; i++ )
+	        	setURIs.add(new URI(ja.getJSONObject(i).getString("meandre_uri")));
+	        return setURIs;
+    	}
+    	catch ( Exception e ) {
+    		throw new TransmissionException(e);
+    	}
     }
 
 
@@ -476,17 +527,22 @@ public class MeandreClient extends MeandreBaseClient{
      *http://<meandre_host>:<meandre_port>/services/repository/search_components.json
      * @throws TransmissionException
      */
-    public Set<URL> retrieveComponentUrlsByQuery(String sQuery)
+    public Set<URI> retrieveComponentUrlsByQuery(String sQuery)
             throws TransmissionException {
-        String sRestCommand = "services/repository/search_components.json";
-        Set<NameValuePair> nvps = new HashSet<NameValuePair>();
-        nvps.add(new NameValuePair("q", sQuery));
-        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
-        String jArrayKey = "meandre_executable_component";
-        String jObjectKey = "meandre_uri";
-        Set<String> sCompUrls = unpackJSONArray(jtRetrieved, jArrayKey, jObjectKey);
-        Set<URL> componentUrls = convertStringSetToUrls(sCompUrls);
-        return componentUrls;
+        try {
+      		String sRestCommand = "services/repository/search_components.json";
+            Set<NameValuePair> nvps = new HashSet<NameValuePair>();
+            nvps.add(new NameValuePair("q", sQuery));
+            JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, null);
+	        JSONArray ja = new JSONArray(jtRetrieved);
+	        Set<URI> setCompURIs = new HashSet<URI>();
+	        for ( int i=0, iMax=ja.length() ; i<iMax ; i++ )
+	        	setCompURIs.add(new URI(ja.getJSONObject(i).getString("meandre_uri")));
+	        return setCompURIs;
+    	}
+    	catch ( Exception e ) {
+    		throw new TransmissionException(e);
+    	}
 
     }
 
@@ -498,19 +554,23 @@ public class MeandreClient extends MeandreBaseClient{
      *http://<meandre_host>:<meandre_port>/services/repository/search_flows.json
      * @throws TransmissionException
      */
-    public Set<URL> retrieveFlowUrlsByQuery(String sQuery)
+    public Set<URI> retrieveFlowUrlsByQuery(String sQuery)
             throws TransmissionException {
 
-        String sRestCommand = "services/repository/search_flows.json";
-        Set<NameValuePair> nvps = new HashSet<NameValuePair>();
-        nvps.add(new NameValuePair("q", sQuery));
-        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
-
-        String jArrayKey = "meandre_flow_component";
-        String jObjectKey = "meandre_uri";
-        Set<String> sFlowUrls = unpackJSONArray(jtRetrieved, jArrayKey, jObjectKey);
-        Set<URL> uFlows = convertStringSetToUrls(sFlowUrls);
-        return uFlows;
+    	try {
+      		String sRestCommand = "services/repository/search_flows.json";
+            Set<NameValuePair> nvps = new HashSet<NameValuePair>();
+            nvps.add(new NameValuePair("q", sQuery));
+            JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, null);
+	        JSONArray ja = new JSONArray(jtRetrieved);
+	        Set<URI> setCompURIs = new HashSet<URI>();
+	        for ( int i=0, iMax=ja.length() ; i<iMax ; i++ )
+	        	setCompURIs.add(new URI(ja.getJSONObject(i).getString("meandre_uri")));
+	        return setCompURIs;
+    	}
+    	catch ( Exception e ) {
+    		throw new TransmissionException(e);
+    	}
     }
 
 
@@ -632,7 +692,7 @@ public class MeandreClient extends MeandreBaseClient{
             Set<File> jarFileContexts, boolean overwrite)
             throws TransmissionException {
 
-        String sRestCommand = "services/repository/add.nt";
+        String sRestCommand = "services/repository/add.json";
 
         Set<NameValuePair> nvps = new HashSet<NameValuePair>();
         nvps.add(new NameValuePair("overwrite", Boolean.toString(overwrite)));
@@ -705,11 +765,12 @@ public class MeandreClient extends MeandreBaseClient{
         Set<NameValuePair> nvps = new HashSet<NameValuePair>();
         nvps.add(new NameValuePair("uri", sResourceUrl));
         JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
-        if(jtRetrieved == null){
-            return false;
-        }
         try{
-            JSONObject joRetrieved = new JSONObject(jtRetrieved);
+        	JSONArray ja = new JSONArray(jtRetrieved);
+            if ( ja.length()!=1 )
+            	return false;
+            
+            JSONObject joRetrieved = ja.getJSONObject(0);
             if(joRetrieved.isNull("meandre_uri")){
                 return false;
             }
@@ -736,15 +797,21 @@ public class MeandreClient extends MeandreBaseClient{
      * http://<meandre_host>:<meandre_port>/services/publish/publish.json
      */
     public boolean publish(String sResourceUrl) throws TransmissionException {
-        String sRestCommand = "services/publish/publish.json";
-        Set<NameValuePair> nvps = new HashSet<NameValuePair>();
-        nvps.add(new NameValuePair("uri", sResourceUrl));
-        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
-        if(jtRetrieved == null){
-            return false;
-        }
-        String sRetrieved = unpackJSONObject(jtRetrieved, "meandre_uri");
-        return (sResourceUrl.equals(sRetrieved));
+        try {
+	        String sRestCommand = "services/publish/publish.json";
+	
+	        Set<NameValuePair> nvps = new HashSet<NameValuePair>();
+	        nvps.add(new NameValuePair("uri", sResourceUrl));
+	        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
+	        JSONArray ja = new JSONArray(jtRetrieved);
+	        if ( ja.length()==1 )
+	        	return sResourceUrl.equals(ja.getJSONObject(0).getString("meandre_uri"));
+	        else
+	        	return false;
+    	}
+    	catch ( Exception e ) {
+    		throw new TransmissionException(e);
+    	}
     }
 
 
@@ -762,15 +829,21 @@ public class MeandreClient extends MeandreBaseClient{
      *http://<meandre_host>:<meandre_port>/services/publish/unpublish.json
      */
     public boolean unpublish(String sResourceUrl) throws TransmissionException {
-        String sRestCommand = "services/publish/unpublish.json";
-        Set<NameValuePair> nvps = new HashSet<NameValuePair>();
-        nvps.add(new NameValuePair("uri", sResourceUrl));
-        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
-        if(jtRetrieved == null){
-            return false;
-        }
-        String sRetrieved = unpackJSONObject(jtRetrieved, "meandre_uri");
-        return (sResourceUrl.equals(sRetrieved));
+    	try {
+	        String sRestCommand = "services/publish/unpublish.json";
+	
+	        Set<NameValuePair> nvps = new HashSet<NameValuePair>();
+	        nvps.add(new NameValuePair("uri", sResourceUrl));
+	        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
+	        JSONArray ja = new JSONArray(jtRetrieved);
+	        if ( ja.length()==1 )
+	        	return sResourceUrl.equals(ja.getJSONObject(0).getString("meandre_uri"));
+	        else
+	        	return false;
+    	}
+    	catch ( Exception e ) {
+    		throw new TransmissionException(e);
+    	}
     }
 
 
@@ -884,16 +957,24 @@ public class MeandreClient extends MeandreBaseClient{
      * the value. requires a server side change.
      * FIXME: This is totally untested.
      */
-    public Map<URL,URL> retrieveRunningFlows() throws TransmissionException{
-        String sRestCommand = "services/execute/list_running_flows.json";
-        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, null);
-        String jArrayKey = "meandre_running_flows";
-        String jKeyElementKey = "flow_instance_uri";
-        String jValueElementKey = "flow_instance_webui_uri";
-        Map<String, String> msRetrievedPairs = unpackJSONMap(jtRetrieved, jArrayKey,
-                jKeyElementKey, jValueElementKey);
-        Map<URL, URL> muRetrievedPairs = convertStringMapToUrls(msRetrievedPairs);
-        return muRetrievedPairs;
+    public Map<URI,URI> retrieveRunningFlows() throws TransmissionException{
+    	try {
+	        String sRestCommand = "services/execute/list_running_flows.json";
+	        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, null);
+	        JSONArray ja = new JSONArray(jtRetrieved);
+	        Map<URI, URI> muRetrievedPairs = new Hashtable<URI,URI>();
+	        for ( int i=0,iMax=ja.length() ; i<iMax ; i++ ) {
+	        	JSONObject jo = ja.getJSONObject(i);
+	        	muRetrievedPairs.put(
+	        			new URI(jo.getString("low_instance_uri")), 
+	        			new URI(jo.getString("flow_instance_webui_uri"))
+	        		);
+	        }	        	
+	        return muRetrievedPairs;
+    	}
+    	catch ( Exception e ) {
+    		throw new TransmissionException(e);
+    	}
     }
 
 
@@ -1019,133 +1100,5 @@ public class MeandreClient extends MeandreBaseClient{
         return joRetrieved;
     }
 
-
-    ///////////
-    //private
-    //////////
-
-
-
-
-
-    /**
-     * unpacks a list of strings that are packed in an JSONArray, packed in
-     * a JSONObject. This is a common pattern for lists of elements returned by
-     * the Meandre Web API.
-     *
-     * The input JSONTokener is converted to a JSONObject with a single element.
-     * That element is a JSONArray with key jArrayKey. Each element in the
-     * array is a JSONObject with key jElementKey, and the value of those elements
-     * are extracted and returned as an array of strings.
-     * @throws TransmissionException
-     *
-     */
-    private Set<String> unpackJSONArray(JSONTokener jArrayWrapper,
-            String jArrayKey, String jElementKey)
-            throws TransmissionException{
-
-        Set<String> scValues = new HashSet<String>();
-        try{
-            JSONObject joToplevel = new JSONObject(jArrayWrapper);
-            JSONArray jArray = joToplevel.getJSONArray(jArrayKey);
-            int numElems = jArray.length();
-
-            for(int i = 0; i < numElems; i++){
-                JSONObject jo = jArray.getJSONObject(i);
-                String str = jo.getString(jElementKey);
-                scValues.add(str);
-            }
-
-        }catch (JSONException exc){
-            throw new TransmissionException(exc);
-        }
-        return scValues;
-    }
-
-    /**
-     * unpacks a single string value from a tokener that contains a json object.
-     * This is a common pattern for values returned by the Meandre Web API.
-     *
-     * The input tokener is converted into a JSONObject, and the string value
-     * associated with the input jElementKey is retrieved and returned.
-     *
-     * If the json conversions fail, the JSONException is wrapped in a Transmission
-     * Exception and thrown.
-     */
-    private String unpackJSONObject(JSONTokener jWrapper, String jElementKey)
-            throws TransmissionException{
-        String sValue = null;
-        try{
-            JSONObject jo = new JSONObject(jWrapper);
-            sValue = jo.getString(jElementKey);
-        }catch (JSONException exc){
-            throw new TransmissionException(exc);
-        }
-        return sValue;
-    }
-
-    /**
-     * unpacks a string to string Map encoded as a json array of key,value pairs.
-     *
-     * The input tokener is converted into a JSONObject. An array with jArrayKey
-     * is extracted from the object. Each element of the array is cast to a
-     * JSONObject and has a key string with jKeyElementKey and value string
-     * with jValueElementKey. The returned Map is then a mapping from the
-     * key strings to the value strings.
-     */
-    private Map<String, String> unpackJSONMap(JSONTokener jWrapper,
-            String jArrayKey, String jKeyElementKey, String jValueElementKey)
-            throws TransmissionException{
-
-        Map<String, String> sMap = new HashMap<String, String>();
-        try{
-            JSONObject joToplevel = new JSONObject(jWrapper);
-            JSONArray jArray = joToplevel.getJSONArray(jArrayKey);
-            int numElems = jArray.length();
-            for(int i = 0; i < numElems; i++){
-                JSONObject jo = jArray.getJSONObject(i);
-                String keyStr = jo.getString(jKeyElementKey);
-                String valueStr = jo.getString(jValueElementKey);
-                sMap.put(keyStr, valueStr);
-            }
-        }catch (JSONException exc){
-            throw new TransmissionException(exc);
-        }
-        return sMap;
-    }
-
-    /** convert a Set of strings into a Set of URL's */
-    private Set<URL> convertStringSetToUrls(Set<String> strs)
-            throws TransmissionException{
-        Set<URL> urls = new HashSet<URL>();
-        Iterator<String> iter = strs.iterator();
-        while(iter.hasNext()){
-           try {
-               urls.add(new URL(iter.next()));
-           }catch (MalformedURLException e) {
-               throw new TransmissionException(
-                       "Problem converting downloaded data into URLs", e);
-           }
-        }
-        return urls;
-    }
-
-    /**convert a String, String map to a URL, URL map */
-    private Map<URL, URL> convertStringMapToUrls(Map<String, String> strMap)
-            throws TransmissionException{
-        Map<URL, URL> urlMap = new HashMap<URL, URL>();
-        try{
-            for(String strKey:strMap.keySet()){
-                String strValue = strMap.get(strKey);
-                URL urlKey = new URL(strKey);
-                URL urlValue = new URL(strValue);
-                urlMap.put(urlKey, urlValue);
-            }
-        }catch(MalformedURLException exc){
-            throw new TransmissionException(
-                    "Problem converting downloaded data into URLs", exc);
-           }
-        return urlMap;
-    }
 
 }

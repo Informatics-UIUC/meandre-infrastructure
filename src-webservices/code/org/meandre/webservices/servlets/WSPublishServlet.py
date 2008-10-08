@@ -32,7 +32,7 @@ def publish_publish ( request, response, format ):
             content = []
             for uri in params['uri']:
                 if meandre_store.publishURI(uri,getMeandreUser(request)) :
-                    content.append(uri)
+                    content.append({'meandre_uri':uri})
             statusOK(response)
             sendTJXContent(response,content,format)
     else:
@@ -50,7 +50,7 @@ def publish_unpublish ( request, response, format ):
             content = []
             for uri in params['uri']:
                 if meandre_store.unpublishURI(uri,getMeandreUser(request)) :
-                    content.append(uri)
+                    content.append({'meandre_uri':uri})
             statusOK(response)
             sendTJXContent(response,content,format)
     else:
