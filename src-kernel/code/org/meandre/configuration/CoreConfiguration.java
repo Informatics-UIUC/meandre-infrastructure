@@ -109,7 +109,8 @@ public class CoreConfiguration {
 	        	new File(getHomeDirectory()).mkdir();
 	            
 	        	// Dump properties
-	            fos = new FileOutputStream("meandre-config-core.xml");
+	        	
+	            fos = new FileOutputStream(fileCnf);
 	            propsCore.storeToXML(fos, "Meandre default configuration file (" + Constants.MEANDRE_VERSION + ")");
 	            fos.close();
 	            

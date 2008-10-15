@@ -101,6 +101,7 @@
                 <include name="**/*.xml"/>
                 <include name="**/*.vm"/>
                 <include name="**/*.list"/>
+                <include name="**/*.py"/>
             </fileset>
         </copy>
 
@@ -177,6 +178,7 @@
                 <path refid="meandre.test.classpath"/>
                 <pathelement location="${build.dir}"/>
                 <pathelement location="${test.dir}"/>
+                <pathelement location="${ws.test}"/>
                 <pathelement path="${java.class.path}"/>
             </classpath>
 
@@ -186,6 +188,7 @@
             <batchtest todir="${test.dir}/xml">
                 <fileset dir="${kernel.test}">
                     <include name="**/*.java"/>
+                    <exclude name="**/TestLoggerFactory.java"/>
                 </fileset>
 
                 <fileset dir="${plugins.test}">
@@ -202,16 +205,17 @@
 
                 <fileset dir="${ws.test}">
                     <include name="**/*.java"/>
+                    <exclude name="**/ServletConfigurableDispatcherTest.java"/>
+                    <exclude name="**/SimpleServlet.java"/>
                 </fileset>
 
                 <fileset dir="${store.test}">
                     <include name="**/*.java"/>
+                    <exclude name="**/SecurityManagerProctor.java"/>
                 </fileset>
-
                 <fileset dir="${client.test}">
                     <include name="**/*.java"/>
                 </fileset>
-
                 <fileset dir="${coordinator.test}">
                     <include name="**/*.java"/>
                 </fileset>

@@ -71,15 +71,28 @@ public abstract class ServletConfigurableDispatcher extends HttpServlet {
 		// Setup the interpreter
 		pi = new PythonInterpreter();
 		// Run the initialization script
-		process(
-				ServletConfigurableDispatcher.class.getResourceAsStream(
-						ServletConfigurableDispatcher.class.getSimpleName()+".py"
-					)
-			);
+		String pyResourceName = 
+		    ServletConfigurableDispatcher.class.getSimpleName()+".py";
+		InputStream pyResourceStream = 
+		    ServletConfigurableDispatcher.class.getResourceAsStream(pyResourceName);
+		//check if we could find the initialization python script using the classloader
+		if(pyResourceStream == null){
+		    throw new NullPointerException(
+		            "Could not find the init script \'" + pyResourceName + 
+		            "\' via the classloader. Make sure it is in your classpath.");
+		}
+		//run the script
+		process(pyResourceStream);
 		// Run the dispatcher definition
-		process(this.getClass().getResourceAsStream(
-				this.getClass().getSimpleName()+".py"
-			));
+		pyResourceName = this.getClass().getSimpleName()+".py";
+		pyResourceStream = this.getClass().getResourceAsStream(pyResourceName);
+        //check if we could find the dispatcher python script using the classloader
+        if(pyResourceStream == null){
+            throw new NullPointerException(
+                    "Could not find the init script \'" + pyResourceName + 
+                    "\' via the classloader. Make sure it is in your classpath.");
+        }		
+		process(pyResourceStream);
 	}
 	
 	/** Destroys the servlet and releases the Python interpreter after cleaning it up.

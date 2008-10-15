@@ -51,8 +51,8 @@ public class MeandreClientTest {
     private static String _serverUrl = NetworkTools.getLocalHostName();
     private static int _serverPort = 1704;
     
-    private static String _workingDir = 
-        "." + File.separator + "test" + File.separator + "output";
+    //made crossplatform in setupBeforeClass
+    private static String _workingDir = "./test/output/MeandreClientTest/";
 
     private static String _sTestUploadJar = 
         "." + File.separator + "data" + File.separator + "test" + 
@@ -75,27 +75,38 @@ public class MeandreClientTest {
         System.out.println("MeandreClientTest: setupBeforeClass begin");
         
         _serverUrl = NetworkTools.getLocalHostName();
+        _workingDir = _workingDir.replace('/', File.separatorChar);
         
         File fWorkDir = new File(_workingDir);
         if(!fWorkDir.exists()){
             fWorkDir.mkdirs();
         }
-
+        MeandreServer.uninstall(fWorkDir);
         _server = new MeandreServer(_serverPort, _workingDir);
-        CoreConfiguration cnf = new CoreConfiguration(_serverPort,_workingDir);
-        _server.setCoreConfiguration(cnf);
+        log("MeandreServer initialized");
+        //CoreConfiguration cnf = new CoreConfiguration(_serverPort,_workingDir);
+        //_server.setCoreConfiguration(cnf);
+        
+        //_server = new MeandreServer(_serverPort, _workingDir);
+        //_server.setCoreConfiguration(cnf);
+        //log("MeandreServer uninstalled");
         _server.start(false);
+        log("MeandreServer started");
         System.out.println("MeandreClientTest: setupBeforeClass end");
     }
     
+    private static void log(String msg) {
+        System.out.println("MeandreClient: " + msg);
+        
+    }
+
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         System.out.println("MeandreClientTest: tearDownAfterClass");
         //CoreConfiguration config = null;
-        //Store store = null;
-        
-        
+        //Store store = null;        
         _server.stop();
+        MeandreServer.uninstall(new File(_workingDir));
         _server = null;
     }
     /**
@@ -130,6 +141,7 @@ public class MeandreClientTest {
         System.out.println("------begin teardown----------");
         _meandreClient.removeLocation(_sDemoRepo);
         //_meandreClient.regenerate();
+        System.out.println("------end teardown----------\n\n");
     }
 
     /**

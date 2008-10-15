@@ -32,7 +32,8 @@ public class MeandreAdminClientTest {
     private static String _serverUrl = "localhost";
     private static int _serverPort = 1704;
     
-    private static String _workingDir = "./test/output/";
+    //made crossplatform in setupBeforeClass
+    private static String _workingDir = "./test/output/MeandreAdminClientTest";
 
 
     
@@ -43,6 +44,8 @@ public class MeandreAdminClientTest {
     public static void setUpBeforeClass() throws Exception {
         log("setupBeforeClass begin");
         _serverUrl = NetworkTools.getLocalHostName();
+        
+        _workingDir = _workingDir.replace('/', File.separatorChar);
         
         File fWorkDir = new File(_workingDir);
         if(!fWorkDir.exists()){
@@ -72,6 +75,7 @@ public class MeandreAdminClientTest {
         log("tearDownAfterClass begin");
          _secManager = null;
         _server.stop();
+        MeandreServer.uninstall(new File(_workingDir));
         _server = null;
         log("tearDownAfterClass end");        
     }
