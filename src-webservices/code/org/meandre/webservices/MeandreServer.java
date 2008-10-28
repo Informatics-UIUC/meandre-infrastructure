@@ -36,6 +36,7 @@ import org.meandre.webservices.servlets.WSPublicServlet;
 import org.meandre.webservices.servlets.WSPublishServlet;
 import org.meandre.webservices.servlets.WSRepositoryServlet;
 import org.meandre.webservices.servlets.WSSecurityServlet;
+import org.meandre.webservices.servlets.WSXSLTTransformer;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
@@ -330,6 +331,8 @@ public class MeandreServer {
 		contextWS.addServlet(new ServletHolder((Servlet) new WSExecuteServlet(store,cnf)),		"/services/execute/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublishServlet(store,cnf)),		"/services/publish/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurityServlet(store,cnf)),		"/services/security/*");
+		
+		contextWS.addServlet(new ServletHolder((Servlet) new WSXSLTTransformer(store,cnf)),		"/services/transformer/*");
 		
 		return contextWS;
 	}

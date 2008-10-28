@@ -127,7 +127,7 @@ public abstract class ServletConfigurableDispatcher extends HttpServlet {
 	 * @param resp The response object
 	 */
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)  {
-		dispatch("GET",req,resp); 
+		dispatch("GET",req,resp);  
 	}
 	
 	/** Response to a post request.
