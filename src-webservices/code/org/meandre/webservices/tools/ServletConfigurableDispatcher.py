@@ -1,20 +1,21 @@
 #
 # The needed imports
 #
+
 from javax.servlet.http import HttpServletResponse
 
-from org.json import JSONArray
-from org.json import JSONObject
-from org.json import XML
+from org.json import JSONArray,JSONObject,XML
 
 from org.meandre.webservices.logger import WSLoggerFactory
-
 from org.meandre.core.store import Store
 
-from com.hp.hpl.jena.vocabulary import DC
-from com.hp.hpl.jena.vocabulary import RDF
-from com.hp.hpl.jena.vocabulary import RDFS
-from com.hp.hpl.jena.vocabulary import XSD
+from com.hp.hpl.jena.vocabulary import DC,RDF,RDFS,XSD
+
+from javax.xml.transform import Source,Transformer,TransformerFactory
+from javax.xml.transform.stream import StreamResult,StreamSource
+from java.io import StringReader
+
+from org.meandre.webservices.tools import ServletConfigurableDispatcher
 
 #
 # The basic dispatching dictionary
@@ -24,6 +25,13 @@ requestMap = {
 
 log = WSLoggerFactory.getWSLogger()
 
+#
+# Prepare the XSLT information
+#
+__xsltFile = ServletConfigurableDispatcher.getSimpleName()+".xslt"
+__xsltSource = StreamSource(ServletConfigurableDispatcher.getResourceAsStream(__xsltFile));
+__xslTransFact = TransformerFactory.newInstance()
+__xslTrans = __xslTransFact.newTransformer(__xsltSource)
 #
 # The main dispatch method
 #
@@ -101,6 +109,13 @@ def contentAppXML ( response ):
        contentAppXML ( response )'''
     response.setContentType("application/xml")
    
+#   
+def contentAppHTML ( response ):
+    '''Sets the response type to xml
+     
+       contentAppHTML ( response )'''
+    response.setContentType("text/html")
+   
 #
 # Response functions
 #
@@ -149,9 +164,16 @@ def __content_to_TXT__(content,tab):
     else :
         return content
         
+
+#
+# Load the processor for XSLs and the stylesheets
+#
+
+
+
 def sendTJXContent ( response, content, format ):
     '''Response the content with the proper format. It supports three response
-       content format: txt, json, and xml.  XML responses follow the following 
+       content format: txt, json, and xml. XML responses follow the following 
        syntax:
        
            <meandre_response>
@@ -165,7 +187,9 @@ def sendTJXContent ( response, content, format ):
            </meandre_response>
            
         Where each meandre_item entry can be a simple text, another set of 
-        meandre_items, or tags identifying the keys of a dictionary.
+        meandre_items, or tags identifying the keys of a dictionary. It also
+        allows the html format, which is only an style sheet transformation of
+        the XML response
         
         sendTJXContent ( response, content, format )'''
     if format=='txt':
@@ -181,10 +205,16 @@ def sendTJXContent ( response, content, format ):
         jc = __content_to_JSON__(content)
         xmlc = XML.toString(jc,"meandre_item")
         sendRawContent(response, '<?xml version="1.0" encoding="UTF-8"?><meandre_response>')
-        # TODO 
-        # Need to add the style sheet transformation to make it look nice
         sendRawContent(response, xmlc)
         sendRawContent(response, '</meandre_response>')
+    elif format=='html' :
+        contentAppHTML(response)
+        xmlc = '<?xml version="1.0" encoding="UTF-8"?><meandre_response>'
+        xmlc += XML.toString(__content_to_JSON__(content),"meandre_item")
+        xmlc += '</meandre_response>'
+        xmlSource = StreamSource(StringReader(xmlc))
+        result = StreamResult(response.getOutputStream())
+        __xslTrans.transform(xmlSource, result);
     else:
         errorNotFound(response)
         

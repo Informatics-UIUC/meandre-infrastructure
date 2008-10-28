@@ -1,5 +1,9 @@
 1.4.0-vcli-alpha Sara
 
+* Created a first XSLT for /services/location/list.html
+
+* Created the basic mechaniscs for returning HTML pages based on XML and XSLTs
+
 * Modified the MDX connection duplications (Derby can support multiple concurrent
   connections to the DB, as long as they are in the same JVM). This gets rid of the
   results problem reading and the obscure message for autocommit off.

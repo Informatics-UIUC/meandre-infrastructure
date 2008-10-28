@@ -48,6 +48,7 @@
             <fileset dir="${demo.src}">
                 <include name="**/*.properties"/>
                 <include name="**/*.xml"/>
+                <include name="**/*.xslt"/>
                 <include name="**/*.vm"/>
                 <include name="**/*.list"/>
             </fileset>
@@ -57,6 +58,7 @@
             <fileset dir="${kernel.src}">
                 <include name="**/*.properties"/>
                 <include name="**/*.xml"/>
+                <include name="**/*.xslt"/>
                 <include name="**/*.vm"/>
                 <include name="**/*.list"/>
                 <include name="**/*.py"/>
@@ -67,6 +69,7 @@
             <fileset dir="${zigzag.src}">
                 <include name="**/*.properties"/>
                 <include name="**/*.xml"/>
+                <include name="**/*.xslt"/>
                 <include name="**/*.vm"/>
                 <include name="**/*.list"/>
             </fileset>
@@ -90,6 +93,7 @@
             <fileset dir="${demo.src}">
                 <include name="**/*.properties"/>
                 <include name="**/*.xml"/>
+                <include name="**/*.xslt"/>
                 <include name="**/*.vm"/>
                 <include name="**/*.list"/>
             </fileset>
@@ -99,6 +103,7 @@
             <fileset dir="${ws.src}">
                 <include name="**/*.properties"/>
                 <include name="**/*.xml"/>
+                <include name="**/*.xslt"/>
                 <include name="**/*.vm"/>
                 <include name="**/*.list"/>
                 <include name="**/*.py"/>
@@ -109,6 +114,7 @@
             <fileset dir="${store.src}">
                 <include name="**/*.properties"/>
                 <include name="**/*.xml"/>
+                <include name="**/*.xslt"/>
                 <include name="**/*.vm"/>
                 <include name="**/*.list"/>
             </fileset>
@@ -116,8 +122,9 @@
 
         <copy todir="${build.dir}" includeEmptyDirs="no">
             <fileset dir="${coordinator.src}">
-                <include name="**/*.properties"/>
+                <include name="**/*.properties" />
                 <include name="**/*.xml"/>
+                <include name="**/*.xslt"/>
                 <include name="**/*.vm"/>
                 <include name="**/*.list"/>
             </fileset>
