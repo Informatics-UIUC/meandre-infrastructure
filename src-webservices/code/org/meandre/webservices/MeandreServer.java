@@ -30,6 +30,7 @@ import org.meandre.core.utils.FileUtil;
 import org.meandre.plugins.PluginFactory;
 import org.meandre.webservices.logger.WSLoggerFactory;
 import org.meandre.webservices.servlets.WSAboutServlet;
+import org.meandre.webservices.servlets.WSAuxiliarServlet;
 import org.meandre.webservices.servlets.WSExecuteServlet;
 import org.meandre.webservices.servlets.WSLocationsServlet;
 import org.meandre.webservices.servlets.WSPublicServlet;
@@ -320,6 +321,7 @@ public class MeandreServer {
 		// Adding the publicly provided services
 		//
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublicServlet(store,cnf)), "/public/services/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSAuxiliarServlet(store,cnf)), "/public/auxiliar/*");
 		
 		//
 		// Adding restrictedly provided services

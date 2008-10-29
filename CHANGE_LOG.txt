@@ -1,5 +1,7 @@
 1.4.0-vcli-alpha Sara
 
+* Created the proper XSLT transformation for all the services that do not require complex for forms
+
 * Created a first XSLT for /services/location/list.html
 
 * Created the basic mechaniscs for returning HTML pages based on XML and XSLTs

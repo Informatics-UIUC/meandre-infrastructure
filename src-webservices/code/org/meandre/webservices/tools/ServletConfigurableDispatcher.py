@@ -120,7 +120,7 @@ def contentAppHTML ( response ):
 # Response functions
 #
 def sendRawContent ( response, content ):
-    '''Pushes the raw content provided to the privided response
+    '''Pushes the raw content provided to the provided response
       
        sendRawContent ( response, content )'''
     response.getWriter().print(content)

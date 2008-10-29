@@ -14,13 +14,13 @@
 				<meta name="description" content="Meandre Server"/>
 				<style type="text/css">
 						a, a:visited {
-							color: #222;
+							color: #aa6000;
 							text-decoration: none;
 							font-style: italic;
 						}
 						
 						a:hover {
-							color: orange;
+							color: #cc6000;
 							text-decoration: underline;
 							font-style: italic;
 						}
@@ -107,6 +107,9 @@
 						
 						#main th,td {	
 							border: 1px solid gray;
+							padding-left:6px;
+							padding-top:3px;
+							padding-bottom:3px;
 						}
 						
 						
@@ -203,6 +206,7 @@
 							<li><a href="/services/publish/list_published.html">List published</a></li>
 		 		    	</ul>
 		 		    </div>
+		 		    <br/>All rights reserved by<br/>DITA, NCSA, and UofI, 2007-2008.
 				</div>	
 				<div id="main">
 					<table>
@@ -210,7 +214,7 @@
 							<xsl:if test="position() = 1">
 								<tr>
 									<xsl:if test="location">
-			          					<th>Location</th>
+			          					<th colspan='2'>Location</th>
 			          				</xsl:if>
 			          				<xsl:if test="description">
 			          					<th>Description</th>
@@ -274,9 +278,11 @@
 			          				</xsl:if>
 			          				<xsl:if test="meandre_uri">
 			          					<th>Meandre URI</th>
+			          					<th>Actions</th>
 			          				</xsl:if>
 			          				<xsl:if test="meandre_tag">
 			          					<th>Tag</th>
+			          					<th>Actions</th>
 			          				</xsl:if>
 			          				<xsl:if test="flow_instance_uri">
 			          					<th>Flow instance URI</th>
@@ -309,9 +315,11 @@
 											<xsl:attribute name="target">_blank</xsl:attribute>
 											<xsl:value-of select="location"/>
 						     			</a>
+						     		</td>
+						     		<td>
 						     			<a>
 						     				<xsl:attribute name="href">/services/locations/remove.html?location=<xsl:value-of select="location"/></xsl:attribute> 
-											(remove)
+											remove
 						     			</a>
 				     				</td>
 				     			</xsl:if>
@@ -385,41 +393,46 @@
 											<xsl:attribute name="target">_blank</xsl:attribute>
 											<xsl:value-of select="meandre_uri"/>
 						     			</a>
-						     			(<a>
+						     		</td>
+						     		<td>
+						     			<a>
 						     				<xsl:attribute name="href">/services/execute/flow.txt?statistics=true&amp;uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
 											<xsl:attribute name="target">_blank</xsl:attribute>
 											<xsl:attribute name="onclick">return checkForFlow()</xsl:attribute>
 											run 
-						     			</a>
-						     			|						     			
+						     			</a> 
+						     			- 				     			
 						     			<a>
 						     				<xsl:attribute name="href">/services/publish/publish.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
 											publish
 						     			</a>
-						     			|						     			
+						     			-				     			
 						     			<a>
 						     				<xsl:attribute name="href">/services/publish/unpublish.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
 											unpublish
-						     			</a>
-						     			|						     			
+						     			</a>	
+						     			-				     			
 						     			<a>
 						     				<xsl:attribute name="href">/services/repository/remove.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
 											remove
-						     			</a>)
+						     			</a>
 				     				</td>
 				     			</xsl:if>
 				     			<xsl:if test="meandre_tag">
 				     				<td>
 				     					<xsl:value-of select="meandre_tag"/>
-						     			(<a>
+						     		</td>
+						     		<td>
+						     			<a>
 						     				<xsl:attribute name="href">/services/repository/components_by_tag.html?tag=<xsl:value-of select="meandre_tag"/></xsl:attribute> 
 											<xsl:value-of select="meandre_uri"/>
-											components
-						     			</a> |
+											show components
+						     			</a> 
+						     			-
 						     			<a>
 						     				<xsl:attribute name="href">/services/repository/flows_by_tag.html?tag=<xsl:value-of select="meandre_tag"/></xsl:attribute> 
-											flows
-						     			</a>)
+											show flows
+						     			</a>
 				     				</td>
 				     			</xsl:if>
 				     			<xsl:if test="flow_instance_uri">
