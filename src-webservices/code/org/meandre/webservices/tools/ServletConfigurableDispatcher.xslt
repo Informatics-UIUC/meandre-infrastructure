@@ -78,6 +78,10 @@
 							padding-left: 0px;
 						}
 						
+						#navigation form {
+							margin-bottom: 2px;
+						}
+						
 						#main {
 							min-width : 440px;
 							padding-left : 210px;
@@ -107,6 +111,19 @@
 					</style>
 			</head>
 		 	<body>
+		 		<script language="JAVASCRIPT" type="TEXT/JAVASCRIPT"><![CDATA[
+						checkForFlow = function () {
+							if ( window.location.pathname=='/services/repository/list_flows.html' ||
+							     window.location.pathname=='/services/repository/search_flows.html' ||
+							     window.location.pathname=='/services/repository/flows_by_tag.html' ) {
+								return confirm('Are you sure you want to run this flow');
+							}
+							else {
+								alert('Only flows are allowed for execution');
+								return false;
+							}
+						} 
+					]]></script>
 		 		<div id="menu"> 
 					<img src="/public/resources/system/logo-meandre.gif" />
 					<div id="navigation">
@@ -116,9 +133,58 @@
 			 		    	<li><a href="/services/about/version.html">Version</a></li>
 			 		    	<li><a href="/services/about/plugins.html">Plugins</a></li>
 		 		    	</ul>
+		 		    	<p>Public</p>
+			 		    <ul>
+			 		    	<li><a href="/public/services/repository.ttl" target="_blank">Published repository</a></li>
+			 		    	<li><a href="/public/services/demo_repository.ttl" target="_blank">Demo repository</a></li>
+			 		    	<li><a href="/public/services/ping.html" >Ping</a></li>
+		 		    	</ul>
 		 		    	<p>Locations</p>
 			 		    <ul>
 							<li><a href="/services/locations/list.html">List</a></li>
+		 		    	</ul>
+		 		    	<p>Repository</p>
+			 		    <ul>
+							<li><a href="/services/repository/dump.ttl" target="_blank">Dump</a></li>
+							<li><a href="/services/repository/regenerate.html">Regenerate</a></li>
+							<li><a href="/services/repository/list_components.html">Components</a></li>
+							<li><a href="/services/repository/list_flows.html">Flows</a></li>
+							<li><a href="/services/repository/tags.html">Tags</a></li>
+							<li>
+								<form name="sfc" method="get" action="/services/repository/search_components.html">
+									<input type="text" id="sc" name="q" value="Search components..." onclick="document.sfc.sc.value=''"/><br/>
+								</form> 
+							</li>
+							<li>
+								<form name="sff"  method="get" action="/services/repository/search_flows.html">
+									<input type="text" id="sf" name="q" value="Search flows..." onclick="document.sff.sf.value=''"/><br/>
+								</form> 
+							</li>
+		 		    	</ul>
+		 		    	<p>Execution</p>
+			 		    <ul>
+							<li><a href="/services/execute/list_running_flows.html">Running flows</a></li>
+		 		    	</ul>
+		 		    	<p>Security</p>
+			 		    <ul>
+							<li><a href="/services/security/users.html">Users</a></li>
+							<li><a href="/services/security/valid_roles.html">Valid roles</a></li>
+							<li><a href="/services/security/current_roles.html">Current roles</a></li>
+							<li>
+								<form name="rou"  method="get" action="/services/security/roles_of_user.html">
+									<input type="text" id="un" name="user_name" value="User roles..." onclick="document.rou.un.value=''"/><br/>
+								</form> 
+							</li>
+							<li>
+								<form name="u"  method="get" action="/services/security/user.html">
+									<input type="text" id="un" name="user_name" value="User info..." onclick="document.u.un.value=''"/><br/>
+								</form> 
+							</li>
+							<li>
+								<form name="rar"  method="get" action="/services/security/revoke_all_roles.html">
+									<input type="text" id="un" name="user_name" value="Revoke all roles..." onclick="document.rar.un.value=''"/><br/>
+								</form> 
+							</li>
 		 		    	</ul>
 		 		    </div>
 				</div>	
@@ -187,6 +253,36 @@
 			          				<xsl:if test="DB_DRIVER_CLASS">
 			          					<th>DB Driver</th>
 			          				</xsl:if>
+			          				<xsl:if test="message">
+			          					<th>Message</th>
+			          				</xsl:if>
+			          				<xsl:if test="meandre_uri">
+			          					<th>Meandre URI</th>
+			          				</xsl:if>
+			          				<xsl:if test="meandre_tag">
+			          					<th>Tag</th>
+			          				</xsl:if>
+			          				<xsl:if test="flow_instance_uri">
+			          					<th>Flow instance URI</th>
+			          				</xsl:if>
+			          				<xsl:if test="flow_instance_webui_uri">
+			          					<th>WebUI URL</th>
+			          				</xsl:if>
+			          				<xsl:if test="meandre_role_name">
+			          					<th>Role name</th>
+			          				</xsl:if>
+			          				<xsl:if test="meandre_role_uri">
+			          					<th>Role URI</th>
+			          				</xsl:if>	
+			          				<xsl:if test="user_name">
+			          					<th>User name</th>
+			          				</xsl:if>	
+			          				<xsl:if test="full_name">
+			          					<th>Full name</th>
+			          				</xsl:if>			   
+			          				<xsl:if test="revoked">
+			          					<th>Roles revoked</th>
+			          				</xsl:if>			          				
 		          				</tr>
 		          			</xsl:if>
 				     		<tr>
@@ -197,8 +293,13 @@
 											<xsl:attribute name="target">_blank</xsl:attribute>
 											<xsl:value-of select="location"/>
 						     			</a>
+						     			<a>
+						     				<xsl:attribute name="href">/services/locations/remove.html?location=<xsl:value-of select="location"/></xsl:attribute> 
+											(remove)
+						     			</a>
 				     				</td>
 				     			</xsl:if>
+				     		
 					     		<xsl:if test="description">
 					     			<td><xsl:value-of select="description"/></td>
 					     		</xsl:if>
@@ -258,9 +359,74 @@
 		          				<xsl:if test="DB_DRIVER_CLASS">
 		          					<td><xsl:value-of select="DB_DRIVER_CLASS"/></td>
 		          				</xsl:if>
+		          				<xsl:if test="message">
+		          					<td><xsl:value-of select="message"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="meandre_uri">
+				     				<td>
+						     			<a>
+						     				<xsl:attribute name="href">/services/repository/describe.ttl?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+											<xsl:attribute name="target">_blank</xsl:attribute>
+											<xsl:value-of select="meandre_uri"/>
+						     			</a>
+						     			(<a>
+						     				<xsl:attribute name="href">/services/execute/flow.txt?statistics=true&amp;uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+											<xsl:attribute name="target">_blank</xsl:attribute>
+											<xsl:attribute name="onclick">return checkForFlow()</xsl:attribute>
+											run 
+						     			</a>
+						     			|						     			
+						     			<a>
+						     				<xsl:attribute name="href">/services/repository/remove.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+											remove
+						     			</a>)
+				     				</td>
+				     			</xsl:if>
+				     			<xsl:if test="meandre_tag">
+				     				<td>
+				     					<xsl:value-of select="meandre_tag"/>
+						     			(<a>
+						     				<xsl:attribute name="href">/services/repository/components_by_tag.html?tag=<xsl:value-of select="meandre_tag"/></xsl:attribute> 
+											<xsl:value-of select="meandre_uri"/>
+											components
+						     			</a> |
+						     			<a>
+						     				<xsl:attribute name="href">/services/repository/flows_by_tag.html?tag=<xsl:value-of select="meandre_tag"/></xsl:attribute> 
+											flows
+						     			</a>)
+				     				</td>
+				     			</xsl:if>
+				     			<xsl:if test="flow_instance_uri">
+		          					<td><xsl:value-of select="flow_instance_uri"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="flow_instance_webui_uri">
+		          					<td>
+		          						<a>
+						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_webui_uri"/></xsl:attribute> 
+											<xsl:value-of select="flow_instance_webui_uri"/>
+						     			</a>
+		          					</td>
+		          				</xsl:if>	
+		          				<xsl:if test="meandre_role_name">
+		          					<td><xsl:value-of select="meandre_role_name"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="meandre_role_uri">
+		          					<td><xsl:value-of select="meandre_role_uri"/></td>
+		          				</xsl:if>	
+		          				<xsl:if test="user_name">
+		          					<td><xsl:value-of select="user_name"/></td>
+		          				</xsl:if>	
+		          				<xsl:if test="full_name">
+		          					<td><xsl:value-of select="full_name"/></td>
+		          				</xsl:if>	
+		          				<xsl:if test="revoked">
+		          					<td><xsl:value-of select="revoked"/></td>
+		          				</xsl:if>		
 					     	</tr>
 				     	</xsl:for-each>
 		     		</table>
+		     		<br/>
+		     		<a href="javascript:javascript:history.go(-1)">Back</a>
 	     		</div>
 		 	</body>
 	 	</html>

@@ -7,7 +7,8 @@ __name__ = 'WSPublicServlet'
 requestMap = {
     'GET': { 
         'repository': 'public_repository',    
-        'demo_repository': 'public_demo_repository'
+        'demo_repository': 'public_demo_repository',    
+        'ping': 'public_ping'
     }
 }
 
@@ -35,5 +36,12 @@ def public_demo_repository ( request, response, format ):
     content = DemoRepositoryGenerator.getTestHelloWorldMoreHetereogenousRepository()
     statusOK(response)
     sendRDFModel(response,content,format)
+    
+def public_ping ( request, response, format ):
+    '''Returns a simple pong for the given ping.''' 
+    content = {'message':'pong'}
+    statusOK(response)
+    sendTJXContent(response,[content],format)
+
     
     

@@ -15,6 +15,7 @@ requestMap = {
         'tags_flows': 'repository_tags_flows',    
         'components_by_tag': 'repository_components_by_tag',    
         'flows_by_tag': 'repository_flows_by_tag',    
+        'describe': 'repository_describe',    
         'describe_component': 'repository_describe_component',    
         'describe_all_components': 'repository_describe_all_components',    
         'describe_flow': 'repository_describe_flow',    
@@ -260,6 +261,29 @@ def repository_describe_flow ( request, response, format ):
         if 'uri' in params :
             qr = meandre_store.getRepositoryStore(getMeandreUser(request))
             content = getEmptyModel()
+            for flow_uri in params['uri']:
+                flow_desc = qr.getFlowDescription(content.createResource(flow_uri))
+                if flow_desc is not None:
+                    content.add(flow_desc.getModel())
+            statusOK(response)
+            sendRDFModel(response,content,format)
+        else:
+            errorExpectationFail(response)
+    else:
+        errorForbidden(response)
+          
+def repository_describe ( request, response, format ):
+    '''Returns all the uris aggregated for the requesting user in the 
+       current Meandre server.'''
+    if checkUserRole (request,Role.REPOSITORY) :
+        params = extractRequestParamaters(request)
+        if 'uri' in params :
+            qr = meandre_store.getRepositoryStore(getMeandreUser(request))
+            content = getEmptyModel()
+            for component_uri in params['uri']:
+                component_desc = qr.getExecutableComponentDescription(content.createResource(component_uri))
+                if component_desc is not None:
+                    content.add(component_desc.getModel())
             for flow_uri in params['uri']:
                 flow_desc = qr.getFlowDescription(content.createResource(flow_uri))
                 if flow_desc is not None:

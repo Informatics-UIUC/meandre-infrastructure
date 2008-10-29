@@ -6,6 +6,7 @@ __name__ = 'WSSecurityServlet'
 
 requestMap = {
     'GET': { 
+        'current_roles': 'security_current_roles',    
         'roles_of_user': 'security_roles_of_user',    
         'users': 'security_users',    
         'user': 'security_user',    
@@ -29,6 +30,23 @@ from org.meandre.core.security import Role
 # Services implementation
 #
 
+def security_current_roles ( request, response, format ):
+    '''List the current signed in user on this Meandre Server.''' 
+    if checkUserRole (request,Role.ADMIN) :
+        content = []
+        user_name = getMeandreUser(request)
+        user = meandre_security.getUser(user_name)
+        roles = meandre_security.getRolesOfUser(user)
+        for role in roles :
+            content.append( {
+                    'meandre_role_uri': role.getUrl(),
+                    'meandre_role_name': role.getShortName() 
+                })
+        statusOK(response)
+        sendTJXContent(response,content,format)
+    else:
+        errorForbidden(response)
+
 def security_roles_of_user ( request, response, format ):
     '''List the roles of the user registered by this instance of the 
        Meandre Server.''' 
@@ -37,13 +55,16 @@ def security_roles_of_user ( request, response, format ):
         if 'user_name' in params :
             content = []
             for user_name in params['user_name'] :
-                user = meandre_security.getUser(user_name)
-                roles = meandre_security.getRolesOfUser(user)
-                for role in roles :
-                    content.append( {
-                            'meandre_role_uri': role.getUrl(),
-                            'meandre_role_name': role.getShortName() 
-                        })
+                if meandre_security.getUsersNickNames().contains(user_name) :
+                    user = meandre_security.getUser(user_name)
+                    roles = meandre_security.getRolesOfUser(user)
+                    for role in roles :
+                        content.append( {
+                                'meandre_role_uri': role.getUrl(),
+                                'meandre_role_name': role.getShortName() 
+                            })
+                else:
+                    content.append({'message': 'ERROR: User '+user_name+' not found'} )
             statusOK(response)
             sendTJXContent(response,content,format)
         else:
@@ -77,11 +98,14 @@ def security_user ( request, response, format ):
         if 'user_name' in params :
             content = []
             for user_name in params['user_name'] :
-                user = meandre_security.getUser(user_name)
-                content.append({
-                    'user_name': user.getNickName(),
-                    'full_name': user.getName()
-                })
+                if meandre_security.getUsersNickNames().contains(user_name) :
+                    user = meandre_security.getUser(user_name)
+                    content.append({
+                        'user_name': user.getNickName(),
+                        'full_name': user.getName()
+                    })
+                else:
+                   content.append({'message': 'ERROR: User '+user_name+' not found'} ) 
             statusOK(response)
             sendTJXContent(response,content,format)
         else:
@@ -114,13 +138,16 @@ def security_revoke_all_roles ( request, response, format ):
         if 'user_name' in params :
             content = []
             for user_name in params['user_name'] :
-                user = meandre_security.getUser(user_name)
-                meandre_security.revokeAllRoles(user)
-                content.append({
-                    'user_name': user.getNickName(),
-                    'full_name': user.getName(),
-                    'revoked': 'all'
-                })
+                if meandre_security.getUsersNickNames().contains(user_name) :
+                    user = meandre_security.getUser(user_name)
+                    meandre_security.revokeAllRoles(user)
+                    content.append({
+                        'user_name': user.getNickName(),
+                        'full_name': user.getName(),
+                        'revoked': 'all'
+                    })
+                else:
+                   content.append({'message': 'ERROR: User '+user_name+' not found'} ) 
             statusOK(response)
             sendTJXContent(response,content,format)
         else:
