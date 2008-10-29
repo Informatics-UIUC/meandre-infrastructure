@@ -974,4 +974,23 @@ public class Store {
 			
 		return setURIs;	
 	}
+	
+	/** Returns the list of published components and flows in the current server.
+	 * 
+	 * @return The set of published components' URI
+	 */
+	public Set<String> getPublishedComponentsAndFlows () {
+		Set<String> setRes = new HashSet<String>();
+		Model modPublic = getPublicRepositoryStore();
+		QueryableRepository qrPublic = new RepositoryImpl(modPublic);
+		
+		for ( ExecutableComponentDescription ecd:qrPublic.getAvailableExecutableComponentDescriptions() )
+			setRes.add(ecd.getExecutableComponent().toString());
+		
+		for ( FlowDescription fd:qrPublic.getAvailableFlowDescriptions() )
+			setRes.add(fd.getFlowComponent().toString());
+		
+		
+		return setRes;
+	}
 }

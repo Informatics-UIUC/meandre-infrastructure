@@ -6,9 +6,10 @@ __name__ = 'WSPublishServlet'
 
 requestMap = {
     'GET': { 
-        'publish': 'publish_publish',    
+        'publish': 'publish_publish',
+        'list_published': 'publish_list_published',    
         'unpublish': 'publish_unpublish'
-    }
+        }
 }
 
 #
@@ -53,6 +54,19 @@ def publish_unpublish ( request, response, format ):
                     content.append({'meandre_uri':uri})
             statusOK(response)
             sendTJXContent(response,content,format)
+    else:
+        errorForbidden(response)        
+    
+    
+def publish_list_published ( request, response, format ):
+    '''List the uro of published components/flows in this 
+       instance of the Meandre Server.''' 
+    if checkUserRole (request,Role.PUBLISH) :
+        content = []
+        for uri in meandre_store.getPublishedComponentsAndFlows() :
+            content.append({'meandre_uri':uri})
+        statusOK(response)
+        sendTJXContent(response,content,format)
     else:
         errorForbidden(response)        
     

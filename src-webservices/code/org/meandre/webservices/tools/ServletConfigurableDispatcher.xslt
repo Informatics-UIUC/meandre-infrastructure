@@ -67,7 +67,7 @@
 							list-style-type : none;
 							padding-top: 6px;
 							padding-bottom: 6px;
-							padding-left: 0px;
+							padding-left: 9px;
 							margin-left: 0px;
 							margin-top: 0px;
 							margin-bottom: 0px;
@@ -142,6 +142,16 @@
 		 		    	<p>Locations</p>
 			 		    <ul>
 							<li><a href="/services/locations/list.html">List</a></li>
+							<li>
+								Add a location<br/>
+								<ul>
+									<form name="al"  method="get" action="/services/locations/add.html">
+										<input type="text" id="loc" name="location" value="Location..." onclick="document.al.loc.value=''"/><br/>
+										<input type="text" id="desc" name="description" value="Description..." onclick="document.al.desc.value=''"/><br/>
+										<input type="submit" value="Add" />
+									</form> 
+								</ul>
+							</li>
 		 		    	</ul>
 		 		    	<p>Repository</p>
 			 		    <ul>
@@ -185,6 +195,10 @@
 									<input type="text" id="un" name="user_name" value="Revoke all roles..." onclick="document.rar.un.value=''"/><br/>
 								</form> 
 							</li>
+		 		    	</ul>
+		 		    	<p>Publish</p>
+			 		    <ul>
+							<li><a href="/services/publish/list_published.html">List published</a></li>
 		 		    	</ul>
 		 		    </div>
 				</div>	
@@ -377,6 +391,16 @@
 						     			</a>
 						     			|						     			
 						     			<a>
+						     				<xsl:attribute name="href">/services/publish/publish.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+											publish
+						     			</a>
+						     			|						     			
+						     			<a>
+						     				<xsl:attribute name="href">/services/publish/unpublish.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+											unpublish
+						     			</a>
+						     			|						     			
+						     			<a>
 						     				<xsl:attribute name="href">/services/repository/remove.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
 											remove
 						     			</a>)
@@ -426,7 +450,8 @@
 				     	</xsl:for-each>
 		     		</table>
 		     		<br/>
-		     		<a href="javascript:javascript:history.go(-1)">Back</a>
+		     		<a href="javascript:javascript:history.go(-1)">Back</a> ---
+		     		<a href="">Refresh</a>
 	     		</div>
 		 	</body>
 	 	</html>

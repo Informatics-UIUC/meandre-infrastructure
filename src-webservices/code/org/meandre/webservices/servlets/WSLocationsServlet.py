@@ -57,6 +57,8 @@ def locations_add ( request, response, format ):
                             'location': uri,
                             'description': dsc
                         })
+                else:
+                    content.append({'message':'ERROR: Could not add location '+uri})
             statusOK(response)
             sendTJXContent(response,content,format)
         else:
