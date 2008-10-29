@@ -201,7 +201,6 @@ public class MeandreServer {
 	public void start () throws Exception {
 		log.info("Starting the WS endpoint...");
 		start(true);
-		Thread.sleep(1000);
 		log.info("Endpoint successfully started");
 		
 	}
