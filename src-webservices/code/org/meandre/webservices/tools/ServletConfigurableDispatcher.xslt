@@ -13,14 +13,16 @@
 				<meta name="ROBOTS" content="NOINDEX,NOFOLLOW"/>
 				<meta name="description" content="Meandre Server"/>
 				<style type="text/css">
-						a {
-							color: #444;
+						a, a:visited {
+							color: #222;
 							text-decoration: none;
+							font-style: italic;
 						}
 						
 						a:hover {
 							color: orange;
 							text-decoration: underline;
+							font-style: italic;
 						}
 						
 						
