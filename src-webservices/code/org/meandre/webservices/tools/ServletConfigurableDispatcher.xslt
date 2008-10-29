@@ -53,8 +53,8 @@
 						
 						#navigation p {
 							padding-left: 6px;
-							padding-top: 3px;
-							padding-bottom: 3px;
+							padding-top: 0px;
+							padding-bottom: 0px;
 							margin-top: 2px;
 							margin-bottom: 2px;
 							color: white;
@@ -110,15 +110,15 @@
 		 		<div id="menu"> 
 					<img src="/public/resources/system/logo-meandre.gif" />
 					<div id="navigation">
-			 			<p>Locations</p>
+			 			<p>About</p>
 			 		    <ul>
-			 		    	<li><a href="/services/locations/list.html">List</a></li>
-			 		    	<li><a href="/services/locations/list.html">List</a></li>
+			 		    	<li><a href="/services/about/installation.html">Installation</a></li>
+			 		    	<li><a href="/services/about/version.html">Version</a></li>
+			 		    	<li><a href="/services/about/plugins.html">Plugins</a></li>
 		 		    	</ul>
 		 		    	<p>Locations</p>
 			 		    <ul>
-			 		    	<li><a href="/services/locations/list.html">List</a></li>
-			 		    	<li><a href="/services/locations/list.html">List</a></li>
+							<li><a href="/services/locations/list.html">List</a></li>
 		 		    	</ul>
 		 		    </div>
 				</div>	
@@ -133,17 +133,131 @@
 			          				<xsl:if test="description">
 			          					<th>Description</th>
 			          				</xsl:if>
+			          				<xsl:if test="key">
+			          					<th>Key</th>
+			          				</xsl:if>
+			          				<xsl:if test="alias">
+			          					<th>Alias</th>
+			          				</xsl:if>
+			          				<xsl:if test="className">
+			          					<th>Class name</th>
+			          				</xsl:if>
+			          				<xsl:if test="isServlet">
+			          					<th>Servlet flag</th>
+			          				</xsl:if>
+			          				<xsl:if test="version">
+			          					<th>Version</th>
+			          				</xsl:if>
+			          				<xsl:if test="DB_PASSWD">
+			          					<th>DB password</th>
+			          				</xsl:if>
+			          				<xsl:if test="MEANDRE_STORE_CONFIG_FILE">
+			          					<th>Store config</th>
+			          				</xsl:if>
+			          				<xsl:if test="DB_USER">
+			          					<th>DB user</th>
+			          				</xsl:if>
+			          				<xsl:if test="CURRENT_USER_LOGGED_IN">
+			          					<th>Logged user</th>
+			          				</xsl:if>
+			          				<xsl:if test="DB">
+			          					<th>DB</th>
+			          				</xsl:if>
+			          				<xsl:if test="MEANDRE_AUTHENTICATION_REALM_FILENAME">
+			          					<th>Real file</th>
+			          				</xsl:if>
+			          				<xsl:if test="MEANDRE_VERSION">
+			          					<th>Version</th>
+			          				</xsl:if>
+			          				<xsl:if test="CURRENT_SESSION_ID">
+			          					<th>Session</th>
+			          				</xsl:if>
+			          				<xsl:if test="CURRENT_TIME">
+			          					<th>Time</th>
+			          				</xsl:if>
+			          				<xsl:if test="MEANDRE_ADMIN_USER">
+			          					<th>Admin user</th>
+			          				</xsl:if>
+			          				<xsl:if test="DB_URL">
+			          					<th>DB URL</th>
+			          				</xsl:if>
+			          				<xsl:if test="MEANDRE_RIGHTS">
+			          					<th>Rights</th>
+			          				</xsl:if>
+			          				<xsl:if test="DB_DRIVER_CLASS">
+			          					<th>DB Driver</th>
+			          				</xsl:if>
 		          				</tr>
 		          			</xsl:if>
 				     		<tr>
-				     			<td>
-					     			<a>
-					     				<xsl:attribute name="href"><xsl:value-of select="location"/></xsl:attribute> 
-										<xsl:attribute name="target">_blank</xsl:attribute>
-										<xsl:value-of select="location"/>
-					     			</a>
-				     			</td>
-					     		<td><xsl:value-of select="description"/></td>
+				     			<xsl:if test="location">
+				     				<td>
+						     			<a>
+						     				<xsl:attribute name="href"><xsl:value-of select="location"/></xsl:attribute> 
+											<xsl:attribute name="target">_blank</xsl:attribute>
+											<xsl:value-of select="location"/>
+						     			</a>
+				     				</td>
+				     			</xsl:if>
+					     		<xsl:if test="description">
+					     			<td><xsl:value-of select="description"/></td>
+					     		</xsl:if>
+		          				<xsl:if test="key">
+		          					<td><xsl:value-of select="key"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="alias">
+		          					<td><xsl:value-of select="alias"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="className">
+		          					<td><xsl:value-of select="className"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="isServlet">
+		          					<td><xsl:value-of select="isServlet"/></td>
+		          				</xsl:if>
+					     		
+					     		<xsl:if test="version">
+		          					<td><xsl:value-of select="version"/></td>
+		          				</xsl:if>
+		          				
+		          				<xsl:if test="DB_PASSWD">
+		          					<td><xsl:value-of select="DB_PASSWD"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="MEANDRE_STORE_CONFIG_FILE">
+		          					<td><xsl:value-of select="MEANDRE_STORE_CONFIG_FILE"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="DB_USER">
+		          					<td><xsl:value-of select="DB_USER"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="CURRENT_USER_LOGGED_IN">
+		          					<td><xsl:value-of select="CURRENT_USER_LOGGED_IN"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="DB">
+		          					<td><xsl:value-of select="DB"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="MEANDRE_AUTHENTICATION_REALM_FILENAME">
+		          					<td><xsl:value-of select="MEANDRE_AUTHENTICATION_REALM_FILENAME"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="MEANDRE_VERSION">
+		          					<td><xsl:value-of select="MEANDRE_VERSION"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="CURRENT_SESSION_ID">
+		          					<td><xsl:value-of select="CURRENT_SESSION_ID"/>n</td>
+		          				</xsl:if>
+		          				<xsl:if test="CURRENT_TIME">
+		          					<td><xsl:value-of select="CURRENT_TIME"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="MEANDRE_ADMIN_USER">
+		          					<td><xsl:value-of select="MEANDRE_ADMIN_USER"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="DB_URL">
+		          					<td><xsl:value-of select="DB_URL"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="MEANDRE_RIGHTS">
+		          					<td><xsl:value-of select="MEANDRE_RIGHTS"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="DB_DRIVER_CLASS">
+		          					<td><xsl:value-of select="DB_DRIVER_CLASS"/></td>
+		          				</xsl:if>
 					     	</tr>
 				     	</xsl:for-each>
 		     		</table>
