@@ -45,6 +45,7 @@ def dispatch(httpMethod,request,response,method,format):
     if httpMethod not in requestMap:
         errorUnauthorized(response)
     elif method in requestMap[httpMethod]:
+        log.info(request.getRemoteAddr()+':'+str(request.getRemotePort())+' --> '+httpMethod+' --> '+request.getRequestURL().toString())
         eval(requestMap[httpMethod][method]+'(request,response,format)')
     else :
         errorNotFound(response)
@@ -260,7 +261,6 @@ def extractRequestParamaters ( request ):
        
        extractRequestParamaters ( request )'''
     method = request.getMethod()
-    log.info(method+' --> '+request.getRequestURL().toString())
     if method=="GET" or method=="get" or method=="POST" or method=="post" :
         return __dictionary_from_get_request__(request)
     else :

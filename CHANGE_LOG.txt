@@ -1,5 +1,12 @@
 1.4.0-vcli-alpha Sara
 
+* Creates an auxiliar service that just display forms for 
+	- Adding to a repository
+	- Create a user 
+	- Roles map for granting and revoking
+
+* Added simple forms for search and the like
+
 * Created the proper XSLT transformation for all the services that do not require complex for forms
 
 * Created a first XSLT for /services/location/list.html

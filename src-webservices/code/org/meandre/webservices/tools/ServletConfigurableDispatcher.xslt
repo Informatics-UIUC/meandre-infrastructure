@@ -146,7 +146,7 @@
 		 		    	</ul>
 		 		    	<p>Locations</p>
 			 		    <ul>
-							<li><a href="/services/locations/list.html">List</a></li>
+			 		    	<li><a href="/services/locations/list.html">List</a></li>
 							<li>
 								Add a location<br/>
 								<ul>
@@ -160,6 +160,7 @@
 		 		    	</ul>
 		 		    	<p>Repository</p>
 			 		    <ul>
+							<li><a href="/services/auxiliar/add_to_repository.html" >Add</a></li>
 							<li><a href="/services/repository/dump.ttl" target="_blank">Dump</a></li>
 							<li><a href="/services/repository/regenerate.html">Regenerate</a></li>
 							<li><a href="/services/repository/list_components.html">Components</a></li>
@@ -182,9 +183,11 @@
 		 		    	</ul>
 		 		    	<p>Security</p>
 			 		    <ul>
+							<li><a href="/services/auxiliar/create_user.html" >Create user</a></li>
 							<li><a href="/services/security/users.html">Users</a></li>
 							<li><a href="/services/security/valid_roles.html">Valid roles</a></li>
-							<li><a href="/services/security/current_roles.html">Current roles</a></li>
+							<li><a href="/services/security/current_roles.html">Current user roles</a></li>
+							<li><a href="/services/auxiliar/roles_map.html">Role map</a></li>
 							<li>
 								<form name="rou"  method="get" action="/services/security/roles_of_user.html">
 									<input type="text" id="un" name="user_name" value="User roles..." onclick="document.rou.un.value=''"/><br/>
@@ -298,12 +301,16 @@
 			          				</xsl:if>	
 			          				<xsl:if test="user_name">
 			          					<th>User name</th>
+			          					<th>Actions</th>
 			          				</xsl:if>	
 			          				<xsl:if test="full_name">
 			          					<th>Full name</th>
 			          				</xsl:if>			   
 			          				<xsl:if test="revoked">
 			          					<th>Roles revoked</th>
+			          				</xsl:if>  
+			          				<xsl:if test="granted">
+			          					<th>Roles granted</th>
 			          				</xsl:if>			          				
 		          				</tr>
 		          			</xsl:if>
@@ -454,12 +461,22 @@
 		          				</xsl:if>	
 		          				<xsl:if test="user_name">
 		          					<td><xsl:value-of select="user_name"/></td>
+		          					<td>
+		          						<a>
+						     				<xsl:attribute name="href">/services/security/remove_users.html?user_name=<xsl:value-of select="user_name"/></xsl:attribute> 
+											<xsl:attribute name="onclick">return confirm('Are you sure you want to delete this user');</xsl:attribute>
+											delete user
+						     			</a>
+		          					</td>
 		          				</xsl:if>	
 		          				<xsl:if test="full_name">
 		          					<td><xsl:value-of select="full_name"/></td>
 		          				</xsl:if>	
 		          				<xsl:if test="revoked">
 		          					<td><xsl:value-of select="revoked"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="granted">
+		          					<td><xsl:value-of select="granted"/></td>
 		          				</xsl:if>		
 					     	</tr>
 				     	</xsl:for-each>

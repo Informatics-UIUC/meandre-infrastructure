@@ -235,12 +235,15 @@ def security_remove_users ( request, response, format ):
         if 'user_name' in params :
             content = []
             for user_name in params['user_name']:
-                user = meandre_security.getUser(user_name)
-                meandre_security.removeUser(user)
-                content.append({
-                    'user_name': user.getNickName(),
-                    'full_name': user.getName()
-                })
+                if user_name!=meandre_store.getAdminUserNickName() and user_name in meandre_security.getUsersNickNames() :
+                    user = meandre_security.getUser(user_name)
+                    meandre_security.removeUser(user)
+                    content.append({
+                        'user_name': user.getNickName(),
+                        'full_name': user.getName()
+                    })
+                else:
+                    content.append({'message':'User '+user_name+' cannot be removed'})
             statusOK(response)
             sendTJXContent(response,content,format)
         else:
