@@ -37,7 +37,6 @@ import org.meandre.webservices.servlets.WSPublicServlet;
 import org.meandre.webservices.servlets.WSPublishServlet;
 import org.meandre.webservices.servlets.WSRepositoryServlet;
 import org.meandre.webservices.servlets.WSSecurityServlet;
-import org.meandre.webservices.tools.WSRedirectionServlet;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
