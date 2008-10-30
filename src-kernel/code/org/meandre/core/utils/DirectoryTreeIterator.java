@@ -63,7 +63,8 @@ public class DirectoryTreeIterator implements Iterator<File>{
         System.out.println("DirectoryTreeIterator.remove() NOT implemented");
     }
     
-    private void log(String msg){
+    @SuppressWarnings("unused")
+	private void log(String msg){
     	System.out.println(msg);
     }
 

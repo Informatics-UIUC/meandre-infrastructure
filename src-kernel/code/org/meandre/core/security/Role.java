@@ -40,7 +40,8 @@ public class Role {
     	
     /** used for keys, etc, when a name identifier is a separate 
      * attribute in a data set*/
-    private static final String FIELD_ROLE_NAME = "meandre_role_name";
+    @SuppressWarnings("unused")
+	private static final String FIELD_ROLE_NAME = "meandre_role_name";
     
 
     /** used for keys, etc, when a name identifier is a separate 
