@@ -65,21 +65,24 @@ __header = """
                         }    
                         
                         #main th,td {    
-                            border: 1px solid gray;
+                            border: 0px solid gray;
                             padding-left:6px;
                             padding-top:3px;
                             padding-bottom:3px;
-                            text-align:center;
+                            text-align:left;
+                            font-size:11px;
                         }
                     </style>
             </head>
              <body>
+             <div id="main">
              <img src="/public/resources/system/logo-meandre.gif" /><br/>
     """
     
 __footer = """
+             </div>
              <br/>
-             <a href="javascript:javascript:history.go(-1)">Back</a>
+             <center><a href="javascript:javascript:history.go(-1)">Back</a></center>
              </body>
     </html>
     """
@@ -169,14 +172,18 @@ __add_to_repository_form = """
 __add_user_form = """
         <form method="get" action="/services/security/create_users.html" >
             <fieldset>
-                <label for="username">Username:</label><br/>
-                <input type="text" name="user_name"/><br/>
-                <label for="fullname">Full name:</label><br/>
-                <input type="text" name="user_full_name"/><br/>
-                <label for="password">Password:</label><br/>
-                <input type="password" name="password"/><br/>
-                <input type="submit" class="submit" value="Add user" />
-                <input type="reset" class="reset" value="Clear data" />
+                <table>
+                    <tr><td>
+                        <label for="username">Username:</label><br/>
+                        <input type="text" name="user_name"/><br/>
+                        <label for="fullname">Full name:</label><br/>
+                        <input type="text" name="user_full_name"/><br/>
+                        <label for="password">Password:</label><br/>
+                        <input type="password" name="password"/><br/>
+                        <input type="submit" class="submit" value="Add user" />
+                        <input type="reset" class="reset" value="Clear data" />
+                    </td></tr>
+                </table>
             </fieldset>
         </form>
     """

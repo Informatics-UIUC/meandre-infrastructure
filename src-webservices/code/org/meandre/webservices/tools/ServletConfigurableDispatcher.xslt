@@ -16,7 +16,6 @@
 						a, a:visited {
 							color: #aa6000;
 							text-decoration: none;
-							font-style: italic;
 						}
 						
 						a:hover {
@@ -29,12 +28,11 @@
 						body {
 						   color: #444; 
 						   background: white; 
-						   font-family: Helvetica, Arial, Verdana; 
+						   font-family: Verdana, Arial, Helvetica ; 
 						   font-size: 11px; 
 						}	
 						#menu {
 							width: 200px;
-							float: left;
 						}
 						
 						#menu img {
@@ -81,23 +79,24 @@
 						}
 						
 						#navigation form {
+							margin-top: 1px;
 							margin-bottom: 2px;
+							font-size: 11px;
 						}
 						
 						#main {
 							min-width : 440px;
-							padding-left : 210px;
 							margin-right:10px;
 						    font-size: 10px; 
 						}
 						
 						#main table {
-							width: 100%;
+							width: 98%;
 							margin-left:auto;
 							margin-right:auto;
 							border: 1px solid gray;
 							border-collapse: collapse;
-							font-size: 12px;
+							font-size: 11px;
 						}
 						
 						#main th {
@@ -112,6 +111,10 @@
 							padding-bottom:3px;
 						}
 						
+						#separator {
+							border:none;
+							font-size:11px;
+						}
 						
 					</style>
 			</head>
@@ -129,6 +132,7 @@
 							}
 						} 
 					]]></script>
+				<table id="separator"><tr><td id="separator" valign="top" style="border:none;" width="200px">
 		 		<div id="menu"> 
 					<img src="/public/resources/system/logo-meandre.gif" />
 					<div id="navigation">
@@ -211,6 +215,7 @@
 		 		    </div>
 		 		    <br/>All rights reserved by<br/>DITA, NCSA, and UofI, 2007-2008.
 				</div>	
+				</td><td id="separator" valign="top" width="100%">
 				<div id="main">
 					<table>
 						<xsl:for-each select="meandre_item">
@@ -482,9 +487,12 @@
 				     	</xsl:for-each>
 		     		</table>
 		     		<br/>
+		     		<center>
 		     		<a href="javascript:javascript:history.go(-1)">Back</a> ---
 		     		<a href="">Refresh</a>
+		     		</center>
 	     		</div>
+	     		</td></tr></table>
 		 	</body>
 	 	</html>
 	</xsl:template>
