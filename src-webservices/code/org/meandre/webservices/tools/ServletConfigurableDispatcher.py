@@ -46,8 +46,13 @@ def dispatch(httpMethod,request,response,method,format):
         errorUnauthorized(response)
     elif method in requestMap[httpMethod]:
         user = request.getRemoteUser()
+        query = request.getQueryString()
         if user is None : user="anonymous"
-        log.info(request.getRemoteAddr()+':'+str(request.getRemotePort())+'/'+user+' --> '+httpMethod+' --> '+request.getRequestURL().toString())
+        if query is None : 
+            query=' '
+        else :
+            query = ' <-- '+query
+        log.info(request.getRemoteAddr()+':'+str(request.getRemotePort())+'/'+user+' --> '+httpMethod+' --> '+request.getRequestURL().toString()+query)
         eval(requestMap[httpMethod][method]+'(request,response,format)')
     else :
         errorNotFound(response)
