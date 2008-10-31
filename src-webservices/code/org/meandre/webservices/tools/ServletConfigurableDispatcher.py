@@ -45,7 +45,9 @@ def dispatch(httpMethod,request,response,method,format):
     if httpMethod not in requestMap:
         errorUnauthorized(response)
     elif method in requestMap[httpMethod]:
-        log.info(request.getRemoteAddr()+':'+str(request.getRemotePort())+' --> '+httpMethod+' --> '+request.getRequestURL().toString())
+        user = request.getRemoteUser()
+        if user is None : user="anonymous"
+        log.info(request.getRemoteAddr()+':'+str(request.getRemotePort())+'/'+user+' --> '+httpMethod+' --> '+request.getRequestURL().toString())
         eval(requestMap[httpMethod][method]+'(request,response,format)')
     else :
         errorNotFound(response)
