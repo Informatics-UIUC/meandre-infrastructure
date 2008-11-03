@@ -16,6 +16,9 @@
 	<entry key="CREATE_SERVER_PROPERTIES_TABLE">
 			FLAVOUR SPECIFIC!!!
 	</entry>
+	<entry key="INSERT_SERVER_STATUS">
+			FLAVOUR SPECIFIC!!!
+	</entry>
 	<entry key="INSERT_DEFAULT_SERVER_PROPERTIES">
 			INSERT INTO meandre_server_properties ( ID, value ) 
 				VALUES ( 'HEARTBEAT_RATE', '5000' ), ('MAX_UPDATE_FAILURES', '5')
@@ -23,6 +26,11 @@
 	<entry key="GET_SERVER_PROPERTIES">
 			SELECT * 
 			FROM meandre_server_properties
+	</entry>
+	<entry key="GET_SERVER_CLUSTER_LOG">
+			SELECT * 
+			FROM meandre_server_log
+			ORDER BY ts DESC
 	</entry>
 	<entry key="DROP_SERVER_STATUS_TABLE">
 			DROP TABLE meandre_server_status
@@ -35,10 +43,6 @@
 	</entry>
 	<entry key="DROP_SERVER_LOG_TABLE">
 			DROP TABLE meandre_server_log
-	</entry>
-	<entry key="INSERT_SERVER_STATUS">
-			INSERT INTO meandre_server_status (ID,status,updated,free_memory) 
-				VALUES (?,?,?,?) 
 	</entry>
 	<entry key="DELETE_SERVER_STATUS">
 			DELETE FROM meandre_server_status  
@@ -62,7 +66,7 @@
 				WHERE ID=?
 	</entry>
 	<entry key="INSERT_SERVER_INFO">
-			INSERT INTO meandre_server_info (ID,ip,name,port,description,memory_available,number_processors,os_arch,os_name,os_version,java_version,java_vm_version,java_vm_vendor,user_name,user_home) 
+			INSERT INTO meandre_server_info (ID,ip,server_name,port,server_description,memory_available,number_processors,os_arch,os_name,os_version,java_version,java_vm_version,java_vm_vendor,local_user_name,user_home) 
 				VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) 
 	</entry>
 	<entry key="DELETE_SERVER_INFO">
@@ -72,9 +76,9 @@
 	<entry key="UPDATE_SERVER_INFO">
 			UPDATE meandre_server_info 
 				SET ip=?,
-				    name=?,
+				    server_name=?,
 				    port=?,
-				    description=?,
+				    server_description=?,
 				    memory_available=?,
 				    number_processors=?,
 				    os_arch=?,
@@ -83,7 +87,7 @@
 				    java_version=?,
 				    java_vm_version=?,
 				    java_vm_vendor=?,
-				    user_name=?,
+				    local_user_name=?,
 				    user_home=?
 				WHERE ID=?
 	</entry>
@@ -100,9 +104,9 @@
 					uptime,
 					failed_updates,
 					ip,
-					name,
+					server_name,
 					port,
-					description,
+					server_description,
 					memory_available,
 					number_processors,
 					os_arch, 
@@ -111,17 +115,18 @@
 				 	java_version,
 				 	java_vm_version,
 				 	java_vm_vendor,
-				 	user_name,
-				 	user_home
+				 	local_user_name,
+				 	user_home,
+				 	ts
 				)
 				SELECT s.ID,
 				       s.status,
 				       s.uptime,
 				       s.failed_updates,
 				       i.ip,
-				       i.name,
+				       i.server_name,
 				       i.port,
-				       i.description,
+				       i.server_description,
 				       i.memory_available,
 				       i.number_processors,
 				       i.os_arch,i.os_name,
@@ -129,8 +134,9 @@
 				       i.java_version,
 				       i.java_vm_version,
 				       i.java_vm_vendor,
-				       i.user_name,
-				       i.user_home 
+				       i.local_user_name,
+				       i.user_home,
+				       s.ts
 			       FROM meandre_server_status AS s LEFT JOIN meandre_server_info AS i ON s.ID=i.ID
 			       WHERE s.ID=?
 	</entry>

@@ -3,6 +3,9 @@ package org.meandre.core.services.coordinator.backend;
 import static org.junit.Assert.*;
 
 import java.io.InputStream;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -273,4 +276,36 @@ public class BackendAdapterTest {
 		
 	}
 	
+	/** Test the get log information
+	 * 
+	 */
+	@Test
+	public void testGetLog () {
+		log.info("Testing the get log information" );
+		
+		BackendAdapter ba = createBackendAdaptorFromStore();
+		
+		// Try to create the schema
+		try {
+			ba.createSchema();
+			ba.updateServerStatus(BackendAdapter.STATUS_RUNNING);
+			ba.unregisterServer();
+			ba.dropSchemaLeavingLogsBehind();
+			
+			// Remove the installed shutdown hook
+			Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
+
+			Collection<Map<String, String>> colLogs = ba.getLogs();
+			assertEquals(2, colLogs.size());
+			Iterator<Map<String, String>> itLog = colLogs.iterator();
+			while (itLog.hasNext()) {
+				log.info(itLog.next().toString());
+			}
+		} catch (BackendAdapterException e) {
+			fail("The schema could not be created and dropped! "+e.toString());
+		}
+	
+		log.info("Test create and drop schema done" );
+		
+	}
 }

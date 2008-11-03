@@ -181,9 +181,17 @@
 								</form> 
 							</li>
 		 		    	</ul>
+		 		    	<p>Publish</p>
+			 		    <ul>
+							<li><a href="/services/publish/list_published.html">List published</a></li>
+		 		    	</ul>
 		 		    	<p>Execution</p>
 			 		    <ul>
 							<li><a href="/services/execute/list_running_flows.html">Running flows</a></li>
+		 		    	</ul>
+		 		    	<p>Cluster</p>
+			 		    <ul>
+							<li><a href="/services/coordinator/log.html">Show logs</a></li>
 		 		    	</ul>
 		 		    	<p>Security</p>
 			 		    <ul>
@@ -208,10 +216,7 @@
 								</form> 
 							</li>
 		 		    	</ul>
-		 		    	<p>Publish</p>
-			 		    <ul>
-							<li><a href="/services/publish/list_published.html">List published</a></li>
-		 		    	</ul>
+		 		    	
 		 		    </div>
 		 		    <br/>All rights reserved by<br/>DITA, NCSA, and UofI, 2007-2008.
 				</div>	
@@ -316,7 +321,64 @@
 			          				</xsl:if>  
 			          				<xsl:if test="granted">
 			          					<th>Roles granted</th>
-			          				</xsl:if>			          				
+			          				</xsl:if>		
+			          				<xsl:if test="id">
+			          					<th>ID</th>
+			          				</xsl:if>
+			          				<xsl:if test="status">
+			          					<th>Status</th>
+			          				</xsl:if>		
+			          				<xsl:if test="uptime">
+			          					<th>Uptime</th>
+			          				</xsl:if>		
+			          				<xsl:if test="failed_updates">
+			          					<th>Failed updates</th>
+			          				</xsl:if>		
+			          				<xsl:if test="ip">
+			          					<th>IP</th>
+			          				</xsl:if>		
+			          				<xsl:if test="server_name">
+			          					<th>Name</th>
+			          				</xsl:if>		
+			          				<xsl:if test="port">
+			          					<th>Port</th>
+			          				</xsl:if>	
+			          				<xsl:if test="memory_available">
+			          					<th>Memory available</th>
+			          				</xsl:if>		
+			          				<xsl:if test="number_processors">
+			          					<th>Processors</th>
+			          				</xsl:if>		
+			          				<xsl:if test="os_name">
+			          					<th>OS</th>
+			          				</xsl:if>		
+			          				<xsl:if test="os_arch">
+			          					<th>OS arch</th>
+			          				</xsl:if>		
+			          				<xsl:if test="os_version">
+			          					<th>OS version</th>
+			          				</xsl:if>		
+			          				<xsl:if test="java_version">
+			          					<th>Java Version</th>
+			          				</xsl:if>		
+			          				<xsl:if test="java_vm_version">
+			          					<th>Java VM version</th>
+			          				</xsl:if>		
+			          				<xsl:if test="java_vm_vendor">
+			          					<th>Java Vendor</th>
+			          				</xsl:if>	
+			          				<xsl:if test="local_user_name">
+			          					<th>Local user</th>
+			          				</xsl:if>			
+			          				<xsl:if test="user_home">
+			          					<th>User home</th>
+			          				</xsl:if>			          						
+			          				<xsl:if test="server_description">
+			          					<th>Description</th>
+			          				</xsl:if>		
+			          				<xsl:if test="ts">
+			          					<th>Time stamp</th>
+			          				</xsl:if>	  				
 		          				</tr>
 		          			</xsl:if>
 				     		<tr>
@@ -482,7 +544,67 @@
 		          				</xsl:if>		
 		          				<xsl:if test="granted">
 		          					<td><xsl:value-of select="granted"/></td>
+		          				</xsl:if>	
+		          				<xsl:if test="id">
+		          					<td><xsl:value-of select="id"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="status">
+		          					<td><xsl:value-of select="status"/></td>
 		          				</xsl:if>		
+		          				<xsl:if test="uptime">
+		          					<td><xsl:value-of select="uptime"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="failed_updates">
+		          					<td><xsl:value-of select="failed_updates"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="ip">
+		          					<td><xsl:value-of select="ip"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="server_name">
+		          					<td><xsl:value-of select="server_name"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="port">
+		          					<td><xsl:value-of select="port"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="description">
+		          					<td><xsl:value-of select="description"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="memory_available">
+		          					<td><xsl:value-of select="memory_available"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="number_processors">
+		          					<td><xsl:value-of select="number_processors"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="os_name">
+		          					<td><xsl:value-of select="os_name"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="os_arch">
+		          					<td><xsl:value-of select="os_arch"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="os_version">
+		          					<td><xsl:value-of select="os_version"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="java_version">
+		          					<td><xsl:value-of select="java_version"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="java_vm_version">
+		          					<td><xsl:value-of select="java_vm_version"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="java_vm_vendor">
+		          					<td><xsl:value-of select="java_vm_vendor"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="local_user_name">
+		          					<td><xsl:value-of select="local_user_name"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="user_home">
+		          					<td><xsl:value-of select="user_home"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="server_description">
+		          					<td><xsl:value-of select="server_description"/></td>
+		          				</xsl:if>		
+		          				<xsl:if test="ts">
+		          					<td><xsl:value-of select="ts"/></td>
+		          				</xsl:if>	  					
 					     	</tr>
 				     	</xsl:for-each>
 		     		</table>

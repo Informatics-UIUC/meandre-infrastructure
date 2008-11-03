@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.security.SecurityManager;
+import org.meandre.core.services.coordinator.backend.BackendAdapter;
 import org.meandre.core.store.Store;
 import org.meandre.plugins.PluginFactory;
 import org.meandre.webservices.tools.ServletConfigurableDispatcher;
@@ -37,6 +38,9 @@ extends ServletConfigurableDispatcher {
 
 	/** The Meandre plugin factory */
 	protected PluginFactory plugins;
+	
+	/** The back end adaptor to the shared store. */
+	protected BackendAdapter backendAdaptor;
 	
 	/** Creates the base servlet and sets up the access to the required
 	 * store and configuration object.
@@ -84,6 +88,8 @@ extends ServletConfigurableDispatcher {
 		pi.set("meandre_config", this.cnf);
 		pi.set("meandre_security", this.secStore);
 		pi.set("meandre_plugins", this.plugins);
+		if (this.backendAdaptor!=null )
+			pi.set("meandre_coordinator", this.backendAdaptor);
 	}
 	
 }

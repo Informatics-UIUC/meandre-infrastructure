@@ -31,6 +31,7 @@ import org.meandre.plugins.PluginFactory;
 import org.meandre.webservices.logger.WSLoggerFactory;
 import org.meandre.webservices.servlets.WSAboutServlet;
 import org.meandre.webservices.servlets.WSAuxiliarServlet;
+import org.meandre.webservices.servlets.WSCoordinatorServlet;
 import org.meandre.webservices.servlets.WSExecuteServlet;
 import org.meandre.webservices.servlets.WSLocationsServlet;
 import org.meandre.webservices.servlets.WSPublicServlet;
@@ -330,6 +331,7 @@ public class MeandreServer {
 		contextWS.addServlet(new ServletHolder((Servlet) new WSExecuteServlet(store,cnf)),		"/services/execute/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublishServlet(store,cnf)),		"/services/publish/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurityServlet(store,cnf)),		"/services/security/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSCoordinatorServlet(store,cnf,baToStore)),		"/services/coordinator/*");
 
 		contextWS.addServlet(new ServletHolder((Servlet) new WSAuxiliarServlet(store,cnf)),     "/services/auxiliar/*");
 		

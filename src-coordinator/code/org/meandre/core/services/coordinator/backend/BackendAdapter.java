@@ -8,11 +8,14 @@ import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -88,6 +91,9 @@ extends Thread {
 	/** Gets the server properties */
 	protected final static String QUERY_GET_SERVER_PROPERTIES = "GET_SERVER_PROPERTIES";
 
+	/** Gets the MDX log */
+	protected final static String QUERY_GET_CLUSTER_LOG = "GET_SERVER_CLUSTER_LOG";
+	
 	/** The constant to pull the drop server log table query */
 	protected final static String QUERY_DROP_SERVER_LOG_TABLE = "DROP_SERVER_LOG_TABLE";
 
@@ -709,6 +715,37 @@ extends Thread {
 		return lstRes;
 	}
 
+	/** Return a list of list with the results of select query in text form.
+	 * 
+	 * @param sQuery The query to run
+	 * @param iLimit The maxim number of entries returned (0 or negative to return all)
+	 * @return The resulting list of lists of text with the column name
+	 * @throws BackendAdapterException Something when wrong running the select
+	 */
+	private List<Map<String,String>> selectTextColumnsWithName (String sQuery, int iLimit ) throws BackendAdapterException {
+		List<Map<String,String>> lstRes = new LinkedList<Map<String,String>>();
+		try {
+			Statement pstm = conn.createStatement();
+			ResultSet rs = pstm.executeQuery(sQuery);
+			ResultSetMetaData rsMD = rs.getMetaData();
+			int iColCount = rsMD.getColumnCount();
+			int iCnt = 0;
+			while(rs.next() && ( iLimit<=0 || iCnt<iLimit) ) {
+				Map<String,String> mapRow = new Hashtable<String,String>();
+				for( int j=1 ; j<=iColCount ; j++) { 
+					String sColumnLabel = rsMD.getColumnLabel(j).toLowerCase();
+					String sValue = rs.getString(j);
+					sValue = ( sValue==null )?"":sValue.trim();
+					mapRow.put(sColumnLabel,sValue);
+				}
+				lstRes.add(mapRow);
+			}
+			rs.close();
+		} catch (SQLException e) {
+			throw new BackendAdapterException(e);
+		}
+		return lstRes;
+	}
 
 	/** Return a list of list with the results of select query in text form.
 	 * 
@@ -891,5 +928,32 @@ extends Thread {
 	 */
 	public boolean isRunning() {
 		return bRunning;
+	}
+	
+	/** Returns the current server ID,
+	 * 
+	 * @return The server ID
+	 */
+	public String getLocalServerID () {
+		return this.sServerID;
+	}
+	
+	/** Returns the collections of entris in the log.
+	 * 
+	 * @return The collection of entries
+	 * @throws BackendAdapterException Failed to retrieve the logs
+	 */
+	public Collection<Map<String,String>> getLogs () throws BackendAdapterException {
+		return getLog(0);
+	}
+	
+	/** Returns the collections of entris in the log.
+	 * 
+	 * @param iLimit The number of top entries to return
+	 * @return The collection of entries
+	 * @throws BackendAdapterException Failed to retrieve the logs
+	 */
+	public Collection<Map<String,String>> getLog (int iLimit) throws BackendAdapterException {
+		return selectTextColumnsWithName(propQueryMapping.getProperty(QUERY_GET_CLUSTER_LOG),iLimit);
 	}
 }

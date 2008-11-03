@@ -2,7 +2,7 @@
 # Implements the basic about services
 #
 
-__name__ = 'WSAboutServlet'
+__name__ = 'WSExecuteServlet'
 
 requestMap = {
     'GET': { 

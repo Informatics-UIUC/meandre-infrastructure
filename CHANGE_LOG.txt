@@ -1,5 +1,10 @@
 1.4.0-vcli-alpha Sara
 
+* Started the coordinator server to expose cluster information
+	- Added log service that listed the log information
+
+* Modfyied the MDX to return the log entries (had to specialize the insert status to make Derby happy)
+
 * Creates an auxiliar service that just display forms for 
 	- Adding to a repository
 	- Create a user 

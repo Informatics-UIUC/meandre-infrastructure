@@ -20,9 +20,9 @@
 			CREATE TABLE IF NOT EXISTS meandre_server_info 
 				(ID CHAR(16), 
 				 ip CHAR(15) default '127.0.0.1', 
-				 name CHAR(40) default 'localhost', 
+				 server_name CHAR(40) default 'localhost', 
 				 port INTEGER default 1714, 
-				 description CHAR(80) default 'unknown',
+				 server_description CHAR(80) default 'unknown',
 				 memory_available BIGINT,
 				 number_processors INTEGER,
 				 os_arch VARCHAR(40), 
@@ -31,7 +31,7 @@
 				 java_version VARCHAR(20),
 				 java_vm_version VARCHAR(20),
 				 java_vm_vendor VARCHAR(40),
-				 user_name VARCHAR(20),
+				 local_user_name VARCHAR(20),
 				 user_home VARCHAR(255),
 				 PRIMARY KEY(ID))
 	</entry>
@@ -42,9 +42,9 @@
 				 uptime REAL default 0, 
 				 failed_updates INTEGER default 0,
 				 ip CHAR(15) default '127.0.0.1', 
-				 name CHAR(40) default 'localhost', 
+				 server_name CHAR(40) default 'localhost', 
 				 port INTEGER default 1714, 
-				 description CHAR(80) default 'unknown',
+				 server_description CHAR(80) default 'unknown',
 				 memory_available BIGINT,
 				 number_processors INTEGER,
 				 os_arch VARCHAR(40), 
@@ -53,7 +53,7 @@
 				 java_version VARCHAR(20),
 				 java_vm_version VARCHAR(20),
 				 java_vm_vendor VARCHAR(40),
-				 user_name VARCHAR(20),
+				 local_user_name VARCHAR(20),
 				 user_home VARCHAR(255),
 				 INDEX USING BTREE(ts),
 				 ts TIMESTAMP)
@@ -63,5 +63,9 @@
 				(ID CHAR(40),
 				 value VARCHAR(128),
 				 PRIMARY KEY (ID))
+	</entry>
+	<entry key="INSERT_SERVER_STATUS">
+			INSERT INTO meandre_server_status (ID,status,updated,free_memory) 
+				VALUES (?,?,?,?) 
 	</entry>
 </properties>
