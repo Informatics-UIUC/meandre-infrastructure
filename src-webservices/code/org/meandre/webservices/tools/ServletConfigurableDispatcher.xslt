@@ -580,9 +580,6 @@
 		          				<xsl:if test="port">
 		          					<td><xsl:value-of select="port"/></td>
 		          				</xsl:if>		
-		          				<xsl:if test="description">
-		          					<td><xsl:value-of select="description"/></td>
-		          				</xsl:if>		
 		          				<xsl:if test="memory_available">
 		          					<td><xsl:value-of select="memory_available"/></td>
 		          				</xsl:if>		
