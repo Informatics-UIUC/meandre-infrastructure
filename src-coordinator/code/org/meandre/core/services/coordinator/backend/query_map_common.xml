@@ -32,6 +32,16 @@
 			FROM meandre_server_log
 			ORDER BY ts DESC
 	</entry>
+	<entry key="GET_SERVER_CLUSTER_STATUS">
+			SELECT * 
+			FROM meandre_server_status
+			ORDER BY status
+	</entry>	
+	<entry key="GET_SERVER_CLUSTER_INFOS">
+			SELECT * 
+			FROM meandre_server_info
+			ORDER BY id
+	</entry>
 	<entry key="DROP_SERVER_STATUS_TABLE">
 			DROP TABLE meandre_server_status
 	</entry>
@@ -149,11 +159,6 @@
 			SELECT failed_updates
 				FROM meandre_server_status
 				WHERE ID=?
-	</entry>
-	<entry key="DUMP_LOG_ENTRIES">
-			SELECT * 
-				FROM meandre_server_log
-				ORDER ORDER BY ts DESC
 	</entry>
 	<entry key="LIST_DIRTY_NODES">
 			SELECT i.ID,i.ip, i.port 

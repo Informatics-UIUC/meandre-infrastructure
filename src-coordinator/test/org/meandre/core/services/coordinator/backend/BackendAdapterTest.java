@@ -308,4 +308,39 @@ public class BackendAdapterTest {
 		log.info("Test create and drop schema done" );
 		
 	}
+
+	
+	/** Test the get statuses information
+	 * 
+	 */
+	@Test
+	public void testGetStatuses () {
+		log.info("Testing the get log information" );
+		
+		BackendAdapter ba = createBackendAdaptorFromStore();
+		
+		// Try to create the schema
+		try {
+			ba.createSchema();
+			ba.updateServerStatus(BackendAdapter.STATUS_RUNNING);
+			
+			Collection<Map<String, String>> colLogs = ba.getStatuses();
+			assertEquals(1, colLogs.size());
+			Iterator<Map<String, String>> itLog = colLogs.iterator();
+			while (itLog.hasNext()) {
+				log.info(itLog.next().toString());
+			}
+			
+			ba.unregisterServer();
+			ba.dropSchemaLeavingLogsBehind();
+			// Remove the installed shutdown hook
+			Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
+		} catch (BackendAdapterException e) {
+			fail("The schema could not be created and dropped! "+e.toString());
+		}
+	
+		log.info("Test create and drop schema done" );
+		
+	}
+
 }

@@ -2,6 +2,9 @@
 
 * Started the coordinator server to expose cluster information
 	- Added log service that listed the log information
+	- Added status service that listed the server's status information
+	- Added info service that listed the servers' information
+	- Added properties service that listed the properties of the server's 
 
 * Modfyied the MDX to return the log entries (had to specialize the insert status to make Derby happy)
 

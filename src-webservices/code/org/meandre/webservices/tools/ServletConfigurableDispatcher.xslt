@@ -136,19 +136,7 @@
 		 		<div id="menu"> 
 					<img src="/public/resources/system/logo-meandre.gif" />
 					<div id="navigation">
-			 			<p>About</p>
-			 		    <ul>
-			 		    	<li><a href="/services/about/installation.html">Installation</a></li>
-			 		    	<li><a href="/services/about/version.html">Version</a></li>
-			 		    	<li><a href="/services/about/plugins.html">Plugins</a></li>
-		 		    	</ul>
-		 		    	<p>Public</p>
-			 		    <ul>
-			 		    	<li><a href="/public/services/repository.ttl" target="_blank">Published repository</a></li>
-			 		    	<li><a href="/public/services/demo_repository.ttl" target="_blank">Demo repository</a></li>
-			 		    	<li><a href="/public/services/ping.html" >Ping</a></li>
-		 		    	</ul>
-		 		    	<p>Locations</p>
+			 			<p>Locations</p>
 			 		    <ul>
 			 		    	<li><a href="/services/locations/list.html">List</a></li>
 							<li>
@@ -191,7 +179,10 @@
 		 		    	</ul>
 		 		    	<p>Cluster</p>
 			 		    <ul>
-							<li><a href="/services/coordinator/log.html">Show logs</a></li>
+							<li><a href="/services/coordinator/log.html">Cluster log</a></li>
+							<li><a href="/services/coordinator/status.html">Servers' statuses</a></li>
+							<li><a href="/services/coordinator/info.html">Servers' information</a></li>
+		 		    		<li><a href="/services/coordinator/property.html">Servers' properties</a></li>
 		 		    	</ul>
 		 		    	<p>Security</p>
 			 		    <ul>
@@ -216,7 +207,18 @@
 								</form> 
 							</li>
 		 		    	</ul>
-		 		    	
+		 		    	<p>Public</p>
+			 		    <ul>
+			 		    	<li><a href="/public/services/repository.ttl" target="_blank">Published repository</a></li>
+			 		    	<li><a href="/public/services/demo_repository.ttl" target="_blank">Demo repository</a></li>
+			 		    	<li><a href="/public/services/ping.html" >Ping</a></li>
+		 		    	</ul>
+		 		    	<p>About</p>
+			 		    <ul>
+			 		    	<li><a href="/services/about/installation.html">Installation</a></li>
+			 		    	<li><a href="/services/about/version.html">Version</a></li>
+			 		    	<li><a href="/services/about/plugins.html">Plugins</a></li>
+		 		    	</ul>
 		 		    </div>
 		 		    <br/>All rights reserved by<br/>DITA, NCSA, and UofI, 2007-2008.
 				</div>	
@@ -330,7 +332,7 @@
 			          				</xsl:if>		
 			          				<xsl:if test="uptime">
 			          					<th>Uptime</th>
-			          				</xsl:if>		
+			          				</xsl:if>	
 			          				<xsl:if test="failed_updates">
 			          					<th>Failed updates</th>
 			          				</xsl:if>		
@@ -378,7 +380,19 @@
 			          				</xsl:if>		
 			          				<xsl:if test="ts">
 			          					<th>Time stamp</th>
-			          				</xsl:if>	  				
+			          				</xsl:if>	  	
+			          				<xsl:if test="previous_updated">
+			          					<th>Last update</th>
+			          				</xsl:if>
+			          				<xsl:if test="free_memory">
+			          					<th>Free memory</th>
+			          				</xsl:if>	
+			          				<xsl:if test="property_key">
+			          					<th>Key</th>
+			          				</xsl:if>
+			          				<xsl:if test="property_value">
+			          					<th>Value</th>
+			          				</xsl:if>				
 		          				</tr>
 		          			</xsl:if>
 				     		<tr>
@@ -604,7 +618,19 @@
 		          				</xsl:if>		
 		          				<xsl:if test="ts">
 		          					<td><xsl:value-of select="ts"/></td>
-		          				</xsl:if>	  					
+		          				</xsl:if>	
+		          				<xsl:if test="previous_updated">
+		          					<td><xsl:value-of select="previous_updated"/></td>
+		          				</xsl:if>	
+		          				<xsl:if test="free_memory">
+		          					<td><xsl:value-of select="free_memory"/></td>
+		          				</xsl:if>	
+		          				<xsl:if test="property_key">
+		          					<td><xsl:value-of select="property_key"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="property_value">
+		          					<td><xsl:value-of select="property_value"/></td>
+		          				</xsl:if>				
 					     	</tr>
 				     	</xsl:for-each>
 		     		</table>

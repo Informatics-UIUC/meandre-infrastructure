@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -93,6 +94,12 @@ extends Thread {
 
 	/** Gets the MDX log */
 	protected final static String QUERY_GET_CLUSTER_LOG = "GET_SERVER_CLUSTER_LOG";
+
+	/** Gets the MDX status */
+	protected final static String QUERY_GET_CLUSTER_STATUS = "GET_SERVER_CLUSTER_STATUS";
+
+	/** Gets the MDX status */
+	protected final static String QUERY_GET_CLUSTER_INFOS = "GET_SERVER_CLUSTER_INFOS";
 	
 	/** The constant to pull the drop server log table query */
 	protected final static String QUERY_DROP_SERVER_LOG_TABLE = "DROP_SERVER_LOG_TABLE";
@@ -129,9 +136,6 @@ extends Thread {
 	
 	/** The constant to pull the query that marks out of sync servers */
 	protected final static String QUERY_MARK_OUTOFSYNC_SERVERS = "MARK_OUTOFSYNC_SERVERS";
-	
-	/** The constant to pull all the entries in the query table */
-	protected final static String QUERY_DUMP_LOG_ENTRIES = "DUMP_LOG_ENTRIES";
 	
 	/** The constant to pull the list the dead nodes */
 	protected final static String QUERY_LIST_DIRTY_NODES = "LIST_DIRTY_NODES";
@@ -739,6 +743,7 @@ extends Thread {
 					mapRow.put(sColumnLabel,sValue);
 				}
 				lstRes.add(mapRow);
+				iCnt++;
 			}
 			rs.close();
 		} catch (SQLException e) {
@@ -938,22 +943,55 @@ extends Thread {
 		return this.sServerID;
 	}
 	
-	/** Returns the collections of entris in the log.
+	/** Returns the collections of entries in the log.
 	 * 
 	 * @return The collection of entries
 	 * @throws BackendAdapterException Failed to retrieve the logs
 	 */
 	public Collection<Map<String,String>> getLogs () throws BackendAdapterException {
-		return getLog(0);
+		return getLogs(0);
 	}
 	
-	/** Returns the collections of entris in the log.
+	/** Returns the collections of entries in the log.
 	 * 
 	 * @param iLimit The number of top entries to return
 	 * @return The collection of entries
 	 * @throws BackendAdapterException Failed to retrieve the logs
 	 */
-	public Collection<Map<String,String>> getLog (int iLimit) throws BackendAdapterException {
+	public Collection<Map<String,String>> getLogs (int iLimit) throws BackendAdapterException {
 		return selectTextColumnsWithName(propQueryMapping.getProperty(QUERY_GET_CLUSTER_LOG),iLimit);
+	}
+	
+	/** Returns the collections of entries in the status table.
+	 * 
+	 * @return The collection of entries
+	 * @throws BackendAdapterException Failed to retrieve the logs
+	 */
+	public Collection<Map<String,String>> getStatuses () throws BackendAdapterException {
+		return selectTextColumnsWithName(propQueryMapping.getProperty(QUERY_GET_CLUSTER_STATUS),0);
+	}
+	
+	/** Returns the collections of entries in the info table.
+	 * 
+	 * @return The collection of entries
+	 * @throws BackendAdapterException Failed to retrieve the logs
+	 */
+	public Collection<Map<String,String>> getInfos () throws BackendAdapterException {
+		return selectTextColumnsWithName(propQueryMapping.getProperty(QUERY_GET_CLUSTER_INFOS),0);
+	}
+	
+	/** Returns the collections of entries in the info table.
+	 * 
+	 * @return The collection of entries
+	 * @throws BackendAdapterException Failed to retrieve the logs
+	 */
+	public Properties getServerProperties () throws BackendAdapterException {
+		Properties prop = new Properties();
+		Iterator<List<String>> iter = selectTextColumns(propQueryMapping.getProperty(QUERY_GET_SERVER_PROPERTIES)).iterator();
+		while (iter.hasNext()) {
+			List<String> lst = iter.next();
+			prop.put(lst.get(0), lst.get(1));
+		}
+		return prop;
 	}
 }
