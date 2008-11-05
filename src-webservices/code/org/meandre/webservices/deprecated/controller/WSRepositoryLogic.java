@@ -1,4 +1,4 @@
-package org.meandre.webservices.controllers;
+package org.meandre.webservices.deprecated.controller;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

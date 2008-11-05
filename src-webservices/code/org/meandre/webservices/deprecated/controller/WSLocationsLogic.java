@@ -16,6 +16,7 @@ import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.store.system.SystemStore;
+import org.meandre.core.utils.ModelIO;
 import org.meandre.webservices.logger.WSLoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -125,13 +126,7 @@ public class WSLocationsLogic {
 				// Read the location and check its consistency
 				//
 			
-				if ( sLocation.endsWith(".ttl"))
-					modelTmp.read(url.openStream(),null,"TTL");
-				else if ( sLocation.endsWith(".nt"))
-					modelTmp.read(url.openStream(),null,"N-TRIPLE");
-				else
-					modelTmp.read(url.openStream(),null);
-
+				ModelIO.readModelInDialect(modelTmp, url);
 				
 				//
 				// Test the location
@@ -258,12 +253,7 @@ public class WSLocationsLogic {
 					// Read the location and check its consistency
 					//
 					try{
-					if ( url.toString().endsWith(".ttl"))
-						modelTmp.read(url.openStream(),null,"TTL");
-					else if ( url.toString().endsWith(".nt"))
-						modelTmp.read(url.openStream(),null,"N-TRIPLE");
-					else
-						modelTmp.read(url.openStream(),null);
+						ModelIO.readModelInDialect(modelTmp, url);
 	               }catch(Exception e){
 	                    log.warning("WSLocationsLogic.removeLocation: Failed to " +
 	                            "add location. Couldnt open url:" +

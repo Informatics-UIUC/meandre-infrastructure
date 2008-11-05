@@ -1,4 +1,4 @@
-package org.meandre.webservices.servlets;
+package org.meandre.webservices.deprecated.servlets;
 
 import java.io.IOException;
 import java.net.URL;
@@ -18,7 +18,7 @@ import org.meandre.core.security.SecurityManager;
 import org.meandre.core.security.SecurityStoreException;
 import org.meandre.core.security.User;
 import org.meandre.core.store.Store;
-import org.meandre.webservices.controllers.WSRepositoryLogic;
+import org.meandre.webservices.deprecated.controller.WSRepositoryLogic;
 import org.meandre.webservices.logger.WSLoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;

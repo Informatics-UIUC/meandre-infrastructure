@@ -726,8 +726,9 @@ public class MeandreClient extends MeandreBaseClient{
                 }
             }
         }
-        byte[] baRetrieved = executePostRequestBytes(sRestCommand, nvps, postParts);
-        System.out.println("returned: " + (new String(baRetrieved)));
+        @SuppressWarnings("unused")
+		byte[] baRetrieved = executePostRequestBytes(sRestCommand, nvps, postParts);
+        //System.out.println("returned: " + (new String(baRetrieved)));
         return true;
     }
 
@@ -873,6 +874,36 @@ public class MeandreClient extends MeandreBaseClient{
 
         String sResults = executeGetRequestString(sRestCommand, nvps);
         return sResults;
+    }
+    
+    /**
+     * This method uploads and executes all the flows in the provided model
+     * 
+     * <p> calls:
+     * http://<meandre_host>:<meandre_port>/services/execute/repository.txt
+     * TODO:Need test
+     */
+    public String runRepository(Model model)
+            throws TransmissionException {
+
+        String sRestCommand = "services/execute/repository.txt";
+
+        Set<NameValuePair> nvps = new HashSet<NameValuePair>();
+       
+        Set<Part> postParts = new HashSet<Part>();
+
+        
+        ByteArrayOutputStream osModel = new ByteArrayOutputStream();
+        model.write(osModel, "N-TRIPLE");
+        byte[] baModel = osModel.toByteArray();
+        //NOTE: "InMemoryBytes" is given as the filename, and it is not
+        //clear what it's used for by httpclient in this context
+        PartSource source = new ByteArrayPartSource("InMemoryBytes",
+        		baModel);
+        postParts.add(new FilePart("repository", source));
+       
+		byte[] baRetrieved = executePostRequestBytes(sRestCommand, nvps, postParts);
+        return new String(baRetrieved);
     }
 
     /**
@@ -1101,4 +1132,5 @@ public class MeandreClient extends MeandreBaseClient{
     }
 
 
+    
 }

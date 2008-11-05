@@ -26,6 +26,7 @@ import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.store.Store;
+import org.meandre.core.utils.ModelIO;
 import org.meandre.webservices.logger.WSLoggerFactory;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
@@ -101,24 +102,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 				//
 				// Read the location and check its consistency
 				//
-				try {
-					modelTmp.read(bais,null,"TTL");
-				}
-				catch ( Exception eTTL ) {
-					try {
-						modelTmp.read(bais,null,"N-TRIPLE");
-					}
-					catch ( Exception eNT ) {
-						try {
-							modelTmp.read(bais,null);
-						}
-						catch ( Exception eRDF ) {
-							IOException ioe = new IOException();
-							ioe.setStackTrace(eRDF.getStackTrace());
-							throw ioe;
-						}
-					}
-				}
+				ModelIO.attemptReadModel(modelTmp, bais);
 
 				//
 				// Accumulate the models

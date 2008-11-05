@@ -34,6 +34,7 @@ import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.utils.Constants;
+import org.meandre.core.utils.ModelIO;
 import org.meandre.webui.PortScroller;
 import org.meandre.webui.WebUI;
 
@@ -265,7 +266,7 @@ public class MAUExecutor {
 			Model mod = ModelFactory.createDefaultModel();
 			File file = new File(sFileName);
 			URL url = new URL("jar:file:"+file.getAbsolutePath()+"!/repository/repository.ttl");
-			mod.read(url.openStream(), null,"TTL");
+			ModelIO.readModelInDialect(mod, url);
 			QueryableRepository qr = new RepositoryImpl(mod);
 
 			// Edit the contexts URI

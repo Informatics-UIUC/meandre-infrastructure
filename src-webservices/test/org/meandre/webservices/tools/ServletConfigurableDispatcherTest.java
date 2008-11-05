@@ -11,6 +11,7 @@ import java.net.URL;
 
 import org.junit.After;
 import org.junit.Before;
+import org.meandre.core.utils.ModelIO;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 
@@ -107,8 +108,7 @@ public abstract class ServletConfigurableDispatcherTest  {
 		try {
 			Model mod = ModelFactory.createDefaultModel();
 			URL url = new URL("http://localhost:"+iTestPort+sMethod);
-			InputStream is = url.openStream();
-			mod.read(is, null, sFormat);
+			ModelIO.readModelInDialect(mod, url);
 			return mod;
 		} catch (MalformedURLException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();

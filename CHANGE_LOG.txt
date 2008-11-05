@@ -1,6 +1,9 @@
 1.4.0-vcli-alpha Sara
 
-* Started the coordinator server to expose cluster information
+* Added a new execute service that accepts a post of 'repository' and runs all the flows in the 
+  contained repository. It also tries to add missing components from the user repository if needed.
+  
+* Services to expose cluster information
 	- Added log service that listed the log information
 	- Added status service that listed the server's status information
 	- Added info service that listed the servers' information

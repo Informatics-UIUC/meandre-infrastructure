@@ -27,6 +27,7 @@ import org.meandre.core.store.security.SecurityStore;
 import org.meandre.core.store.system.SystemStore;
 import org.meandre.core.store.system.SystemStoreImpl;
 import org.meandre.core.utils.Constants;
+import org.meandre.core.utils.ModelIO;
 import org.meandre.core.utils.NetworkTools;
 
 import com.hp.hpl.jena.db.DBConnection;
@@ -654,12 +655,7 @@ public class Store {
 				// Read the location and check its consistency
 				//
 				try{
-					if ( url.toString().endsWith(".ttl"))
-						modelTmp.read(url.openStream(),null,"TTL");
-					else if ( url.toString().endsWith(".nt"))
-						modelTmp.read(url.openStream(),null,"N-TRIPLE");
-					else
-						modelTmp.read(url.openStream(),null);
+					ModelIO.readModelInDialect(modelTmp, url);
 				}
 				catch(Exception e){
                     log.warning("Store failed removing Location: " +
@@ -747,15 +743,8 @@ public class Store {
 	    
 				//
 				// Read the location and check its consistency
-				//
-			
-				if ( sLocation.endsWith(".ttl"))
-					modelTmp.read(url.openStream(),null,"TTL");
-				else if ( sLocation.endsWith(".nt"))
-					modelTmp.read(url.openStream(),null,"N-TRIPLE");
-				else
-					modelTmp.read(url.openStream(),null);
-
+				//			
+				ModelIO.readModelInDialect(modelTmp, url);
 				
 				//
 				// Test the location
@@ -845,12 +834,7 @@ public class Store {
 				//
 				// Read the location and check its consistency
 				//
-				if ( sLoc.endsWith(".ttl"))
-					modelTmp.read(url.openStream(),null,"TTL");
-				else if ( sLoc.endsWith(".nt"))
-					modelTmp.read(url.openStream(),null,"N-TRIPLE");
-				else
-					modelTmp.read(url.openStream(),null);
+				ModelIO.readModelInDialect(modelTmp, url);
 
 				QueryableRepository qrNew = new RepositoryImpl(modelTmp);
 				

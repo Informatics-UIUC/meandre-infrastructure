@@ -11,6 +11,9 @@ requestMap = {
         'url': 'execute_url',
         'web_component_url': 'execute_web_component_url',
         'uri_flow': 'execute_uri_flow'
+    },
+    'POST': {
+        'repository': 'execute_repository'
     }
 }
 
@@ -31,6 +34,8 @@ from org.meandre.core.security import Role
 from org.meandre.core.engine.execution import InteractiveExecution
 from org.meandre.webui import WebUIFactory
 from org.meandre.webservices.beans import JobDetail
+
+from org.meandre.webservices.servlets import WSExecuteServlet
 
 #
 # Services implementation
@@ -154,4 +159,31 @@ def execute_uri_flow ( request, response, format ):
     else:
         errorForbidden(response)
  
+ 
+def execute_repository ( request, response, format ):
+    '''Executes all the flows in the provided repository.'''
+    if checkUserRole (request,Role.EXECUTION) :
+        qr = WSExecuteServlet.extractRepository(request,meandre_store)
+        if qr is not None :
+            uris = [uri.toString() for uri in qr.getAvailableFlows()]
+            tokens = [str(System.currentTimeMillis()) for i in range(len(uris))]
+            stats = [True for i in range(len(uris))]
+            content = []
+            for flow_uri, stat, token in zip(uris,stats,tokens): 
+                statusOK(response)
+                job = JobDetail()
+                executionTokenMap[token] = job
+                if format == 'txt' :
+                    InteractiveExecution.executeVerboseFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,stat,token,job)
+                elif format == 'silent': 
+                    InteractiveExecution.executeSilentFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,token,job)
+                else :
+                    errorNotFound(response)
+                del executionTokenMap[token]
+        else :
+            errorExpectationFail(response)
+    else:
+        errorForbidden(response)
+
+
     

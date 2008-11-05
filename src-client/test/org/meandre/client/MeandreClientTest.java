@@ -783,6 +783,24 @@ public class MeandreClientTest {
     }
 
     /**
+     * Test method for 
+     * {@link org.meandre.client.MeandreClient#uploadFiles(Set<File>, boolean)}.
+     */
+    @Test
+    public void testRunRepositorys() {
+        Model mod = DemoRepositoryGenerator.getTestHelloWorldMoreHetereogenousRepository();
+        try{
+            String ret = _meandreClient.runRepository(mod);
+            System.out.println(ret);
+            assertTrue(ret.length()>1000);
+            assertTrue(ret.indexOf("Error")==-1);
+        }catch(Exception e){
+            e.printStackTrace();
+            fail("could not complete upload");
+        }
+        return;
+    }
+    /**
      * Test method for {@link org.meandre.client.MeandreClient#abortFlow()}.
      */
     @Test
