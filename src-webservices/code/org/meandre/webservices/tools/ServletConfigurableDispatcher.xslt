@@ -176,6 +176,7 @@
 		 		    	<p>Execution</p>
 			 		    <ul>
 							<li><a href="/services/execute/list_running_flows.html">Running flows</a></li>
+							<li><a href="/services/auxiliar/execute_repository.html">Execute repository</a></li>
 		 		    	</ul>
 		 		    	<p>Cluster</p>
 			 		    <ul>
