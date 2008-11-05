@@ -14,10 +14,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.services.coordinator.CoordinatorServiceCallBack;
-import org.meandre.core.services.coordinator.backend.BackendAdapter;
-import org.meandre.core.services.coordinator.backend.BackendAdapterException;
-import org.meandre.core.services.coordinator.backend.DerbyBackendAdapter;
-import org.meandre.core.services.coordinator.backend.MySQLBackendAdapter;
+import org.meandre.core.services.coordinator.backend.CoordinatorBackendAdapter;
+import org.meandre.core.services.coordinator.backend.CoordinatorBackendAdapterException;
+import org.meandre.core.services.coordinator.backend.DerbyCoordinatorBackendAdapter;
+import org.meandre.core.services.coordinator.backend.MySQLCoordinatorBackendAdapter;
 import org.meandre.core.services.coordinator.logger.CoordinatorLoggerFactory;
 import org.meandre.core.store.Store;
 import org.meandre.core.utils.Constants;
@@ -35,8 +35,8 @@ public class BackendAdapterTest {
 	
 	/** Contains the list of backend addapters to test */
 	protected static String [] sbaNames = { 
-		DerbyBackendAdapter.class.getName(), 
-		MySQLBackendAdapter.class.getName(),
+		DerbyCoordinatorBackendAdapter.class.getName(), 
+		MySQLCoordinatorBackendAdapter.class.getName(),
 	};
 	
 	
@@ -54,7 +54,7 @@ public class BackendAdapterTest {
 		
 		// Check the base adapter
 		try {
-			InputStream dis = BackendAdapter.class.getResourceAsStream(BackendAdapter.COMMON_MAP_FILE);
+			InputStream dis = CoordinatorBackendAdapter.class.getResourceAsStream(CoordinatorBackendAdapter.COMMON_MAP_FILE);
 			assertNotNull(dis);
 			if ( dis!=null )
 				dis.close();
@@ -67,7 +67,7 @@ public class BackendAdapterTest {
 			try {
 				Class c = Class.forName(sCN);
 				String[] sCNa = sCN.split("\\"+".");
-				String sPropFile = sCNa[sCNa.length-1].replaceAll("BackendAdapter", "").toLowerCase();
+				String sPropFile = sCNa[sCNa.length-1].replaceAll("CoordinatorBackendAdapter", "").toLowerCase();
 				sPropFile = "query_map_"+sPropFile+".xml";
 				InputStream dis = c.getResourceAsStream(sPropFile);
 				assertNotNull(dis);
@@ -88,10 +88,10 @@ public class BackendAdapterTest {
 	@After
 	public void cleanAfterTesting() {
 		try {
-			BackendAdapter ba = createBackendAdaptorFromStore();
+			CoordinatorBackendAdapter ba = createBackendAdaptorFromStore();
 			ba.dropSchema();
 		} 
-		catch ( BackendAdapterException bae ) {
+		catch ( CoordinatorBackendAdapterException bae ) {
 			log.warning("Failed to drop schema after the test");
 		}
 	}
@@ -118,7 +118,7 @@ public class BackendAdapterTest {
 	private void instantiateBackendAdapter ( String sCN ) {
 
 		try {
-			BackendAdapter ba = (BackendAdapter) Class.forName(sCN).newInstance();
+			CoordinatorBackendAdapter ba = (CoordinatorBackendAdapter) Class.forName(sCN).newInstance();
 			String[] sCNa = sCN.split("\\"+".");
 			String sCNClassName = sCNa[sCNa.length-1];
 			
@@ -134,14 +134,14 @@ public class BackendAdapterTest {
 	/** Gets and adapter based on the current store configuration object.
 	 * 
 	 */
-	private BackendAdapter createBackendAdaptorFromStore () {
+	private CoordinatorBackendAdapter createBackendAdaptorFromStore () {
 		CoreConfiguration cnf = new CoreConfiguration();
 		Store store = new Store(cnf);
 		
 		try {
 			// Instantiate the adaptor
-			BackendAdapter ba = (BackendAdapter) Class.forName(
-					"org.meandre.core.services.coordinator.backend."+store.getDatabaseFlavor()+"BackendAdapter"
+			CoordinatorBackendAdapter ba = (CoordinatorBackendAdapter) Class.forName(
+					"org.meandre.core.services.coordinator.backend."+store.getDatabaseFlavor()+"CoordinatorBackendAdapter"
 				).newInstance();
 			
 			// Link it to a store
@@ -181,7 +181,7 @@ public class BackendAdapterTest {
 
 		log.info("Running test create and drop schema" );
 		
-		BackendAdapter ba = createBackendAdaptorFromStore();
+		CoordinatorBackendAdapter ba = createBackendAdaptorFromStore();
 		
 		// Try to create the schema
 		try {
@@ -190,7 +190,7 @@ public class BackendAdapterTest {
 
 			// Remove the installed shutdown hook
 			Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
-		} catch (BackendAdapterException e) {
+		} catch (CoordinatorBackendAdapterException e) {
 			fail("The schema could not be created and dropped! "+e.toString());
 		}
 	
@@ -207,7 +207,7 @@ public class BackendAdapterTest {
 		log.info("Running test register server");
 		
 		int iRepetitions = 5;
-		BackendAdapter ba = createBackendAdaptorFromStore();
+		CoordinatorBackendAdapter ba = createBackendAdaptorFromStore();
 		
 		// Try to create the schema
 		try {
@@ -216,7 +216,7 @@ public class BackendAdapterTest {
 			
 			for ( ; iRepetitions>=0 ; iRepetitions-- ) {
 				// Register the server
-				ba.updateServerStatus(BackendAdapter.STATUS_RUNNING);
+				ba.updateServerStatus(CoordinatorBackendAdapter.STATUS_RUNNING);
 				
 				// Sleep a bit so I can check the table contents
 				try {
@@ -234,7 +234,7 @@ public class BackendAdapterTest {
 			
 			// Remove the installed shutdown hook
 			Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
-		} catch (BackendAdapterException e) {
+		} catch (CoordinatorBackendAdapterException e) {
 			fail("The schema could not be created and dropped! "+e.toString());
 		}
 		
@@ -250,7 +250,7 @@ public class BackendAdapterTest {
 		
 		log.info("Running test update thread");
 		
-		BackendAdapter ba = createBackendAdaptorFromStore();
+		CoordinatorBackendAdapter ba = createBackendAdaptorFromStore();
 		
 		// Try to create the schema
 		try {
@@ -261,14 +261,14 @@ public class BackendAdapterTest {
 			// Sleep a bit so I can check the table contents
 			try {
 				ba.close();
-			} catch (BackendAdapterException e) {
+			} catch (CoordinatorBackendAdapterException e) {
 				fail("The close operation was interrupted! "+e.toString());
 			}
 						
 			// Remove the installed shutdown hook
 			Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
 			
-		} catch (BackendAdapterException e) {
+		} catch (CoordinatorBackendAdapterException e) {
 			fail("The schema could not be created and dropped! "+e.toString());
 		}
 	
@@ -283,12 +283,12 @@ public class BackendAdapterTest {
 	public void testGetLog () {
 		log.info("Testing the get log information" );
 		
-		BackendAdapter ba = createBackendAdaptorFromStore();
+		CoordinatorBackendAdapter ba = createBackendAdaptorFromStore();
 		
 		// Try to create the schema
 		try {
 			ba.createSchema();
-			ba.updateServerStatus(BackendAdapter.STATUS_RUNNING);
+			ba.updateServerStatus(CoordinatorBackendAdapter.STATUS_RUNNING);
 			ba.unregisterServer();
 			ba.dropSchemaLeavingLogsBehind();
 			
@@ -301,7 +301,7 @@ public class BackendAdapterTest {
 			while (itLog.hasNext()) {
 				log.info(itLog.next().toString());
 			}
-		} catch (BackendAdapterException e) {
+		} catch (CoordinatorBackendAdapterException e) {
 			fail("The schema could not be created and dropped! "+e.toString());
 		}
 	
@@ -317,12 +317,12 @@ public class BackendAdapterTest {
 	public void testGetStatuses () {
 		log.info("Testing the get log information" );
 		
-		BackendAdapter ba = createBackendAdaptorFromStore();
+		CoordinatorBackendAdapter ba = createBackendAdaptorFromStore();
 		
 		// Try to create the schema
 		try {
 			ba.createSchema();
-			ba.updateServerStatus(BackendAdapter.STATUS_RUNNING);
+			ba.updateServerStatus(CoordinatorBackendAdapter.STATUS_RUNNING);
 			
 			Collection<Map<String, String>> colLogs = ba.getStatuses();
 			assertEquals(1, colLogs.size());
@@ -335,7 +335,7 @@ public class BackendAdapterTest {
 			ba.dropSchemaLeavingLogsBehind();
 			// Remove the installed shutdown hook
 			Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
-		} catch (BackendAdapterException e) {
+		} catch (CoordinatorBackendAdapterException e) {
 			fail("The schema could not be created and dropped! "+e.toString());
 		}
 	

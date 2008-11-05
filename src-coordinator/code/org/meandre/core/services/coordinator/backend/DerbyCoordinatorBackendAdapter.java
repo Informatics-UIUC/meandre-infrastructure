@@ -16,18 +16,18 @@ import org.meandre.core.logger.KernelLoggerFactory;
  * @author Xavier Llor&agrave;
  *
  */
-public class DerbyBackendAdapter 
-extends BackendAdapter {
+public class DerbyCoordinatorBackendAdapter 
+extends CoordinatorBackendAdapter {
 	
 	/** The name of the resource file containing the query mapping */
 	static final String QUERY_MAP_FILE = "query_map_derby.xml";
 
 	/** Initialize the query map */
-	public DerbyBackendAdapter() {
+	public DerbyCoordinatorBackendAdapter() {
 		super();
 		try {
 			Properties props = new Properties();
-			props.loadFromXML(DerbyBackendAdapter.class.getResourceAsStream(QUERY_MAP_FILE));
+			props.loadFromXML(DerbyCoordinatorBackendAdapter.class.getResourceAsStream(QUERY_MAP_FILE));
 			super.propQueryMapping.putAll(props);
 		} catch (Exception e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -38,20 +38,20 @@ extends BackendAdapter {
 	
 	/** Creates the required schema if it does not exist. 
 	 * 
-	 * @throws BackendAdapterException Thrown when the connection to the back end could not be retrieved
+	 * @throws CoordinatorBackendAdapterException Thrown when the connection to the back end could not be retrieved
 	 */
 	public void createSchema() 
-	throws BackendAdapterException {
+	throws CoordinatorBackendAdapterException {
 		
 		try {
 			int iFailures = 0;
-			BackendAdapterException [] bae = new BackendAdapterException[4];
+			CoordinatorBackendAdapterException [] bae = new CoordinatorBackendAdapterException[4];
 			
 			// Create the server status table
 			try {
 				String sQueryCSST = propQueryMapping.getProperty(QUERY_CREATE_SERVER_STATUS_TABLE);
 				executeUpdateQuery(sQueryCSST);
-			} catch (BackendAdapterException e) {
+			} catch (CoordinatorBackendAdapterException e) {
 				bae[iFailures++]=e;
 			}
 			
@@ -59,7 +59,7 @@ extends BackendAdapter {
 			try {
 				String sQueryCSIT = propQueryMapping.getProperty(QUERY_CREATE_SERVER_INFO_TABLE);
 				executeUpdateQuery(sQueryCSIT);
-			} catch (BackendAdapterException e) {
+			} catch (CoordinatorBackendAdapterException e) {
 				bae[iFailures++]=e;
 			}
 
@@ -67,7 +67,7 @@ extends BackendAdapter {
 			try {
 				String sQueryCSPT = propQueryMapping.getProperty(QUERY_CREATE_SERVER_PROPERTIES_TABLE);
 				executeUpdateQuery(sQueryCSPT);
-			} catch (BackendAdapterException e) {
+			} catch (CoordinatorBackendAdapterException e) {
 				bae[iFailures++]=e;
 			}
 			
@@ -75,7 +75,7 @@ extends BackendAdapter {
 			try {
 				String sQueryCSLT = propQueryMapping.getProperty(QUERY_CREATE_SERVER_LOG_TABLE);
 				executeUpdateQuery(sQueryCSLT);
-			} catch (BackendAdapterException e) {
+			} catch (CoordinatorBackendAdapterException e) {
 				bae[iFailures++]=e;
 			}
 			
@@ -94,7 +94,7 @@ extends BackendAdapter {
 					// Commit the transaction
 					if ( bTransactional ) conn.commit();
 				}
-				catch ( BackendAdapterException e ) {
+				catch ( CoordinatorBackendAdapterException e ) {
 					// Roll it back
 					if ( bTransactional ) conn.rollback();
 					log.warning(getName()+" found that default properties are already defined. Skipping adding them again");
@@ -107,7 +107,7 @@ extends BackendAdapter {
 				for ( int i=0 ; i<iFailures ; i++ )
 					bae[i].printStackTrace(new PrintStream(baos));
 				log.severe("Rollback operation failed! "+baos.toString());
-				for ( BackendAdapterException e:bae )
+				for ( CoordinatorBackendAdapterException e:bae )
 					throw e;
 			}
 			
@@ -116,7 +116,7 @@ extends BackendAdapter {
 			e.printStackTrace(new PrintStream(baos));
 			log.severe("Commit operation failed! "+baos.toString());
 		}
-		catch ( BackendAdapterException bae ) {
+		catch ( CoordinatorBackendAdapterException bae ) {
 			try {
 				// Roll it back
 				if ( bTransactional ) conn.rollback();

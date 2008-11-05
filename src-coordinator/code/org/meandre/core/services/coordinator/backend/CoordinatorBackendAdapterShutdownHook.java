@@ -15,11 +15,11 @@ import org.meandre.core.services.coordinator.logger.CoordinatorLoggerFactory;
  * @author Xavier Llor&agrave;
  *
  */
-public class BackendAdapterShutdownHook 
+public class CoordinatorBackendAdapterShutdownHook 
 extends Thread {
 
 	/** The backend adapter assocciated to the shutdown hook */
-	private BackendAdapter ba = null;
+	private CoordinatorBackendAdapter ba = null;
 	
 	/** The logger to use */
 	private Logger log = CoordinatorLoggerFactory.getCoordinatorLogger();
@@ -28,7 +28,7 @@ extends Thread {
 	 * 
 	 * @param ba The backend adapter to clean
 	 */
-	public BackendAdapterShutdownHook ( BackendAdapter ba ) {
+	public CoordinatorBackendAdapterShutdownHook ( CoordinatorBackendAdapter ba ) {
 		this.ba = ba;
 	}
 	
@@ -41,7 +41,7 @@ extends Thread {
 				ba.close();
 				log.info("Shutdown hook for "+ba.getName()+" exiting");
 			}
-		} catch (BackendAdapterException e) {
+		} catch (CoordinatorBackendAdapterException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
 			KernelLoggerFactory.getCoreLogger().warning(baos.toString());

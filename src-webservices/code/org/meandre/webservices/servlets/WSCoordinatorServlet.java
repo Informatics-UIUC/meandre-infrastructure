@@ -4,7 +4,7 @@
 package org.meandre.webservices.servlets;
 
 import org.meandre.configuration.CoreConfiguration;
-import org.meandre.core.services.coordinator.backend.BackendAdapter;
+import org.meandre.core.services.coordinator.backend.CoordinatorBackendAdapter;
 import org.meandre.core.store.Store;
 
 /** Provides the servlet that serves Execute requests.
@@ -23,7 +23,7 @@ public class WSCoordinatorServlet extends MeandreBaseServlet {
 	 * @param cnf The Meandre configuration to use
 	 * @param baToStore 
 	 */
-	public WSCoordinatorServlet(Store store, CoreConfiguration cnf, BackendAdapter baToStore) {
+	public WSCoordinatorServlet(Store store, CoreConfiguration cnf, CoordinatorBackendAdapter baToStore) {
 		super(store, cnf);
 		this.backendAdaptor = baToStore;
 	}

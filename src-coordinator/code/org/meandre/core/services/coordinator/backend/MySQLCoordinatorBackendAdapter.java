@@ -16,18 +16,18 @@ import org.meandre.core.logger.KernelLoggerFactory;
  * @author Xavier Llor&agrave;
  *
  */
-public class MySQLBackendAdapter 
-extends BackendAdapter {
+public class MySQLCoordinatorBackendAdapter 
+extends CoordinatorBackendAdapter {
 	
 	/** The name of the resource file containing the query mapping */
 	static final String QUERY_MAP_FILE = "query_map_mysql.xml";
 
 	/** Initialize the query map */
-	public MySQLBackendAdapter() {
+	public MySQLCoordinatorBackendAdapter() {
 		super();
 		try {
 			Properties props = new Properties();
-			props.loadFromXML(DerbyBackendAdapter.class.getResourceAsStream(QUERY_MAP_FILE));
+			props.loadFromXML(DerbyCoordinatorBackendAdapter.class.getResourceAsStream(QUERY_MAP_FILE));
 			super.propQueryMapping.putAll(props);
 		} catch (Exception e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -38,10 +38,10 @@ extends BackendAdapter {
 
 	/** Creates the required schema if it does not exist. 
 	 * 
-	 * @throws BackendAdapterException Thrown when the connection to the back end could not be retrieved
+	 * @throws CoordinatorBackendAdapterException Thrown when the connection to the back end could not be retrieved
 	 */
 	public void createSchema() 
-	throws BackendAdapterException {
+	throws CoordinatorBackendAdapterException {
 		
 		try {
 			// Create the server status table
@@ -73,7 +73,7 @@ extends BackendAdapter {
 				// Commit the transaction
 				if ( bTransactional ) conn.commit();
 			}
-			catch ( BackendAdapterException bae ) {
+			catch ( CoordinatorBackendAdapterException bae ) {
 				// Roll it back
 				if ( bTransactional ) conn.rollback();
 				log.warning(getName()+" found that default properties are already defined. Skipping adding them again");
@@ -86,7 +86,7 @@ extends BackendAdapter {
 			e.printStackTrace(new PrintStream(baos));
 			log.severe("Commit operation failed! "+baos.toString());
 		}
-		catch ( BackendAdapterException bae ) {
+		catch ( CoordinatorBackendAdapterException bae ) {
 			try {
 				// Roll it back
 				if ( bTransactional ) conn.rollback();

@@ -30,7 +30,7 @@ import org.meandre.core.utils.NetworkTools;
  * @author Xavier Llor&agrave;
  *
  */
-public abstract class BackendAdapter 
+public abstract class CoordinatorBackendAdapter 
 extends Thread {
 
 	/** The heartbeat update rate */
@@ -159,7 +159,7 @@ extends Thread {
 	private String sDesc = null;
 
 	/** The shutdown hook */
-	private static Hashtable<BackendAdapter,BackendAdapterShutdownHook> beashMap = new Hashtable<BackendAdapter,BackendAdapterShutdownHook>();
+	private static Hashtable<CoordinatorBackendAdapter,CoordinatorBackendAdapterShutdownHook> beashMap = new Hashtable<CoordinatorBackendAdapter,CoordinatorBackendAdapterShutdownHook>();
 
 	/** The flag that controls the finalization of the thread process. */
 	private boolean bNotDone = true;
@@ -183,12 +183,12 @@ extends Thread {
 	private boolean bRunning;
 	
 	/** Initialize the query map */
-	public BackendAdapter() {
+	public CoordinatorBackendAdapter() {
 		
 		log = CoordinatorLoggerFactory.getCoordinatorLogger();
 		
 		try {
-			propQueryMapping.loadFromXML(DerbyBackendAdapter.class.getResourceAsStream(COMMON_MAP_FILE));
+			propQueryMapping.loadFromXML(DerbyCoordinatorBackendAdapter.class.getResourceAsStream(COMMON_MAP_FILE));
 		} catch (Exception e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
@@ -226,7 +226,7 @@ extends Thread {
 		
 		// Add the shutdown hook
 		if ( beashMap.get(this)==null ) {
-			BackendAdapterShutdownHook beash = new BackendAdapterShutdownHook(this);
+			CoordinatorBackendAdapterShutdownHook beash = new CoordinatorBackendAdapterShutdownHook(this);
 			beashMap.put(this, beash);
 			Runtime.getRuntime().addShutdownHook(beash);
 			log.info(getName()+" registered shutdown hook");
@@ -238,28 +238,28 @@ extends Thread {
 	 * 
 	 * @return The back end adapter shutdown hook
 	 */
-	public BackendAdapterShutdownHook getShutdownHook() {
+	public CoordinatorBackendAdapterShutdownHook getShutdownHook() {
 		return beashMap.get(this);
 	}
 	
 	/** Creates the required schema if it does not exist. 
 	 * 
-	 * @throws BackendAdapterException Thrown when the connection to the back end could not be retrieved
+	 * @throws CoordinatorBackendAdapterException Thrown when the connection to the back end could not be retrieved
 	 */
-	public abstract void createSchema() throws BackendAdapterException ;
+	public abstract void createSchema() throws CoordinatorBackendAdapterException ;
 	
 	/** Deletes the tables created after the schema.
 	 * 
-	 * @throws BackendAdapterException The tables in the schema could not be dropped
+	 * @throws CoordinatorBackendAdapterException The tables in the schema could not be dropped
 	 */
-	public void dropSchema () throws BackendAdapterException {
+	public void dropSchema () throws CoordinatorBackendAdapterException {
 
 		try {
 			// Drop the server status and info table
 			try {
 				dropSchemaLeavingLogsBehind();
 			}
-			catch (BackendAdapterException bae) {
+			catch (CoordinatorBackendAdapterException bae) {
 				log.warning("Schema partially dropped!");
 			}
 			
@@ -277,7 +277,7 @@ extends Thread {
 			e.printStackTrace(new PrintStream(baos));
 			log.severe("Commit operation failed! "+baos.toString());
 		}
-		catch ( BackendAdapterException bae ) {
+		catch ( CoordinatorBackendAdapterException bae ) {
 			try {
 				// Roll it back
 				if ( bTransactional ) conn.rollback();
@@ -294,9 +294,9 @@ extends Thread {
 	/** Deletes the tables created after the schema except the login tables so they 
 	 * can be used for diagnostics.
 	 * 
-	 * @throws BackendAdapterException The tables in the schema could not be dropped
+	 * @throws CoordinatorBackendAdapterException The tables in the schema could not be dropped
 	 */
-	public void dropSchemaLeavingLogsBehind () throws BackendAdapterException {
+	public void dropSchemaLeavingLogsBehind () throws CoordinatorBackendAdapterException {
 
 		try {
 			// Drop the server status table
@@ -321,7 +321,7 @@ extends Thread {
 			e.printStackTrace(new PrintStream(baos));
 			log.severe("Commit operation failed! "+baos.toString());
 		}
-		catch ( BackendAdapterException bae ) {
+		catch ( CoordinatorBackendAdapterException bae ) {
 			try {
 				// Roll it back
 				if ( bTransactional ) conn.rollback();
@@ -337,9 +337,9 @@ extends Thread {
 
 	/** Loads the server propoerties the server to the backend store
 	 * 
-	 * @throws BackendAdapterException The server properties could not be retrieved
+	 * @throws CoordinatorBackendAdapterException The server properties could not be retrieved
 	 */
-	private void updateServerPropertiesUncommited() throws BackendAdapterException {
+	private void updateServerPropertiesUncommited() throws CoordinatorBackendAdapterException {
 		
 		try {
 			String sQuery = propQueryMapping.getProperty(QUERY_GET_SERVER_PROPERTIES);
@@ -363,9 +363,9 @@ extends Thread {
 	/** Registers the server to the backend store
 	 * 
 	 * @param bCreate Create the entry if needed, update otherwise
-	 * @throws BackendAdapterException The server could not be registered
+	 * @throws CoordinatorBackendAdapterException The server could not be registered
 	 */
-	public void registerServer ( boolean bCreate ) throws BackendAdapterException {
+	public void registerServer ( boolean bCreate ) throws CoordinatorBackendAdapterException {
 		
 		try {	
 			// Log the status to dirty if status was left behind
@@ -387,7 +387,7 @@ extends Thread {
 			e.printStackTrace(new PrintStream(baos));
 			log.severe("Commit operation failed! "+baos.toString());
 		}
-		catch ( BackendAdapterException bae ) {
+		catch ( CoordinatorBackendAdapterException bae ) {
 			try {
 				// Roll it back
 				if ( bTransactional ) conn.rollback();
@@ -404,9 +404,9 @@ extends Thread {
 	/** Update the server status to the backend store
 	 * 
 	 * @param sStatus The status value to update
-	 * @throws BackendAdapterException The server could not be registered
+	 * @throws CoordinatorBackendAdapterException The server could not be registered
 	 */
-	public void updateServerStatus( String sStatus ) throws BackendAdapterException {
+	public void updateServerStatus( String sStatus ) throws CoordinatorBackendAdapterException {
 		try {
 			// Update the server status
 			String sQueryUCSS = propQueryMapping.getProperty(QUERY_UPDATE_SERVER_STATUS);
@@ -438,7 +438,7 @@ extends Thread {
 			e.printStackTrace(new PrintStream(baos));
 			log.severe("Commit operation failed! "+baos.toString());
 		}
-		catch ( BackendAdapterException bae ) {
+		catch ( CoordinatorBackendAdapterException bae ) {
 			try {
 				// Roll it back
 				if ( bTransactional ) conn.rollback();
@@ -453,9 +453,9 @@ extends Thread {
 
 	/** Update the server status to the backend store
 	 *
-	 * @throws BackendAdapterException The server could not be registered
+	 * @throws CoordinatorBackendAdapterException The server could not be registered
 	 */
-	public void updateServerInfo() throws BackendAdapterException {
+	public void updateServerInfo() throws CoordinatorBackendAdapterException {
 		try {
 			// Update the server status
 			Runtime rt = Runtime.getRuntime();
@@ -511,7 +511,7 @@ extends Thread {
 			e.printStackTrace(new PrintStream(baos));
 			log.severe("Commit operation failed! "+baos.toString());
 		}
-		catch ( BackendAdapterException bae ) {
+		catch ( CoordinatorBackendAdapterException bae ) {
 			try {
 				// Roll it back
 				if ( bTransactional ) conn.rollback();
@@ -527,10 +527,10 @@ extends Thread {
 	/** Update the server status to the backend store
 	 * 
 	 * @param sStatus The status value to update
-	 * @throws BackendAdapterException The server could not be registered
+	 * @throws CoordinatorBackendAdapterException The server could not be registered
 	 */
 	protected void updateDirtyServerStatusUncommitedTransaction( String sServerID, String sStatus ) 
-	throws BackendAdapterException {
+	throws CoordinatorBackendAdapterException {
 		// Update the server status
 		String sQueryUCSS = propQueryMapping.getProperty(QUERY_UPDATE_SERVER_STATUS_FAILURE);
 		long lTimestamp = System.currentTimeMillis();
@@ -569,9 +569,9 @@ extends Thread {
 
 	/** Unregisters the server from the backend store
 	 * 
-	 * @throws BackendAdapterException The server could not be unregistered
+	 * @throws CoordinatorBackendAdapterException The server could not be unregistered
 	 */
-	public void unregisterServer() throws BackendAdapterException {
+	public void unregisterServer() throws CoordinatorBackendAdapterException {
 		try {
 			unregisterServerUncommited(sServerID,STATUS_UNREGISTERED);
 			
@@ -585,7 +585,7 @@ extends Thread {
 			e.printStackTrace(new PrintStream(baos));
 			log.severe("Commit operation failed! "+baos.toString());
 		}
-		catch ( BackendAdapterException bae ) {
+		catch ( CoordinatorBackendAdapterException bae ) {
 			try {
 				// Roll it back
 				if ( bTransactional ) conn.rollback();
@@ -600,9 +600,9 @@ extends Thread {
 	
 	/** Unregisters the server from the backend store
 	 * 
-	 * @throws BackendAdapterException The server could not be unregistered
+	 * @throws CoordinatorBackendAdapterException The server could not be unregistered
 	 */
-	protected void unregisterServerUncommited( String sID, String sStatus ) throws BackendAdapterException {
+	protected void unregisterServerUncommited( String sID, String sStatus ) throws CoordinatorBackendAdapterException {
 					
 		// Get server ID
 		Object [] oaValues = {
@@ -631,9 +631,9 @@ extends Thread {
 	 * 
 	 * @param sID The server ID
 	 * @param sStatus The status to log
-	 * @throws BackendAdapterException The server could not be unregistered
+	 * @throws CoordinatorBackendAdapterException The server could not be unregistered
 	 */
-	protected void logServerStatusEventUncommited( String sID, String sStatus ) throws BackendAdapterException {
+	protected void logServerStatusEventUncommited( String sID, String sStatus ) throws CoordinatorBackendAdapterException {
 		
 		String sQueryUCSS = propQueryMapping.getProperty(QUERY_UPDATE_SERVER_STATUS);
 		long lTimestamp = System.currentTimeMillis();
@@ -658,17 +658,17 @@ extends Thread {
 	/** Runs and update query against the backend.
 	 * 
 	 * @param sQuery The query to run the update
-	 * @throws BackendAdapterException Thrown when there was a problem with the backend running the update
+	 * @throws CoordinatorBackendAdapterException Thrown when there was a problem with the backend running the update
 	 */
 	protected void executeUpdateQuery(String sQuery)
-	throws BackendAdapterException {
+	throws CoordinatorBackendAdapterException {
 		
 		// Run the update
 		try {
 			Statement stm = conn.createStatement();
 			stm.executeUpdate(sQuery);
 		} catch (SQLException e) {
-			throw new BackendAdapterException(e);
+			throw new CoordinatorBackendAdapterException(e);
 		}
 	}
 	
@@ -676,10 +676,10 @@ extends Thread {
 	 * 
 	 * @param sQuery The query to run
 	 * @param oaValues The values to use for the update
-	 * @throws BackendAdapterException Something when wrong running the update
+	 * @throws CoordinatorBackendAdapterException Something when wrong running the update
 	 */
 	private int executeUpdateQueryWithParams(String sQuery, Object[] oaValues ) 
-	throws BackendAdapterException {
+	throws CoordinatorBackendAdapterException {
 		
 		// Run the update
 		try {
@@ -688,7 +688,7 @@ extends Thread {
 				pstm.setObject(i, oaValues[i-1]);
 			return pstm.executeUpdate();
 		} catch (SQLException e) {
-			throw new BackendAdapterException(e);
+			throw new CoordinatorBackendAdapterException(e);
 		}
 	}
 
@@ -696,9 +696,9 @@ extends Thread {
 	 * 
 	 * @param sQuery The query to run
 	 * @return The resulting list of lists of text
-	 * @throws BackendAdapterException Something when wrong running the select
+	 * @throws CoordinatorBackendAdapterException Something when wrong running the select
 	 */
-	private List<List<String>> selectTextColumns (String sQuery ) throws BackendAdapterException {
+	private List<List<String>> selectTextColumns (String sQuery ) throws CoordinatorBackendAdapterException {
 		List<List<String>> lstRes = new LinkedList<List<String>>();
 		try {
 			Statement pstm = conn.createStatement();
@@ -714,7 +714,7 @@ extends Thread {
 			}
 			rs.close();
 		} catch (SQLException e) {
-			throw new BackendAdapterException(e);
+			throw new CoordinatorBackendAdapterException(e);
 		}
 		return lstRes;
 	}
@@ -724,9 +724,9 @@ extends Thread {
 	 * @param sQuery The query to run
 	 * @param iLimit The maxim number of entries returned (0 or negative to return all)
 	 * @return The resulting list of lists of text with the column name
-	 * @throws BackendAdapterException Something when wrong running the select
+	 * @throws CoordinatorBackendAdapterException Something when wrong running the select
 	 */
-	private List<Map<String,String>> selectTextColumnsWithName (String sQuery, int iLimit ) throws BackendAdapterException {
+	private List<Map<String,String>> selectTextColumnsWithName (String sQuery, int iLimit ) throws CoordinatorBackendAdapterException {
 		List<Map<String,String>> lstRes = new LinkedList<Map<String,String>>();
 		try {
 			Statement pstm = conn.createStatement();
@@ -747,7 +747,7 @@ extends Thread {
 			}
 			rs.close();
 		} catch (SQLException e) {
-			throw new BackendAdapterException(e);
+			throw new CoordinatorBackendAdapterException(e);
 		}
 		return lstRes;
 	}
@@ -757,10 +757,10 @@ extends Thread {
 	 * @param sQuery The query to run
 	 * @param oaValues The values to use for the query
 	 * @return The resulting list of lists of text
-	 * @throws BackendAdapterException Something when wrong running the select
+	 * @throws CoordinatorBackendAdapterException Something when wrong running the select
 	 */
 	private List<List<String>> selectTextColumns (String sQuery, Object [] oaValues) 
-	throws BackendAdapterException {
+	throws CoordinatorBackendAdapterException {
 		List<List<String>> lstRes = new LinkedList<List<String>>();
 		try {
 			PreparedStatement pstm = conn.prepareStatement(sQuery);
@@ -778,7 +778,7 @@ extends Thread {
 			}
 			rs.close();
 		} catch (SQLException e) {
-			throw new BackendAdapterException(e);
+			throw new CoordinatorBackendAdapterException(e);
 		}
 		return lstRes;
 	}
@@ -829,11 +829,11 @@ extends Thread {
 	/** This methos is only provided to the shutdown hook to allow it
 	 * to properly close the connection to the backend storage system.
 	 * 
-	 * @throws BackendAdapterException The connection could not be properly closed
+	 * @throws CoordinatorBackendAdapterException The connection could not be properly closed
 	 * 
 	 */
 	public void close() 
-	throws BackendAdapterException {
+	throws CoordinatorBackendAdapterException {
 		try {
 			this.bNotDone = false;
 			// Allow the backend adapter to stop
@@ -847,7 +847,7 @@ extends Thread {
 			conn.close();
 			log.info(sServerID+" shutdown");
 		} catch (SQLException e) {
-			throw new BackendAdapterException(e);
+			throw new CoordinatorBackendAdapterException(e);
 		}
 	}
 	
@@ -865,7 +865,7 @@ extends Thread {
 				try {
 					updateServerPropertiesUncommited();
 					updateServerStatus(STATUS_RUNNING);
-				} catch (BackendAdapterException e) {
+				} catch (CoordinatorBackendAdapterException e) {
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
 					e.printStackTrace(new PrintStream(baos));
 					log.warning(sServerID+" deamon thread could not update its status. "+baos.toString());
@@ -901,7 +901,7 @@ extends Thread {
 						e.printStackTrace(new PrintStream(baos));
 						log.severe(sServerID+" Commit operation failed! "+baos.toString());
 					}
-					catch ( BackendAdapterException bae ) {
+					catch ( CoordinatorBackendAdapterException bae ) {
 						try {
 							// Roll it back
 							if ( bTransactional ) conn.rollback();
@@ -946,9 +946,9 @@ extends Thread {
 	/** Returns the collections of entries in the log.
 	 * 
 	 * @return The collection of entries
-	 * @throws BackendAdapterException Failed to retrieve the logs
+	 * @throws CoordinatorBackendAdapterException Failed to retrieve the logs
 	 */
-	public Collection<Map<String,String>> getLogs () throws BackendAdapterException {
+	public Collection<Map<String,String>> getLogs () throws CoordinatorBackendAdapterException {
 		return getLogs(0);
 	}
 	
@@ -956,36 +956,36 @@ extends Thread {
 	 * 
 	 * @param iLimit The number of top entries to return
 	 * @return The collection of entries
-	 * @throws BackendAdapterException Failed to retrieve the logs
+	 * @throws CoordinatorBackendAdapterException Failed to retrieve the logs
 	 */
-	public Collection<Map<String,String>> getLogs (int iLimit) throws BackendAdapterException {
+	public Collection<Map<String,String>> getLogs (int iLimit) throws CoordinatorBackendAdapterException {
 		return selectTextColumnsWithName(propQueryMapping.getProperty(QUERY_GET_CLUSTER_LOG),iLimit);
 	}
 	
 	/** Returns the collections of entries in the status table.
 	 * 
 	 * @return The collection of entries
-	 * @throws BackendAdapterException Failed to retrieve the logs
+	 * @throws CoordinatorBackendAdapterException Failed to retrieve the logs
 	 */
-	public Collection<Map<String,String>> getStatuses () throws BackendAdapterException {
+	public Collection<Map<String,String>> getStatuses () throws CoordinatorBackendAdapterException {
 		return selectTextColumnsWithName(propQueryMapping.getProperty(QUERY_GET_CLUSTER_STATUS),0);
 	}
 	
 	/** Returns the collections of entries in the info table.
 	 * 
 	 * @return The collection of entries
-	 * @throws BackendAdapterException Failed to retrieve the logs
+	 * @throws CoordinatorBackendAdapterException Failed to retrieve the logs
 	 */
-	public Collection<Map<String,String>> getInfos () throws BackendAdapterException {
+	public Collection<Map<String,String>> getInfos () throws CoordinatorBackendAdapterException {
 		return selectTextColumnsWithName(propQueryMapping.getProperty(QUERY_GET_CLUSTER_INFOS),0);
 	}
 	
 	/** Returns the collections of entries in the info table.
 	 * 
 	 * @return The collection of entries
-	 * @throws BackendAdapterException Failed to retrieve the logs
+	 * @throws CoordinatorBackendAdapterException Failed to retrieve the logs
 	 */
-	public Properties getServerProperties () throws BackendAdapterException {
+	public Properties getServerProperties () throws CoordinatorBackendAdapterException {
 		Properties prop = new Properties();
 		Iterator<List<String>> iter = selectTextColumns(propQueryMapping.getProperty(QUERY_GET_SERVER_PROPERTIES)).iterator();
 		while (iter.hasNext()) {

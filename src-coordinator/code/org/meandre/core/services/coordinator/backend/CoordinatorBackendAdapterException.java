@@ -8,7 +8,7 @@ package org.meandre.core.services.coordinator.backend;
  * @author Xavier Llor&agrave;
  *
  */
-public class BackendAdapterException extends Exception {
+public class CoordinatorBackendAdapterException extends Exception {
 
 	/** A default serial ID */
 	private static final long serialVersionUID = 1L;
@@ -16,7 +16,7 @@ public class BackendAdapterException extends Exception {
 	/** Create an empty exception.
 	 * 
 	 */
-	public BackendAdapterException() {
+	public CoordinatorBackendAdapterException() {
 		super();
 	}
 
@@ -24,7 +24,7 @@ public class BackendAdapterException extends Exception {
 	 * 
 	 * @param sMsg The message
 	 */
-	public BackendAdapterException(String sMsg) {
+	public CoordinatorBackendAdapterException(String sMsg) {
 		super(sMsg);
 	}
 
@@ -32,7 +32,7 @@ public class BackendAdapterException extends Exception {
 	 * 
 	 * @param tObj The throwable object
 	 */
-	public BackendAdapterException(Throwable tObj) {
+	public CoordinatorBackendAdapterException(Throwable tObj) {
 		super(tObj);
 	}
 
@@ -41,7 +41,7 @@ public class BackendAdapterException extends Exception {
 	 * @param sMsg The message
 	 * @param tObj The throwable object
 	 */
-	public BackendAdapterException(String sMsg, Throwable tObj) {
+	public CoordinatorBackendAdapterException(String sMsg, Throwable tObj) {
 		super(sMsg, tObj);
 	}
 

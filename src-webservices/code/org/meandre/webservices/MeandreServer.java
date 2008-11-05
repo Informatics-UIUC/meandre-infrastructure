@@ -22,8 +22,8 @@ import javax.servlet.Servlet;
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.security.Role;
 import org.meandre.core.services.coordinator.CoordinatorServiceCallBack;
-import org.meandre.core.services.coordinator.backend.BackendAdapter;
-import org.meandre.core.services.coordinator.backend.BackendAdapterException;
+import org.meandre.core.services.coordinator.backend.CoordinatorBackendAdapter;
+import org.meandre.core.services.coordinator.backend.CoordinatorBackendAdapterException;
 import org.meandre.core.store.Store;
 import org.meandre.core.utils.Constants;
 import org.meandre.core.utils.FileUtil;
@@ -90,7 +90,7 @@ public class MeandreServer {
 	private Server server;
 
 	/** The backend adapter linked to this server */
-	private BackendAdapter baToStore = null;
+	private CoordinatorBackendAdapter baToStore = null;
 	
 	/** Should the server be stoped? */
 	private boolean bStop = false;
@@ -374,8 +374,8 @@ public class MeandreServer {
 	private void registerAndFireBackendAdapter() {
 		// Instantiate the adaptor
 		try {
-			baToStore = (BackendAdapter) Class.forName(
-					"org.meandre.core.services.coordinator.backend."+store.getDatabaseFlavor()+"BackendAdapter"
+			baToStore = (CoordinatorBackendAdapter) Class.forName(
+					"org.meandre.core.services.coordinator.backend."+store.getDatabaseFlavor()+"CoordinatorBackendAdapter"
 				).newInstance();
 			
 			// Link it to a store
@@ -429,7 +429,7 @@ public class MeandreServer {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
 			log.severe("Unknow required back end adapter for flavor "+store.getDatabaseFlavor());
-		} catch (BackendAdapterException e) {
+		} catch (CoordinatorBackendAdapterException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
 			log.severe("Backend adaptor could not create the default schema for the "+store.getDatabaseFlavor()+" backend flavor");
