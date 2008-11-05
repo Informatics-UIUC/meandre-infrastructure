@@ -20,14 +20,14 @@ public class MySQLCoordinatorBackendAdapter
 extends CoordinatorBackendAdapter {
 	
 	/** The name of the resource file containing the query mapping */
-	static final String QUERY_MAP_FILE = "query_map_mysql.xml";
+	static final String QUERY_MAP_FILE = "coordinator_query_map_mysql.xml";
 
 	/** Initialize the query map */
 	public MySQLCoordinatorBackendAdapter() {
 		super();
 		try {
 			Properties props = new Properties();
-			props.loadFromXML(DerbyCoordinatorBackendAdapter.class.getResourceAsStream(QUERY_MAP_FILE));
+			props.loadFromXML(MySQLCoordinatorBackendAdapter.class.getResourceAsStream(QUERY_MAP_FILE));
 			super.propQueryMapping.putAll(props);
 		} catch (Exception e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -79,7 +79,7 @@ extends CoordinatorBackendAdapter {
 				log.warning(getName()+" found that default properties are already defined. Skipping adding them again");
 			}
 			
-			log.fine(sServerID+" created schema");
+			log.fine(sServerID+" created coordinator schema");
 			
 		} catch (SQLException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();

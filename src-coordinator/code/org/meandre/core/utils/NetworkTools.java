@@ -76,4 +76,13 @@ public class NetworkTools {
 		return sRes;
 	}
 	
+	/** Returns the server ID for the current server.
+	 * 
+	 * @param iPort The port where the server is running
+	 * @return The ID
+	 */
+	public static String getServerID (int iPort) {
+		return NetworkTools.getNumericIPValue()+Integer.toHexString(iPort).toUpperCase();
+	}
+	
 }

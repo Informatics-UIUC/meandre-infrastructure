@@ -20,7 +20,7 @@ public class DerbyCoordinatorBackendAdapter
 extends CoordinatorBackendAdapter {
 	
 	/** The name of the resource file containing the query mapping */
-	static final String QUERY_MAP_FILE = "query_map_derby.xml";
+	static final String QUERY_MAP_FILE = "coordinator_query_map_derby.xml";
 
 	/** Initialize the query map */
 	public DerbyCoordinatorBackendAdapter() {
@@ -100,7 +100,7 @@ extends CoordinatorBackendAdapter {
 					log.warning(getName()+" found that default properties are already defined. Skipping adding them again");
 				}
 				
-				log.fine(sServerID+" created schema");
+				log.fine(sServerID+" created coordinator schema");
 			}
 			else if  ( iFailures<4 ) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();

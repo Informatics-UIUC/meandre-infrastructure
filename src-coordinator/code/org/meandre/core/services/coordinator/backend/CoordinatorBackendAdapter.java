@@ -6,26 +6,24 @@ package org.meandre.core.services.coordinator.backend;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.services.coordinator.CoordinatorServiceCallBack;
 import org.meandre.core.services.coordinator.logger.CoordinatorLoggerFactory;
+import org.meandre.core.services.coordinator.tools.DatabaseBackendAdapterException;
+import org.meandre.core.services.coordinator.tools.DatabaseTools;
 import org.meandre.core.utils.NetworkTools;
 
-/** The base class for the backend adapters.
+/** The base class for the Coordinator backend adapter.
  * 
  * @author Xavier Llor&agrave;
  *
@@ -54,14 +52,14 @@ extends Thread {
 	/** The server was assumed shutdown */
 	public static final String STATUS_DIRTY_SHUTDOWN = "D";
 
-	/** The database flavour property name */
+	/** The database flavor property name */
 	public final static String DB = "DB";
 	
 	/** The marker used for the queries */
 	public final static String MARKER = "MARKER";
 
 	/** The common query map file */
-	static final String COMMON_MAP_FILE = "query_map_common.xml";
+	static final String COMMON_MAP_FILE = "coordinator_query_map_common.xml";
 
 	/** The porperty map containing the mapping */
 	protected final Properties propQueryMapping = new Properties();
@@ -188,11 +186,11 @@ extends Thread {
 		log = CoordinatorLoggerFactory.getCoordinatorLogger();
 		
 		try {
-			propQueryMapping.loadFromXML(DerbyCoordinatorBackendAdapter.class.getResourceAsStream(COMMON_MAP_FILE));
+			propQueryMapping.loadFromXML(CoordinatorBackendAdapter.class.getResourceAsStream(COMMON_MAP_FILE));
 		} catch (Exception e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
-			KernelLoggerFactory.getCoreLogger().severe("Derby query map missing! "+baos.toString());
+			log.severe("Derby query map missing! "+baos.toString());
 		}
 	}
 	
@@ -209,14 +207,14 @@ extends Thread {
 			this.conn = conn;
 			this.bTransactional = !conn.getAutoCommit();
 			this.iPort = iPort;
-			this.sServerID = NetworkTools.getNumericIPValue()+Integer.toHexString(iPort).toUpperCase();
+			this.sServerID = NetworkTools.getServerID(iPort);
 			this.sDesc = aspcb.getDescription();
 			this.aspcbCallBack = aspcb;
 
 			// Set the thread name
 			super.setName("MCT:"+sServerID);
 			
-			log.info(sServerID+" linked to "+sDesc);
+			log.info(sServerID+" linked to coordinator backend adapter "+sDesc);
 			
 		} catch (Exception e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -662,12 +660,10 @@ extends Thread {
 	 */
 	protected void executeUpdateQuery(String sQuery)
 	throws CoordinatorBackendAdapterException {
-		
 		// Run the update
 		try {
-			Statement stm = conn.createStatement();
-			stm.executeUpdate(sQuery);
-		} catch (SQLException e) {
+			DatabaseTools.executeUpdateQuery(conn, sQuery);
+		} catch (DatabaseBackendAdapterException e) {
 			throw new CoordinatorBackendAdapterException(e);
 		}
 	}
@@ -683,11 +679,8 @@ extends Thread {
 		
 		// Run the update
 		try {
-			PreparedStatement pstm = conn.prepareStatement(sQuery);
-			for ( int i=1,iMax=oaValues.length ; i<=iMax ; i++ )
-				pstm.setObject(i, oaValues[i-1]);
-			return pstm.executeUpdate();
-		} catch (SQLException e) {
+			return DatabaseTools.executeUpdateQueryWithParams(conn, sQuery, oaValues);
+		} catch (DatabaseBackendAdapterException e) {
 			throw new CoordinatorBackendAdapterException(e);
 		}
 	}
@@ -699,24 +692,11 @@ extends Thread {
 	 * @throws CoordinatorBackendAdapterException Something when wrong running the select
 	 */
 	private List<List<String>> selectTextColumns (String sQuery ) throws CoordinatorBackendAdapterException {
-		List<List<String>> lstRes = new LinkedList<List<String>>();
 		try {
-			Statement pstm = conn.createStatement();
-			ResultSet rs = pstm.executeQuery(sQuery);
-			int iColCount = rs.getMetaData().getColumnCount();
-			
-			while(rs.next()) {
-				List<String> lstRow = new LinkedList<String>();
-				for( int j=1 ; j<=iColCount ; j++) { 
-					lstRow.add(rs.getString(j));
-				}
-				lstRes.add(lstRow);
-			}
-			rs.close();
-		} catch (SQLException e) {
+			return DatabaseTools.selectTextColumns(conn, sQuery);
+		} catch (DatabaseBackendAdapterException e) {
 			throw new CoordinatorBackendAdapterException(e);
 		}
-		return lstRes;
 	}
 
 	/** Return a list of list with the results of select query in text form.
@@ -727,29 +707,11 @@ extends Thread {
 	 * @throws CoordinatorBackendAdapterException Something when wrong running the select
 	 */
 	private List<Map<String,String>> selectTextColumnsWithName (String sQuery, int iLimit ) throws CoordinatorBackendAdapterException {
-		List<Map<String,String>> lstRes = new LinkedList<Map<String,String>>();
 		try {
-			Statement pstm = conn.createStatement();
-			ResultSet rs = pstm.executeQuery(sQuery);
-			ResultSetMetaData rsMD = rs.getMetaData();
-			int iColCount = rsMD.getColumnCount();
-			int iCnt = 0;
-			while(rs.next() && ( iLimit<=0 || iCnt<iLimit) ) {
-				Map<String,String> mapRow = new Hashtable<String,String>();
-				for( int j=1 ; j<=iColCount ; j++) { 
-					String sColumnLabel = rsMD.getColumnLabel(j).toLowerCase();
-					String sValue = rs.getString(j);
-					sValue = ( sValue==null )?"":sValue.trim();
-					mapRow.put(sColumnLabel,sValue);
-				}
-				lstRes.add(mapRow);
-				iCnt++;
-			}
-			rs.close();
-		} catch (SQLException e) {
+			return DatabaseTools.selectTextColumnsWithName(conn, sQuery, iLimit);
+		} catch (DatabaseBackendAdapterException e) {
 			throw new CoordinatorBackendAdapterException(e);
 		}
-		return lstRes;
 	}
 
 	/** Return a list of list with the results of select query in text form.
@@ -761,26 +723,11 @@ extends Thread {
 	 */
 	private List<List<String>> selectTextColumns (String sQuery, Object [] oaValues) 
 	throws CoordinatorBackendAdapterException {
-		List<List<String>> lstRes = new LinkedList<List<String>>();
 		try {
-			PreparedStatement pstm = conn.prepareStatement(sQuery);
-			for ( int i=1,iMax=oaValues.length ; i<=iMax ; i++ )
-				pstm.setObject(i, oaValues[i-1]);
-			ResultSet rs = pstm.executeQuery();
-			int iColCount = rs.getMetaData().getColumnCount();
-			
-			while(rs.next()) {
-				List<String> lstRow = new LinkedList<String>();
-				for( int j=1 ; j<=iColCount ; j++) { 
-					lstRow.add(rs.getString(j));
-				}
-				lstRes.add(lstRow);
-			}
-			rs.close();
-		} catch (SQLException e) {
+			return DatabaseTools.selectTextColumns(conn, sQuery, oaValues);
+		} catch (DatabaseBackendAdapterException e) {
 			throw new CoordinatorBackendAdapterException(e);
 		}
-		return lstRes;
 	}
 
 	

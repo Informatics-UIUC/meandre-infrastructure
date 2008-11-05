@@ -1,5 +1,9 @@
 1.4.0-vcli-alpha Sara
 
+* Started creating the base infrastructure for the service.
+
+* Refactored the coordinator backend adapter to reflect the coordinator nature of it.
+
 * Added the html auxiliar facade that allows top upload and execute a repository
 
 * Added a new execute service that accepts a post of 'repository' and runs all the flows in the 

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>	
+<comment>Generic query mapping for SQL databases</comment>
+	<entry key="DB">Derby</entry>
+	<entry key="MARKER">@@@</entry>
+	<entry key="CREATE_JOB_STATUS_TABLE">
+			FLAVOUR SPECIFIC!!!
+	</entry>
+	<entry key="CREATE_JOB_CONSOLE_TABLE">
+			FLAVOUR SPECIFIC!!!
+	</entry>
+	<entry key="CREATE_JOB_LOG_TABLE">
+			FLAVOUR SPECIFIC!!!
+	</entry>
+</properties>

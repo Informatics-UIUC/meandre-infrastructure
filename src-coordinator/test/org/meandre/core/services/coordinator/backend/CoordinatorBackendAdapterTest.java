@@ -28,7 +28,7 @@ import org.meandre.core.utils.Constants;
  * @author Xavier Llor&agrave;
  *
  */
-public class BackendAdapterTest {
+public class CoordinatorBackendAdapterTest {
 
 	/** The logger to use */
 	public final static Logger log = CoordinatorLoggerFactory.getCoordinatorLogger();
@@ -68,7 +68,7 @@ public class BackendAdapterTest {
 				Class c = Class.forName(sCN);
 				String[] sCNa = sCN.split("\\"+".");
 				String sPropFile = sCNa[sCNa.length-1].replaceAll("CoordinatorBackendAdapter", "").toLowerCase();
-				sPropFile = "query_map_"+sPropFile+".xml";
+				sPropFile = "coordinator_query_map_"+sPropFile+".xml";
 				InputStream dis = c.getResourceAsStream(sPropFile);
 				assertNotNull(dis);
 				if ( dis!=null )
