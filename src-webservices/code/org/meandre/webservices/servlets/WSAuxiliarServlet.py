@@ -8,7 +8,8 @@ requestMap = {
     'GET': { 
         'add_to_repository': 'auxiliar_add_to_repository',
         'create_user': 'auxiliar_create_user',
-        'roles_map': 'auxiliar_roles_map'
+        'roles_map': 'auxiliar_roles_map',
+        'execute_repository': 'auxiliar_execute_repository'
     }
 }
 
@@ -187,7 +188,33 @@ __add_user_form = """
             </fieldset>
         </form>
     """
-    
+
+__run_repository_form = """
+        <form enctype="multipart/form-data" method="POST" action="/services/execute/repository.txt" >
+        <fieldset>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <label for="repository">Reposiotyr:</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="file" name="repository" />
+                            </td> 
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="submit" class="submit" value="Execute" />
+                                <input type="reset" class="reset" value="Clear data" />
+                            </td>
+                        </tr>
+                    </tbody>                
+                </table>
+            </fieldset>
+        </form>
+    """
 #
 # Services implementation
 #
@@ -250,4 +277,21 @@ def auxiliar_roles_map ( request, response, format ):
             errorNotFound(response)
     else:
         errorForbidden(response)
+        
+
+def auxiliar_execute_repository ( request, response, format ):
+    '''Generates for to upload to a repository.''' 
+    if checkUserRole (request,Role.EXECUTION) :
+        if format=='html' :
+            statusOK(response)
+            contentAppHTML(response)
+            sendRawContent(response,__header)
+            sendRawContent(response,__run_repository_form)
+            sendRawContent(response,__footer)
+        else :
+            errorNotFound(response)
+    else:
+        errorForbidden(response)
+
+
     

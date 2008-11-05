@@ -1,5 +1,7 @@
 1.4.0-vcli-alpha Sara
 
+* Added the html auxiliar facade that allows top upload and execute a repository
+
 * Added a new execute service that accepts a post of 'repository' and runs all the flows in the 
   contained repository. It also tries to add missing components from the user repository if needed.
   
