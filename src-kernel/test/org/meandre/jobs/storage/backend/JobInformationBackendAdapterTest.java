@@ -3,6 +3,7 @@
  */
 package org.meandre.jobs.storage.backend;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
@@ -138,12 +139,84 @@ public class JobInformationBackendAdapterTest {
 		// Try to create the schema
 		try {
 			ba.createSchema();
-			ba.dropSchema();
+			// Drop done on the cleanup of the fixture
+			// ba.dropSchema();
 		} catch (JobInformationBackendAdapterException e) {
 			fail("The schema could not be created and dropped! "+e.toString());
 		}
 	
 		log.info("Test create and drop schema done" );
+		
+	}
+
+	/** Test the console basic IO.
+	 * 
+	 */
+	@Test
+	public void testConsosolBasicIO () {
+
+		log.info("Running test of the basic console IO" );
+		
+		JobInformationBackendAdapter ba = createBackendAdaptorFromStore();
+		
+		// Try to create the schema
+		try {
+			final int TIMES = 10;
+			ba.createSchema();
+			
+			for ( int i=0, iMax=TIMES ; i<iMax ; i++ ) {
+				ba.print("SID", "JID", "line "+i);
+				Thread.sleep(10);
+			}
+			
+			String sConsole = ba.getConsole("JID");
+			String [] sLine = sConsole.split("\n");
+			assertEquals(TIMES,sLine.length);
+			for ( int i=0, iMax=TIMES ; i<iMax ; i++ )
+				assertEquals("line "+i, sLine[i]);
+		} catch (JobInformationBackendAdapterException e) {
+			fail("The console request faileed! "+e.toString());
+		}catch (InterruptedException e) {
+			fail("Sleep interrupted");
+		}
+	
+		log.info("Test  of the basic console IO done" );
+		
+	}
+
+
+	/** Test the console log IO.
+	 * 
+	 */
+	@Test
+	public void testLogBasicIO () {
+
+		log.info("Running test of the basic log IO" );
+		
+		JobInformationBackendAdapter ba = createBackendAdaptorFromStore();
+		
+		// Try to create the schema
+		try {
+			final int TIMES = 10;
+			ba.createSchema();
+			
+			for ( int i=0, iMax=TIMES ; i<iMax ; i++ ) {
+				ba.log("SID", "JID", "TEST", "log "+i);
+				Thread.sleep(10);
+			}
+			
+			String sLog = ba.getLog("JID");
+			String [] sLine = sLog.split("\n");
+			assertEquals(TIMES,sLine.length);
+			for ( int i=0, iMax=TIMES ; i<iMax ; i++ )
+				assertEquals("TEST: log "+i, sLine[i]);
+		} catch (JobInformationBackendAdapterException e) {
+			fail("The log request faileed! "+e.toString());
+		} catch (InterruptedException e) {
+			fail("Sleep interrupted");
+		}
+	
+		log.info("Test  of the basic log IO done" );
 		
 	}
 

@@ -86,6 +86,40 @@ public class DatabaseTools {
 		}
 		return lstRes;
 	}
+	
+
+	/** Return a list of list with the results of select query in text form populating the query with the
+	 * provided parameters.
+	 * 
+	 * @param conn The connection object to use
+	 * @param sQuery The query to run
+	 * @param oaValues The parameters to set in the query
+	 * @return The resulting list of lists of text
+	 * @throws CoordinatorBackendAdapterException Something when wrong running the select
+	 */
+	public static List<List<String>> selectTextColumnsWithParams (Connection conn, String sQuery, Object [] oaValues ) 
+	throws DatabaseBackendAdapterException {
+		List<List<String>> lstRes = new LinkedList<List<String>>();
+		try {
+			PreparedStatement pstm = conn.prepareStatement(sQuery);
+			for ( int i=1,iMax=oaValues.length ; i<=iMax ; i++ )
+				pstm.setObject(i, oaValues[i-1]);
+			ResultSet rs = pstm.executeQuery();
+			int iColCount = rs.getMetaData().getColumnCount();
+			
+			while(rs.next()) {
+				List<String> lstRow = new LinkedList<String>();
+				for( int j=1 ; j<=iColCount ; j++) { 
+					lstRow.add(rs.getString(j));
+				}
+				lstRes.add(lstRow);
+			}
+			rs.close();
+		} catch (SQLException e) {
+			throw new DatabaseBackendAdapterException(e);
+		}
+		return lstRes;
+	}
 
 	/** Return a list of list with the results of select query in text form.
 	 * 

@@ -5,12 +5,34 @@
 	<entry key="DB">Derby</entry>
 	<entry key="MARKER">@@@</entry>
 	<entry key="CREATE_JOB_STATUS_TABLE">
-			FLAVOUR SPECIFIC!!!
+			CREATE TABLE meandre_job_status 
+				(server_ID CHAR(16),
+				 job_ID CHAR(32), 
+				 status CHAR(1) default 'D', 
+				 ts timestamp,
+				 PRIMARY KEY(server_ID,job_ID))
 	</entry>
 	<entry key="CREATE_JOB_CONSOLE_TABLE">
-			FLAVOUR SPECIFIC!!!
+			CREATE TABLE meandre_job_console
+				(server_ID CHAR(16),
+				 job_ID CHAR(32), 
+				 print VARCHAR(32672), 
+				 ts timestamp)
 	</entry>
 	<entry key="CREATE_JOB_LOG_TABLE">
-			FLAVOUR SPECIFIC!!!
+			CREATE TABLE meandre_job_log
+				(server_ID CHAR(16),
+				 job_ID CHAR(32), 
+				 level CHAR(32), 
+				 log VARCHAR(32672), 
+				 ts timestamp)
+	</entry>
+	<entry key="INSERT_JOB_CONSOLE">
+			INSERT INTO meandre_job_console (server_ID,job_ID,print,ts)
+				VALUES (?,?,?,CURRENT TIMESTAMP)
+	</entry>
+	<entry key="INSERT_JOB_LOG">
+			INSERT INTO meandre_job_log (server_ID,job_ID,level,log,ts)
+				VALUES (?,?,?,?,CURRENT TIMESTAMP)
 	</entry>
 </properties>

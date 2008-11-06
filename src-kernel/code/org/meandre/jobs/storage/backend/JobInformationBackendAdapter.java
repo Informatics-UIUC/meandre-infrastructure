@@ -32,7 +32,7 @@ public abstract class JobInformationBackendAdapter {
 	
 	/** The marker used for the queries */
 	public final static String PROPERTY_MARKER = "MARKER";
-	
+
 	/** Create job status query constant */
 	protected final static String QUERY_CREATE_JOB_STATUS_TABLE = "CREATE_JOB_STATUS_TABLE";
 	
@@ -42,6 +42,26 @@ public abstract class JobInformationBackendAdapter {
 	/** Create job log query constant */
 	protected final static String QUERY_CREATE_JOB_LOG_TABLE = "CREATE_JOB_LOG_TABLE";
 	
+	/** Drop job status query constant */
+	protected final static String QUERY_DROP_JOB_STATUS_TABLE = "DROP_JOB_STATUS_TABLE";
+	
+	/** Drop job console query constant */
+	protected final static String QUERY_DROP_JOB_CONSOLE_TABLE = "DROP_JOB_CONSOLE_TABLE";
+
+	/** Drop job log query constant */
+	protected final static String QUERY_DROP_JOB_LOG_TABLE = "DROP_JOB_LOG_TABLE";
+	
+	/** Insert and entry to the console */
+	protected final static String QUERY_INSERT_JOB_CONSOLE = "INSERT_JOB_CONSOLE";
+	
+	/** Insert and entry to the log */
+	protected final static String QUERY_INSERT_JOB_LOG = "INSERT_JOB_LOG";
+
+	/** Select the console for a given job */
+	protected final static String QUERY_SELECT_JOB_CONSOLE = "SELECT_JOB_CONSOLE";
+	
+	/** Selects the log for a given job */
+	protected final static String QUERY_SELECT_JOB_LOG = "SELECT_JOB_LOG";
 	
 	/** The logger to use */
 	protected Logger log = KernelLoggerFactory.getCoreLogger();
@@ -151,10 +171,28 @@ public abstract class JobInformationBackendAdapter {
 	 * @return The resulting list of lists of text
 	 * @throws CoordinatorBackendAdapterException Something when wrong running the select
 	 */
+	@SuppressWarnings("unused")
 	private List<List<String>> selectTextColumns (String sQuery ) 
 	throws JobInformationBackendAdapterException {
 		try {
 			return DatabaseTools.selectTextColumns(conn, sQuery);
+		} catch (DatabaseBackendAdapterException e) {
+			throw new JobInformationBackendAdapterException(e);
+		}
+	}
+
+
+	/** Return a list of list with the results of select query in text form.
+	 * 
+	 * @param sQuery The query to run
+	 * @param oaValues The parameters to set in the query
+	 * @return The resulting list of lists of text
+	 * @throws CoordinatorBackendAdapterException Something when wrong running the select
+	 */
+	private List<List<String>> selectTextColumnsWithParams (String sQuery, Object [] oaValues ) 
+	throws JobInformationBackendAdapterException {
+		try {
+			return DatabaseTools.selectTextColumnsWithParams(conn, sQuery,oaValues);
 		} catch (DatabaseBackendAdapterException e) {
 			throw new JobInformationBackendAdapterException(e);
 		}
@@ -167,6 +205,7 @@ public abstract class JobInformationBackendAdapter {
 	 * @return The resulting list of lists of text with the column name
 	 * @throws CoordinatorBackendAdapterException Something when wrong running the select
 	 */
+	@SuppressWarnings("unused")
 	private List<Map<String,String>> selectTextColumnsWithName (String sQuery, int iLimit ) 
 	throws JobInformationBackendAdapterException {
 		try {
@@ -183,6 +222,7 @@ public abstract class JobInformationBackendAdapter {
 	 * @return The resulting list of lists of text
 	 * @throws CoordinatorBackendAdapterException Something when wrong running the select
 	 */
+	@SuppressWarnings("unused")
 	private List<List<String>> selectTextColumns (String sQuery, Object [] oaValues) 
 	throws JobInformationBackendAdapterException {
 		try {
@@ -232,7 +272,142 @@ public abstract class JobInformationBackendAdapter {
 	 */
 	public void dropSchema() 
 	throws JobInformationBackendAdapterException {
-		// TODO Auto-generated method stub
+		try {
+			// Drop the server log table
+			String sQueryDSST = propQueryMapping.getProperty(QUERY_DROP_JOB_STATUS_TABLE);
+			executeUpdateQuery(sQueryDSST);
+			
+			String sQueryDSCT = propQueryMapping.getProperty(QUERY_DROP_JOB_CONSOLE_TABLE);
+			executeUpdateQuery(sQueryDSCT);
+			
+			String sQueryDSLT = propQueryMapping.getProperty(QUERY_DROP_JOB_LOG_TABLE);
+			executeUpdateQuery(sQueryDSLT);
+	
+			// Commit the transaction
+			if ( bTransactional ) conn.commit();
+			
+			log.fine(sServerID+" droped job information schema");
+		} catch (SQLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Commit operation failed! "+baos.toString());
+		}
 		
+	}
+
+	/** Logs information into the log table.
+	 * 
+	 * @param sServerID The server ID to use
+	 * @param sJobID The job ID login the entry
+	 * @param sLevel The lever of the log
+	 * @param oLog The log text to trace
+	 */
+	public void log ( String sServerID, String sJobID, String sLevel, Object oLog ) {
+		try {
+			String sQueryIJL = propQueryMapping.getProperty(QUERY_INSERT_JOB_LOG);
+			Object [] oaValuesUpdate = {
+					sServerID,
+					sJobID,
+					sLevel.trim(),
+					oLog.toString().trim()
+				};
+			executeUpdateQueryWithParams(sQueryIJL, oaValuesUpdate);
+			
+			// Commit the transaction
+			if ( bTransactional ) conn.commit();
+			
+		} catch (JobInformationBackendAdapterException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.warning("Could not log to the job information storage! "+baos);
+		}
+		catch (SQLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Commit operation failed! "+baos.toString());
+		}
+	}
+	
+
+	/** Prints information into the log table.
+	 * 
+	 * @param sServerID The server ID to use
+	 * @param sJobID The job ID login the entry
+	 * @param oText The log text to trace
+	 */
+	public void print ( String sServerID, String sJobID, Object oLog ) {
+		try {
+			String sQueryIJC = propQueryMapping.getProperty(QUERY_INSERT_JOB_CONSOLE);
+			Object [] oaValuesUpdate = {
+					sServerID,
+					sJobID,
+					oLog.toString().trim()
+				};
+			executeUpdateQueryWithParams(sQueryIJC, oaValuesUpdate);
+			
+			// Commit the transaction
+			if ( bTransactional ) conn.commit();
+			
+		} catch (JobInformationBackendAdapterException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.warning("Could not print to the job information storage! "+baos);
+		}
+		catch (SQLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Commit operation failed! "+baos.toString());
+		}
+	}
+
+	/** Returns the current log for the provided job ID.
+	 * 
+	 * @param sJobID The job ID
+	 * @return The concatenated string of logs
+	 */
+	public String getLog ( String sJobID ) {
+		StringBuffer sb = new StringBuffer();
+		
+		try {
+			String sQueryIJC = propQueryMapping.getProperty(QUERY_SELECT_JOB_LOG);
+			Object [] oaValuesUpdate = { sJobID };
+			for ( List<String> ls:selectTextColumnsWithParams(sQueryIJC,oaValuesUpdate) ) {
+				String s = ls.get(ls.size()-1).trim();
+				s = s.replaceAll("\n$|\n\r$|\r\n$", "");
+				sb.append(ls.get(ls.size()-2).trim()+": "+s+"\n");
+			}
+		} catch (JobInformationBackendAdapterException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.warning("Could not retrieve log from job information storage! "+baos);
+		}
+		
+		return sb.toString();
+	}
+	
+
+	/** Returns the current console for the provided job ID.
+	 * 
+	 * @param sJobID The job ID
+	 * @return The concatenated string of logs
+	 */
+	public String getConsole ( String sJobID ) {
+		StringBuffer sb = new StringBuffer();
+		
+		try {
+			String sQueryIJC = propQueryMapping.getProperty(QUERY_SELECT_JOB_CONSOLE);
+			Object [] oaValuesUpdate = { sJobID };
+			for ( List<String> ls:selectTextColumnsWithParams(sQueryIJC,oaValuesUpdate) ) {
+				String s = ls.get(ls.size()-1);
+				s = s.replaceAll("\n$|\n\r$|\r\n$", "");
+				sb.append(s+"\n");
+			}
+		} catch (JobInformationBackendAdapterException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.warning("Could not retrive console from job information storage! "+baos);
+		}
+		
+		return sb.toString();
 	}
 }

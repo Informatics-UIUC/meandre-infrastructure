@@ -335,7 +335,6 @@ public class MeandreServer {
 
 		contextWS.addServlet(new ServletHolder((Servlet) new WSAuxiliarServlet(store,cnf)),     "/services/auxiliar/*");
 		
-
 		
 		return contextWS;
 	}

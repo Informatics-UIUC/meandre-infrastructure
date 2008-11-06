@@ -64,6 +64,6 @@
 	</entry>
 	<entry key="INSERT_SERVER_STATUS">
 			INSERT INTO meandre_server_status (ID,status,updated,free_memory,ts) 
-				VALUES (?,?,?,?,current timestamp) 
+				VALUES (?,?,?,?,CURRENT TIMESTAMP) 
 	</entry>
 </properties>

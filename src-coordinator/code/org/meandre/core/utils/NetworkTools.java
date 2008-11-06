@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.MessageDigest;
 
 import org.meandre.core.logger.KernelLoggerFactory;
 
@@ -85,4 +86,24 @@ public class NetworkTools {
 		return NetworkTools.getNumericIPValue()+Integer.toHexString(iPort).toUpperCase();
 	}
 	
+	/** Returns the MD5 hash for the given String.
+	 * 
+	 * @param sString The string to use
+	 * @return The stringfied has value
+	 */
+	public static String getMD5 ( String sString ) {
+		try {
+			 MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
+			 digest.update(sString.getBytes());
+			 String sRes ="";
+			 for ( byte b:digest.digest())
+				 sRes += Integer.toHexString(b).toUpperCase();
+			 return sRes;
+		} catch (Exception e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			KernelLoggerFactory.getCoreLogger().warning(baos.toString());
+			return null;
+		}
+	}
 }
