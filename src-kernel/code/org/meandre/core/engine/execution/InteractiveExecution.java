@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,12 +44,13 @@ public class InteractiveExecution {
 	 * @param bStats Should statistics be collected
 	 * @param sToken The token to assign to the execution of the flow
 	 * @param job The job detail information bean
+	 * @param sFUID The flow execution unique ID
+	 * @return True if the execution succeeded, false otherwise
 	 * @throws IOException A problem was encountered when printing content to the output
 	 * @throws CorruptedDescriptionException The flow could not be properly recovered
 	 * @throws ConductorException An execution was thrown during the execution process
 	 */
-	public static void executeVerboseFlowURI( QueryableRepository qr, String sURI, OutputStream outStream, CoreConfiguration cnf, boolean bStats, String sToken, JobDetail job ) throws IOException,
-			CorruptedDescriptionException, ConductorException {
+	public static boolean executeVerboseFlowURI( QueryableRepository qr, String sURI, OutputStream outStream, CoreConfiguration cnf, boolean bStats, String sToken, JobDetail job, String sFUID )  {
 
 		PrintStream pw = new PrintStream(outStream);
 		
@@ -70,12 +72,12 @@ public class InteractiveExecution {
 		StatisticsProbeImpl spi = null;
 		try {
 			if ( !bStats ){
-				exec = conductor.buildExecutor(qr, resURI,pw);
+				exec = conductor.buildExecutor(qr,resURI,pw,sFUID);
 			}
 			else {
 				spi = new StatisticsProbeImpl();
 				MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),spi,false,false);
-				exec = conductor.buildExecutor(qr, resURI, mrProbe,pw);
+				exec = conductor.buildExecutor(qr, resURI, mrProbe,pw,sFUID);
 				mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
 			}
 			pw.flush();
@@ -182,6 +184,11 @@ public class InteractiveExecution {
 				WSLoggerFactory.getWSLogger().warning(baos.toString());
 			}
 		}
+		
+		if ( exec!=null )
+			return exec.hadGracefullTermination();
+		else
+			return false;
 	
 	}
 	
@@ -193,12 +200,13 @@ public class InteractiveExecution {
 	 * @param cnf The core configuration object
 	 * @param sToken The token to assign to the execution of the flow
 	 * @param job The job detail information bean
+	 * @param sFUID The flow execution unique ID
+	 * @return True if the execution succeeded, false otherwise
 	 * @throws IOException A problem was encountered when printing content to the output
 	 * @throws CorruptedDescriptionException The flow could not be properly recovered
 	 * @throws ConductorException An execution was thrown during the execution process
 	 */
-	public static void executeSilentFlowURI( QueryableRepository qr, String sURI, OutputStream outStream, CoreConfiguration cnf, String sToken, JobDetail job  ) throws IOException,
-			CorruptedDescriptionException, ConductorException {
+	public static boolean executeSilentFlowURI( QueryableRepository qr, String sURI, OutputStream outStream, CoreConfiguration cnf, String sToken, JobDetail job, String sFUID  ) {
 
 		PrintStream pw = new PrintStream(outStream);
 		
@@ -213,7 +221,7 @@ public class InteractiveExecution {
 		try {
 			spi = new StatisticsProbeImpl();
 			MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),spi,false,false);
-			exec = conductor.buildExecutor(qr, resURI, mrProbe,pw);
+			exec = conductor.buildExecutor(qr, resURI, mrProbe,pw,sFUID);
 			mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
 		
 			int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
@@ -268,6 +276,20 @@ public class InteractiveExecution {
 			pw.println(te);
 			pw.flush();
 		}
+		
+		if ( exec!=null )
+			return exec.hadGracefullTermination();
+		else
+			return false;
 	}
 	
+
+	/** Create a new unique execution flow ID
+	 * 
+	 * @param resFlow The flow resource URI
+	 * @return The unique execution ID
+	 */
+	public static String createUniqueExecutionFlowID ( String resFlow ) {
+		return resFlow+NetworkTools.getNumericIPValue()+"/"+System.currentTimeMillis()+"/"+(Math.abs(new Random().nextInt()))+"/";
+	}
 }

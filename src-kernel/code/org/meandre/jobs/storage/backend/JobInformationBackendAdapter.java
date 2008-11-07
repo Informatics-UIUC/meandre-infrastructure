@@ -150,7 +150,6 @@ public abstract class JobInformationBackendAdapter {
 			
 			// Clena guys left behind on a crash
 			updateJobStatusInServer(
-					sServerID, 
 					JobInformationBackendAdapter.JOB_STATUS_COMPLETED, 
 					JobInformationBackendAdapter.JOB_STATUS_KILLED)
 				;
@@ -179,6 +178,8 @@ public abstract class JobInformationBackendAdapter {
 	public void close() {
 		try {
 			conn.close();
+			// Remove the installed shutdown hook
+			Runtime.getRuntime().removeShutdownHook(getShutdownHook()); 
 		} catch (SQLException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
@@ -365,13 +366,11 @@ public abstract class JobInformationBackendAdapter {
 	}
 
 	/** Logs information into the log table.
-	 * 
-	 * @param sServerID The server ID to use
 	 * @param sJobID The job ID login the entry
 	 * @param sLevel The lever of the log
 	 * @param oLog The log text to trace
 	 */
-	public void log ( String sServerID, String sJobID, String sLevel, Object oLog ) {
+	public void log ( String sJobID, String sLevel, Object oLog ) {
 		try {
 			String sQueryIJL = propQueryMapping.getProperty(QUERY_INSERT_JOB_LOG);
 			Object [] oaValuesUpdate = {
@@ -404,7 +403,7 @@ public abstract class JobInformationBackendAdapter {
 	 * @param sJobID The job ID login the entry
 	 * @param oText The log text to trace
 	 */
-	public void print ( String sServerID, String sJobID, Object oLog ) {
+	public void print ( String sJobID, Object oLog ) {
 		try {
 			String sQueryIJC = propQueryMapping.getProperty(QUERY_INSERT_JOB_CONSOLE);
 			Object [] oaValuesUpdate = {
@@ -445,10 +444,19 @@ public abstract class JobInformationBackendAdapter {
 				s = s.replaceAll("\n$|\n\r$|\r\n$", "");
 				sb.append(ls.get(ls.size()-2).trim()+": "+s+"\n");
 			}
+			
+			// Commit the transaction
+			if ( bTransactional ) conn.commit();
+			
 		} catch (JobInformationBackendAdapterException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
 			log.warning("Could not retrieve log from job information storage! "+baos);
+		}
+		catch (SQLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Commit operation failed! "+baos.toString());
 		}
 		
 		return sb.toString();
@@ -471,10 +479,19 @@ public abstract class JobInformationBackendAdapter {
 				s = s.replaceAll("\n$|\n\r$|\r\n$", "");
 				sb.append(s+"\n");
 			}
+			
+			// Commit the transaction
+			if ( bTransactional ) conn.commit();
+			
 		} catch (JobInformationBackendAdapterException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
 			log.warning("Could not retrive console from job information storage! "+baos);
+		}
+		catch (SQLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Commit operation failed! "+baos.toString());
 		}
 		
 		return sb.toString();
@@ -485,7 +502,7 @@ public abstract class JobInformationBackendAdapter {
 	 * @param sServerID The server ID to use
 	 * @param sJobID The job ID login the entry
 	 */
-	public void startJob ( String sServerID, String sJobID ) {
+	public void startJob ( String sJobID ) {
 		try {
 			String sQueryIJS = propQueryMapping.getProperty(QUERY_INSERT_JOB_STATUS);
 			Object [] oaValuesUpdate = {
@@ -501,7 +518,7 @@ public abstract class JobInformationBackendAdapter {
 		} catch (JobInformationBackendAdapterException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
-			log.warning("Could not print to the job information storage! "+baos);
+			log.warning("Could not register job start at the backend information storage! "+baos);
 		}
 		catch (SQLException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -517,7 +534,7 @@ public abstract class JobInformationBackendAdapter {
 	 * @param sJobID The job ID login the entry
 	 * @param sStatus The new job status
 	 */
-	public void updateJobStatus ( String sServerID, String sJobID, String sStatus ) {
+	public void updateJobStatus ( String sJobID, String sStatus ) {
 		try {
 			String sQueryUJS = propQueryMapping.getProperty(QUERY_UPDATE_JOB_STATUS);
 			Object [] oaValuesUpdate = {
@@ -533,7 +550,7 @@ public abstract class JobInformationBackendAdapter {
 		} catch (JobInformationBackendAdapterException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
-			log.warning("Could not print to the job information storage! "+baos);
+			log.warning("Could not update job status at the backend information storage! "+baos);
 		}
 		catch (SQLException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -549,7 +566,7 @@ public abstract class JobInformationBackendAdapter {
 	 * @param sOldStatus The old status to update
 	 * @param sNewStatus The new status to seet
 	 */
-	public void updateJobStatusInServer ( String sServerID, String sOldStatus, String sNewStatus ) {
+	public void updateJobStatusInServer ( String sOldStatus, String sNewStatus ) {
 		try {
 			String sQueryUJS = propQueryMapping.getProperty(QUERY_UPDATE_JOB_STATUSES_SERVER);
 			Object [] oaValuesUpdate = {
@@ -565,7 +582,7 @@ public abstract class JobInformationBackendAdapter {
 		} catch (JobInformationBackendAdapterException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
-			log.warning("Could not print to the job information storage! "+baos);
+			log.warning("Could not update job status at the backend information storage! "+baos);
 		}
 		catch (SQLException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -584,6 +601,10 @@ public abstract class JobInformationBackendAdapter {
 			String sQueryIJC = propQueryMapping.getProperty(QUERY_SELECT_JOB_STATUS);
 			Object [] oaValuesUpdate = { sJobID };
 			List<Map<String, String>> ls = selectTextColumnsWithNameAndParams(sQueryIJC,oaValuesUpdate,0);
+			
+			// Commit the transaction
+			if ( bTransactional ) conn.commit();
+			
 			if ( ls.size()!=1 )
 				return null;
 			else
@@ -591,7 +612,12 @@ public abstract class JobInformationBackendAdapter {
 		} catch (JobInformationBackendAdapterException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
-			log.warning("Could not retrive console from job information storage! "+baos);
+			log.warning("Could not retrieve job status at the backend information storage! "+baos);
+		}
+		catch (SQLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Commit operation failed! "+baos.toString());
 		}
 		
 		return null;
@@ -607,11 +633,20 @@ public abstract class JobInformationBackendAdapter {
 		try {
 			String sQuerySJS = propQueryMapping.getProperty(QUERY_SELECT_JOB_STATUSES);
 			List<Map<String, String>> lsRes = selectTextColumnsWithName(sQuerySJS,0);
+			
+			// Commit the transaction
+			if ( bTransactional ) conn.commit();
+			
 			return lsRes;
 		} catch (JobInformationBackendAdapterException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
-			log.warning("Could not retrive console from job information storage! "+baos);
+			log.warning("Could not retrieve job statuses at the backend information storage! "+baos);
+		}
+		catch (SQLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Commit operation failed! "+baos.toString());
 		}
 		return null;
 	}

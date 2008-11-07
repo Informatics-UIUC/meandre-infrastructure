@@ -36,7 +36,7 @@ from org.meandre.webui import WebUIFactory
 from org.meandre.webservices.beans import JobDetail
 
 from org.meandre.webservices.servlets import WSExecuteServlet
-
+from org.meandre.jobs.storage.backend import JobInformationBackendAdapter
 #
 # Services implementation
 #
@@ -56,10 +56,23 @@ def execute_flow ( request, response, format ):
                 qr = meandre_store.getRepositoryStore(getMeandreUser(request))
                 job = JobDetail()
                 executionTokenMap[token] = job
+                jiba = meandre_store.getJobInformation()
                 if format == 'txt' :
-                    InteractiveExecution.executeVerboseFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,stat,token,job)
+                    fuid = InteractiveExecution.createUniqueExecutionFlowID(flow_uri)
+                    jiba.startJob(fuid)
+                    res = InteractiveExecution.executeVerboseFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,stat,token,job,fuid)
+                    if res :
+                        jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_COMPLETED)
+                    else :
+                        jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_ABORTED)
                 elif format == 'silent': 
-                    InteractiveExecution.executeSilentFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,token,job)
+                    fuid = InteractiveExecution.createUniqueExecutionFlowID(flow_uri)
+                    jiba.startJob(fuid)
+                    res = InteractiveExecution.executeSilentFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,token,job,fuid)
+                    if res :
+                        jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_COMPLETED)
+                    else :
+                        jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_ABORTED)
                 else :
                     errorNotFound(response)
                 del executionTokenMap[token]

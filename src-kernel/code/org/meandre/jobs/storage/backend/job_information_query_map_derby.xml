@@ -7,7 +7,7 @@
 	<entry key="CREATE_JOB_STATUS_TABLE">
 			CREATE TABLE meandre_job_status 
 				(server_ID CHAR(16),
-				 job_ID CHAR(32), 
+				 job_ID CHAR(250), 
 				 status CHAR(1) default 'U', 
 				 ts timestamp,
 				 PRIMARY KEY(server_ID,job_ID))
@@ -15,14 +15,14 @@
 	<entry key="CREATE_JOB_CONSOLE_TABLE">
 			CREATE TABLE meandre_job_console
 				(server_ID CHAR(16),
-				 job_ID CHAR(32), 
+				 job_ID CHAR(250), 
 				 print VARCHAR(32672), 
 				 ts timestamp)
 	</entry>
 	<entry key="CREATE_JOB_LOG_TABLE">
 			CREATE TABLE meandre_job_log
 				(server_ID CHAR(16),
-				 job_ID CHAR(32), 
+				 job_ID CHAR(250), 
 				 level CHAR(32), 
 				 log VARCHAR(32672), 
 				 ts timestamp)

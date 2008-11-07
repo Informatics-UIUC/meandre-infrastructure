@@ -85,16 +85,8 @@ public class JobInformationBackendAdapterTest {
 	 */
 	@After
 	public void cleanAfterTesting() {
-		try {
-			JobInformationBackendAdapter ba = createBackendAdaptorFromStore();
-			ba.dropSchema();
-
-			// Remove the installed shutdown hook
-			Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
-		} 
-		catch ( JobInformationBackendAdapterException bae ) {
-			log.warning("Failed to drop schema after the test");
-		}
+		JobInformationBackendAdapter ba = createBackendAdaptorFromStore();
+		ba.close();
 	}
 
 
@@ -162,7 +154,7 @@ public class JobInformationBackendAdapterTest {
 			final int TIMES = 10;
 			
 			for ( int i=0, iMax=TIMES ; i<iMax ; i++ ) {
-				ba.print("SID", "JID", "line "+i);
+				ba.print("JID", "line "+i);
 				Thread.sleep(10);
 			}
 			
@@ -198,7 +190,7 @@ public class JobInformationBackendAdapterTest {
 			final int TIMES = 10;
 			
 			for ( int i=0, iMax=TIMES ; i<iMax ; i++ ) {
-				ba.log("SID", "JID", "TEST", "log "+i);
+				ba.log("JID", "TEST", "log "+i);
 				Thread.sleep(10);
 			}
 			
@@ -233,7 +225,7 @@ public class JobInformationBackendAdapterTest {
 		
 		// Start jobs
 		for ( int i=0; i<TIMES; i++ )
-			ba.startJob("SID", "JID"+i);
+			ba.startJob("JID"+i);
 		
 		// Retrieve jobs
 		for ( int i=0; i<TIMES; i++ )
@@ -251,7 +243,7 @@ public class JobInformationBackendAdapterTest {
 		
 		// Change jobs status
 		for ( int i=0; i<TIMES; i++ )
-			ba.updateJobStatus("SID", "JID"+i,JobInformationBackendAdapter.JOB_STATUS_COMPLETED);
+			ba.updateJobStatus("JID"+i,JobInformationBackendAdapter.JOB_STATUS_COMPLETED);
 		
 		// Check the changes statuses
 		for ( Map<String,String> mapStatus:ba.getJobStatuses() )
@@ -263,7 +255,6 @@ public class JobInformationBackendAdapterTest {
 		
 		// Simulate server death
 		ba.updateJobStatusInServer(
-				"SID", 
 				JobInformationBackendAdapter.JOB_STATUS_COMPLETED, 
 				JobInformationBackendAdapter.JOB_STATUS_KILLED)
 			;

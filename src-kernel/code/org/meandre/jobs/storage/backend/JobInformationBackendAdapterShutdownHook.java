@@ -1,5 +1,8 @@
 package org.meandre.jobs.storage.backend;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.sql.SQLException;
 import java.util.logging.Logger;
 
 import org.meandre.core.logger.KernelLoggerFactory;
@@ -33,13 +36,20 @@ extends Thread {
 	 * 
 	 */
 	public void run () {
-		String sServerID = ba.getServerID();
-		ba.updateJobStatusInServer(
-				sServerID, 
-				JobInformationBackendAdapter.JOB_STATUS_RUNNING, 
-				JobInformationBackendAdapter.JOB_STATUS_KILLED)
-			;
-		ba.close();
-		log.info("Shutdown hook for "+sServerID+" exiting");
+		try {
+			if (!ba.conn.isClosed()) {
+			String sServerID = ba.getServerID();
+				ba.updateJobStatusInServer(
+						JobInformationBackendAdapter.JOB_STATUS_RUNNING, 
+						JobInformationBackendAdapter.JOB_STATUS_KILLED)
+					;
+				ba.conn.close();
+				log.info("Shutdown hook for "+sServerID+" exiting");
+			}
+		} catch (SQLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Error closing the job information connection to the backend! "+baos.toString());
+		}
 	}
 }

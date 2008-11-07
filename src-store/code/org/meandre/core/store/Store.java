@@ -29,6 +29,7 @@ import org.meandre.core.store.system.SystemStoreImpl;
 import org.meandre.core.utils.Constants;
 import org.meandre.core.utils.ModelIO;
 import org.meandre.core.utils.NetworkTools;
+import org.meandre.jobs.storage.backend.JobInformationBackendAdapter;
 
 import com.hp.hpl.jena.db.DBConnection;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -169,6 +170,9 @@ public class Store {
 	/** The core configuration object */
 	private CoreConfiguration cnf;
 
+	/** The job backend adapter information */
+	private JobInformationBackendAdapter baJobInfo;
+
     /** Initialize a default store.
      * 
      * @param cnf The core configuration object
@@ -282,7 +286,28 @@ public class Store {
         log.config("Initialization of JENA RDBModelMaker done");
         initializeSecurityStore();
         
-
+        // Initialize the Job Information backend adapter
+        try {
+			 // Instantiate the adaptor
+			baJobInfo = (JobInformationBackendAdapter) Class.forName(
+					"org.meandre.jobs.storage.backend."+getDatabaseFlavor()+"JobInformationBackendAdapter"
+				).newInstance();
+			// Link it to a store
+			baJobInfo.linkToService(getConnectionToDB(),cnf.getBasePort());
+		} catch (InstantiationException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Could not instantiate job information backend adapter! "+baos.toString());
+		} catch (IllegalAccessException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Could not found access class for job information backend adapter! "+baos.toString());
+		} catch (ClassNotFoundException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Could not found class for job information backend adapter! "+baos.toString());
+		}	
+		
     }
 
     /**
@@ -976,5 +1001,13 @@ public class Store {
 		
 		
 		return setRes;
+	}
+	
+	/** Returns the job information backend adapter object linked to this store.
+	 * 
+	 * @return The backend adapter to the job information
+	 */
+	public JobInformationBackendAdapter getJobInformation () {
+		return this.baJobInfo;
 	}
 }

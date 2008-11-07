@@ -105,8 +105,24 @@ public class Conductor {
 	 */
 	public Executor buildExecutor(QueryableRepository qr, Resource res, PrintStream console )
 	throws CorruptedDescriptionException, ConductorException {
+		String sFlowUniqueExecutionID = res.toString()+NetworkTools.getNumericIPValue()+"/"+System.currentTimeMillis()+"/"+(Math.abs(new Random().nextInt()))+"/";
+		return buildExecutor(qr,res,console,sFlowUniqueExecutionID);
+	}
+
+	/** Creates an execution object for the given flow description.
+	 *
+	 * @param qr The queryable repository containing component descriptions
+	 * @param res The resource identifying the flow to prepare for execution
+	 * @param console The output console
+	 * @param sFUID The flow execution ID
+	 * @return The executor object
+	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
+	 * @throws ConductorException The counductor could not create an executable flow
+	 */
+	public Executor buildExecutor(QueryableRepository qr, Resource res, PrintStream console, String sFUID )
+	throws CorruptedDescriptionException, ConductorException {
 		MrProbe thdMrProbe = new MrProbe(log,new NullProbeImpl(),false,false);
-		Executor exec = buildExecutor(qr, res,thdMrProbe,console);
+		Executor exec = buildExecutor(qr, res,thdMrProbe,console,sFUID);
 		thdMrProbe.setName(exec.getThreadGroupName()+"mr-probe");
 		exec.initWebUI(PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID()), "XStreamTest");
 		return exec;
@@ -122,11 +138,27 @@ public class Conductor {
 	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
 	 * @throws ConductorException The conductor could not create an executable flow
 	 */
-	@SuppressWarnings("unchecked")
 	public Executor buildExecutor(QueryableRepository qr, Resource res, MrProbe thdMrProbe, PrintStream console)
 	throws CorruptedDescriptionException, ConductorException {
-		// The unique execution flow ID
 		String sFlowUniqueExecutionID = res.toString()+NetworkTools.getNumericIPValue()+"/"+System.currentTimeMillis()+"/"+(Math.abs(new Random().nextInt()))+"/";
+		return buildExecutor(qr,res,thdMrProbe,console,sFlowUniqueExecutionID);
+	}
+	/** Creates an execution object for the given flow description.
+	 *
+	 * @param qr The queryable repository containing component descriptions
+	 * @param res The resource identifying the flow to prepare for execution
+	 * @param thdMrProbe The MrProbe to use
+	 * @param console The output console
+	 * @param sFUID The flow unique execution ID
+	 * @return The executor object
+	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
+	 * @throws ConductorException The conductor could not create an executable flow
+	 */
+	@SuppressWarnings("unchecked")
+	public Executor buildExecutor(QueryableRepository qr, Resource res, MrProbe thdMrProbe, PrintStream console,String sFUID)
+	throws CorruptedDescriptionException, ConductorException {
+		// The unique execution flow ID
+		String sFlowUniqueExecutionID = sFUID;
 		String flowID = res.toString();
 		// Map class names to classes
 		Hashtable<String,Class> htMapNameToClass = new Hashtable<String,Class>();
@@ -565,4 +597,5 @@ public class Conductor {
 	public void setParentClassloader(ClassLoader parentClassloader) {
 		this.parentClassloader = parentClassloader;
 	}
+	
 }

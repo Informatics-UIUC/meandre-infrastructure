@@ -259,6 +259,7 @@ public class MeandreServer {
 		log.info("Stoping Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+")");
 		bStop  = true;
 		baToStore.close();
+		store.getJobInformation().close();
 		//baToStore.getShutdownHook().run();
 		server.stop();
 	}
