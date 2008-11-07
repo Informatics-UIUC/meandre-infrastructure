@@ -118,7 +118,7 @@ public class DataPortDescriptionTest {
 	}
 
 	/**
-	 * Test method for {@link org.meandre.core.store.repository.DataPortDescription#getName()}.
+	 * Test method for {@link org.meandre.core.store.repository.DataPortDescription#getServerID()}.
 	 */
 	@Test
 	public void testGetName() {

@@ -156,6 +156,45 @@ public class DatabaseTools {
 		return lstRes;
 	}
 
+
+	/** Return a list of list with the results of select query in text form.
+	 * 
+	 * @param conn The connection object to use
+	 * @param sQuery The query to run
+	 * @param iLimit The maxim number of entries returned (0 or negative to return all)
+	 * @param oaValues The parameter values to use
+	 * @return The resulting list of lists of text with the column name
+	 * @throws CoordinatorBackendAdapterException Something when wrong running the select
+	 */
+	public static List<Map<String,String>> selectTextColumnsWithNameAndParams (Connection conn, String sQuery, int iLimit, Object [] oaValues ) 
+	throws DatabaseBackendAdapterException {
+		List<Map<String,String>> lstRes = new LinkedList<Map<String,String>>();
+		try {
+			PreparedStatement pstm = conn.prepareStatement(sQuery);
+			for ( int i=1,iMax=oaValues.length ; i<=iMax ; i++ )
+				pstm.setObject(i, oaValues[i-1]);
+			ResultSet rs = pstm.executeQuery();
+			ResultSetMetaData rsMD = rs.getMetaData();
+			int iColCount = rsMD.getColumnCount();
+			int iCnt = 0;
+			while(rs.next() && ( iLimit<=0 || iCnt<iLimit) ) {
+				Map<String,String> mapRow = new Hashtable<String,String>();
+				for( int j=1 ; j<=iColCount ; j++) { 
+					String sColumnLabel = rsMD.getColumnLabel(j).toLowerCase();
+					String sValue = rs.getString(j);
+					sValue = ( sValue==null )?"":sValue.trim();
+					mapRow.put(sColumnLabel,sValue);
+				}
+				lstRes.add(mapRow);
+				iCnt++;
+			}
+			rs.close();
+		} catch (SQLException e) {
+			throw new DatabaseBackendAdapterException(e);
+		}
+		return lstRes;
+	}
+
 	/** Return a list of list with the results of select query in text form.
 	 * 
 	 * @param conn The connection object to use

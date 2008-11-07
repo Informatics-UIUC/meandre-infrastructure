@@ -8,7 +8,7 @@
 			CREATE TABLE meandre_job_status 
 				(server_ID CHAR(16),
 				 job_ID CHAR(32), 
-				 status CHAR(1) default 'D', 
+				 status CHAR(1) default 'U', 
 				 ts timestamp,
 				 PRIMARY KEY(server_ID,job_ID))
 	</entry>
@@ -34,5 +34,19 @@
 	<entry key="INSERT_JOB_LOG">
 			INSERT INTO meandre_job_log (server_ID,job_ID,level,log,ts)
 				VALUES (?,?,?,?,CURRENT TIMESTAMP)
+	</entry>
+	<entry key="INSERT_JOB_STATUS">
+			INSERT INTO meandre_job_status (server_ID,job_ID,status,ts)
+				VALUES (?,?,?,CURRENT TIMESTAMP)
+	</entry>
+	<entry key="UPDATE_JOB_STATUS">
+			UPDATE meandre_job_status
+				SET status=?, ts = CURRENT TIMESTAMP
+				WHERE server_ID=? and job_ID=?
+	</entry>
+	<entry key="UPDATE_JOB_STATUSES_SERVER">
+			UPDATE meandre_job_status
+				SET status=?, ts = CURRENT TIMESTAMP
+				WHERE server_ID=? and status=?
 	</entry>
 </properties>

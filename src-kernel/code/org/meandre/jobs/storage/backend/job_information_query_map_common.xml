@@ -40,4 +40,14 @@
 	<entry key="DROP_JOB_LOG_TABLE">
 			DROP TABLE meandre_job_log
 	</entry>
+	<entry key ="SELECT_JOB_STATUS">
+			SELECT server_ID,job_ID,status,ts
+			FROM meandre_job_status
+			WHERE job_id = ?
+	</entry>
+	<entry key ="SELECT_JOB_STATUSES">
+			SELECT server_ID,job_ID,status,ts
+			FROM meandre_job_status
+			ORDER BY ts DESC
+	</entry>
 </properties>

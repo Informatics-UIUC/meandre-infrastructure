@@ -8,6 +8,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.io.InputStream;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -87,6 +88,9 @@ public class JobInformationBackendAdapterTest {
 		try {
 			JobInformationBackendAdapter ba = createBackendAdaptorFromStore();
 			ba.dropSchema();
+
+			// Remove the installed shutdown hook
+			Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
 		} 
 		catch ( JobInformationBackendAdapterException bae ) {
 			log.warning("Failed to drop schema after the test");
@@ -136,14 +140,8 @@ public class JobInformationBackendAdapterTest {
 		
 		JobInformationBackendAdapter ba = createBackendAdaptorFromStore();
 		
-		// Try to create the schema
-		try {
-			ba.createSchema();
-			// Drop done on the cleanup of the fixture
-			// ba.dropSchema();
-		} catch (JobInformationBackendAdapterException e) {
-			fail("The schema could not be created and dropped! "+e.toString());
-		}
+		// Remove the installed shutdown hook
+		Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
 	
 		log.info("Test create and drop schema done" );
 		
@@ -162,7 +160,6 @@ public class JobInformationBackendAdapterTest {
 		// Try to create the schema
 		try {
 			final int TIMES = 10;
-			ba.createSchema();
 			
 			for ( int i=0, iMax=TIMES ; i<iMax ; i++ ) {
 				ba.print("SID", "JID", "line "+i);
@@ -174,9 +171,10 @@ public class JobInformationBackendAdapterTest {
 			assertEquals(TIMES,sLine.length);
 			for ( int i=0, iMax=TIMES ; i<iMax ; i++ )
 				assertEquals("line "+i, sLine[i]);
-		} catch (JobInformationBackendAdapterException e) {
-			fail("The console request faileed! "+e.toString());
-		}catch (InterruptedException e) {
+			
+			// Remove the installed shutdown hook
+			Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
+		} catch (InterruptedException e) {
 			fail("Sleep interrupted");
 		}
 	
@@ -198,7 +196,6 @@ public class JobInformationBackendAdapterTest {
 		// Try to create the schema
 		try {
 			final int TIMES = 10;
-			ba.createSchema();
 			
 			for ( int i=0, iMax=TIMES ; i<iMax ; i++ ) {
 				ba.log("SID", "JID", "TEST", "log "+i);
@@ -210,8 +207,9 @@ public class JobInformationBackendAdapterTest {
 			assertEquals(TIMES,sLine.length);
 			for ( int i=0, iMax=TIMES ; i<iMax ; i++ )
 				assertEquals("TEST: log "+i, sLine[i]);
-		} catch (JobInformationBackendAdapterException e) {
-			fail("The log request faileed! "+e.toString());
+			
+			// Remove the installed shutdown hook
+			Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook());
 		} catch (InterruptedException e) {
 			fail("Sleep interrupted");
 		}
@@ -220,4 +218,67 @@ public class JobInformationBackendAdapterTest {
 		
 	}
 
+
+	/** Test the job status manipulation IO.
+	 * 
+	 */
+	@Test
+	public void testJobStatus () {
+
+		log.info("Running test of the job status manipulation" );
+		
+		JobInformationBackendAdapter ba = createBackendAdaptorFromStore();
+		
+		final int TIMES = 10;
+		
+		// Start jobs
+		for ( int i=0; i<TIMES; i++ )
+			ba.startJob("SID", "JID"+i);
+		
+		// Retrieve jobs
+		for ( int i=0; i<TIMES; i++ )
+			assertEquals(
+					JobInformationBackendAdapter.JOB_STATUS_RUNNING, 
+					ba.getJobStatus("JID"+i)
+				);
+		
+		// Retrieve all the jobs
+		for ( Map<String,String> mapStatus:ba.getJobStatuses() )
+			assertEquals(
+					JobInformationBackendAdapter.JOB_STATUS_RUNNING, 
+					mapStatus.get("status")
+				);
+		
+		// Change jobs status
+		for ( int i=0; i<TIMES; i++ )
+			ba.updateJobStatus("SID", "JID"+i,JobInformationBackendAdapter.JOB_STATUS_COMPLETED);
+		
+		// Check the changes statuses
+		for ( Map<String,String> mapStatus:ba.getJobStatuses() )
+			assertEquals(
+					JobInformationBackendAdapter.JOB_STATUS_COMPLETED, 
+					mapStatus.get("status")
+				);
+		
+		
+		// Simulate server death
+		ba.updateJobStatusInServer(
+				"SID", 
+				JobInformationBackendAdapter.JOB_STATUS_COMPLETED, 
+				JobInformationBackendAdapter.JOB_STATUS_KILLED)
+			;
+		
+		// Check the changes statuses
+		for ( Map<String,String> mapStatus:ba.getJobStatuses() )
+			assertEquals(
+					JobInformationBackendAdapter.JOB_STATUS_KILLED, 
+					mapStatus.get("status")
+				);
+		
+		// Remove the installed shutdown hook
+		Runtime.getRuntime().removeShutdownHook(ba.getShutdownHook()); 
+	
+		log.info("Test  of the basic log IO done" );
+		
+	}
 }
