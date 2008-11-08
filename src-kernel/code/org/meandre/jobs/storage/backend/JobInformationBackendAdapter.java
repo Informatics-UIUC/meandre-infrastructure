@@ -150,7 +150,7 @@ public abstract class JobInformationBackendAdapter {
 			
 			// Clena guys left behind on a crash
 			updateJobStatusInServer(
-					JobInformationBackendAdapter.JOB_STATUS_COMPLETED, 
+					JobInformationBackendAdapter.JOB_STATUS_RUNNING, 
 					JobInformationBackendAdapter.JOB_STATUS_KILLED)
 				;
 			

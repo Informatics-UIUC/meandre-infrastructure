@@ -287,9 +287,10 @@ public class InteractiveExecution {
 	/** Create a new unique execution flow ID
 	 * 
 	 * @param resFlow The flow resource URI
+	 * @param iPort The port number the server is running on
 	 * @return The unique execution ID
 	 */
-	public static String createUniqueExecutionFlowID ( String resFlow ) {
+	public static String createUniqueExecutionFlowID ( String resFlow, int iPort ) {
 		return resFlow+NetworkTools.getNumericIPValue()+"/"+System.currentTimeMillis()+"/"+(Math.abs(new Random().nextInt()))+"/";
 	}
 }

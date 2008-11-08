@@ -177,6 +177,7 @@
 			 		    <ul>
 							<li><a href="/services/execute/list_running_flows.html">Running flows</a></li>
 							<li><a href="/services/auxiliar/execute_repository.html">Execute repository</a></li>
+							<li><a href="/services/jobs/list_jobs_statuses.html">List job statuses</a></li>
 		 		    	</ul>
 		 		    	<p>Cluster</p>
 			 		    <ul>
@@ -327,6 +328,9 @@
 			          				</xsl:if>		
 			          				<xsl:if test="id">
 			          					<th>ID</th>
+			          				</xsl:if>		
+			          				<xsl:if test="server_id">
+			          					<th>Server</th>
 			          				</xsl:if>
 			          				<xsl:if test="status">
 			          					<th>Status</th>
@@ -393,6 +397,9 @@
 			          				</xsl:if>
 			          				<xsl:if test="property_value">
 			          					<th>Value</th>
+			          				</xsl:if>		
+			          				<xsl:if test="job_id">
+			          					<th>Job ID</th>
 			          				</xsl:if>				
 		          				</tr>
 		          			</xsl:if>
@@ -563,6 +570,9 @@
 		          				<xsl:if test="id">
 		          					<td><xsl:value-of select="id"/></td>
 		          				</xsl:if>
+		          				<xsl:if test="server_id">
+		          					<td><xsl:value-of select="server_id"/></td>
+		          				</xsl:if>
 		          				<xsl:if test="status">
 		          					<td><xsl:value-of select="status"/></td>
 		          				</xsl:if>		
@@ -628,6 +638,9 @@
 		          				</xsl:if>
 		          				<xsl:if test="property_value">
 		          					<td><xsl:value-of select="property_value"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="job_id">
+		          					<td><xsl:value-of select="job_id"/></td>
 		          				</xsl:if>				
 					     	</tr>
 				     	</xsl:for-each>

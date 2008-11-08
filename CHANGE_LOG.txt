@@ -1,5 +1,9 @@
 1.4.0-vcli-alpha Sara
 
+* Added to query and mechanics to manage job statuses
+
+* Written the basic queries and mechanics to have a persistent log and console
+
 * Started creating the base infrastructure for the service.
 
 * Refactored the coordinator backend adapter to reflect the coordinator nature of it.
