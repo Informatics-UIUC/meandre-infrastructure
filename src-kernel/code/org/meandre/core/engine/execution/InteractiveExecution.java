@@ -291,6 +291,8 @@ public class InteractiveExecution {
 	 * @return The unique execution ID
 	 */
 	public static String createUniqueExecutionFlowID ( String resFlow, int iPort ) {
-		return resFlow+NetworkTools.getNumericIPValue()+"/"+System.currentTimeMillis()+"/"+(Math.abs(new Random().nextInt()))+"/";
+		return resFlow + NetworkTools.getNumericIPValue()
+				+ Integer.toHexString(iPort).toUpperCase() + "/" + System.currentTimeMillis()
+				+ "/" + (Math.abs(new Random().nextInt())) + "/";
 	}
 }
