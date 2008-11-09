@@ -398,9 +398,12 @@
 			          				<xsl:if test="property_value">
 			          					<th>Value</th>
 			          				</xsl:if>		
-			          				<xsl:if test="job_id">
+			          				<xsl:if test="job_id and not(console)">
 			          					<th>Job ID</th>
-			          				</xsl:if>				
+			          				</xsl:if>	
+			          				<xsl:if test="console">	
+			          					<th>Console output</th>
+			          				</xsl:if>			
 		          				</tr>
 		          			</xsl:if>
 				     		<tr>
@@ -639,9 +642,22 @@
 		          				<xsl:if test="property_value">
 		          					<td><xsl:value-of select="property_value"/></td>
 		          				</xsl:if>
-		          				<xsl:if test="job_id">
-		          					<td><xsl:value-of select="job_id"/></td>
-		          				</xsl:if>				
+		          				<xsl:if test="job_id and not(console)">
+		          					<td>
+		          						<xsl:value-of select="job_id"/>
+		          						<a>
+						     				<xsl:attribute name="href">/services/jobs/job_console.html?uri=<xsl:value-of select="job_id"/></xsl:attribute> 
+											Console
+						     			</a>
+					     			</td>
+		          				</xsl:if>	
+		          				<xsl:if test="console">	
+		          					<td>
+		          						<pre>
+		          							<xsl:value-of select="console"/>
+		          						</pre>
+		          					</td>	
+		          				</xsl:if>	
 					     	</tr>
 				     	</xsl:for-each>
 		     		</table>

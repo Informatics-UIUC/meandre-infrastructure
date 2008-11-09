@@ -377,7 +377,7 @@ public abstract class JobInformationBackendAdapter {
 					sServerID,
 					sJobID,
 					sLevel.trim(),
-					oLog.toString().trim()
+					oLog.toString()
 				};
 			executeUpdateQueryWithParams(sQueryIJL, oaValuesUpdate);
 			
@@ -403,13 +403,13 @@ public abstract class JobInformationBackendAdapter {
 	 * @param sJobID The job ID login the entry
 	 * @param oText The log text to trace
 	 */
-	public void print ( String sJobID, Object oLog ) {
+	public void print ( String sJobID, Object oPrint ) {
 		try {
 			String sQueryIJC = propQueryMapping.getProperty(QUERY_INSERT_JOB_CONSOLE);
 			Object [] oaValuesUpdate = {
 					sServerID,
 					sJobID,
-					oLog.toString().trim()
+					oPrint.toString()
 				};
 			executeUpdateQueryWithParams(sQueryIJC, oaValuesUpdate);
 			
@@ -441,8 +441,8 @@ public abstract class JobInformationBackendAdapter {
 			Object [] oaValuesUpdate = { sJobID };
 			for ( List<String> ls:selectTextColumnsWithParams(sQueryIJC,oaValuesUpdate) ) {
 				String s = ls.get(ls.size()-1).trim();
-				s = s.replaceAll("\n$|\n\r$|\r\n$", "");
-				sb.append(ls.get(ls.size()-2).trim()+": "+s+"\n");
+				s = s.replaceAll("\n$|\n\r$|\r\n$", "\n");
+				sb.append(ls.get(ls.size()-2).trim()+": "+s);
 			}
 			
 			// Commit the transaction
@@ -476,8 +476,8 @@ public abstract class JobInformationBackendAdapter {
 			Object [] oaValuesUpdate = { sJobID };
 			for ( List<String> ls:selectTextColumnsWithParams(sQueryIJC,oaValuesUpdate) ) {
 				String s = ls.get(ls.size()-1);
-				s = s.replaceAll("\n$|\n\r$|\r\n$", "");
-				sb.append(s+"\n");
+				s = s.replaceAll("\n$|\n\r$|\r\n$", "\n");
+				sb.append(s);
 			}
 			
 			// Commit the transaction

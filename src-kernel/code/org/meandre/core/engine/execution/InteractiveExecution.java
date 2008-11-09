@@ -21,6 +21,8 @@ import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.utils.Constants;
 import org.meandre.core.utils.NetworkTools;
+import org.meandre.jobs.storage.backend.JobInformationBackendAdapter;
+import org.meandre.jobs.storage.helpers.PersistentPrintStream;
 import org.meandre.webservices.beans.JobDetail;
 import org.meandre.webservices.logger.WSLoggerFactory;
 import org.meandre.webui.PortScroller;
@@ -45,14 +47,22 @@ public class InteractiveExecution {
 	 * @param sToken The token to assign to the execution of the flow
 	 * @param job The job detail information bean
 	 * @param sFUID The flow execution unique ID
+	 * @param jiba The job information back end adapter
 	 * @return True if the execution succeeded, false otherwise
 	 * @throws IOException A problem was encountered when printing content to the output
 	 * @throws CorruptedDescriptionException The flow could not be properly recovered
 	 * @throws ConductorException An execution was thrown during the execution process
 	 */
-	public static boolean executeVerboseFlowURI( QueryableRepository qr, String sURI, OutputStream outStream, CoreConfiguration cnf, boolean bStats, String sToken, JobDetail job, String sFUID )  {
+	public static boolean executeVerboseFlowURI( QueryableRepository qr, 
+			String sURI, OutputStream outStream, CoreConfiguration cnf, 
+			boolean bStats, String sToken, JobDetail job, String sFUID,
+			JobInformationBackendAdapter jiba )  {
 
-		PrintStream pw = new PrintStream(outStream);
+		PersistentPrintStream pw = new PersistentPrintStream(
+				new PrintStream(outStream),
+				jiba,
+				sFUID
+			);
 		
 		pw.println("Meandre Execution Engine version "+Constants.MEANDRE_VERSION);
 		pw.println("All rights reserved by DITA, NCSA, UofI (2007-2008)");
@@ -184,6 +194,7 @@ public class InteractiveExecution {
 				WSLoggerFactory.getWSLogger().warning(baos.toString());
 			}
 		}
+		pw.close();
 		
 		if ( exec!=null )
 			return exec.hadGracefullTermination();
@@ -201,14 +212,22 @@ public class InteractiveExecution {
 	 * @param sToken The token to assign to the execution of the flow
 	 * @param job The job detail information bean
 	 * @param sFUID The flow execution unique ID
+	 * @param jiba The job information back end adapter
 	 * @return True if the execution succeeded, false otherwise
 	 * @throws IOException A problem was encountered when printing content to the output
 	 * @throws CorruptedDescriptionException The flow could not be properly recovered
 	 * @throws ConductorException An execution was thrown during the execution process
 	 */
-	public static boolean executeSilentFlowURI( QueryableRepository qr, String sURI, OutputStream outStream, CoreConfiguration cnf, String sToken, JobDetail job, String sFUID  ) {
+	public static boolean executeSilentFlowURI( QueryableRepository qr, 
+			String sURI, OutputStream outStream, CoreConfiguration cnf, 
+			String sToken, JobDetail job, String sFUID, 
+			JobInformationBackendAdapter jiba ) {
 
-		PrintStream pw = new PrintStream(outStream);
+		PersistentPrintStream pw = new PersistentPrintStream(
+				new PrintStream(outStream),
+				jiba,
+				sFUID
+			);
 		
 		// Create the execution
 		FlowDescription fd = qr.getFlowDescription(qr.getModel().createResource(sURI));
@@ -276,6 +295,8 @@ public class InteractiveExecution {
 			pw.println(te);
 			pw.flush();
 		}
+		
+		pw.close();
 		
 		if ( exec!=null )
 			return exec.hadGracefullTermination();
