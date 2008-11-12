@@ -1,5 +1,9 @@
 1.4.0-vcli-alpha Sara
 
+* Added the proxied url to the execute services execute_url and list_running_flows
+
+* Added a call that returns the proxied url on the component context properties
+
 * Hooked the webui proxy to the meandre server. This is just a bypass to the 
   webUI handler. The secondary server is still being started.
 

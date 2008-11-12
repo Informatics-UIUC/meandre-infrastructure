@@ -307,6 +307,9 @@
 			          				<xsl:if test="flow_instance_webui_uri">
 			          					<th>WebUI URL</th>
 			          				</xsl:if>
+			          				<xsl:if test="flow_instance_proxy_webui_uri">
+			          					<th>Proxy WebUI URL</th>
+			          				</xsl:if>
 			          				<xsl:if test="meandre_role_name">
 			          					<th>Role name</th>
 			          				</xsl:if>
@@ -542,6 +545,14 @@
 		          						<a>
 						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_webui_uri"/></xsl:attribute> 
 											<xsl:value-of select="flow_instance_webui_uri"/>
+						     			</a>
+		          					</td>
+		          				</xsl:if>	
+		          				<xsl:if test="flow_instance_proxy_webui_uri">
+		          					<td>
+		          						<a>
+						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_proxy_webui_uri"/></xsl:attribute> 
+											<xsl:value-of select="flow_instance_proxy_webui_uri"/>
 						     			</a>
 		          					</td>
 		          				</xsl:if>	
