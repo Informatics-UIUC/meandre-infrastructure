@@ -1453,7 +1453,7 @@ public class DemoRepositoryGenerator {
 		Resource resInsPT0 = ModelFactory.createDefaultModel().createResource(sBaseURL+"instance/pass-through/4");
 		Resource resInsPT0Component = ecdPT.getExecutableComponent();
 		String sInsPT0Name = "Pass Through 0";
-		String sInsPT0Desc = "Prints the concatenated object";
+		String sInsPT0Desc = "Passes the object through";
 		PropertiesDescription pdPInsPT0Properties = new PropertiesDescription();
 		ExecutableComponentInstanceDescription ecidPT0 = new ExecutableComponentInstanceDescription(resInsPT0,resInsPT0Component,sInsPT0Name,sInsPT0Desc,pdPInsPT0Properties);
 
