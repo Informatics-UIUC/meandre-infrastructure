@@ -45,7 +45,6 @@ def job_job_console ( request, response, format ):
             jiba = meandre_store.getJobInformation()
             for uri in params['uri'] :
                 console = jiba.getConsole(uri)
-                if len(console)==0 : 'Console not available'
                 content.append( {'job_id':uri, 'console':console} )
             statusOK(response)
             sendTJXContent(response,content,format)
