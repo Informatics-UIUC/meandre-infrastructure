@@ -5,7 +5,11 @@
 
 package org.meandre.client;
 
+import java.net.URI;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.meandre.core.repository.LocationBean;
@@ -313,6 +317,77 @@ public class MeandreProxy{
 		}
 		return bWasCallOK;
 	}
+	
+	/**
+     * returns the url name of any running flows and the urls assigned to
+     * the webui component of the flow.
+     *
+     * @return a map where the keys are flow id urls, and the values are webui
+     * urls
+     *
+     *<p> calls:
+     *http://<meandre_host>:<meandre_port>/services/execute/list_running_flows.json
+     *TODO: need to reverse the order in the map so that the always unique
+     * webui_url is the key and the not-always-unique flow intance url is
+     * the value. requires a server side change.
+     * FIXME: This is totally untested.
+     */
+    public Set<Map<String,URI>> getRunningFlowsInformation() {
+    	try {
+    		Set<Map<String,URI>> setRes = new HashSet<Map<String,URI>>(10);
+    		Map<URI,Map<String,URI>> mapTmp = this.client.retrieveRunningFlowsInformation();
+			for ( URI uri:mapTmp.keySet() )
+				setRes.add(mapTmp.get(uri));
+			return setRes;
+		} catch (TransmissionException e) {
+			return new HashSet<Map<String,URI>>();
+		}
+    }
+  
+
+    /**
+     * returns the job statuses.
+     *
+     * @return a vector of maps where the keys are status information keys.
+     *
+     *<p> calls:
+     *http://<meandre_host>:<meandre_port>/services/jobs/list_jobs_statuses.json
+     *TODO: need to reverse the order in the map so that the always unique
+     * webui_url is the key and the not-always-unique flow intance url is
+     * the value. requires a server side change.
+     * FIXME: This is totally untested.
+     */
+    public Vector<Map<String,String>> getJobStatuses() {
+    	try {
+	        return this.client.retrieveJobStatuses();
+    	}
+    	catch ( Exception e ) {
+    		return new Vector<Map<String,String>>();
+    	}
+    }
+    
+    /**
+     * returns the job console.
+     *
+     * @param sFUID The flow ID
+     * @return a string with the console for the given string.
+     *
+     *<p> calls:
+     *http://<meandre_host>:<meandre_port>/services/jobs/job_console.json
+     *TODO: need to reverse the order in the map so that the always unique
+     * webui_url is the key and the not-always-unique flow intance url is
+     * the value. requires a server side change.
+     * FIXME: This is totally untested.
+     */
+    public String getJobConsole(String sFUID) {
+    	try {
+	        return this.client.retrieveJobConsole(sFUID);
+    	}
+    	catch ( Exception e ) {
+    		return "Console not available";
+    	}
+    }
+
 	
 	/** Return the list of running flows of this proxy.
 	 * 

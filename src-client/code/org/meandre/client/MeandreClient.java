@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Vector;
 import java.util.Map.Entry;
 
 import org.apache.commons.httpclient.NameValuePair;
@@ -997,7 +998,7 @@ public class MeandreClient extends MeandreBaseClient{
 	        for ( int i=0,iMax=ja.length() ; i<iMax ; i++ ) {
 	        	JSONObject jo = ja.getJSONObject(i);
 	        	muRetrievedPairs.put(
-	        			new URI(jo.getString("low_instance_uri")), 
+	        			new URI(jo.getString("flow_instance_uri")), 
 	        			new URI(jo.getString("flow_instance_webui_uri"))
 	        		);
 	        }	        	
@@ -1005,6 +1006,102 @@ public class MeandreClient extends MeandreBaseClient{
     	}
     	catch ( Exception e ) {
     		throw new TransmissionException(e);
+    	}
+    }
+
+    /**
+     * returns the url name of any running flows and the urls assigned to
+     * the webui component of the flow.
+     *
+     * @return a map where the keys are flow id urls, and the values are webui
+     * urls
+     *
+     *<p> calls:
+     *http://<meandre_host>:<meandre_port>/services/execute/list_running_flows.json
+     *TODO: need to reverse the order in the map so that the always unique
+     * webui_url is the key and the not-always-unique flow intance url is
+     * the value. requires a server side change.
+     * FIXME: This is totally untested.
+     */
+    public Map<URI,Map<String,URI>> retrieveRunningFlowsInformation() throws TransmissionException{
+    	try {
+	        String sRestCommand = "services/execute/list_running_flows.json";
+	        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, null);
+	        JSONArray ja = new JSONArray(jtRetrieved);
+	        Map<URI, Map<String,URI>> muRetrievedPairs = new Hashtable<URI,Map<String,URI>>();
+	        for ( int i=0,iMax=ja.length() ; i<iMax ; i++ ) {
+	        	JSONObject jo = ja.getJSONObject(i);
+	        	Map<String,URI> map = new Hashtable<String,URI>(3);
+	        	URI furi = new URI(jo.getString("flow_instance_uri"));
+	        	map.put("flow_instance_uri",furi);
+	        	map.put("flow_instance_webui_uri",new URI(jo.getString("flow_instance_webui_uri")));
+	        	map.put("flow_instance_proxy_webui_uri",new URI(jo.getString("flow_instance_proxy_webui_uri")));
+	        	muRetrievedPairs.put(furi,map);
+	        }	        	
+	        return muRetrievedPairs;
+    	}
+    	catch ( Exception e ) {
+    		throw new TransmissionException(e);
+    	}
+    }
+
+    /**
+     * returns the job statuses.
+     *
+     * @return a vector of maps where the keys are status information keys.
+     *
+     *<p> calls:
+     *http://<meandre_host>:<meandre_port>/services/jobs/list_jobs_statuses.json
+     *TODO: need to reverse the order in the map so that the always unique
+     * webui_url is the key and the not-always-unique flow intance url is
+     * the value. requires a server side change.
+     * FIXME: This is totally untested.
+     */
+    public Vector<Map<String,String>> retrieveJobStatuses() throws TransmissionException{
+    	try {
+	        String sRestCommand = "services/jobs/list_jobs_statuses.json";
+	        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, null);
+	        JSONArray ja = new JSONArray(jtRetrieved);
+	        Vector<Map<String,String>> vecStatuses = new Vector<Map<String,String>>();
+	        for ( int i=0,iMax=ja.length() ; i<iMax ; i++ ) {
+	        	JSONObject jo = ja.getJSONObject(i);
+	        	Map<String,String> map = new Hashtable<String,String>(4);
+	        	map.put("status",jo.getString("status"));
+	        	map.put("server_id",jo.getString("server_id"));
+	        	map.put("ts",jo.getString("ts"));
+	        	map.put("job_id",jo.getString("job_id"));
+	        	vecStatuses.add(map);
+	        }	        	
+	        return vecStatuses;
+    	}
+    	catch ( Exception e ) {
+    		throw new TransmissionException(e);
+    	}
+    }
+
+    
+    /**
+     * returns the job console.
+     *
+     * @param sFUID The flow ID
+     * @return a string with the console for the given string.
+     *
+     *<p> calls:
+     *http://<meandre_host>:<meandre_port>/services/jobs/job_console.json
+     *TODO: need to reverse the order in the map so that the always unique
+     * webui_url is the key and the not-always-unique flow intance url is
+     * the value. requires a server side change.
+     * FIXME: This is totally untested.
+     */
+    public String retrieveJobConsole(String sFUID) throws TransmissionException{
+    	try {
+	        String sRestCommand = "services/jobs/job_console.json?uri="+sFUID;
+	        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, null);
+	        JSONArray ja = new JSONArray(jtRetrieved);
+	        return ja.getJSONObject(0).getString("console");
+    	}
+    	catch ( Exception e ) {
+    		return "Console not available";
     	}
     }
 
