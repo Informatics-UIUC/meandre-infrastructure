@@ -78,6 +78,17 @@ public interface ComponentContextProperties {
 	 */
 	public URL getWebUIUrl ( boolean bName ) throws ComponentContextException;
 
+	/** Gets the proxied webUI URL.
+	 *
+	 * @param bName True if the url needs to be build using the name.
+	 *              False build the URL using the IP address.
+	 * @return The proxy webUI URL
+	 * @throws ComponentContextException Problem recovering the IP
+	 *
+	 *
+	 */
+	public URL getProxyWebUIUrl ( boolean bName ) throws ComponentContextException;
+
 	/** Returns the unique ID of the executable instance for the current flow.
 	 *
 	 * @return The unique execution instance ID

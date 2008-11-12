@@ -366,6 +366,28 @@ implements ComponentContext {
 
 		return urlRes;
 	}
+	
+	/** Gets the proxied webUI URL.
+	 *
+	 * @param bName True if the url needs to be build using the name.
+	 *              False build the URL using the IP address.
+	 * @return The proxy webUI URL
+	 * @throws ComponentContextException Problem recovering the IP
+	 *
+	 *
+	 */
+	public URL getProxyWebUIUrl ( boolean bName ) throws ComponentContextException {
+		URL urlRes = null;
+		
+		try {
+			urlRes = new URL("http://"+NetworkTools.getLocalHostName()+":"+ccCnf.getBasePort()+"/webui/"+webui.getPort()+"/");
+		} catch (MalformedURLException e) {
+			throw new ComponentContextException(e);
+		}
+
+		return urlRes;
+	}
+
 
 	/** Returns the logging facility.
 	 *
