@@ -474,11 +474,15 @@ public abstract class JobInformationBackendAdapter {
 		try {
 			String sQueryIJC = propQueryMapping.getProperty(QUERY_SELECT_JOB_CONSOLE);
 			Object [] oaValuesUpdate = { sJobID };
-			for ( List<String> ls:selectTextColumnsWithParams(sQueryIJC,oaValuesUpdate) ) {
+			List<List<String>> lstConsole = selectTextColumnsWithParams(sQueryIJC,oaValuesUpdate);
+			for ( List<String> ls:lstConsole ) {
 				String s = ls.get(ls.size()-1);
 				s = s.replaceAll("\n$|\n\r$|\r\n$", "\n");
 				sb.append(s);
 			}
+			
+			if ( lstConsole.size()==0 )
+				sb.append("Console not available");
 			
 			// Commit the transaction
 			if ( bTransactional ) conn.commit();
