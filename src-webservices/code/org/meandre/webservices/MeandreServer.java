@@ -39,6 +39,7 @@ import org.meandre.webservices.servlets.WSPublicServlet;
 import org.meandre.webservices.servlets.WSPublishServlet;
 import org.meandre.webservices.servlets.WSRepositoryServlet;
 import org.meandre.webservices.servlets.WSSecurityServlet;
+import org.meandre.webservices.webuiproxy.WebUIProxy;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
@@ -273,11 +274,14 @@ public class MeandreServer {
 	 */
 	private Context initializeTheWebServices(Server server)
 			throws IOException {
+		
+		// Install the WebUI proxy before anyother handler
+		server.addHandler(new WebUIProxy());
+		
 		//
 		// Initializing the web services
 		//
 		Context contextWS = new Context(server,"/",Context.SESSIONS);
-
 		Constraint constraint = new Constraint();
 		constraint.setName(Constraint.__BASIC_AUTH);
 		

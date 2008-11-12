@@ -21,6 +21,7 @@ import com.hp.hpl.jena.vocabulary.XSD;
 
 /** A basic handler to display public Meandre information.
  * 
+ * @deprecated As release 1.4
  * @author Xavier Llor&agrave;
  *
  */

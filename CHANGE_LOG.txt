@@ -1,5 +1,12 @@
 1.4.0-vcli-alpha Sara
 
+* Hooked the webui proxy to the meandre server. This is just a bypass to the 
+  webUI handler. The secondary server is still being started.
+
+* Adding test to the WebUI infrastructure previous to the WebUI proxying. The
+  basic strategy is to stand a servlet handler on the service that tracks /webui/
+  requests and process them. 
+
 * Added a WS in the new created jobs section to pull the current console output of a job
 
 * Modified the interactive execution methods to create a new persistent print writer

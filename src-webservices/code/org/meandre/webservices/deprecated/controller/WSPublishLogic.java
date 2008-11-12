@@ -20,6 +20,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 /** The publish services logic
  * 
+ * @deprecated As release 1.4
  * @author Xavier Llor&agrave;
  *
  */

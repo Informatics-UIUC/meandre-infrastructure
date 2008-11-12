@@ -40,6 +40,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 /** This class wraps the basic logic to execute flows.
  *
+ * @deprecated As release 1.4
  * @author Xavier Llor&agrave;
  * -modified by Amit Kumar June 14th 2008 to return a 404 status if a flow does not exist
  */

@@ -20,6 +20,8 @@ import org.meandre.webservices.logger.WSLoggerFactory;
 /** 
  * A Handler for role management calls that affect the local security store.
  *
+ * 
+ * @deprecated As release 1.4
  * @author Peter Groves
  *
  */

@@ -47,7 +47,9 @@ public class WebUI {
 	 * @param cnf The core configuration object
 	 * @throws WebUIException The server could not be started
 	 */
-	public WebUI(String flowUniqueID, MrProper mrProper, MrProbe mrProbe, int iPort, Logger log, CoreConfiguration cnf) throws WebUIException {
+	public WebUI(String flowUniqueID, MrProper mrProper, MrProbe mrProbe, 
+			int iPort, Logger log, CoreConfiguration cnf) 
+	throws WebUIException {
 		// Storing config values
 		this.sFlowUniqueID = flowUniqueID;
 		this.mrProper = mrProper;

@@ -41,6 +41,7 @@ import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 
 /** The about services logic
  *
+ * @deprecated As release 1.4
  * @author Xavier Llor&agrave;
  * @modified by Amit Kumar: -added globalPluginsJSON function and getServerVersion function
  *  -May 31st 2008

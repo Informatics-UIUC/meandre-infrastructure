@@ -89,15 +89,15 @@ public class WebUIDispatcher extends AbstractHandler {
 			HttpServletResponse response, int dispatch) throws IOException,
 			ServletException {
 		
-		if ( target.startsWith("/admin/") )
+		
+		if ( target.startsWith("/admin/") ) {
 			processAdminRequest(target,request,response,dispatch);
+		}
 		else if ( target.startsWith("/public/resources") ) {
 			resource_handler.handle(target, request, response, dispatch);
 		}
 		else {
-		
 			if (lstHandlers.size() > 0) {
-				
 				Request base_request = (request instanceof Request) ? 
 		                (Request) request : 
 		                HttpConnection.getCurrentConnection().getRequest();

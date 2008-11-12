@@ -43,7 +43,7 @@ public class DemoRepositoryGenerator {
 	public static Logger log = DemoLoggerFactory.getDemoLogger();
 	
 	/** Base testing URL */
-	public static String sTestBaseURL = "http://test.org";
+	public static String sTestBaseURL = "meandre://test.org";
 	
 	/** A unique reference ID */
 	private static long lUniqueID = 0;

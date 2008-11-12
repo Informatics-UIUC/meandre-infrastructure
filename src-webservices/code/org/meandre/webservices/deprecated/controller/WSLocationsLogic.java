@@ -25,6 +25,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 /** This class groups all the basic logic required to maintain the locations
  * for the Meandre webservices interface.
  * 
+ * @deprecated As release 1.4
  * @author Xavier Llor&agrave;
  *
  */

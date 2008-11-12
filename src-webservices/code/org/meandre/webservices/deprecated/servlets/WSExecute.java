@@ -25,6 +25,7 @@ import org.meandre.webui.WebUIException;
 
 /** A basic handler to execute flows.
  * 
+ * @deprecated As release 1.4
  * @author Xavier Llor&agrave;
  *
  */

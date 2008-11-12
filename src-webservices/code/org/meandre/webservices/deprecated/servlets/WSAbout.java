@@ -22,6 +22,7 @@ import org.meandre.webservices.logger.WSLoggerFactory;
 
 /** A basic handler to display basic information.
  *
+ * @deprecated As release 1.4
  * @author Xavier Llor&agrave;
  * @modified Amit Kumar -Added support for /version and /plugins -May 31st 2008
  */

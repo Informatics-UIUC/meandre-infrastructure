@@ -19,6 +19,7 @@ import org.meandre.webservices.logger.WSLoggerFactory;
 
 /** A basic handler to handle the publishing facility.
  * 
+ * @deprecated As release 1.4
  * @author Xavier Llor&agrave;
  *
  */

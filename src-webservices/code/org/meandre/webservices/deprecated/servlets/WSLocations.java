@@ -25,6 +25,7 @@ import org.meandre.webservices.logger.WSLoggerFactory;
 	
 /** The class handling the locations interactions.
  * 
+ * @deprecated As release 1.4
  * @author Xavier Llor&agrave;
  *
  */

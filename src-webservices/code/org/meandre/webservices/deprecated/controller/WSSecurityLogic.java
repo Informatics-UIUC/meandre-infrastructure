@@ -19,6 +19,7 @@ import org.meandre.webservices.logger.WSLoggerFactory;
 /** 
  * Controller for privileges (role) management via web services.
  *
+ * @deprecated As release 1.4
  * @author Peter Groves
  *
  */
