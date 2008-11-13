@@ -127,6 +127,7 @@ public class MeandreProxy{
             try{
                 //Set<String> roles = this.client.retrieveUserRoles();
                 this.client.retrieveUserRoles();
+                bWasCallOK = true;
             }catch(TransmissionException e){
                 bWasCallOK = false;
                 log("Couldn't retrieve roles: " + e.toString());
@@ -143,6 +144,7 @@ public class MeandreProxy{
 		if ( this.qrCached==null ) {
             try{
                 this.qrCached = this.client.retrieveRepository();
+                bWasCallOK = true;
             }catch(TransmissionException e){
                 bWasCallOK = false;
                 log("Couldn't retrieve Repository: " +e.toString());
@@ -161,7 +163,9 @@ public class MeandreProxy{
 	public QueryableRepository getPublicRepository () {
 		// The public repository
         try{
-            return this.client.retrieveRepository();
+            QueryableRepository qr = this.client.retrieveRepository();
+            bWasCallOK = true;
+            return qr;
         }catch(TransmissionException e){
             bWasCallOK = false;
             log("Couldn't retrieve Public Repository: " + e.toString());
@@ -189,6 +193,7 @@ public class MeandreProxy{
 		Set<LocationBean> loca = null;
         try{
             loca = this.client.retrieveLocations();
+            bWasCallOK = true;
         }catch(TransmissionException e){
             bWasCallOK = false;
             log("Couldn't retrieve locations: " + e.toString());
@@ -206,6 +211,7 @@ public class MeandreProxy{
 		
         try{
             localWasCallOK = this.client.regenerate();
+            bWasCallOK = true;
         }catch(TransmissionException e){
     		localWasCallOK = false;		
             log("Proxy couldn't regenerate repository:") ;
@@ -229,6 +235,7 @@ public class MeandreProxy{
         try{
             if ( mapRoles!=null ) {
                 bWasCallOK = this.client.addLocation(sLocation, sDescription);
+                bWasCallOK = true;
             }
         }catch(Exception e){
             bWasCallOK = false;
@@ -248,6 +255,7 @@ public class MeandreProxy{
         try{
             if ( mapRoles!=null ) {
                 bWasCallOK = this.client.removeLocation(sLocation);
+                bWasCallOK = true;
             }
         }catch(Exception e){
             bWasCallOK = false;
@@ -266,6 +274,7 @@ public class MeandreProxy{
         if ( mapRoles!=null ) {
 		    try {
 			    bWasCallOK = this.client.publish(sURI);
+                bWasCallOK = true;
 			} catch (TransmissionException e) {
                 bWasCallOK = false;
 			    log.warning("Proxy couldn't perform publish: " + e);
@@ -287,6 +296,7 @@ public class MeandreProxy{
         if (mapRoles!=null) {
 		    try {
 			    bWasCallOK = this.client.unpublish(sURI);
+                bWasCallOK = true;
 			} catch (TransmissionException e) {
                 bWasCallOK = false;
 			    log.warning("Proxy couldn't perform unpublish: " + e);
@@ -307,6 +317,7 @@ public class MeandreProxy{
 		if ( mapRoles!=null ) {
 			try {
 				bWasCallOK = this.client.removeResource(sURI);
+                bWasCallOK = true;
 			} catch (TransmissionException e) {
                 bWasCallOK = false;
 			    log.warning("Proxy couldn't perform remove: " + e);
@@ -338,8 +349,10 @@ public class MeandreProxy{
     		Map<URI,Map<String,URI>> mapTmp = this.client.retrieveRunningFlowsInformation();
 			for ( URI uri:mapTmp.keySet() )
 				setRes.add(mapTmp.get(uri));
+            bWasCallOK = true;
 			return setRes;
 		} catch (TransmissionException e) {
+            bWasCallOK = false;
 			return new HashSet<Map<String,URI>>();
 		}
     }
@@ -359,9 +372,12 @@ public class MeandreProxy{
      */
     public Vector<Map<String,String>> getJobStatuses() {
     	try {
-	        return this.client.retrieveJobStatuses();
+	        Vector<Map<String, String>> js = this.client.retrieveJobStatuses();
+            bWasCallOK = true;
+            return js;
     	}
     	catch ( Exception e ) {
+            bWasCallOK = false;
     		return new Vector<Map<String,String>>();
     	}
     }
@@ -381,9 +397,12 @@ public class MeandreProxy{
      */
     public String getJobConsole(String sFUID) {
     	try {
-	        return this.client.retrieveJobConsole(sFUID);
+	        String jc = this.client.retrieveJobConsole(sFUID);
+            bWasCallOK = true;
+            return jc;
     	}
     	catch ( Exception e ) {
+            bWasCallOK = false;
     		return "Console not available";
     	}
     }
