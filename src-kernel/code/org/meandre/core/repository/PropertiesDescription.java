@@ -1,4 +1,4 @@
-package org.meandre.core.repository;
+ package org.meandre.core.repository;
 
 import java.util.Collection;
 import java.util.Hashtable;

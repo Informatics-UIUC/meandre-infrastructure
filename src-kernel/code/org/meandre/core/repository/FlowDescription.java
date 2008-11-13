@@ -231,6 +231,25 @@ public class FlowDescription {
 		return (ecd==null)?null:ecd.getExecutableComponent();
 
 	}
+	
+	/** Returns the executable component instance description based on the resource.
+	 * 
+	 * @param res The requested resource
+	 * @return The Executable component instance description
+	 */
+	public ExecutableComponentInstanceDescription getExecutableComponentInstanceDescription ( Resource res ) {
+		return htExecutableComponentInstances.get(res);
+	}
+
+	/** Returns the executable component instance description based on the stringfyed resource.
+	 * 
+	 * @param sRes The requested resource
+	 * @return The Executable component instance description
+	 */
+	public ExecutableComponentInstanceDescription getExecutableComponentInstanceDescription ( String sRes ) {
+		Resource res = ModelFactory.createDefaultModel().createResource(sRes);
+		return htExecutableComponentInstances.get(res);
+	}
 
 	/** Adds an executable component instance.
 	 *
