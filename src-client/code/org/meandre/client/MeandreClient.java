@@ -38,8 +38,12 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 /**
  * Programmatic interface to the Meandre server webservices API. Mimicks opening
  * a session with the server and allowing the client to interact with it,
- * although in reality the session has no state and WSCLient simply sends an
+ * although in reality the session has no state and MeandreClient simply sends an
  * independent http request for every operation.
+ *
+ * <p>The setCredentials() method must be called before authorized calls on 
+ * a MeandreClient can be invoked. All calls are authorized unless they say
+ * specifically that they do not require authoriziation.
  *
  * @author pgroves
  *
@@ -47,9 +51,13 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 public class MeandreClient extends MeandreBaseClient{
 
     /**
-     * initialize to talk to a particular server.
+     * initialize to talk to a particular server. You need to call the
+     * "setCredentials" method in MeandreBaseClient before you can make 
+     * authorized calls to the server. 
      *
-     * @param serverHost just the hostname, e.g. "localhost", not "http://localhost"
+     *
+     * @param serverHost just the hostname, e.g. "localhost", 
+     *      NOT "http://localhost"
      * @param serversPort the port on the serverhost that the server is listening
      */
     public MeandreClient(String serverHost, int serversPort){
@@ -70,7 +78,8 @@ public class MeandreClient extends MeandreBaseClient{
      *
      * TODO: need a java object instance to represent installation properties
      */
-    public JSONObject retrieveInstallationProperties() throws TransmissionException{
+    public JSONObject retrieveInstallationProperties()
+            throws TransmissionException{
         String sRestCommand = "services/about/installation.json";
         try {
         	JSONTokener jt = executeGetRequestJSON(sRestCommand, null);
@@ -1169,7 +1178,7 @@ public class MeandreClient extends MeandreBaseClient{
         //we must modify the global port, so save the value to reset it at the
         //end
         int masterPort = this.getPort();
-        this.setServerAddress(this.getServerUrl(), iRunningFlowPort);
+        this.setServerAddress(this.getServerHost(), iRunningFlowPort);
 
         String sRestCommand = "admin/abort.txt";
         boolean success = false;
@@ -1181,7 +1190,7 @@ public class MeandreClient extends MeandreBaseClient{
             throw e;
         }finally{
             //reset the port for this client instance
-            this.setServerAddress(this.getServerUrl(), masterPort);
+            this.setServerAddress(this.getServerHost(), masterPort);
         }
         return success;
     }
@@ -1208,7 +1217,7 @@ public class MeandreClient extends MeandreBaseClient{
         //we must modify the global port, so save the value to reset it at the
         //end
         int masterPort = this.getPort();
-        this.setServerAddress(this.getServerUrl(), iRunningFlowPort);
+        this.setServerAddress(this.getServerHost(), iRunningFlowPort);
 
         String sRestCommand = "admin/statistics.json";
         JSONObject joRetrieved = null;
@@ -1221,7 +1230,7 @@ public class MeandreClient extends MeandreBaseClient{
             throw new TransmissionException(je);
         }finally{
             //reset the port for this client instance
-            this.setServerAddress(this.getServerUrl(), masterPort);
+            this.setServerAddress(this.getServerHost(), masterPort);
         }
 
         return joRetrieved;

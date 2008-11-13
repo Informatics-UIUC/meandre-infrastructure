@@ -12,6 +12,18 @@ import org.meandre.core.security.SecurityManager;
 import org.meandre.core.security.SecurityStoreException;
 import org.meandre.core.security.User;
 
+/**
+ * A client interface to the security system of a remote meandre server. This
+ * client allows a user with admin privileges to create and modify user accounts,
+ * and assign/revoke roles of users. The client is initialized with a server's
+ * hostname and port, and the credentials of the admin user the client is 
+ * acting on behalf of. Once initialized, MeandreAdminClient acts as a
+ * SecurityManager, where all calls to the underlying SecurityManager on
+ * the server side are relayed through webservices calls.
+ *
+ * @author Peter Groves
+ *
+ */
 public class MeandreAdminClient extends MeandreBaseClient 
 implements SecurityManager{
 
@@ -19,8 +31,8 @@ implements SecurityManager{
      * urls end up being something like:
      * "http://{host}:{port}/{CMD_BASE}{CMD_XXXXX}.{ext}
      *
-     * CMD_XXXX can be CMD_ROLES_OF_USER, CMD_USERS ....
-	 * ext is json, xml, ...
+     * {CMD_XXXX} can be CMD_ROLES_OF_USER, CMD_USERS ....
+	 * {ext} is json, xml, ...
      */
     public static final String CMD_BASE = "services/security/";
 
@@ -44,6 +56,8 @@ implements SecurityManager{
     public static final String PARAM_FULL_NAME = "user_full_name";
     public static final String PARAM_PASSWORD = "password";
     public static final String PARAM_ROLE = "role_name";
+
+
     /**
      * initialize to talk to a particular server. 
      *
@@ -54,7 +68,11 @@ implements SecurityManager{
         super(serverHost, serversPort);
     }
     
-    
+    /**
+     * create a new user with the given nickName, name, and password. This is
+     * the password the new user will have, not the password of the
+     * admin account being used to perform the operation.
+     */
     public User createUser(String nickName, String name, String password)
             throws SecurityStoreException {
         String sRestCommand = CMD_BASE + CMD_CREATE_USER + ".json";
@@ -98,6 +116,10 @@ implements SecurityManager{
         return roles;
     }
 
+    /**
+     * get the User object of the account associated with a nickName on
+     * the server.
+     */
     public User getUser(String nickName) throws SecurityStoreException {
         String sRestCommand = CMD_BASE + CMD_USER + ".json";
 		Set<NameValuePair> nvps = new HashSet<NameValuePair>();
@@ -116,7 +138,7 @@ implements SecurityManager{
     }
     
     /** retrieve a list of all users from the remote Meandre server. 
-     * @throws Exception */
+     **/
     public Set<User> getUsers() throws SecurityStoreException {
         String sRestCommand = CMD_BASE + CMD_USERS + ".json";
 		Set<User> users = null;
@@ -138,6 +160,9 @@ implements SecurityManager{
     */
 
 
+    /**
+     * grants a user a role, and therefore the permissions of that role.
+     */
     public void grantRole(User usr, Role roleToGrant)
             throws SecurityStoreException {
         String sRestCommand = CMD_BASE + CMD_ASSIGN_ROLE + ".json";
@@ -175,7 +200,7 @@ implements SecurityManager{
 
 	/**
 	 * calls getRolesOfUsers to retrieve the roles of the user from
-	 * the server and then checks it for the input role
+	 * the server and then checks it for the input roleToCheck.
 	 */
     public boolean hasRoleGranted(User usr, Role roleToCheck)
             throws SecurityStoreException {
@@ -204,6 +229,7 @@ implements SecurityManager{
         
     }
 
+    /** remove the roleToRevoke from the user's set of roles on the server */
     public void revokeRole(User usr, Role roleToRevoke)
             throws SecurityStoreException {
 

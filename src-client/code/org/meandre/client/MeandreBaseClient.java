@@ -24,6 +24,15 @@ import org.json.JSONTokener;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
+/**
+ * The basic framework for making calls to the webservices of a running
+ * Meandre Infrastructure instance. MeandreBaseClient takes care of 
+ * authorization and basic http communication. Also provides convenience
+ * methods for common types of meandre requests, such as GET request that 
+ * returns data in JSON format.
+ *
+ * @author Peter Groves
+ */
 public class MeandreBaseClient{
 
 	/** handles low level communication with a meandre server */
@@ -33,7 +42,7 @@ public class MeandreBaseClient{
 	private  Credentials _credentials = null;
 
 	/**base url of the server to interact with. */
-    private String _serverUrl = null;
+    private String _serverHost = null;
 	
     /**port number the server is listening on.*/
     private int _port;
@@ -42,28 +51,44 @@ public class MeandreBaseClient{
 	/**
 	 * initialize a client that talks to a Meandre server located at the input
 	 * url and port.
+     *
+     * @param serverHost just the hostname, e.g. "localhost", 
+     *      NOT "http://localhost"
+     * @param serversPort the port on the serverhost that the server is listening
 	 */
-	public MeandreBaseClient(String serverUrl, int serversPort){
+	public MeandreBaseClient(String serverHost, int serversPort){
 	    _httpClient = new HttpClient();
-		setServerAddress(serverUrl, serversPort);
+		setServerAddress(serverHost, serversPort);
 	}
 
 
 	/**
 	 * initialize a client that talks to a Meandre server located at 
-	 * http://localhost on port 1714.
+	 * http://localhost on port 1714. 
+     * <p>same as MeandreBaseClient("localhost", 1714)
 	 */
 
 	public MeandreBaseClient(){
-		this("http://localhost", 1714);
+		this("localhost", 1714);
 	}
 
+    /**
+     * set the username and password that this client will use when sending
+     * requests to the server. must be set before any server calls requiring
+     * authentication are made.
+     */
     public void setCredentials(String userName, String password){
         updateCredentials(userName, password);
     }
 
-    public void setServerAddress(String serverUrl, int serversPort){
-        _serverUrl = serverUrl;
+    /**
+     * Change the server and port that this client will communicate with.
+     * Note that this does not reset the credentials - the same credentials
+     * used on the old serverHost will be used on the new server until 
+     * you call setCredentials.
+     */
+    public void setServerAddress(String serverHost, int serversPort){
+        _serverHost = serverHost;
         _port = serversPort;
 		updateConnection();
     }
@@ -77,20 +102,19 @@ public class MeandreBaseClient{
         return _port;
     }
 
-    public String getServerUrl(){
-        return _serverUrl;
+    public String getServerHost(){
+        return _serverHost;
     }
 
 	/**
 	 * synchronizes the open http connection with this MeandreClient's
-	 * internal variables (server, port, credentials)
+	 * internal variables (server, port, credentials).
 	 */
 	private void updateConnection(){
 	    HostConfiguration config = new HostConfiguration();
-        config.setHost(_serverUrl, _port);
+        config.setHost(_serverHost, _port);
         _httpClient.setHostConfiguration(config);
 		if(_credentials != null){
-			//AuthScope scope = new AuthScope(_serverUrl, _port, null);
             AuthScope scope = new AuthScope(null, _port, null);
 			_httpClient.getState().setCredentials(scope, _credentials);
 		}
@@ -228,6 +252,7 @@ public class MeandreBaseClient{
 	/***
 	 * performs a GET request and returns the response in json format.
 	 * returns null if the response was an empty string.
+     * see <code>executePostRequestBytes</code> for info on params
 	 *  
 	 */
 	public JSONTokener executeGetRequestJSON(String sRestCommand, 
@@ -244,6 +269,7 @@ public class MeandreBaseClient{
 
 	/**
 	 * performs a GET request and returns the response data as a string.
+     * see <code>executePostRequestBytes</code> for info on params
 	 *
 	 */
 	public String executeGetRequestString(String sRestCommand,
@@ -265,6 +291,7 @@ public class MeandreBaseClient{
 	 * performs a GET request and returns the response data as an RDF
 	 * Jena Model. The sRestCommand must request the model data in 
 	 * the N-Triple format (*.nt file)
+     * see <code>executePostRequestBytes</code> for info on params
 	 *
 	 */
 
