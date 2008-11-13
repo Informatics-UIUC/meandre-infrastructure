@@ -904,6 +904,7 @@ public class MeandreClient extends MeandreBaseClient{
         postParts.add(new FilePart("repository", source));
        
 		byte[] baRetrieved = executePostRequestBytes(sRestCommand, nvps, postParts);
+		
         return new String(baRetrieved);
     }
 
@@ -925,8 +926,6 @@ public class MeandreClient extends MeandreBaseClient{
         Set<NameValuePair> nvps = new HashSet<NameValuePair>();
         nvps.add(new NameValuePair("uri", sFlowUrl));
         nvps.add(new NameValuePair("statistic", Boolean.toString(verbose)));
-
-
         InputStream insResult = executeGetRequestStream(sRestCommand, nvps);
         return insResult;
     }

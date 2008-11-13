@@ -5,6 +5,8 @@
 
 package org.meandre.client;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Map;
@@ -14,6 +16,8 @@ import java.util.logging.Logger;
 
 import org.meandre.core.repository.LocationBean;
 import org.meandre.core.repository.QueryableRepository;
+
+import com.hp.hpl.jena.rdf.model.Model;
 
 
 
@@ -407,6 +411,21 @@ public class MeandreProxy{
     	}
     }
 
+    /** Runs the requested model on the server
+     * 
+     * @param mod The model to run
+     * @return The output
+     */
+    public String runRepository (Model mod) {
+    	try {
+			return client.runRepository(mod);
+		} catch (TransmissionException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			PrintStream ps = new PrintStream(baos);
+			e.printStackTrace(ps);
+			return "Failed to run the requested repository!!!\n"+baos.toString();
+		}
+    }
 	
 	/** Return the list of running flows of this proxy.
 	 * 
