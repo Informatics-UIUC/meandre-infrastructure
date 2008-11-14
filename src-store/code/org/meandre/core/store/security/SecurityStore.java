@@ -36,9 +36,11 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-/** Implements a secury store. Sensitive information should be store
- * here. For instance, it maintains all the privileges accounting for the 
- * Meandre web app.
+/** 
+ * A SecurityManager implementation that stores the user/role information
+ * in a parent Store and keeps the meandre-realm properties file updated so
+ * Jetty knows about the current state of permissions.
+ * 
  * 
  * @author Xavier Llor&agrave;
  * @author Peter Groves
@@ -47,7 +49,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 
 public class SecurityStore implements SecurityManager {
 
-    /** Query all nicknames */
+    /** LARQ Query for all nicknames */
     public static final String QUERY_ALL_NICKNAMES = 
     	"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n" +
     	"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
@@ -63,7 +65,7 @@ public class SecurityStore implements SecurityManager {
 		"    ?user meandreSecProp:nickname ?nickname "+
 		"}";
 
-    /** Query all users */
+    /** LARQ Query for all users */
     public static final String QUERY_ALL_USERS = 
     	"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n"+
     	"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"+
@@ -90,7 +92,7 @@ public class SecurityStore implements SecurityManager {
 		//"ORDER BY ?nickname ?name ?password ?date ?action";
 
 
-    /** The model repository */
+    /** The model repository. contains all users and their roles */
     protected Model _model = null;
 
     /** The core root logger */
@@ -145,50 +147,7 @@ public class SecurityStore implements SecurityManager {
         flush();
     }
 
-    /** Creates the basic default accounting information. Adds info on
-     * available roles to the rdf store, creates an admin user.
-     * 
-     * @throws SecurityStoreException The password encryptor failed
-     * 
-     */
-/*    private void initializeAccounting() throws SecurityStoreException {
-        log("initialzeAccounting begin");
-		Resource resRoot = _model.createResource(BASE_SECURITY_URL);
-		//log("resRoot created");
-		// Create the actions
-		/*Resource resBaseAct = _model.createResource(Role.BASE_WEB_ROLE_URL);
-		for (Role role : Role.getStandardRoles()) {
-            String sRoleUrl = role.getUrl();
-            Resource resRole = _model.createResource(sRoleUrl);
-			resBaseAct.addProperty(RDFS.subClassOf, resRole);
-        }
-		//log("web roles added");
-		
-		Property propRoleBase = null;
-		//try{
-		    propRoleBase = ResourceFactory.createProperty(Role.BASE_WEB_ROLE_URL);
-		//}catch(Exception e){
-		 //   log(e.toString());
-		//}
-        //log("roles base prop made");
-		resRoot.addProperty(propRoleBase, resBaseAct);/
-		//log("base role added");
-		// Creates the admin user and grant all roles
-        String adminUserName = _store.getAdminUserNickName();
-        String adminPass = PasswordEncryptor.encrypt(adminUserName);
-        String adminFullName = "Admin Istrator";
-        log("creating admin");
-        User admin = createUser(adminUserName, adminFullName, adminPass);
-        //give admin all available roles
-        log(".initializeAccounting: adding admin's roles");
-        grantRoles(admin, Role.getStandardRoles());
-	}
-*/
-
- 
-
-
-
+    /** see SecurityManager interface. */
     public User createUser(String sNickName, String sName, String sPassword) 
     throws SecurityStoreException {
         //create storedUser instance
@@ -203,12 +162,7 @@ public class SecurityStore implements SecurityManager {
         return stUser;
     }
 
-
-    /** Removes a user form the system.
-     * 
-     * @param usr The user to delete
-     * @throws SecurityStoreException Admin user cannot be deleted from the system
-     */
+    /** see SecurityManager interface. */
     public void removeUser(User user) throws SecurityStoreException {
     	StoredUser stUser = userToStoredUser(user);
     	if (user.getNickName().equals(_store.getAdminUserNickName()) )
@@ -220,10 +174,8 @@ public class SecurityStore implements SecurityManager {
     		flush();    	
     	}
     }
-    /** Return the nick name of every user in the store.
-     * 
-     * @return The user nick names
-     */
+
+    /** see SecurityManager interface. */
     public Set<String> getUsersNickNames(){
    
     	Query query = QueryFactory.create(QUERY_ALL_NICKNAMES) ;
@@ -238,6 +190,7 @@ public class SecurityStore implements SecurityManager {
     	return setNickNames;
     }
     
+    /** see SecurityManager interface. */
     public Set<User> getUsers() throws SecurityStoreException{
         //not sure why this cast is necessary
         Set<User> users = new HashSet<User>();
@@ -251,17 +204,14 @@ public class SecurityStore implements SecurityManager {
         return users;
     }
     
+    /** see SecurityManager interface. */
     public User getUser(String sNickName) throws SecurityStoreException {
         return getStoredUser(sNickName);
     }
 
 
-   /** Check if the given role has been granted to the given user.
-     * 
-     * @param sRole The role
-     * @param sNickName The user nickname
-     * @return True if role granted, false otherwhise
-     */
+
+    /** see SecurityManager interface. */
     public boolean hasRoleGranted (User usr, Role roleToCheck) {
 
         boolean bHasRole = false;
@@ -277,15 +227,16 @@ public class SecurityStore implements SecurityManager {
     	return bHasRole;
     }
 
-    /**
-     * looks up a user in the store and returns its roles.
-     */
+
+    /** see SecurityManager interface. */
     public Set<Role> getRolesOfUser(User usr)
     throws SecurityStoreException{
         StoredUser stUser = userToStoredUser(usr);
         return stUser.getRoles();
     }
-
+    
+    
+    /** see SecurityManager interface. */
     public void grantRole(User usr, Role roleToGrant)
             throws SecurityStoreException {
         log("grantRole begin. user = " + usr.getNickName() + ", role = " +
@@ -308,13 +259,7 @@ public class SecurityStore implements SecurityManager {
         }
     }
     
-    /**
-     * associates a user with a set of roles being granted to it and
-     * commits the change to the Store.
-     *
-     * @param usr User getting new privileges
-     * @param rolesToGrant the new privilege levels to assign to usr
-     */
+     /** see SecurityManager interface. */
     public void grantRoles(User usr, Set<Role> rolesToGrant)
     throws SecurityStoreException {
         for(Role role : rolesToGrant){
@@ -322,6 +267,7 @@ public class SecurityStore implements SecurityManager {
         }
     }
     
+    /** see SecurityManager interface. */
     public void revokeRole(User usr, Role roleToRevoke)
             throws SecurityStoreException {
         log("revokeRole begin. user = " + usr.getNickName() + ", role = " +
@@ -345,14 +291,15 @@ public class SecurityStore implements SecurityManager {
 		}  
     }
 
-
+    /** see SecurityManager interface. */
     public void revokeRoles(User usr, Set<Role> rolesToRevoke)
     throws SecurityStoreException {
         for(Role role: rolesToRevoke ) {
                revokeRole(usr, role);
         }  
     }
-
+    
+    /** see SecurityManager interface. */
     public void revokeAllRoles(User usr) throws SecurityStoreException {
         Set<Role> roles = getRolesOfUser(usr);
         log(roles.toString());
@@ -362,17 +309,6 @@ public class SecurityStore implements SecurityManager {
 	public Set<Role> getValidRoles() throws SecurityStoreException {
 		return Role.getStandardRoles();
 	}
-    /*public User updateUser(String nickName, String name, String password)
-    throws SecurityStoreException {
-       StoredUser stUser = getStoredUser(nickName);
-       Set<Role> existingRoles = stUser.getRoles();
-       removeUser(stUser);
-       User newUser = createUser(nickName, name, password);
-       grantRoles(newUser, existingRoles); 
-       return newUser;
-    }*/
-
-
     
     /**
      * return the internal rdf model of this security store
@@ -395,8 +331,11 @@ public class SecurityStore implements SecurityManager {
         return roles;
     }    
     
+    /**
+     * queries the local jena model for a list of all users.
+     */
     private Set<StoredUser> getStoredUsers()
-    throws SecurityStoreException{
+            throws SecurityStoreException{
         //log("getUsers begin");
         Query query = QueryFactory.create(QUERY_ALL_USERS) ;
         QueryExecution exec = QueryExecutionFactory.create(query, _model, null);
@@ -439,7 +378,7 @@ public class SecurityStore implements SecurityManager {
      *
      */
     private StoredUser userToStoredUser(User user) 
-    throws SecurityStoreException{
+            throws SecurityStoreException{
         return getStoredUser(user.getNickName());
     }
 
@@ -448,7 +387,7 @@ public class SecurityStore implements SecurityManager {
      * it (as a StoredUser instance).
      */
     private StoredUser getStoredUser(String sNickName) 
-    throws SecurityStoreException {
+            throws SecurityStoreException {
         //get all users
         Set<StoredUser> stUsers = getStoredUsers();
         //find one with the input nickname
@@ -513,6 +452,17 @@ public class SecurityStore implements SecurityManager {
        // Make globally available
        LARQ.setDefaultIndex(_index);
    }
+    
+    /**
+     * an extension of a basic user object that is aware of it's roles 
+     * (permissions). The roles associated with a user are actually a property
+     * of the SecurityStore, not the User, so this is a view of a User that 
+     * only the SecurityStore is allowed to see. Also can generate jena (rdf)
+     * models to be added/removed from the main SecurityStore model that 
+     * contains all users and roles.
+     * 
+     * @author pgroves
+     */
     private class StoredUser extends User{
 
     	/** The creation date */
@@ -524,16 +474,12 @@ public class SecurityStore implements SecurityManager {
     	/** The set of role actions assigned to the user */
 	    private Set<Role> _actionRoles = null;       
 
-
-   
-        
         public StoredUser(String sNickName, String sName, String sPassword,
                 String sDate) throws SecurityStoreException{
             super(sNickName, sName);
             _sDate = sDate;
             _sPassword = sPassword;
             _actionRoles = new HashSet<Role>();
-            //_actionRoles.add(Role.HOME);
         }
 
         /**
@@ -549,7 +495,6 @@ public class SecurityStore implements SecurityManager {
 	    	String sNow = dateFormatter.format(dateNow);
 	    	_sDate = sNow;
             _actionRoles = new HashSet<Role>();
-            //_actionRoles.add(Role.HOME);
         }
 
 
@@ -578,6 +523,10 @@ public class SecurityStore implements SecurityManager {
         private String getUrl(){
             return User.BASE_USER_PROPERTY_URL + "/" + this.getNickName();
         }
+        
+        /**
+         * generates a jena model of a user including it's assigned roles.        
+         */
         public Model getModel(){
             Model model = ModelFactory.createDefaultModel();
     		model.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
