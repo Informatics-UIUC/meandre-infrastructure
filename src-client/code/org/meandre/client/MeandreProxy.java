@@ -54,6 +54,9 @@ public class MeandreProxy{
 
 	/** Did the last call succeed */
 	private boolean bWasCallOK;
+	
+	/**Server version string*/
+	private String serverVersion;
 
 
 	/** Creates a Meandre Proxy and contacts the server to initialize
@@ -61,16 +64,30 @@ public class MeandreProxy{
 	 * 
 	 * @param sUser The user of the proxy
 	 * @param sPasswd The password of the proxy
-	 * @param sURL The Meandre server URL
+	 * @param sServerHost The Meandre server 
+	 * @param iServerPort The Meandre server port
 	 */
 	public MeandreProxy ( String sUser, String sPasswd, String sServerHost,
             int iServerPort ) {
+		update(sUser,sPasswd,sServerHost,iServerPort);
+	}
+	
+	/**Call this function when you want to reuse the function
+	 *
+	 * @param sUser The user of the proxy
+	 * @param sPasswd The password of the proxy
+	 * @param sServerHost The Meandre server 
+	 * @param iServerPort The Meandre server port
+	 */
+	public void update ( String sUser, String sPasswd, String sServerHost,
+			int iServerPort ) {
 		this.sUserName = sUser;
 		this.sPassword = sPasswd;
-		this.sBaseURL  = "http://" + sServerHost + ":" + 
-                Integer.toString(iServerPort) + "/";
-
-        this.client = new MeandreClient(sServerHost, iServerPort);
+		
+		String hostWithProtocol = "http://"+sServerHost;
+		this.sBaseURL  = hostWithProtocol +":"+iServerPort +"/";
+		
+		this.client = new MeandreClient(sServerHost, iServerPort);
         client.setCredentials(sUser, sPasswd);
 		
 		String sUserPassword = sUserName + ":" + sPassword;
@@ -81,7 +98,7 @@ public class MeandreProxy{
 		// Force the repository caching
 		this.qrCached = getRepository();
 	}
-
+	
 	/** Returns true if the proxy was successfully initialized; false otherwise.
 	 *  
 	 * @return True is successfully initialized
@@ -507,4 +524,95 @@ public class MeandreProxy{
 			log.warning(e.toString());
 		}
 	}*/
+	
+	// ---- Amit's patch comented by Xavier ---------------
+	// TODO: Write the proper test for these methods
+
+    /** Gets the RDF component description
+	 *
+     * @param componentUri The component URI
+     * @return The string containing the RDF
+     */
+	public String getComponentDescriptor(String componentUri) {
+		String descriptor=null;
+		try {
+			descriptor = this.client.retrieveComponentDescriptorAsString(componentUri);
+		} catch (TransmissionException e) {
+			log.severe(e.getMessage());
+		}
+		return descriptor;
+	}
+
+
+	/** Gets the server version.
+	 * 
+	 * @return The server version
+	 * @throws TransmissionException Could not get the server version
+	 */
+	public String getComponentJarInfo(String jarFile) {
+		String jarInfo=null;
+		try {
+			jarInfo=this.client.getComponentJarInfo(jarFile);
+		} catch (TransmissionException e) {
+			log.severe(e.getMessage());
+		}
+		return jarInfo;
+	}
+
+	/** Pings the server
+	 *
+	 *	@return True if it successfully pinged the server
+	 */
+	public boolean ping() {
+		try {
+			return this.client.ping();
+		} catch (TransmissionException e) {
+			log.severe(e.getMessage());
+		}
+		return false;
+	}
+	
+	/** Gets the server version.
+	 * 
+	 * @return The server version
+	 * @throws TransmissionException Could not get the server version
+	 */
+	public String getServerVersion() {
+		String versionString = null;
+		int status= 500;
+		try {
+			versionString = this.client.getServerVersion();
+		} catch (TransmissionException e) {
+			log.severe(e.getMessage());
+		}
+		if ( versionString==null || status == 404){
+			bWasCallOK = false;	
+			this.serverVersion = "N/A";
+		}else{
+			int i=versionString.indexOf("=");
+			if(i==-1){
+				log.warning("Error could not get the server version");
+				this.serverVersion ="N/A";
+				return this.serverVersion;
+			}
+			this.serverVersion = versionString.substring(i+1);
+		}
+		return this.serverVersion;
+	}
+	
+	/** Return the JSON content describing the plugins available.
+	 * 
+	 * @return The JSON string
+	 * @throws TransmissionException Fail to retrieve the plugins' information
+	 */
+	public String getServerPluginsAsJSON() {
+		String pluginString = null;
+		try {
+			pluginString = this.client.getServerPlugins();
+		} catch (TransmissionException e) {
+			log.fine(e.getMessage());
+		}
+		return pluginString;
+	}
+	
 }

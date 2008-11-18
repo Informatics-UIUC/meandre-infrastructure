@@ -1236,6 +1236,78 @@ public class MeandreClient extends MeandreBaseClient{
         return joRetrieved;
     }
 
+    //----- Amit's patch comented by Xavier and are UNTESTED ----
+    // TODO: Write test cases for the methods below
+
+    /** Return Component Descriptor as String
+     *
+     * @param sComponentUrl The component url
+     * @return The RDF description of the component
+     * @throws TransmissionException The component could not be retrieved
+     */
+	public String retrieveComponentDescriptorAsString(
+			String sComponentUrl) throws TransmissionException {
+		String sRestCommand = "services/repository/describe_component.nt";
+		Set<NameValuePair> nvps = new HashSet<NameValuePair>();
+		nvps.add(new NameValuePair("uri", sComponentUrl));
+		String model= executeGetRequestString(sRestCommand, nvps);
+		return model;
+	}
+
+	/** Gets the server version.
+	 * 
+	 * @return The server version
+	 * @throws TransmissionException Could not get the server version
+	 */
+	public String getServerVersion() throws TransmissionException {
+		String sRestCommand = "services/about/version.txt";
+		Set<NameValuePair> nvps = new HashSet<NameValuePair>();
+		String sResults = executeGetRequestString(sRestCommand, nvps);
+		return sResults;
+	}
+
+	/** Return the JSON content describing the plugins available.
+	 * 
+	 * @return The JSON string
+	 * @throws TransmissionException Fail to retrieve the plugins' information
+	 */
+	public String getServerPlugins() throws TransmissionException {
+		String sRestCommand = "services/about/plugin.json";
+		Set<NameValuePair> nvps = new HashSet<NameValuePair>();
+		String sResults = executeGetRequestString(sRestCommand, nvps);
+		return sResults;
+	}
+
+    
+	/** Returns jar information
+	 *
+	 * @param jarFile The jar file to get the info from
+	 * @return Returns the information associated to the jar
+	 * @throws TransmissionException The plugin failed to retrieve the information
+	 */
+	public String getComponentJarInfo(String jarFile)
+			throws TransmissionException {
+		String sRestCommand = "plugin/jar/" + jarFile + "/info";
+		Set<NameValuePair> nvps = new HashSet<NameValuePair>();
+		String value = executeGetRequestString(sRestCommand, nvps);
+		return value;
+	}
+
+
+	/** Pings the server
+	 *
+	 *	@return True if it successfully pinged the server
+	 */
+	public boolean ping() throws TransmissionException {
+		String sRestCommand = "public/services/ping.txt";
+		Set<NameValuePair> nvps = new HashSet<NameValuePair>();
+		String sPing = executeGetRequestString(sRestCommand, nvps);
+		if (sPing == null) {
+			return Boolean.FALSE;
+		}
+		return Boolean.TRUE;
+	}
+
 
     
 }
