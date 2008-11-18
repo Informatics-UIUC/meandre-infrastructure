@@ -86,7 +86,9 @@ def repository_list_components ( request, response, format ):
         else:
             resources = qr.getAvailableExecutableComponents()
         for resource in resources:
-            content.append({'meandre_uri':resource.toString()})
+            content.append({'meandre_uri':resource.toString(),
+                            'meandre_uri_name':qr.getExecutableComponentDescription(resource).getName(),
+                            'description':qr.getExecutableComponentDescription(resource).getDescription()})
         statusOK(response)
         sendTJXContent(response,content,format)
     else:
@@ -114,7 +116,9 @@ def repository_list_flows ( request, response, format ):
         else:
             resources = qr.getAvailableFlows()
         for resource in resources:
-            content.append({'meandre_uri':resource.toString()})
+            content.append({'meandre_uri':resource.toString(),
+                            'meandre_uri_name':qr.getFlowDescription(resource).getName(),
+                            'description':qr.getFlowDescription(resource).getDescription()})
         statusOK(response)
         sendTJXContent(response,content,format)
     else:
@@ -171,9 +175,9 @@ def repository_components_by_tag ( request, response, format ):
                 components = qr.getComponentsByTag(tag) 
                 if components is not None :
                     for component in components :
-                         content.append({
-                                'meandre_uri': component.getExecutableComponent().toString()
-                            })
+                         content.append({'meandre_uri':component.getExecutableComponent().toString(),
+                                         'meandre_uri_name':component.getName(),
+                                         'description':component.getDescription()})
             statusOK(response)
             sendTJXContent(response,content,format)
         else:
@@ -193,10 +197,10 @@ def repository_flows_by_tag ( request, response, format ):
             for tag in params['tag'] :
                 flows = qr.getFlowsByTag(tag)
                 if flows is not None : 
-                    for component in flows :
-                        content.append({
-                            'meandre_uri': component.getFlowComponent().toString()
-                            })
+                    for flow in flows :
+                        content.append({'meandre_uri':flow.getFlowComponent().toString(),
+                                        'meandre_uri_name':flow.getName(),
+                                        'description':flow.getDescription()})
             statusOK(response)
             sendTJXContent(response,content,format)
         else:
@@ -356,7 +360,9 @@ def repository_search_components ( request, response, format ):
                 resources = qrNew.getAvailableExecutableComponentsOrderedBy(order,limit)            
             
             for resource in resources:
-                content.append({'meandre_uri':resource.toString()})
+                content.append({'meandre_uri':resource.toString(),
+                                'meandre_uri_name':qr.getExecutableComponentDescription(resource).getName(),
+                                'description':qr.getExecutableComponentDescription(resource).getDescription()})
             statusOK(response)
             sendTJXContent(response,content,format) 
         else:
@@ -392,7 +398,9 @@ def repository_search_flows ( request, response, format ):
                 resources = qrNew.getAvailableFlowsOrderedBy(order,limit)            
             
             for resource in resources:
-                content.append({'meandre_uri':resource.toString()})
+                content.append({'meandre_uri':resource.toString(),
+                                'meandre_uri_name':qr.getFlowDescription(resource).getName(),
+                                'description':qr.getFlowDescription(resource).getDescription()})
             statusOK(response)
             sendTJXContent(response,content,format) 
         else:

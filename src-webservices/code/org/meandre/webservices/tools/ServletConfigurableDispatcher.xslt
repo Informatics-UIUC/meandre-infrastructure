@@ -233,7 +233,10 @@
 									<xsl:if test="location">
 			          					<th colspan='2'>Location</th>
 			          				</xsl:if>
-			          				<xsl:if test="description">
+			          				<xsl:if test="meandre_uri_name">
+			          					<th>Name</th>
+		          					</xsl:if>
+		          					<xsl:if test="description">
 			          					<th>Description</th>
 			          				</xsl:if>
 			          				<xsl:if test="key">
@@ -425,8 +428,10 @@
 						     			</a>
 				     				</td>
 				     			</xsl:if>
-				     		
-					     		<xsl:if test="description">
+				     			<xsl:if test="meandre_uri_name">
+		          					<td><xsl:value-of select="meandre_uri_name"/></td>
+	          					</xsl:if>
+		          				<xsl:if test="description">
 					     			<td><xsl:value-of select="description"/></td>
 					     		</xsl:if>
 		          				<xsl:if test="key">

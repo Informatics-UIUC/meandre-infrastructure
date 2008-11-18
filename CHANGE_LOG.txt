@@ -1,5 +1,8 @@
 1.4.0-vcli-alpha Sara
 
+* Added the following entries to the returned information 'meandre_uri', 'meandre_uri_name', 
+  'description' to both, components and flow calls (see the html interface for mer details).
+  
 * Bug fix to the upload repository service (reading from the same input stream multiple times)
 
 * Added the proxied url to the execute services execute_url and list_running_flows
