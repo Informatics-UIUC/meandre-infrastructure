@@ -44,8 +44,10 @@ public class ZigZagParserTest {
 				 parser.start(); 
 		    }
 		    catch ( ParseException pe ) {
-		    	fail(pe.toString());
+			    ms.stop();
+			    fail(pe.toString());
 		    } catch (FileNotFoundException e) {
+		    	ms.stop();
 		    	fail(e.toString());
 			} 
 		}
@@ -96,8 +98,10 @@ public class ZigZagParserTest {
 				 parser.fg.generateMAU(file.getAbsolutePath().replaceAll(".zz$", ".mau"));
 		    }
 		    catch ( ParseException pe ) {
+		    	ms.stop();
 		    	fail(pe.toString());
 		    } catch (FileNotFoundException e) {
+		    	ms.stop();
 		    	fail(e.toString());
 			} 
 		}

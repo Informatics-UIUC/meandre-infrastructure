@@ -945,7 +945,7 @@ public class MeandreClient extends MeandreBaseClient{
      *          port=1716
      *          hostname=192.168.0.2
      *          token=1213938009687
-     *          uri=http://test.org/flow/webmonkflow/1213938147793/1565344277
+     *          uri=meandre://test.org/flow/webmonkflow/1213938147793/1565344277
      *
      * Note: Not yet unit tested
      *

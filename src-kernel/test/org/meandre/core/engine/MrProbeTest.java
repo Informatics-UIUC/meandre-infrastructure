@@ -31,7 +31,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 public class MrProbeTest {
 	
 	/** The base URI for the tests */
-	private static final String BASE_TEST_URI = "http://test.org/flow/0";
+	private static final String BASE_TEST_URI = "meandre://test.org/flow/0";
 
 	/** The number of repetitions of the battery of calls */
 	private final int NUMBER_OF_REPETITIONS = 10;

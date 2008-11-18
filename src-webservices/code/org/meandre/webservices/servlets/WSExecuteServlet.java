@@ -3,7 +3,6 @@
  */
 package org.meandre.webservices.servlets;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
@@ -69,7 +68,7 @@ public class WSExecuteServlet extends MeandreBaseServlet {
 			// check if the current item is a form field or an uploaded file
 			if(fieldName.equals("repository")) {
 
-				ByteArrayInputStream bais = new ByteArrayInputStream(item.get());
+				String sContent = new String(item.get());
 
 				Model modelTmp = ModelFactory.createDefaultModel();
 
@@ -81,7 +80,7 @@ public class WSExecuteServlet extends MeandreBaseServlet {
 				//
 				// Read the location and check its consistency
 				//
-				ModelIO.attemptReadModel(modelTmp, bais);
+				ModelIO.attemptReadModel(modelTmp, sContent);
 
 				//
 				// Accumulate the models

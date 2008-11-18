@@ -3,7 +3,6 @@
  */
 package org.meandre.webservices.servlets;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -90,8 +89,9 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 			// check if the current item is a form field or an uploaded file
 			if(fieldName.equals("repository")) {
 
-				ByteArrayInputStream bais = new ByteArrayInputStream(item.get());
-
+				String sRDFContent = new String(item.get());
+				if (sRDFContent.length()==0 ) continue;
+				
 				Model modelTmp = ModelFactory.createDefaultModel();
 
 				modelTmp.setNsPrefix("", "http://www.meandre.org/ontology/");
@@ -102,24 +102,28 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 				//
 				// Read the location and check its consistency
 				//
-				ModelIO.attemptReadModel(modelTmp, bais);
+				ModelIO.attemptReadModel(modelTmp,sRDFContent);
 
 				//
 				// Accumulate the models
 				//
+				// TODO: Add fail safe check!!!
 				modelAcc.add(modelTmp);
 			}
 			// Check if we need to upload jar files
 			else if(fieldName.equals("context")) {
 				String sFile = item.getName();
+				if ( sFile.length()==0 ) continue;
 				htContextBytes.put(sFile, item.get());
 			}
 			else if ( fieldName.equals("embed") ) {
 				String sValue = item.getString();
+				if ( sValue.length()==0 ) continue;
 				bEmbed = sValue.equals("true");
 			}
 			else if ( fieldName.equals("overwrite") ) {
 				String sValue = item.getString();
+				if ( sValue.length()==0 ) continue;
 				bOverwrite = sValue.equals("true");
 			}
 		}
@@ -209,6 +213,9 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 					// Dump the context file to the disc only once
 					//
 					for ( String sFile:setFiles) {
+						// Failsafe check
+						if ( sFile.length()==0 ) continue;
+							
 						// Dump the files to disk
 						new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator).mkdirs();
 			    		File savedFile = new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator+sFile);

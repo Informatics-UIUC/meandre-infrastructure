@@ -365,7 +365,8 @@ public abstract class JobInformationBackendAdapter {
 		
 	}
 
-	/** Logs information into the log table.
+	/** Logs information into the log table adding.
+	 * 
 	 * @param sJobID The job ID login the entry
 	 * @param sLevel The lever of the log
 	 * @param oLog The log text to trace
@@ -397,7 +398,7 @@ public abstract class JobInformationBackendAdapter {
 	}
 	
 
-	/** Prints information into the log table.
+	/** Prints information into the console table.
 	 * 
 	 * @param sServerID The server ID to use
 	 * @param sJobID The job ID login the entry
@@ -428,6 +429,17 @@ public abstract class JobInformationBackendAdapter {
 		}
 	}
 
+
+	/** Prints information into the console table adding a new line.
+	 * 
+	 * @param sServerID The server ID to use
+	 * @param sJobID The job ID login the entry
+	 * @param oText The log text to trace
+	 */
+	public void println ( String sJobID, Object oPrint ) {
+		print(sJobID,oPrint.toString()+"\n");
+	}
+
 	/** Returns the current log for the provided job ID.
 	 * 
 	 * @param sJobID The job ID
@@ -442,7 +454,7 @@ public abstract class JobInformationBackendAdapter {
 			for ( List<String> ls:selectTextColumnsWithParams(sQueryIJC,oaValuesUpdate) ) {
 				String s = ls.get(ls.size()-1).trim();
 				s = s.replaceAll("\n$|\n\r$|\r\n$", "\n");
-				sb.append(ls.get(ls.size()-2).trim()+": "+s);
+				sb.append(ls.get(ls.size()-2).trim()+": "+s+"\n");
 			}
 			
 			// Commit the transaction

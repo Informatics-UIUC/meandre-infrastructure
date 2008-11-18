@@ -321,8 +321,8 @@ public class MeandreClientTest {
             fail("Transmission failure: " + e.toString());
         }
         try{
-        	URI expected1 = new URI("http://test.org/component/push-string");
-            URI expected2 = new URI("http://test.org/component/print-object");
+        	URI expected1 = new URI("meandre://test.org/component/push-string");
+            URI expected2 = new URI("meandre://test.org/component/print-object");
             /*for(URL comp: compUrls){
                 System.out.println(comp.toString());
             }*/
@@ -343,7 +343,7 @@ public class MeandreClientTest {
     @Test
     public void testRetrieveFlowUris() {
         Set<URI> flowUris = null;
-        String sUri = "http://test.org/flow/test-hello-world-with-python-and-lisp/";
+        String sUri = "meandre://test.org/flow/test-hello-world-with-python-and-lisp/";
         try{
             flowUris = _meandreClient.retrieveFlowUris();
         }catch (TransmissionException e){
@@ -420,7 +420,7 @@ public class MeandreClientTest {
         String tag = "print";
         URI expectedCompUrl = null;
         try{
-            expectedCompUrl = new URI("http://test.org/component/print-object");
+            expectedCompUrl = new URI("meandre://test.org/component/print-object");
         }catch(Exception e){
             fail("uri prob");
         }
@@ -454,7 +454,7 @@ public class MeandreClientTest {
         String tag = "demo";
         URI expectedFlowUri = null;
         try{
-            String sUri = "http://test.org/flow/";
+            String sUri = "meandre://test.org/flow/";
             sUri += "test-hello-world-with-python-and-lisp/";
             expectedFlowUri = new URI(sUri);
         }catch(Exception e){
@@ -477,7 +477,7 @@ public class MeandreClientTest {
      */
     @Test
     public void testRetrieveComponentDescriptor() {
-        String sUri = "http://test.org/component/print-object";
+        String sUri = "meandre://test.org/component/print-object";
         ExecutableComponentDescription comp = null;
         try{
             comp = _meandreClient.retrieveComponentDescriptor(sUri);
@@ -493,7 +493,7 @@ public class MeandreClientTest {
      */
     @Test
     public void testRetrieveFlowDescriptor() {
-        String sUri = "http://test.org/flow/test-hello-world-with-python-and-lisp/";
+        String sUri = "meandre://test.org/flow/test-hello-world-with-python-and-lisp/";
         FlowDescription comp = null;
         try{
             comp = _meandreClient.retrieveFlowDescriptor(sUri);
@@ -542,7 +542,7 @@ public class MeandreClientTest {
                 repo.getAvailableExecutableComponents()){
             System.out.println(comp.toString());
         }
-        String sCompUrl = "http://test.org/component/print-object";
+        String sCompUrl = "meandre://test.org/component/print-object";
         Resource rCompUrl = ResourceFactory.createResource(sCompUrl);
         ExecutableComponentDescription comp = 
                 repo.getExecutableComponentDescription(rCompUrl);
@@ -655,7 +655,7 @@ public class MeandreClientTest {
      */
     @Test
     public void testPublish() {
-        String sUrl = "http://test.org/flow/test-hello-world-with-python-and-lisp/";
+        String sUrl = "meandre://test.org/flow/test-hello-world-with-python-and-lisp/";
         try{
             boolean ret = _meandreClient.publish(sUrl);
             assertTrue("!publish success", ret);
@@ -673,7 +673,7 @@ public class MeandreClientTest {
      */
     @Test
     public void testUnpublish() {
-        String sUrl = "http://test.org/flow/test-hello-world-with-python-and-lisp/";
+        String sUrl = "meandre://test.org/flow/test-hello-world-with-python-and-lisp/";
         boolean ret;
         try{
             //ret = _meandreClient.publish(sUrl);
@@ -694,7 +694,7 @@ public class MeandreClientTest {
     @Test
     public void testRunFlow() {
         String sUrl = 
-                "http://test.org/flow/test-hello-world-with-python-and-lisp/";
+                "meandre://test.org/flow/test-hello-world-with-python-and-lisp/";
         String ret;
         try{
             
@@ -719,7 +719,7 @@ public class MeandreClientTest {
     public void testRunFlowStreamOutput() {
         
         String sUrl = 
-            "http://test.org/flow/test-hello-world-with-python-and-lisp/";
+            "meandre://test.org/flow/test-hello-world-with-python-and-lisp/";
         
         try{
         

@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
@@ -44,12 +46,12 @@ public abstract class Tools {
 	 * @return The resulting URL
 	 * @throws ParseException The URI is not a valid repository URL
 	 */
-	public static URL filterURItoURL ( String sURI, int iLine ) 
+	public static URI filterURItoURL ( String sURI, int iLine ) 
 	throws ParseException {
 		String sURL = sURI.substring(1, sURI.length()-1).trim();
 		try {
-			return new URL(sURL);
-		} catch (MalformedURLException e) {
+			return new URI(sURL);
+		} catch (URISyntaxException e) {
 			throw new ParseException ( "The URL "+sURL+" is not a valid repository one (line: "+2+")");
 		}
 	}
@@ -118,10 +120,10 @@ public abstract class Tools {
 					try {
 						// Pull the URL and dump it to the local file
 						Resource res = (Resource)node;
-						URL url = new URL(res.getURI().replaceAll(" ", "%20"));
-						if ( url.toString().endsWith(".jar")) {
-							String [] sa = url.getPath().split("/");
-							InputStream is = url.openStream();
+						URI uri = new URI(res.getURI().replaceAll(" ", "%20"));
+						if ( uri.toString().endsWith(".jar")) {
+							String [] sa = uri.getPath().split("/");
+							InputStream is = uri.toURL().openStream();
 							FileOutputStream fos = new FileOutputStream(new File(fileFolderContexts.toString()+File.separator+sa[sa.length-1]));
 							int iTmp;
 							while ( (iTmp=is.read())!=-1 )
@@ -131,6 +133,8 @@ public abstract class Tools {
 					} catch (MalformedURLException e) {
 						throw new ParseException(e.toString());
 					} catch (IOException e) {
+						throw new ParseException(e.toString());
+					} catch (URISyntaxException e) {
 						throw new ParseException(e.toString());
 					}
 				}

@@ -28,6 +28,9 @@ import org.meandre.core.store.Store;
 public class JobInformationBackendAdapterTest {
 
 
+	/** The job id to use for testing purposes */
+	private static final String JID = "JID-"+System.currentTimeMillis()+"-";
+
 	/** The logger to use */
 	public final static Logger log = KernelLoggerFactory.getCoreLogger();
 	
@@ -154,11 +157,11 @@ public class JobInformationBackendAdapterTest {
 			final int TIMES = 10;
 			
 			for ( int i=0, iMax=TIMES ; i<iMax ; i++ ) {
-				ba.print("JID", "line "+i);
+				ba.println(JID, "line "+i);
 				Thread.sleep(10);
 			}
 			
-			String sConsole = ba.getConsole("JID");
+			String sConsole = ba.getConsole(JID);
 			String [] sLine = sConsole.split("\n");
 			assertEquals(TIMES,sLine.length);
 			for ( int i=0, iMax=TIMES ; i<iMax ; i++ )
@@ -190,11 +193,11 @@ public class JobInformationBackendAdapterTest {
 			final int TIMES = 10;
 			
 			for ( int i=0, iMax=TIMES ; i<iMax ; i++ ) {
-				ba.log("JID", "TEST", "log "+i);
+				ba.log(JID, "TEST", "log "+i);
 				Thread.sleep(10);
 			}
 			
-			String sLog = ba.getLog("JID");
+			String sLog = ba.getLog(JID);
 			String [] sLine = sLog.split("\n");
 			assertEquals(TIMES,sLine.length);
 			for ( int i=0, iMax=TIMES ; i<iMax ; i++ )
@@ -225,29 +228,31 @@ public class JobInformationBackendAdapterTest {
 		
 		// Start jobs
 		for ( int i=0; i<TIMES; i++ )
-			ba.startJob("JID"+i);
+			ba.startJob(JID+i);
 		
 		// Retrieve jobs
 		for ( int i=0; i<TIMES; i++ )
 			assertEquals(
 					JobInformationBackendAdapter.JOB_STATUS_RUNNING, 
-					ba.getJobStatus("JID"+i)
+					ba.getJobStatus(JID+i)
 				);
 		
 		// Retrieve all the jobs
 		for ( Map<String,String> mapStatus:ba.getJobStatuses() )
-			assertEquals(
-					JobInformationBackendAdapter.JOB_STATUS_RUNNING, 
-					mapStatus.get("status")
-				);
+			if ( mapStatus.get("job_id").startsWith(JID) )
+				assertEquals(
+						JobInformationBackendAdapter.JOB_STATUS_RUNNING, 
+						mapStatus.get("status")
+					);
 		
 		// Change jobs status
 		for ( int i=0; i<TIMES; i++ )
-			ba.updateJobStatus("JID"+i,JobInformationBackendAdapter.JOB_STATUS_COMPLETED);
+			ba.updateJobStatus(JID+i,JobInformationBackendAdapter.JOB_STATUS_COMPLETED);
 		
 		// Check the changes statuses
 		for ( Map<String,String> mapStatus:ba.getJobStatuses() )
-			assertEquals(
+			if ( mapStatus.get("job_id").startsWith(JID) )
+				assertEquals(
 					JobInformationBackendAdapter.JOB_STATUS_COMPLETED, 
 					mapStatus.get("status")
 				);

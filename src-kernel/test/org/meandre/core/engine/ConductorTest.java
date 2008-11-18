@@ -137,7 +137,7 @@ public class ConductorTest {
 			// Run simple hello world
 			Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
 			QueryableRepository qr = new RepositoryImpl(model);
-			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("meandre://test.org/component/concatenate-strings")));
 			// Run the basic test
 			runHelloWorldFlow(conductor, qr);
 			
@@ -162,7 +162,7 @@ public class ConductorTest {
 			RepositoryImpl qr = new RepositoryImpl(model);
 			//for ( Resource res:qr.getAvailableExecutableComponents())
 			//	System.out.println(res);
-			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/to-uppercase")));
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("meandre://test.org/component/to-uppercase")));
 			// Run the basic test
 			runHelloWorldHetereogenousFlow(conductor, qr);
 			
@@ -187,7 +187,7 @@ public class ConductorTest {
 			RepositoryImpl qr = new RepositoryImpl(model);
 			//for ( Resource res:qr.getAvailableExecutableComponents())
 			//	System.out.println(res);
-			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/to-uppercase")));
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("meandre://test.org/component/to-uppercase")));
 			// Run the basic test
 			runHelloWorldMoreHetereogenousFlow(conductor, qr);
 			
@@ -209,7 +209,7 @@ public class ConductorTest {
 			// Run simple hello world dangling input/outputs
 			Model model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsRepository();
 			RepositoryImpl qr = new RepositoryImpl(model);
-			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("meandre://test.org/component/concatenate-strings")));
 			// Create the execution
 			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),System.out));
 					
@@ -232,7 +232,7 @@ public class ConductorTest {
 			// Run simple hello world dangling input/outputs + fork
 			Model model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
 			RepositoryImpl qr = new RepositoryImpl(model);
-			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("meandre://test.org/component/concatenate-strings")));
 			// Create the execution
 			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),System.out));
 			
@@ -255,7 +255,7 @@ public class ConductorTest {
 			// Run simple hello world
 			Model model = DemoRepositoryGenerator.getTestHelloWorldPartialDanglingRepository();
 			QueryableRepository qr = new RepositoryImpl(model);
-			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("meandre://test.org/component/concatenate-strings")));
 			// Create the execution
 			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),System.out));
 				

@@ -106,7 +106,7 @@ public class RepositoryImplTest {
 		for ( Resource res:qr.getAvailableExecutableComponents() )
 			assertNotNull(qr.getExecutableComponentDescription(res));
 		
-		assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
+		assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("meandre://test.org/component/concatenate-strings")));
 		
 	}
 
