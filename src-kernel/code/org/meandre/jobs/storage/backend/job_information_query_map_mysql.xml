@@ -18,7 +18,7 @@
 				 job_ID CHAR(250), 
 				 print TEXT, 
 				 ts TIMESTAMP,
-				 INDEX ts_idx HASH (ts))
+				 INDEX ts_idx (ts))
 	</entry>
 	<entry key="CREATE_JOB_LOG_TABLE">
 			CREATE TABLE meandre_job_log
@@ -27,7 +27,7 @@
 				 level CHAR(32), 
 				 log TEXT, 
 				 ts TIMESTAMP,
-				 INDEX ts_idx HASH (ts))
+				 INDEX ts_idx (ts))
 	</entry>
 	
 	<entry key="INSERT_JOB_CONSOLE">
