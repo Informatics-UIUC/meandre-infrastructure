@@ -136,21 +136,7 @@
 		 		<div id="menu"> 
 					<img src="/public/resources/system/logo-meandre.gif" />
 					<div id="navigation">
-			 			<p>Locations</p>
-			 		    <ul>
-			 		    	<li><a href="/services/locations/list.html">List</a></li>
-							<li>
-								Add a location<br/>
-								<ul>
-									<form name="al"  method="get" action="/services/locations/add.html">
-										<input type="text" id="loc" name="location" value="Location..." onclick="document.al.loc.value=''"/><br/>
-										<input type="text" id="desc" name="description" value="Description..." onclick="document.al.desc.value=''"/><br/>
-										<input type="submit" value="Add" />
-									</form> 
-								</ul>
-							</li>
-		 		    	</ul>
-		 		    	<p>Repository</p>
+			 			<p>Repository</p>
 			 		    <ul>
 							<li><a href="/services/auxiliar/add_to_repository.html" >Add</a></li>
 							<li><a href="/services/repository/dump.ttl" target="_blank">Dump</a></li>
@@ -186,6 +172,20 @@
 							<li><a href="/services/coordinator/info.html">Servers' information</a></li>
 		 		    		<li><a href="/services/coordinator/property.html">Servers' properties</a></li>
 		 		    		<li><a href="/services/server/shutdown.html" onclick="return confirm('Are you sure you want to shutdown this server?');">Shutdown this server</a></li>
+		 		    	</ul>
+		 		    	<p>Locations</p>
+			 		    <ul>
+			 		    	<li><a href="/services/locations/list.html">List</a></li>
+							<li>
+								Add a location<br/>
+								<ul>
+									<form name="al"  method="get" action="/services/locations/add.html">
+										<input type="text" id="loc" name="location" value="Location..." onclick="document.al.loc.value=''"/><br/>
+										<input type="text" id="desc" name="description" value="Description..." onclick="document.al.desc.value=''"/><br/>
+										<input type="submit" value="Add" />
+									</form> 
+								</ul>
+							</li>
 		 		    	</ul>
 		 		    	<p>Security</p>
 			 		    <ul>
