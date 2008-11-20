@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.net.URL;
@@ -35,6 +37,7 @@ import com.hp.hpl.jena.db.DBConnection;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
@@ -789,8 +792,38 @@ public class Store {
 				 
 				// Adding components
 				for ( ExecutableComponentDescription ecd:qrNew.getAvailableExecutableComponentDescriptions())
-					if ( !qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent()))
+					if ( !qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent())) {
 						model.add(ecd.getModel());
+						// What it should be 
+						//if ( ecd.getMode()==ExecutableComponentDescription.WEBUI_COMPONENT ) {
+						// The failsafe
+						if ( true ) {
+								for ( RDFNode rdfNode:ecd.getContext() ) {
+								boolean bFile = !rdfNode.toString().endsWith("/");
+								if ( rdfNode.isResource() && bFile ) {
+									// Need to pull the files
+									try {
+										URL urlCntx = new URL(rdfNode.toString());
+										String [] saSplit = urlCntx.getFile().split("/");
+										String sFile = saSplit[saSplit.length-1]; 
+										new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator).mkdirs();
+							    		File savedFile = new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator+sFile);
+										FileOutputStream fos = new FileOutputStream(savedFile);
+										int iChar; 
+										InputStream is = urlCntx.openStream();
+										while ( (iChar=is.read())>=0 ) fos.write(iChar);
+										fos.close();
+									} catch (Exception e) {
+										ByteArrayOutputStream  baos = new ByteArrayOutputStream();
+										PrintStream ps = new PrintStream(baos);
+										e.printStackTrace(ps);
+										log.warning("Problems pulling context "+rdfNode+"\n"+baos);
+										throw new IOException(e.toString());
+									}
+								}
+							}
+						}
+					}
 					else
 						log.warning("Component "+ecd.getExecutableComponent()+" already exist in the current repository. Discarding it.");
 				
@@ -802,7 +835,7 @@ public class Store {
 						log.warning("Flow "+fd.getFlowComponent()+" already exist in the current repository. Discarding it.");
 				
 				model.commit();
-				qr.refreshCache();
+				getRepositoryStore(sUser).refreshCache(model);
 				bRes = true;
 			}
 			catch ( Exception e ) {
