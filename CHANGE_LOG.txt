@@ -1,5 +1,9 @@
 1.4.0-vcli-alpha Sara
 
+* Added a check to make sure that the add to repository won't corrupt the repository
+
+* Fix to the execute servlet flow services that did not execute when a token was provided.
+
 * Added patches to the Meandre Client and Meandre Admin Client provided by Amit. 
   Patches add:
   	- Capability to get a componet description

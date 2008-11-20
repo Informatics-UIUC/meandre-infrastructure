@@ -22,6 +22,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.repository.ExecutableComponentDescription;
+import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.store.Store;
@@ -80,7 +81,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 
 		// The user repository
 		QueryableRepository qr = store.getRepositoryStore(request.getRemoteUser());
-
+		
 		while(itr.hasNext()) {
 			FileItem item = itr.next();
 		    // Get the name of the field
@@ -107,8 +108,21 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 				//
 				// Accumulate the models
 				//
-				// TODO: Add fail safe check!!!
-				modelAcc.add(modelTmp);
+				QueryableRepository qrTmp = new RepositoryImpl(modelTmp);
+				QueryableRepository qrAcc = new RepositoryImpl(modelAcc);
+
+				for ( ExecutableComponentDescription ecd:qrTmp.getAvailableExecutableComponentDescriptions() )
+					if ( !qrAcc.getAvailableExecutableComponents().contains(ecd.getExecutableComponent()) )
+						modelAcc.add(ecd.getModel());
+					else
+						log.warning("Discarding component "+ecd.getExecutableComponent()+". It already exist in th repository");
+
+				for ( FlowDescription fd:qrTmp.getAvailableFlowDescriptions() )
+					if ( !qrAcc.getAvailableFlows().contains(fd.getFlowComponent()) )
+						modelAcc.add(fd.getModel());
+					else
+						log.warning("Discarding flow "+fd.getFlowComponent()+". It already exist in th repository");
+				
 			}
 			// Check if we need to upload jar files
 			else if(fieldName.equals("context")) {
