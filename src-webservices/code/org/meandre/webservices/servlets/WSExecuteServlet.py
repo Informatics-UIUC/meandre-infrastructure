@@ -49,6 +49,8 @@ def execute_flow ( request, response, format ):
             uris,tokens,stats = params['uri'],[], []
             if 'token' not in params:
                 tokens = [str(System.currentTimeMillis()) for i in range(len(uris))]
+            else :
+                tokens = params['token']
             stats = ['statistics' in params for i in range(len(uris))]
             content = []
             for flow_uri, stat, token in zip(uris,stats,tokens): 
