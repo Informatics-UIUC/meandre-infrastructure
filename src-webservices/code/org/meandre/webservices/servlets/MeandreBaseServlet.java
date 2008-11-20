@@ -11,6 +11,7 @@ import org.meandre.core.security.SecurityManager;
 import org.meandre.core.services.coordinator.backend.CoordinatorBackendAdapter;
 import org.meandre.core.store.Store;
 import org.meandre.plugins.PluginFactory;
+import org.meandre.webservices.MeandreServer;
 import org.meandre.webservices.tools.ServletConfigurableDispatcher;
 
 
@@ -41,14 +42,19 @@ extends ServletConfigurableDispatcher {
 	
 	/** The back end adaptor to the shared store. */
 	protected CoordinatorBackendAdapter backendAdaptor;
+
+	/** The parent Meandre server */
+	private MeandreServer server;
 	
 	/** Creates the base servlet and sets up the access to the required
 	 * store and configuration object.
 	 * 
+	 * @param server The Meandre server
 	 * @param store The Meandre store to use
 	 * @param cnf The Meandre configuration to use
 	 */
-	protected MeandreBaseServlet (Store store, CoreConfiguration cnf) {
+	protected MeandreBaseServlet (MeandreServer server, Store store, CoreConfiguration cnf) {
+		this.server = server;
 		this.store = store;
 		this.cnf = cnf;
 		this.secStore = store.getSecurityStore();
@@ -84,6 +90,7 @@ extends ServletConfigurableDispatcher {
 					)
 			);
 		// Add the extra global variables
+		pi.set("meandre_server", this.server);
 		pi.set("meandre_store", this.store);
 		pi.set("meandre_config", this.cnf);
 		pi.set("meandre_security", this.secStore);

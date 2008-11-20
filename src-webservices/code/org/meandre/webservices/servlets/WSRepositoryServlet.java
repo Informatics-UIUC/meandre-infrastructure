@@ -27,6 +27,7 @@ import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.store.Store;
 import org.meandre.core.utils.ModelIO;
+import org.meandre.webservices.MeandreServer;
 import org.meandre.webservices.logger.WSLoggerFactory;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
@@ -50,11 +51,12 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 	
 	/** Creates the servlet to provide Repository information.
 	 * 
+	 * @param server The Meandre server
 	 * @param store The Meandre store to use
 	 * @param cnf The Meandre configuration to use
 	 */
-	public WSRepositoryServlet(Store store, CoreConfiguration cnf) {
-		super(store, cnf);
+	public WSRepositoryServlet(MeandreServer server, Store store, CoreConfiguration cnf) {
+		super(server, store, cnf);
 	}
 
 	/** Adds components and flows to the user repository.

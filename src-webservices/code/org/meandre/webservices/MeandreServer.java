@@ -39,6 +39,7 @@ import org.meandre.webservices.servlets.WSPublicServlet;
 import org.meandre.webservices.servlets.WSPublishServlet;
 import org.meandre.webservices.servlets.WSRepositoryServlet;
 import org.meandre.webservices.servlets.WSSecurityServlet;
+import org.meandre.webservices.servlets.WSServerServlet;
 import org.meandre.webservices.webuiproxy.WebUIProxy;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.security.Constraint;
@@ -204,8 +205,6 @@ public class MeandreServer {
 	public void start () throws Exception {
 		log.info("Starting the WS endpoint...");
 		start(true);
-		log.info("Endpoint successfully started");
-		
 	}
 	
 	/**
@@ -253,7 +252,7 @@ public class MeandreServer {
 		
 	}
 	
-	/** Stops the main Jetty server and MXBeanServer container
+	/** Stops the main Jetty server 
 	 * @throws Exception Jetty could not be stopped
 	 * 
 	 */
@@ -262,10 +261,42 @@ public class MeandreServer {
 		bStop  = true;
 		baToStore.close();
 		store.getJobInformation().close();
-		//baToStore.getShutdownHook().run();
 		server.stop();
 	}
 
+	/** Stops the main Jetty server with a certain delay
+	 * 
+	 * @param iDelay
+	 * @throws Exception Jetty could not be stopped
+	 * 
+	 */
+	public void delayedStop (final int iDelay) throws Exception {
+		
+		log.info("Stoping Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+")");
+		bStop  = true;
+		baToStore.close();
+		store.getJobInformation().close();
+		
+		// Spawns a thread for the delayed stop
+		Thread th = new Thread(new Runnable(){
+
+			public void run() {
+				
+				try {
+					Thread.sleep(iDelay);
+					server.stop();
+				} catch (Exception e) {
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					PrintStream ps = new PrintStream(baos);
+					e.printStackTrace(ps);
+					log.warning("Problem arised while shutting down the server!!!\n"+baos.toString());
+				}
+			}
+			
+		});
+		th.start();		
+	}
+	
 	/** Initialize the webservices
 	 *
 	 * @param server The server object
@@ -326,21 +357,22 @@ public class MeandreServer {
 		//
 		// Adding the publicly provided services
 		//
-		contextWS.addServlet(new ServletHolder((Servlet) new WSPublicServlet(store,cnf)), "/public/services/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSPublicServlet(this,store,cnf)), "/public/services/*");
 		
 		//
 		// Adding restrictedly provided services
 		//
-		contextWS.addServlet(new ServletHolder((Servlet) new WSAboutServlet(store,cnf)), 		"/services/about/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSLocationsServlet(store,cnf)),	"/services/locations/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSRepositoryServlet(store,cnf)),	"/services/repository/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSExecuteServlet(store,cnf)),		"/services/execute/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSPublishServlet(store,cnf)),		"/services/publish/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurityServlet(store,cnf)),		"/services/security/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSCoordinatorServlet(store,cnf,baToStore)),		"/services/coordinator/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSJobServlet(store,cnf)),		"/services/jobs/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSAboutServlet(this,store,cnf)), 		"/services/about/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSLocationsServlet(this,store,cnf)),	"/services/locations/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSRepositoryServlet(this,store,cnf)),	"/services/repository/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSExecuteServlet(this,store,cnf)),		"/services/execute/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSPublishServlet(this,store,cnf)),		"/services/publish/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurityServlet(this,store,cnf)),		"/services/security/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSCoordinatorServlet(this,store,cnf,baToStore)),		"/services/coordinator/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSJobServlet(this,store,cnf)),		"/services/jobs/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSServerServlet(this,store,cnf)),		"/services/server/*");
 
-		contextWS.addServlet(new ServletHolder((Servlet) new WSAuxiliarServlet(store,cnf)),     "/services/auxiliar/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSAuxiliarServlet(this,store,cnf)),     "/services/auxiliar/*");
 		
 		
 		return contextWS;

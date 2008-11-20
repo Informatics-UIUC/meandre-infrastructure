@@ -1,5 +1,8 @@
 1.4.0-vcli-alpha Sara
 
+* Added a simple service to shutdown the server at /services/server/shutdown.html (as 
+  usual it also supports txt, json, and xml calls)
+  
 * Added a check to make sure that the add to repository won't corrupt the repository
 
 * Fix to the execute servlet flow services that did not execute when a token was provided.

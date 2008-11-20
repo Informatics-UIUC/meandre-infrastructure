@@ -20,6 +20,7 @@ import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.store.Store;
 import org.meandre.core.utils.ModelIO;
+import org.meandre.webservices.MeandreServer;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -36,11 +37,12 @@ public class WSExecuteServlet extends MeandreBaseServlet {
 	
 	/** Creates the servlet to provide Execute information.
 	 * 
+	 * @param server The Meandre server
 	 * @param store The Meandre store to use
 	 * @param cnf The Meandre configuration to use
 	 */
-	public WSExecuteServlet(Store store, CoreConfiguration cnf) {
-		super(store, cnf);
+	public WSExecuteServlet(MeandreServer server, Store store, CoreConfiguration cnf) {
+		super(server,store, cnf);
 		
 	}
 

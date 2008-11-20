@@ -185,6 +185,7 @@
 							<li><a href="/services/coordinator/status.html">Servers' statuses</a></li>
 							<li><a href="/services/coordinator/info.html">Servers' information</a></li>
 		 		    		<li><a href="/services/coordinator/property.html">Servers' properties</a></li>
+		 		    		<li><a href="/services/server/shutdown.html" onclick="return confirm('Are you sure you want to shutdown this server?');">Shutdown this server</a></li>
 		 		    	</ul>
 		 		    	<p>Security</p>
 			 		    <ul>
@@ -572,7 +573,7 @@
 		          					<td>
 		          						<a>
 						     				<xsl:attribute name="href">/services/security/remove_users.html?user_name=<xsl:value-of select="user_name"/></xsl:attribute> 
-											<xsl:attribute name="onclick">return confirm('Are you sure you want to delete this user');</xsl:attribute>
+											<xsl:attribute name="onclick">return confirm('Are you sure you want to delete this user?');</xsl:attribute>
 											delete user
 						     			</a>
 		          					</td>
