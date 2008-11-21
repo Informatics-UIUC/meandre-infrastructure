@@ -1272,7 +1272,7 @@ public class MeandreClient extends MeandreBaseClient{
 	 * @throws TransmissionException Fail to retrieve the plugins' information
 	 */
 	public String getServerPlugins() throws TransmissionException {
-		String sRestCommand = "services/about/plugin.json";
+		String sRestCommand = "services/about/plugins.json";
 		Set<NameValuePair> nvps = new HashSet<NameValuePair>();
 		String sResults = executeGetRequestString(sRestCommand, nvps);
 		return sResults;
