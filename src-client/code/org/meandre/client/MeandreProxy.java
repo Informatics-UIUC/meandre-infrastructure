@@ -147,7 +147,7 @@ public class MeandreProxy{
 		if ( mapRoles==null ) {
             try{
                 //Set<String> roles = this.client.retrieveUserRoles();
-                this.client.retrieveUserRoles();
+                this.mapRoles=this.client.retrieveUserRoles();
                 bWasCallOK = true;
             }catch(TransmissionException e){
                 bWasCallOK = false;
