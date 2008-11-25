@@ -69,7 +69,11 @@ public class MAUExecutor {
 	/** The filename to execute */
 	private String sFileName;
 
+	/** The parent class loader */
 	private ClassLoader parentClassloader;
+
+	/** The port number to use */
+	private int iPort;
 	
 	/** The main method that runs the the MAU file.
 	 *
@@ -82,11 +86,14 @@ public class MAUExecutor {
 		for ( Handler h:KernelLoggerFactory.getCoreLogger().getHandlers() )
 			h.setLevel(Level.WARNING);
 
-		if ( sArgs.length!=1 ) {
-			System.err.println("Wrong syntax!!!\nThe MAU executor requires one .mau file");
+		if ( sArgs.length<1 || sArgs.length>2 ) {
+			System.err.println("Wrong syntax!!!\nThe MAU executor requires one .mau file and " +
+					"an optional port number for the WebUI");
 		}
 		else  {
 			MAUExecutor mau = new MAUExecutor(sArgs[0]);
+			if ( sArgs.length==2 )
+				mau.setWebUIPortNumber(Integer.parseInt(sArgs[1]));
 			mau.run();
 		}
 	}
@@ -98,6 +105,14 @@ public class MAUExecutor {
 	public MAUExecutor ( String sFileName ) {
 		ps = System.out;
 		this.sFileName = sFileName;
+	}
+	
+	/** Set the WebUI port number to use.
+	 * 
+	 * @param iPort The port number
+	 */
+	public void setWebUIPortNumber(int iPort) {
+		this.iPort = iPort;
 	}
 
 	/** Set the output stream to use.
@@ -161,7 +176,7 @@ public class MAUExecutor {
 
 		Resource resURI = qr.getAvailableFlows().iterator().next();
 		ps.println("Preparing flow: "+resURI);
-		CoreConfiguration cnf = new CoreConfiguration();
+		CoreConfiguration cnf = new CoreConfiguration(iPort-1,".");
 		Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
 
 		exec =null;

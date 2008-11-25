@@ -1,5 +1,7 @@
 1.4.0-vcli-alpha Sara
 
+* Added the option to select the port number from the command line on the MAUExecutor
+
 * The conductor class loader now makes sure only directories and jar files are 
   passed as locations to pull classes from.
   
