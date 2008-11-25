@@ -1,5 +1,7 @@
 1.4.0-vcli-alpha Sara
 
+* Added a html face to the component and flow descriptors
+
 * All the jars when a location is add are now being pulled down to the public resources directory
 
 * Added a simple service to shutdown the server at /services/server/shutdown.html (as 

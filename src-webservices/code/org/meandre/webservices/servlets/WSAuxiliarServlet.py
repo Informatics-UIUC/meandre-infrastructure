@@ -9,7 +9,8 @@ requestMap = {
         'add_to_repository': 'auxiliar_add_to_repository',
         'create_user': 'auxiliar_create_user',
         'roles_map': 'auxiliar_roles_map',
-        'execute_repository': 'auxiliar_execute_repository'
+        'execute_repository': 'auxiliar_execute_repository',
+        'show': 'auxiliar_show'
     }
 }
 
@@ -56,7 +57,7 @@ __header = """
                             margin-left:auto;
                             margin-right:auto;
                             border: 1px solid gray;
-                            border-collapse: collapse;
+                            border-collapse: separate;
                             font-size: 12px;
                         }
                         
@@ -293,5 +294,139 @@ def auxiliar_execute_repository ( request, response, format ):
     else:
         errorForbidden(response)
 
+
+def auxiliar_show ( request, response, format ):
+    '''Renders a flow or a component information.''' 
+    
+    def render_basic_metadata ( desc ):
+        '''Renders the basic metadata share by components and flows'''
+        html  = ''
+        html += '<tr><th valign="top"><strong>Name</strong>:</th><td>'+desc.getName()+'</td></tr>'
+        html += '<tr><th valign="top"><strong>Description</strong>:</th><td>'+desc.getDescription()+'</td></tr>'
+        html += '<tr><th valign="top"><strong>Creator</strong>:</th><td>'+desc.getCreator()+'</td></tr>'
+        html += '<tr><th valign="top"><strong>Creation date</strong>:</th><td>'+desc.getCreationDate().toString()+'</td></tr>'
+        html += '<tr><th valign="top"><strong>Rights</strong>:</th><td>'+desc.getRights()+'</td></tr>'
+        html += '<tr><th valign="top"><strong>Tags</strong>:</th><td>'+desc.getTags().toString()+'</td></tr>'
+        return html
+    
+    def render_descriptor_download ( uri ):
+        '''Displays the download row for the supported formats'''
+        html  = '<tr><th>Download</th><td>'
+        html += uri+' ('
+        html += '<a href="/services/repository/describe.rdf?uri='+uri+'" target="_blank" title="Get RDF/XML">RDF/XML</a>, '
+        html += '<a href="/services/repository/describe.ttl?uri='+uri+'" target="_blank" title="Get TTL">TTL</a>, '
+        html += '<a href="/services/repository/describe.nt?uri='+uri+'" target="_blank" title="Get N-TRIPLE">N-TRIPLE</a>)'
+        html += '</td></tr>'
+        return html
+    
+    def render_component ( comp_desc ):
+        '''Given a component description it renders the info in html'''
+        
+        def render_component_data_port ( dpd ):
+            '''Renders a component data port'''
+            html  = '<tr><th valign="top"><strong>URI</strong>:</th><td>'+dpd.getResource().toString()+'</td></tr>'
+            html += '<tr><th valign="top"><strong>Name</strong>:</th><td>'+dpd.getName()+'</td></tr>'
+            html += '<tr><th valign="top"><strong>Description</strong>:</th><td>'+dpd.getDescription()+'</td></tr>'
+            return html
+         
+        def render_property ( prop ):
+            '''Renders a component property'''
+            html = ''
+            for key in  prop.getKeys() :
+                html += '<table>'
+                html += '<tr><th valign="top"><strong>Name</strong>:</th><td>'+key+'</td></tr>'
+                html += '<tr><th valign="top"><strong>Description</strong>:</th><td>'+prop.getDescription(key)+'</td></tr>'
+                html += '<tr><th valign="top"><strong>Default</strong>:</th><td>'+prop.getValue(key)+'</td></tr>'
+                html += '</table><br/>'
+            return html
+            
+        html  = '<br/><table>'
+        html += render_basic_metadata(comp_desc)
+        html += render_descriptor_download(comp_desc.getExecutableComponentAsString())
+        html += '<tr><th valign="top"><strong>Runnable</strong>:</th><td>'+comp_desc.getRunnable()+'</td></tr>'
+        html += '<tr><th valign="top"><strong>Format</strong>:</th><td>'+comp_desc.getFormat()+'</td></tr>'
+        html += '<tr><th valign="top"><strong>Firing policy</strong>:</th><td>'+comp_desc.getFiringPolicy()+'</td></tr>'
+        html += '<tr><th valign="top"><strong>Context</strong>:</th><td>'
+        for context in comp_desc.getContext() :
+            html += context.toString()+'<br/>'
+        html += '</td></tr>' 
+        html += '<tr><th valign="top"><strong>Properties:</strong></th><td>'+render_property(comp_desc.getProperties())+'</td></tr>'
+        html += '<tr><th valign="top"><strong>Inputs:</strong></th><td>'
+        for dpd in comp_desc.getInputs() :
+            html += '<table>'+render_component_data_port(dpd)+'</table><br/>'
+        html += '</td></tr>'
+        html += '<tr><th valign="top"><strong>Outputs:</strong></th><td>'
+        for dpd in comp_desc.getOutputs() :
+            html += '<table>'+render_component_data_port(dpd)+'</table><br/>'
+        html += '</td></tr>'
+        html += '</table>'  
+        return html
+      
+    def render_flow ( flow_desc ):
+        '''Given a flow description it renders the info in html'''
+        
+        def render_component_instance ( ecid ):
+            '''Renders a component instance'''
+            html  = '<tr><th valign="top"><strong>URI</strong>:</th><td>'+ecid.getExecutableComponentInstance().toString()+'</td></tr>'
+            html += '<tr><th valign="top"><strong>Name</strong>:</th><td>'+ecid.getName()+'</td></tr>'
+            html += '<tr><th valign="top"><strong>Description</strong>:</th><td>'+ecid.getDescription()+'</td></tr>'
+            html += '<tr><th valign="top"><strong>Component</strong>:</th><td><a href="/services/auxiliar/show.html?uri='+ecid.getExecutableComponent().toString()+'">'+ecid.getExecutableComponent().toString()+'</a></td></tr>'
+            html += '<tr><th valign="top"><strong>Set properties</strong>:</th><td>'
+            props =  ecid.getProperties()
+            for key in props.getKeys() :
+                if key.find('wb_')<0 :
+                    html += key+' = '+props.getValue(key)+'<br/>'
+            html += '</td></tr>'            
+            return html
+        
+        def render_component_instance_connector ( cd ):
+            '''Renders a connector'''
+            html  = '<tr><th valign="top"><strong>URI</strong>:</th><td>'+cd.getConnector().toString()+'</td></tr>'
+            html += '<tr><th valign="top"><strong>Source</strong>:</th><td>'+cd.getSourceInstance().toString()+'</td></tr>'
+            html += '<tr><th valign="top"><strong>Source port</strong>:</th><td>'+cd.getSourceInstanceDataPort().toString()+'</td></tr>'
+            html += '<tr><th valign="top"><strong>Target</strong>:</th><td>'+cd.getTargetInstance().toString()+'</td></tr>'
+            html += '<tr><th valign="top"><strong>Target port</strong>:</th><td>'+cd.getTargetInstanceDataPort().toString()+'</td></tr>'  
+            return html
+        
+        html  = '<br/><table>'
+        html += render_basic_metadata(flow_desc)
+        html += render_descriptor_download(flow_desc.getFlowComponentAsString())
+        html += '<tr><th valign="top"><strong>Instances:</strong></th><td>'
+        for ecid in flow_desc.getExecutableComponentInstances() :
+            html += '<table>'+render_component_instance(ecid)+'</table><br/>'
+        html += '</td></tr>'
+        html += '<tr><th valign="top"><strong>Connectors:</strong></th><td>'
+        for cd in flow_desc.getConnectorDescriptions() :
+            html += '<table>'+render_component_instance_connector(cd)+'</table><br/>'
+        html += '</td></tr>'
+        html += '</table>'
+        return html
+    
+    if checkUserRole (request,Role.REPOSITORY) or checkUserRole (request,Role.FLOW) or checkUserRole (request,Role.COMPONENT) :
+        if format=='html' :
+            params = extractRequestParamaters(request)
+            if 'uri' in params :
+                statusOK(response)
+                contentAppHTML(response)
+                sendRawContent(response,__header)
+                for uri in params['uri']:
+                    content = getEmptyModel()
+                    qr = meandre_store.getRepositoryStore(getMeandreUser(request))
+                    comp_desc = qr.getExecutableComponentDescription(content.createResource(uri))
+                    flow_desc = qr.getFlowDescription(content.createResource(uri))
+                    if comp_desc is not None:
+                        sendRawContent(response,render_component(comp_desc))
+                    if flow_desc is not None:
+                        sendRawContent(response,render_flow(flow_desc))
+                sendRawContent(response,__footer)
+            else :
+                errorExpectationFail(response)
+        else :
+            errorNotFound(response)
+    else:
+        errorForbidden(response)
+
+
+    
 
     

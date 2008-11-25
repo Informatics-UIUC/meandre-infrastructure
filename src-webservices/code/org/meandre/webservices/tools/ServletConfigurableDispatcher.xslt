@@ -237,7 +237,7 @@
 			          				<xsl:if test="meandre_uri_name">
 			          					<th>Name</th>
 		          					</xsl:if>
-		          					<xsl:if test="description">
+		          					<xsl:if test="description and not(meandre_uri)">
 			          					<th>Description</th>
 			          				</xsl:if>
 			          				<xsl:if test="key">
@@ -432,7 +432,7 @@
 				     			<xsl:if test="meandre_uri_name">
 		          					<td><xsl:value-of select="meandre_uri_name"/></td>
 	          					</xsl:if>
-		          				<xsl:if test="description">
+		          				<xsl:if test="description and not(meandre_uri)">
 					     			<td><xsl:value-of select="description"/></td>
 					     		</xsl:if>
 		          				<xsl:if test="key">
@@ -497,8 +497,7 @@
 		          				<xsl:if test="meandre_uri">
 				     				<td>
 						     			<a>
-						     				<xsl:attribute name="href">/services/repository/describe.ttl?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
-											<xsl:attribute name="target">_blank</xsl:attribute>
+						     				<xsl:attribute name="href">/services/auxiliar/show.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
 											<xsl:value-of select="meandre_uri"/>
 						     			</a>
 						     		</td>
