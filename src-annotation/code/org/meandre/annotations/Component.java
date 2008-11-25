@@ -32,7 +32,7 @@ public @interface Component {
 	
 	
 	String name();
-	String baseURL() default "http://seasr.org/components/";
+	String baseURL() default "meandre://seasr.org/components/";
 	String creator();
 	String description();
 	String tags();
