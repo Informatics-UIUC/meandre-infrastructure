@@ -50,10 +50,10 @@ public class PluginFactory {
 	private CoreConfiguration cnf;
 
 	/** Files to transfer to the public directory */
-	private String [] saResources = { "logo-meandre.gif" };
+	private final static String [] saResources = { "logo-meandre.gif" };
 	
 	/** The target directory insed the public resources dir */
-	private String sRescoureDesctination = "system/";
+	private final static String sRescoureDestination = "system/";
 		
 	/** Creates an unitialized plugin factory and avoids other to instantiate it.
 	 *
@@ -134,8 +134,9 @@ public class PluginFactory {
 	 *
 	 * @param server The server to user
 	 * @param log The logger to use
+	 * @param cnf The core configuration object
 	 */
-	public void initializeGlobalPublicFileServer(Server server, Logger log) {
+	public static void initializeGlobalPublicFileServer(Server server, Logger log, CoreConfiguration cnf) {
 		//
 		// Initializing the public file server
 		//
@@ -161,7 +162,7 @@ public class PluginFactory {
 			}
 		}
 		
-		File fileResDir = new File(file.getAbsolutePath()+File.separator+sRescoureDesctination);
+		File fileResDir = new File(file.getAbsolutePath()+File.separator+sRescoureDestination);
 		if  ( fileResDir.mkdir() )  {
 			try {
 				for ( String sFile:saResources ) {

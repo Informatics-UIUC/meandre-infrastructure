@@ -1,5 +1,7 @@
 1.4.0-vcli-alpha Sara
 
+* Reenabled the global file share on the WebUIs (disabled by Amit's changes)
+
 * Added the option to select the port number from the command line on the MAUExecutor
 
 * The conductor class loader now makes sure only directories and jar files are 

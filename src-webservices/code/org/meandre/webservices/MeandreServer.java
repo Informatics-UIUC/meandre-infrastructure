@@ -227,7 +227,7 @@ public class MeandreServer {
 		
 		// Initialize global file server
 		PluginFactory pf = PluginFactory.getPluginFactory(cnf);
-		pf.initializeGlobalPublicFileServer(server,log);
+		PluginFactory.initializeGlobalPublicFileServer(server,log,cnf);
 
 		// Initialize the web services
 		Context cntxGlobal = initializeTheWebServices(server);
