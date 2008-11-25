@@ -553,7 +553,8 @@ public class Conductor {
 		URL [] ua = new URL[setURLContext.size()];
 		for ( String sURL:setURLContext )
 			try {
-				ua[iCnt++] = new URL(sURL);
+				if ( sURL.endsWith(".jar") || sURL.endsWith("/") )
+					ua[iCnt++] = new URL(sURL);
 			} catch (MalformedURLException e) {
 				throw new CorruptedDescriptionException("Context URL "+sURL+" is not a valid URL");
 			}
