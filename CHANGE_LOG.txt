@@ -1,5 +1,8 @@
 1.4.0-vcli-alpha Sara
 
+* The infrastructure looks for a file called meandre-default-locations.txt. Each
+  line is a location and this set of locations are added to any newly created user.
+  
 * Reenabled the global file share on the WebUIs (disabled by Amit's changes)
 
 * Added the option to select the port number from the command line on the MAUExecutor

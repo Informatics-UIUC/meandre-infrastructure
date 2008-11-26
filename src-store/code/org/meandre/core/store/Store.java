@@ -4,8 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.LineNumberReader;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.net.URL;
@@ -106,8 +108,10 @@ public class Store {
      */
     private String sConfigFile = "meandre-config-store.xml";
     
-    
-
+    /**
+     * The default configuration file name
+     */
+    private String sLocationFile = "meandre-default-locations.txt";
 
     /**
      * Contains the basic properties of storage mechanism
@@ -159,6 +163,10 @@ public class Store {
      */
     private SecurityStore ssSecurityStore = null;
 
+    /**
+     * The default set of location to create per user
+     */
+    private Set<String> setDefaultLocations = new HashSet<String>();
 
     /**
      * The repository cache entry
@@ -261,6 +269,23 @@ public class Store {
                             " could not be written to disk!");
 
             }
+        }
+        
+
+        // Try to open the default location file
+    	try {
+            //
+            // Load the properties from the default location
+            //
+    		File file = new File(sConfigPath + File.separator + sLocationFile);
+            FileReader fr = new FileReader(file);
+            LineNumberReader lnr = new LineNumberReader(fr);
+            String sTmp;
+            while ( (sTmp=lnr.readLine())!=null ) setDefaultLocations.add(sTmp.trim());
+            fr.close();
+        }
+    	catch (Exception eWrite) {
+            log.warning("Meandre default location file " +sConfigPath + File.separator +sLocationFile+" could not be loaded");
         }
 
         // Report the current configuration to the log file
@@ -452,9 +477,11 @@ public class Store {
         else {
             RepositoryImpl rep = new RepositoryImpl(getMaker().createModel(BASE_REPOSITORY_STORE_URL + sNickName));
             // Creating a new repository
-            // TODO: Pull a list of canned repositories from a properties file
             htMapRepImpl.put(sNickName, rep);
-            return new RepositoryImpl(getMaker().createModel(BASE_REPOSITORY_STORE_URL + sNickName));
+            for ( String sLocation:setDefaultLocations )
+            	addLocation(sNickName, sLocation, "Default location", cnf);
+            rep.refreshCache(rep.getModel());
+            return rep;
         }
     }
 
