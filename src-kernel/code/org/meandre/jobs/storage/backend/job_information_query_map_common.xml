@@ -23,13 +23,13 @@
 			SELECT server_ID,ts,print 
 			FROM meandre_job_console
 			WHERE job_ID = ?
-			ORDER BY ts
+			ORDER BY ID ASC
 	</entry>
 	<entry key="SELECT_JOB_LOG">
 			SELECT server_ID,ts,level,log 
 			FROM meandre_job_log
 			WHERE job_ID = ?
-			ORDER BY ts
+			ORDER BY ID ASC
 	</entry>
 	<entry key="DROP_JOB_STATUS_TABLE">
 			DROP TABLE meandre_job_status

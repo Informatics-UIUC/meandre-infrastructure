@@ -12,7 +12,6 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.StringWriter;
 import java.net.URI;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -641,8 +640,8 @@ public class MeandreClientTest {
             fail("TransmissionFailure: " + e.toString());
         }
         try{
-            assertFalse("Contains resource URL", 
-                    flowsAfter.contains(new URL(sResourceUrl)));
+            assertFalse("Contains resource URI", 
+                    flowsAfter.contains(new URI(sResourceUrl)));
         }catch(Exception e){
             e.printStackTrace();
         }        

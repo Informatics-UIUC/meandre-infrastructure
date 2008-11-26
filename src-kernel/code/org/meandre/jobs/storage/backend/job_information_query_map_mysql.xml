@@ -14,20 +14,24 @@
 	</entry>
 	<entry key="CREATE_JOB_CONSOLE_TABLE">
 			CREATE TABLE meandre_job_console
-				(server_ID CHAR(16),
+				(ID int(64) auto_increment,
+				 server_ID CHAR(16),
 				 job_ID CHAR(250), 
 				 print TEXT, 
 				 ts TIMESTAMP,
-				 INDEX ts_idx (ts))
+				 INDEX ts_idx (ts),
+				 PRIMARY KEY(ID))
 	</entry>
 	<entry key="CREATE_JOB_LOG_TABLE">
 			CREATE TABLE meandre_job_log
-				(server_ID CHAR(16),
+				(ID int(64) auto_increment,
+				 server_ID CHAR(16),
 				 job_ID CHAR(250), 
 				 level CHAR(32), 
 				 log TEXT, 
 				 ts TIMESTAMP,
-				 INDEX ts_idx (ts))
+				 INDEX ts_idx (ts),
+				 PRIMARY KEY(ID))
 	</entry>
 	
 	<entry key="INSERT_JOB_CONSOLE">
