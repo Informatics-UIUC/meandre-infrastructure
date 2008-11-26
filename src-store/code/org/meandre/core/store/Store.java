@@ -451,6 +451,8 @@ public class Store {
             return htMapRepImpl.get(sNickName);
         else {
             RepositoryImpl rep = new RepositoryImpl(getMaker().createModel(BASE_REPOSITORY_STORE_URL + sNickName));
+            // Creating a new repository
+            // TODO: Pull a list of canned repositories from a properties file
             htMapRepImpl.put(sNickName, rep);
             return new RepositoryImpl(getMaker().createModel(BASE_REPOSITORY_STORE_URL + sNickName));
         }
@@ -864,79 +866,16 @@ public class Store {
 	public boolean regenerateRepository(String sUser) {
 		boolean bRes = true;
 
-		//
-		// Regenerate the users repository
-		//
-		QueryableRepository qr = getRepositoryStore(sUser);
-
-		// Cleaning the user repository entries
-		Model mod = qr.getModel();
-		mod.begin();
-		mod.removeAll();
-		mod.commit();
-
+		// Preserves the current components uploaded not belonging to a location
+		
 		// Regenerating the user repository entries
 		SystemStore ss = getSystemStore(cnf,sUser);
 		Set<Hashtable<String, String>> setProps = ss.getProperty(SystemStore.REPOSITORY_LOCATION);
 		for ( Hashtable<String, String> ht:setProps ) {
 			String sLoc = ht.get("value");
-			try {
-				URL url = new URL(sLoc);
-				Model modelTmp = ModelFactory.createDefaultModel();
-
-				modelTmp.setNsPrefix("", "http://www.meandre.org/ontology/");
-				modelTmp.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
-				modelTmp.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
-				modelTmp.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
-
-				//
-				// Read the location and check its consistency
-				//
-				ModelIO.readModelInDialect(modelTmp, url);
-
-				QueryableRepository qrNew = new RepositoryImpl(modelTmp);
-				
-				// Adding flows
-				Model modUser = qr.getModel();
-				for ( Resource resFlow:qrNew.getAvailableFlows() ) {
-					if ( qr.getFlowDescription(resFlow)==null ) {
-						// Component does not exist
-						modUser.begin();
-						modUser.add(qrNew.getFlowDescription(resFlow).getModel());
-						modUser.commit();
-					}
-					else {
-						// Flow does exist
-						log.warning("Flow "+resFlow+" already exist in "+sUser+" repository. Discarding it.");
-					}
-				}
-
-				// Adding the components after adding the contexts
-				for ( ExecutableComponentDescription ecd:qrNew.getAvailableExecutableComponentDescriptions()) {
-					if ( qr.getExecutableComponentDescription(ecd.getExecutableComponent())!=null ) {
-						// Component does exist
-						log.warning("Discarding existing component "+ecd.getExecutableComponent()+".");
-					}
-					else {
-						modUser.begin();
-						modUser.add(ecd.getModel());
-						modUser.commit();
-					}
-				}
-				//Commiting changes
-				
-				
-				// Refresh the cache
-				qr.refreshCache();
-				
-			}
-			catch ( Exception e ) {
-				log.warning("WSRepositoryLogic: Failed to load location\n"+e.toString());
-				qr.refreshCache();
-				bRes = false;
-			}
+			removeLocation(sUser, sLoc, cnf);
+			addLocation(sUser, sLoc, ht.get("description"), cnf);
 		}
-
 
 		return bRes;
 	}
