@@ -36,23 +36,27 @@ public class WSInfrastructureBootstrapper {
 	 * @throws Exception
 	 *             Something went wrong, really wrong.
 	 */
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] sArgs) throws Exception {
 		log.config("Bootstrapping Menadre Workflow Engine");
 
 		log.config("Installing MeandreSecurityManager");
 		
-		// Had to disable to allow the JMX thing to work
-//		if( System.getSecurityManager() == null )
-//		    System.setSecurityManager( new MeandreSecurityManager() );
-		
-		log.config("Starting Meandre server");
-		MeandreServer ms = new MeandreServer();
-		ms.start();
+		if ( sArgs.length!=0 && sArgs.length!=2 ) {
+			System.err.println("Wrong syntax!!!\nThe Meandre Server only access none" +
+					"or 2 parameters <port_name, base_dir>");
+		}
+		else  {
+			if ( sArgs.length==0 ) {
+		 		log.config("Starting Meandre server");
+				MeandreServer ms = new MeandreServer();
+				ms.start();
+			}
+			else {
+				log.config("Starting Meandre server");
+				MeandreServer ms = new MeandreServer(Integer.parseInt(sArgs[0]),sArgs[1]);
+				ms.start();
+			}
+		}
 	}
-
-
-
-	
-
 
 }
