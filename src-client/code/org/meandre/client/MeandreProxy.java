@@ -16,8 +16,10 @@ import java.util.logging.Logger;
 
 import org.meandre.core.repository.LocationBean;
 import org.meandre.core.repository.QueryableRepository;
+import org.meandre.core.repository.RepositoryImpl;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 
 
@@ -61,6 +63,8 @@ public class MeandreProxy{
 	/** Creates an empty Meandre Proxy 
 	 */
 	public MeandreProxy () {
+		bIsReady = bWasCallOK = false;
+		qrCached = new RepositoryImpl(ModelFactory.createDefaultModel());
 	}
 
 	/** Creates a Meandre Proxy and contacts the server to initialize

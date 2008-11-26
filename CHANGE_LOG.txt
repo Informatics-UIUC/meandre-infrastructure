@@ -1,5 +1,7 @@
 1.4.0-vcli-alpha Sara
 
+* Added an empty constructor to the Meandre Proxy by Amit's request
+
 * Added the avility to pass a port number and a base directory to the infrastructure
   bootstrapper.
   
