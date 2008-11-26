@@ -58,6 +58,10 @@ public class MeandreProxy{
 	/**Server version string*/
 	private String serverVersion;
 
+	/** Creates an empty Meandre Proxy 
+	 */
+	public MeandreProxy () {
+	}
 
 	/** Creates a Meandre Proxy and contacts the server to initialize
      * the cache.
