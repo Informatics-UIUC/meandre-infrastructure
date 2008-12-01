@@ -197,7 +197,7 @@ __run_repository_form = """
                     <tbody>
                         <tr>
                             <td>
-                                <label for="repository">Reposiotyr:</label>
+                                <label for="repository">Repository:</label>
                             </td>
                         </tr>
                         <tr>
