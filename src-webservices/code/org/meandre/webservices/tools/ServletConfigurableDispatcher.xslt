@@ -550,6 +550,11 @@
 		          						<a>
 						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_webui_uri"/></xsl:attribute> 
 											<xsl:value-of select="flow_instance_webui_uri"/>
+						     			</a> -
+						     			<a>
+						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_webui_uri"/>/admin/admin/abort.txt</xsl:attribute> 
+						     				<xsl:attribute name="target">_blank</xsl:attribute> 
+											abort
 						     			</a>
 		          					</td>
 		          				</xsl:if>	
