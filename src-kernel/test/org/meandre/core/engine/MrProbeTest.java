@@ -218,7 +218,7 @@ public class MrProbeTest {
 		assertEquals(0,baosErr.size());
 		
 		String sResult = "HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C01234567) HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C01234567)  \n";
-		assertEquals(sResult.length(),baosOut.size());
+		assertTrue(sResult.length()==baosOut.size() || sResult.length()+1==baosOut.size());
 	}
 
 	/** Creates a MrProbe thread for the given probe, runs a battery of probe calls

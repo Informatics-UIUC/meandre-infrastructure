@@ -215,8 +215,11 @@ public abstract class Tools {
 					File file = new File(fileDir+File.separator+sFile);
 					if ( file.isDirectory() )
 						queuePending.offer(file);
-					else
-						res.add(new File(file.toString().replaceAll(fileDirectory.toString(), "")));
+					else {
+						int iDirLen = fileDirectory.toString().length();
+						String sNewFileName = file.toString().substring(iDirLen);
+						res.add(new File(sNewFileName));
+					}
 				}
 			}
 		}

@@ -497,7 +497,7 @@ public class FlowGenerator {
 		ps.println("ZigZag compilation finished successfuly!" );
 		ps.print("Preparing flow descriptor... " );
 
-		sOutputFileName = (sOutputFileName.endsWith("/"))?sOutputFileName.replaceAll("/$", ""):sOutputFileName;
+		sOutputFileName = (sOutputFileName.endsWith(File.pathSeparator))?sOutputFileName.replaceAll(File.separator+"$", ""):sOutputFileName;
 
 		// Get the flow description generated so far (inlcuding the parallel processing)
 		FlowDescription fd = getFlowDescription(sOutputFileName,true);

@@ -64,7 +64,7 @@ public class JythonExecutableComponentAdapterTest {
 		}
 		jeca.untrapOutputAndErrorStreams();
 		String sRes = jeca.getOutput().toString();
-		assertEquals("Hello World!\n",sRes);
+		assertTrue(sRes.indexOf("Hello World!")>=0);
 		assertEquals(0, jeca.getError().size());
 	}
 
@@ -96,10 +96,11 @@ public class JythonExecutableComponentAdapterTest {
 		jeca.initialize(cc);
 		jeca.untrapOutputAndErrorStreams();
 		sRes = jeca.getOutput().toString();
-		assertEquals("Initialize called\n",sRes);
+		assertTrue(sRes.indexOf("Initialize called")>=0);
 		jeca.dispose(cc);
 		sRes = jeca.getOutput().toString();
-		assertEquals("Initialize called\nDispose called\n",sRes);
+		assertTrue(sRes.indexOf("Initialize called")>=0);
+		assertTrue(sRes.indexOf("Dispose called")>=0);
 		thdMrProbe.done();
 	}
 

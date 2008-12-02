@@ -54,7 +54,7 @@ public class ConductorTest {
 		assertEquals(0,baosErr.size());
 		
 		String sResult = "P1 Hello World!!! Happy Meandring!!! (P1,C0123456) Hello World!!! Happy Meandring!!! (P1,C0123456) \n";
-		assertEquals(sResult.length(),baosOut.size());
+		assertTrue(sResult.length()==baosOut.size() || sResult.length()+1==baosOut.size());
 	}
 
 	/** Run the basic hello world test with dangling outputs.
@@ -89,7 +89,7 @@ public class ConductorTest {
 		assertTrue(sError.contains("Started SocketConnector@"));
 		
 		String sResult = "HELLO WORLD!!! HAPPY MEANDRING!!!  (P1,C0123456)  HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C0123456)  \n";
-		assertEquals(sResult.length(),baosOut.size());
+		assertTrue(sResult.length()==baosOut.size() || sResult.length()+1==baosOut.size());
 	}
 
 	/** Run the basic hello world test with dangling outputs.
@@ -122,7 +122,7 @@ public class ConductorTest {
 		assertEquals(0,baosErr.size());
 		
 		String sResult = "HELLO WORLD!!! HAPPY MEANDRING!!!  (P1,C0123456)  HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C0123456)  \n";
-		assertEquals(sResult.length(),baosOut.size());
+		assertTrue(sResult.length()==baosOut.size() || sResult.length()+1==baosOut.size());
 	}
 	
 	/**
