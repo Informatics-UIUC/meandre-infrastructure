@@ -106,7 +106,6 @@ public class WebUIDispatcher extends AbstractHandler {
 					return;
 				base_request.setHandled(true);
 
-				
 				response.setStatus(HttpServletResponse.SC_OK);
 				response.setContentType("text/html");
 				
@@ -115,7 +114,9 @@ public class WebUIDispatcher extends AbstractHandler {
 				boolean bHasParams = !request.getParameterMap().isEmpty();
 				String contentType = request.getContentType();
 				boolean isMultiPart = Boolean.FALSE;
-				if(contentType!=null &&contentType.startsWith("multipart/form-data")){
+				if ( (contentType!=null && contentType.startsWith("multipart/form-data")) || 
+					  request.getMethod().equalsIgnoreCase("post") || 
+					  request.getMethod().equalsIgnoreCase("put")  ){
 					isMultiPart = Boolean.TRUE;
 				}
 				int iSize = lstHandlers.size();
