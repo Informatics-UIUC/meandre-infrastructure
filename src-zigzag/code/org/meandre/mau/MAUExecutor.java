@@ -105,6 +105,7 @@ public class MAUExecutor {
 	public MAUExecutor ( String sFileName ) {
 		ps = System.out;
 		this.sFileName = sFileName;
+		this.iPort = 1714;
 	}
 	
 	/** Set the WebUI port number to use.
