@@ -163,7 +163,7 @@ def execute_uri_flow ( request, response, format ):
                 if token in executionTokenMap :
                     job = executionTokenMap[token]
                     job_info = {
-                            'port': job.getPort(),
+                            'port': job.getPort().toString(),
                             'hostname': job.getHostname(),
                             'token': job.getToken(),
                             'uri': job.getFlowInstanceId()
