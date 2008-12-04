@@ -89,7 +89,7 @@ public class WebUIDispatcher extends AbstractHandler {
 			HttpServletResponse response, int dispatch) throws IOException,
 			ServletException {
 		
-		
+		target = target.replaceAll("^(/)+", "/");
 		if ( target.startsWith("/admin/") ) {
 			processAdminRequest(target,request,response,dispatch);
 		}
@@ -169,7 +169,7 @@ public class WebUIDispatcher extends AbstractHandler {
 				: HttpConnection.getCurrentConnection().getRequest();
 		base_request.setHandled(true);
 		
-		String [] saParts = new URL(request.getRequestURL().toString()).getPath().split("\\.");
+		String [] saParts = target.split("\\.");
    		String sTarget = saParts[0];
 		String sExtension = "";
 		PrintWriter pw = response.getWriter();	
