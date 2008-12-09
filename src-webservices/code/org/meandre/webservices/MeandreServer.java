@@ -392,13 +392,13 @@ public class MeandreServer {
 					public void run() {
 						while (!bStop ) {
 							try {
-								HashUserRealm hur = new HashUserRealm("Meandre Flow Execution Engine",store.getRealmFilename());
-								sh.setUserRealm(hur);
+								HashUserRealm hur = (HashUserRealm) sh.getUserRealm();
+								hur.setConfig(store.getRealmFilename());
 								Thread.sleep(SECURITY_REALM_SYNC);
-							} catch (InterruptedException e) {
-								log.warning(e.toString());
-							} catch (IOException e) {
-								log.warning(e.toString());
+							} catch (Exception e) {
+								log.warning("Security realm sync service:"+e.toString());
+							} catch (Throwable t) {
+								log.warning("Security realm sync service:"+t.toString());
 							}
 						}						
 					}					

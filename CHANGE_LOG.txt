@@ -1,5 +1,7 @@
 1.4.0-vcli-alpha Sara
 
+* Fix to the way realm properties are updated
+
 * Fix to make sure that tests also pass on a MS Windows platform
 
 * Added abort link on the HTML list running flow interface
