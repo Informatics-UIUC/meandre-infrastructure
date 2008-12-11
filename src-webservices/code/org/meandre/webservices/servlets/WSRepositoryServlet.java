@@ -180,6 +180,8 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 				// Component does not exist
 				modUser.add(qrNew.getFlowDescription(resFlow).getModel());
 				setAddedURIs.add(resFlow.toString());
+				log.info("Added flow "+resFlow+" to "+request.getRemoteUser()+"'s repository");
+				
 			}
 			else {
 				if ( bOverwrite ) {
@@ -187,6 +189,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 					modUser.remove(qr.getFlowDescription(resFlow).getModel());
 					modUser.add(qrNew.getFlowDescription(resFlow).getModel());
 					setAddedURIs.add(resFlow.toString());
+					log.info("Added flow "+resFlow+" to "+request.getRemoteUser()+"'s repository");
 				}
 				else
 					// Component does exist
@@ -204,12 +207,14 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 					if ( bOverwrite ) {
 						modUser.remove(qr.getExecutableComponentDescription(ecd.getExecutableComponent()).getModel());
 						modUser.add(ecd.getExecutableComponent().getModel());
+						log.info("Added component "+ecd.getExecutableComponent()+" to "+request.getRemoteUser()+"'s repository");
 					}
 					else
 						log.warning("Discarding upload of the existem component "+ecd.getExecutableComponent()+". No overwrite flag provided.");
 				}
 				else {
 					modUser.add(ecd.getModel());
+					log.info("Added component "+ecd.getExecutableComponent()+" to "+request.getRemoteUser()+"'s repository");
 				}
 			}
 			else {
@@ -247,7 +252,6 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 						Resource res = modUser.createResource(urlRequest.getProtocol()+"://"+urlRequest.getHost()+":"+urlRequest.getPort()+"/public/resources/contexts/java/"+sFile);
 						ecd.getContext().add(res);
 					}
-					ecd.getModel().write(System.out,"TTL");
 					// Avoid dumping them multiple times
 					bWriteOnce = false;
 				}
@@ -256,6 +260,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 					if ( bOverwrite ) {
 						modUser.remove(qr.getExecutableComponentDescription(ecd.getExecutableComponent()).getModel());
 						modUser.add(ecd.getModel());
+						log.info("Adding component "+ecd.getExecutableComponent()+" to "+request.getRemoteUser()+"'s repository");
 					}
 					else
 						log.warning("Discarding upload of the existem component "+ecd.getExecutableComponent()+". No overwrite flag provided.");

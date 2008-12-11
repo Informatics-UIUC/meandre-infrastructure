@@ -1,5 +1,7 @@
 1.4.0-vcli-alpha Sara
 
+* Remove the dump of the uploaded components/flows. Replaced by proper login
+
 * Expose the sorting of flows and component on the HTML rendering interface
 
 * Fix to the way realm properties are updated
