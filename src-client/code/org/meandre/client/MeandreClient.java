@@ -41,7 +41,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
  * although in reality the session has no state and MeandreClient simply sends an
  * independent http request for every operation.
  *
- * <p>The setCredentials() method must be called before authorized calls on 
+ * <p>The setCredentials() method must be called before authorized calls on
  * a MeandreClient can be invoked. All calls are authorized unless they say
  * specifically that they do not require authoriziation.
  *
@@ -52,11 +52,11 @@ public class MeandreClient extends MeandreBaseClient{
 
     /**
      * initialize to talk to a particular server. You need to call the
-     * "setCredentials" method in MeandreBaseClient before you can make 
-     * authorized calls to the server. 
+     * "setCredentials" method in MeandreBaseClient before you can make
+     * authorized calls to the server.
      *
      *
-     * @param serverHost just the hostname, e.g. "localhost", 
+     * @param serverHost just the hostname, e.g. "localhost",
      *      NOT "http://localhost"
      * @param serversPort the port on the serverhost that the server is listening
      */
@@ -184,7 +184,7 @@ public class MeandreClient extends MeandreBaseClient{
 	        	JSONObject jo = ja.getJSONObject(i);
 	        	beanSet.add(new LocationBean(jo.getString("location"), jo.getString("description")));
 	        }
-	        	
+
 	        return beanSet;
     	}
     	catch (Exception e) {
@@ -431,7 +431,7 @@ public class MeandreClient extends MeandreBaseClient{
     public Set<URI> retrieveComponentsByTag(String sTag) throws TransmissionException {
     	try {
 	        String sRestCommand = "services/repository/components_by_tag.json";
-	
+
 	        Set<NameValuePair> nvps = new HashSet<NameValuePair>();
 	        nvps.add(new NameValuePair("tag", sTag));
 	        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
@@ -457,7 +457,7 @@ public class MeandreClient extends MeandreBaseClient{
     public Set<URI> retrieveFlowsByTag(String sTag) throws TransmissionException {
     	try {
 	        String sRestCommand = "services/repository/flows_by_tag.json";
-	
+
 	        Set<NameValuePair> nvps = new HashSet<NameValuePair>();
 	        nvps.add(new NameValuePair("tag", sTag));
 	        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
@@ -780,7 +780,7 @@ public class MeandreClient extends MeandreBaseClient{
         	JSONArray ja = new JSONArray(jtRetrieved);
             if ( ja.length()!=1 )
             	return false;
-            
+
             JSONObject joRetrieved = ja.getJSONObject(0);
             if(joRetrieved.isNull("meandre_uri")){
                 return false;
@@ -810,7 +810,7 @@ public class MeandreClient extends MeandreBaseClient{
     public boolean publish(String sResourceUrl) throws TransmissionException {
         try {
 	        String sRestCommand = "services/publish/publish.json";
-	
+
 	        Set<NameValuePair> nvps = new HashSet<NameValuePair>();
 	        nvps.add(new NameValuePair("uri", sResourceUrl));
 	        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
@@ -842,7 +842,7 @@ public class MeandreClient extends MeandreBaseClient{
     public boolean unpublish(String sResourceUrl) throws TransmissionException {
     	try {
 	        String sRestCommand = "services/publish/unpublish.json";
-	
+
 	        Set<NameValuePair> nvps = new HashSet<NameValuePair>();
 	        nvps.add(new NameValuePair("uri", sResourceUrl));
 	        JSONTokener jtRetrieved = executeGetRequestJSON(sRestCommand, nvps);
@@ -885,10 +885,10 @@ public class MeandreClient extends MeandreBaseClient{
         String sResults = executeGetRequestString(sRestCommand, nvps);
         return sResults;
     }
-    
+
     /**
      * This method uploads and executes all the flows in the provided model
-     * 
+     *
      * <p> calls:
      * http://<meandre_host>:<meandre_port>/services/execute/repository.txt
      * TODO:Need test
@@ -899,10 +899,10 @@ public class MeandreClient extends MeandreBaseClient{
         String sRestCommand = "services/execute/repository.txt";
 
         Set<NameValuePair> nvps = new HashSet<NameValuePair>();
-       
+
         Set<Part> postParts = new HashSet<Part>();
 
-        
+
         ByteArrayOutputStream osModel = new ByteArrayOutputStream();
         model.write(osModel, "N-TRIPLE");
         byte[] baModel = osModel.toByteArray();
@@ -911,9 +911,9 @@ public class MeandreClient extends MeandreBaseClient{
         PartSource source = new ByteArrayPartSource("InMemoryBytes",
         		baModel);
         postParts.add(new FilePart("repository", source));
-       
+
 		byte[] baRetrieved = executePostRequestBytes(sRestCommand, nvps, postParts);
-		
+
         return new String(baRetrieved);
     }
 
@@ -931,12 +931,21 @@ public class MeandreClient extends MeandreBaseClient{
 
     public InputStream runFlowStreamOutput(String sFlowUrl, boolean verbose)
         throws TransmissionException{
+
+        return runFlowStreamOutput(sFlowUrl, null, verbose);
+    }
+
+    public InputStream runFlowStreamOutput(String sFlowUrl, String token, boolean verbose)
+        throws TransmissionException {
+
         String sRestCommand = "services/execute/flow.txt";
         Set<NameValuePair> nvps = new HashSet<NameValuePair>();
         nvps.add(new NameValuePair("uri", sFlowUrl));
+        if (token != null)
+            nvps.add(new NameValuePair("token", token));
         nvps.add(new NameValuePair("statistic", Boolean.toString(verbose)));
-        InputStream insResult = executeGetRequestStream(sRestCommand, nvps);
-        return insResult;
+
+        return executeGetRequestStream(sRestCommand, nvps);
     }
 
     /**
@@ -1006,10 +1015,10 @@ public class MeandreClient extends MeandreBaseClient{
 	        for ( int i=0,iMax=ja.length() ; i<iMax ; i++ ) {
 	        	JSONObject jo = ja.getJSONObject(i);
 	        	muRetrievedPairs.put(
-	        			new URI(jo.getString("flow_instance_uri")), 
+	        			new URI(jo.getString("flow_instance_uri")),
 	        			new URI(jo.getString("flow_instance_webui_uri"))
 	        		);
-	        }	        	
+	        }
 	        return muRetrievedPairs;
     	}
     	catch ( Exception e ) {
@@ -1045,7 +1054,7 @@ public class MeandreClient extends MeandreBaseClient{
 	        	map.put("flow_instance_webui_uri",new URI(jo.getString("flow_instance_webui_uri")));
 	        	map.put("flow_instance_proxy_webui_uri",new URI(jo.getString("flow_instance_proxy_webui_uri")));
 	        	muRetrievedPairs.put(furi,map);
-	        }	        	
+	        }
 	        return muRetrievedPairs;
     	}
     	catch ( Exception e ) {
@@ -1079,7 +1088,7 @@ public class MeandreClient extends MeandreBaseClient{
 	        	map.put("ts",jo.getString("ts"));
 	        	map.put("job_id",jo.getString("job_id"));
 	        	vecStatuses.add(map);
-	        }	        	
+	        }
 	        return vecStatuses;
     	}
     	catch ( Exception e ) {
@@ -1087,7 +1096,7 @@ public class MeandreClient extends MeandreBaseClient{
     	}
     }
 
-    
+
     /**
      * returns the job console.
      *
@@ -1255,7 +1264,7 @@ public class MeandreClient extends MeandreBaseClient{
 	}
 
 	/** Gets the server version.
-	 * 
+	 *
 	 * @return The server version
 	 * @throws TransmissionException Could not get the server version
 	 */
@@ -1267,7 +1276,7 @@ public class MeandreClient extends MeandreBaseClient{
 	}
 
 	/** Return the JSON content describing the plugins available.
-	 * 
+	 *
 	 * @return The JSON string
 	 * @throws TransmissionException Fail to retrieve the plugins' information
 	 */
@@ -1278,7 +1287,7 @@ public class MeandreClient extends MeandreBaseClient{
 		return sResults;
 	}
 
-    
+
 	/** Returns jar information
 	 *
 	 * @param jarFile The jar file to get the info from
@@ -1309,5 +1318,5 @@ public class MeandreClient extends MeandreBaseClient{
 	}
 
 
-    
+
 }
