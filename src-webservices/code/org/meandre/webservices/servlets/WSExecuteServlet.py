@@ -163,11 +163,16 @@ def execute_uri_flow ( request, response, format ):
                 if token in executionTokenMap :
                     job = executionTokenMap[token]
                     if job is not None:
+                        port,host,token,uri = str(job.getPort()),job.getHostname(),job.getToken(),job.getFlowInstanceId()
+                        if port is None: port=-1
+                        if host is None: host = 'localhost'
+                        if token is None: token = 'MissinToken'
+                        if uri is None: uri = 'meandre://missing.uri'
                         job_info = {
-                                'port': str(job.getPort()),
-                                'hostname': job.getHostname(),
-                                'token': job.getToken(),
-                                'uri': job.getFlowInstanceId()
+                                'port': port,
+                                'hostname': host,
+                                'token': token,
+                                'uri': uri
                             }
                         content.append(job_info)
                         statusOK(response)
