@@ -162,15 +162,20 @@ def execute_uri_flow ( request, response, format ):
             for token in tokens: 
                 if token in executionTokenMap :
                     job = executionTokenMap[token]
-                    job_info = {
-                            'port': str(job.getPort()),
-                            'hostname': job.getHostname(),
-                            'token': job.getToken(),
-                            'uri': job.getFlowInstanceId()
-                        }
-                    content.append(job_info)
-            statusOK(response)
-            sendTJXContent(response,content,format)
+                    if job is not None:
+                        job_info = {
+                                'port': str(job.getPort()),
+                                'hostname': job.getHostname(),
+                                'token': job.getToken(),
+                                'uri': job.getFlowInstanceId()
+                            }
+                        content.append(job_info)
+                        statusOK(response)
+                        sendTJXContent(response,content,format)
+                    else :
+                        errorExpectationFail(response)    
+                else :
+                    errorExpectationFail(response)                 
         else :
             errorExpectationFail(response)
     else:
