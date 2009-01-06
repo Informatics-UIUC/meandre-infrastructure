@@ -393,6 +393,30 @@ public class ZigZagConsole {
 					System.out.println();
 				}
 			}
+			else if ( sFormat.equals("rdf") || sFormat.equals("nt") || sFormat.equals("ttl")) {
+				String sDialect = "RDF/XML-ABBREV";
+				if ( sFormat.equals("nt") ) sDialect="N-TRIPLE";
+				if ( sFormat.equals("ttl")) sDialect="TTL";
+				
+				try {
+					File file = new File(sURI);
+					FileOutputStream fos;
+					fos = new FileOutputStream(file);
+					FlowDescription fd = fg.getFlowDescription(sURI,true);
+					fd.getModel().write(fos,sDialect);
+					fos.close();
+				} catch (FileNotFoundException e) {
+					System.out.println();
+					System.out.println("\t File "+sURI+" could not be saved.");
+					System.out.println();
+				} catch (IOException e) {
+					System.out.println();
+					System.out.println("\t Problem while closing file "+sURI+".");
+					System.out.println();
+				}
+				
+			}
+			
 			else {
 				System.out.println();
 				System.out.println("\t Wrong file format. Please see help save for more information.");
@@ -698,10 +722,11 @@ public class ZigZagConsole {
 			System.out.println("\t version: Print the version information for this ZigZag interpreter console.");
 		}
 		else if ( sCmd.equals("save") ) {
-			System.out.println("\t save [zigzag|mau] <file_name>: ");
+			System.out.println("\t save [zigzag|mau|rdf|ttl|nt] <file_name>: ");
 			System.out.println("\t                  Save the current flow to the provided file name. ");
 			System.out.println("\t                  If the ZigZag format is selected save the flow as a ZigZag file. ");
-			System.out.println("\t                  Otherwise, the flow is saved as a MAU file. ");
+			System.out.println("\t                  The flow is saved as a MAU file is requested. Also the RDF version ");
+			System.out.println("\t                  of the flow can be safe on RDF/XML, TTL, and NT dialects ");
 		}
 		else if ( sCmd.equals("show") ) {
 			System.out.println("\t show flow: ");
