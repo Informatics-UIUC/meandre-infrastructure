@@ -685,7 +685,7 @@
 		     		<br/>
 		     		<center>
 		     		<a href="javascript:javascript:history.go(-1)">Back</a> ---
-		     		<a href="">Refresh</a>
+		     		<a href="javascript:this.location.reload();">Refresh</a>
 		     		</center>
 	     		</div>
 	     		</td></tr></table>
