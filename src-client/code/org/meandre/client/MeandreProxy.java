@@ -482,7 +482,17 @@ public class MeandreProxy{
 	}*/
 
 
+    /**
+     * sets the logger for warning and error messages. some log messages will
+     * still go to standard out.
+     */
+    public void setLogger(Logger newLogger){
+        log = newLogger;
+    }
 
+    public Logger getLogger(){
+        return log;
+    }
 
 
 	
