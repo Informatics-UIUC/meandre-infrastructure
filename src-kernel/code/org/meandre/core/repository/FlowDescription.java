@@ -204,7 +204,7 @@ public class FlowDescription {
 
 	/** Sets the creation date of the flow.
 	 *
-	 * @param date The date
+	 * @param d The date
 	 */
 	public void setCreationDate ( Date d ) {
 		dateCreation = d;

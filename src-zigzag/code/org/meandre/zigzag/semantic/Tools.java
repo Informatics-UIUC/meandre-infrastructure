@@ -103,7 +103,7 @@ public abstract class Tools {
 	 *
 	 * @param fd The flow descriptor
 	 * @param qr The repository implementation
-	 * @param fileDirCntxs The folder containing the contexts
+	 * @param fileFolderContexts The folder containing the contexts
 	 * @throws ParserException Something went really wrong
 	 */
 	public static void prepareJarsToTheFileSystem(FlowDescription fd, QueryableRepository qr, File fileFolderContexts ) 

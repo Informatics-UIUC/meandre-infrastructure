@@ -64,7 +64,6 @@ public class WebUIHelloWorldFragment implements ExecutableComponent, WebUIFragme
 	/** This method gets called when a call with parameters is done to a given component
 	 * webUI fragment
 	 *
-	 * @param target The target path
 	 * @param request The request object
 	 * @param response The response object
 	 * @throws WebUIException A problem occurred during the call back

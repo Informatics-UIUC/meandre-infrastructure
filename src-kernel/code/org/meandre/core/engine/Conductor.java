@@ -37,8 +37,6 @@ import java.util.logging.Logger;
  * which will eventually execute the flow.
  *
  * @author Xavier Llor&agrave;
- * @modified Amit Kumar -added support for parentClassloader
- *
  */
 public class Conductor {
 

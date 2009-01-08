@@ -74,7 +74,6 @@ public interface Probe {
 	 * @param owc The wrapped component done with the disposing call
 	 * @param ts The time stamp
 	 * @param bSerializeState The wrapped component is serialized
-	 * @param bSerializedData The data provided has been serialized
 	 */
 	public void probeExecutableComponentDisposed(String sECID, Object owc, Date ts, boolean bSerializeState);
 

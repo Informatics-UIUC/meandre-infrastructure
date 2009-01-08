@@ -7,9 +7,7 @@ import org.meandre.configuration.CoreConfiguration;
 
 /**Interface implemented by the plugins
  *
- * @author Amit Kumar
- * @created Jan 10, 2008
- * @Modified by Xavier Llor&agrave;
+ * @author Amit Kumar and modified by Xavier Llor&agrave;
  *
  */
 public interface MeandrePlugin {
@@ -65,9 +63,9 @@ public interface MeandrePlugin {
 	 */
 	public void inited(Boolean success);
 	
-	/**Return true or false
+	/** Return true if the plugin was initialized, false otherwise
 	 * 
-	 * @return
+	 * @return The initialization flag
 	 */
 	public boolean isInited();
 	

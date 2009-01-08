@@ -217,7 +217,7 @@ implements ComponentContext {
 
 	/** Returns the current data component on the given active buffer.
 	 *
-	 * @param The name of the input
+	 * @param sInputBuffer The name of the input
 	 * @return The data component
 	 * @throws ComponentContextException Violation of the component context detected
 	 */

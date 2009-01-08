@@ -24,7 +24,7 @@ public class MeandreFormatter extends Formatter {
 	
 	/** Formats the record.
 	 * 
-	 * @param The log record to format
+	 * @param record The log record to format
 	 * @return The formated record
 	 */
 	  public String format(LogRecord record) {

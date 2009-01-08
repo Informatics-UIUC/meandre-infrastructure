@@ -79,7 +79,7 @@ public class FlowDrawer {
 	
 	/** Initialize the flow drawer.
 	 * 
-	 * @param fdc The set of controls containing the flow description
+	 * @param fd The set of controls containing the flow description
 	 *
 	 */
 	public FlowDrawer (FlowDescription fd) {
@@ -126,7 +126,7 @@ public class FlowDrawer {
 
 	/** Add a component descriptor to the graph.
 	 * 
-	 * @param ecid The executable component instance description to add.
+	 * @param cd The connector description instance description to add.
 	 * @param fd The flow description
 	 */
 	public void add( ConnectorDescription cd, FlowDescription fd ) {

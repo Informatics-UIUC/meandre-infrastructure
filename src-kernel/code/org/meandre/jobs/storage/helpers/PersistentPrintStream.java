@@ -251,7 +251,7 @@ public class PersistentPrintStream extends PrintStream {
 
 	/** Print a character array and add a new end of line.
 	 * 
-	 * @param b The character array to print
+	 * @param c The character array to print
 	 */
 	public void println(char[] c) {
 		print(new String(c)+EOL);
@@ -314,7 +314,9 @@ public class PersistentPrintStream extends PrintStream {
 
 	/** Print the subset of the byte array assuming it represents a string.
 	 * 
-	 * @param ba The string to print
+	 * @param buf The buffer to write
+	 * @param off The offset
+	 * @param len The length
 	 */
 	public void write(byte[] buf, int off, int len) {
 		byte[] ba = new byte[len];

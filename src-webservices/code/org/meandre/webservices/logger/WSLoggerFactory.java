@@ -13,8 +13,7 @@ import org.meandre.core.logger.MeandreFormatter;
 
 /** This class implements a disposable logger factory for demo components and flows.
  * 
- * @author Xavier Llor&agrave;
- * @modified Amit Kumar -Added Formatter
+ * @author Xavier Llor&agrave; (modified Amit Kumar -Added Formatter)
  */
 public class WSLoggerFactory {
 	

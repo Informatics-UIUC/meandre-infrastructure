@@ -34,7 +34,7 @@ public class DefaultWebUIHandler extends AbstractHandler {
 	 * @param target The target path
 	 * @param request The request object
 	 * @param response The response object
-	 * @param dispath The dispatch flag
+	 * @param dispatch The dispatch flag
 	 * @throws IOException An IO exception arised when processing the request
 	 * @throws ServletException The servlet could not complete the request
 	 */

@@ -5,7 +5,6 @@ import java.util.Calendar;
 /** This class contains basic global constants used by the engine.
  * 
  * @author Xavier Llor&agrave;
- * @modified by Amit Kumar: Added Release Tag information and qualifier
  */
 public class Constants {
 

@@ -22,10 +22,7 @@ import de.schlichtherle.io.FileInputStream;
  * the zip/jar/tar.gz files. The files are mounted
  * as a Virtual file system.
  *
- * @author Amit Kumar
- * Created on Oct 25, 2007 1:00:45 AM
- * @modified for the core on Feb 23rd 2008
- * @modified by Xavier Llor&agrave; to fix the directory mismatch + add the setCoreConfig method
+ * @author Amit Kumar (modified by Xavier Llor&agrave; to fix the directory mismatch + add the setCoreConfig method)
  *
  */
 public class VFSServlet  

@@ -29,8 +29,6 @@ import org.mortbay.jetty.servlet.ServletHolder;
 /**This class provides a basic factory for managing plugins.
  *
  * @author Xavier Llor&agrave;
- * @modified Amit Kumar -added support for Filters and getter Method for
- * plugin information June 27th 2008
  */
 public class PluginFactory {
 

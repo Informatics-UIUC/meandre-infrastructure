@@ -132,7 +132,6 @@ public abstract class JobInformationBackendAdapter {
 	 * 
 	 * @param conn The connection to the backend store
 	 * @param iPort The port number where the coordinated service runs
-	 * @param aspcb The service callback
 	 */
 	public void linkToService(Connection conn, int iPort ) {
 				
@@ -400,9 +399,8 @@ public abstract class JobInformationBackendAdapter {
 
 	/** Prints information into the console table.
 	 * 
-	 * @param sServerID The server ID to use
 	 * @param sJobID The job ID login the entry
-	 * @param oText The log text to trace
+	 * @param oPrint The log text to trace
 	 */
 	public void print ( String sJobID, Object oPrint ) {
 		try {
@@ -432,9 +430,8 @@ public abstract class JobInformationBackendAdapter {
 
 	/** Prints information into the console table adding a new line.
 	 * 
-	 * @param sServerID The server ID to use
 	 * @param sJobID The job ID login the entry
-	 * @param oText The log text to trace
+	 * @param oPrint The log text to trace
 	 */
 	public void println ( String sJobID, Object oPrint ) {
 		print(sJobID,oPrint.toString()+"\n");
@@ -515,7 +512,6 @@ public abstract class JobInformationBackendAdapter {
 	
 	/** Records that a job started.
 	 * 
-	 * @param sServerID The server ID to use
 	 * @param sJobID The job ID login the entry
 	 */
 	public void startJob ( String sJobID ) {
@@ -546,7 +542,6 @@ public abstract class JobInformationBackendAdapter {
 	
 	/** Update the job status.
 	 * 
-	 * @param sServerID The server ID to use
 	 * @param sJobID The job ID login the entry
 	 * @param sStatus The new job status
 	 */
@@ -578,7 +573,6 @@ public abstract class JobInformationBackendAdapter {
 	
 	/** Update the job status for all the jobs in this server.
 	 * 
-	 * @param sServerID The server ID to use
 	 * @param sOldStatus The old status to update
 	 * @param sNewStatus The new status to seet
 	 */
@@ -642,7 +636,6 @@ public abstract class JobInformationBackendAdapter {
 
 	/** Returns the current job status.
 	 * 
-	 * @param sJobID The job ID
 	 * @return The concatenated string of logs
 	 */
 	public List<Map<String, String>> getJobStatuses () {

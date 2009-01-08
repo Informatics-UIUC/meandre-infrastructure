@@ -41,7 +41,6 @@ public interface QueryableRepository {
 
     /**
      * Creates a list of components sorted by either date or name and returns the first N (='limit') values
-     * @param model  The model containing the components
      * @param sOrder The sorting order ("date" or "name" for now) - or null if no sorting required
      * @param limit  The maximum number of values to be returned (or -1 if no limit)
      * @return The list of components
@@ -88,11 +87,9 @@ public interface QueryableRepository {
 
    /**
      * Creates a list of flows sorted by either date or name and returns the first N (='limit') values
-     * @param model  The model containing the flows
      * @param sOrder The sorting order ("date" or "name" for now) - or null if no sorting required
      * @param limit  The maximum number of values to be returned (or -1 if no limit)
      * @return The list of flows
-     * @author Boris Capitanu
      */
     public Collection<Resource> getAvailableFlowsOrderedBy(String sOrder, int limit);
 	

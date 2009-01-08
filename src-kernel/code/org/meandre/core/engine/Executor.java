@@ -138,8 +138,8 @@ public class Executor {
 	/**This function is protocol dependent. When changing the application
 	 * to Https -we need to modify this function
 	 * 
-	 * @param nextPortForUse
-	 * @return
+	 * @param nextPortForUse Use the provided port
+	 * @return Returns the host web URL
 	 */
 	private String getHostWebUrl(int nextPortForUse) {
 			String sServer = NetworkTools.getLocalHostName();

@@ -615,7 +615,7 @@ public class Store {
 	 * 
 	 * @param sURI The URI to publish
 	 * @param sRemoteUser The publishing user.
-	 * @return 
+	 * @return Try if the URI was unpublished
 	 */
 	public boolean unpublishURI(String sURI, String sRemoteUser) {
 		
@@ -771,7 +771,7 @@ public class Store {
 	/** This method adds a location to the user repository. Also checks that is
 	 * a valid description of it.
 	 * 
-	 * @param The user adding the location
+	 * @param sUser The user adding the location
 	 * @param sLocation The location to add
 	 * @param sDescription The description of the location to add
 	 * @param cnf The core configuration object

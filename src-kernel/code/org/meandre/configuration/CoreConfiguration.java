@@ -63,7 +63,7 @@ public class CoreConfiguration {
 	/** Creates a core configuration object with the default property values.
 	 * It uses the existing property file and uses those values if it exists.
 	 * 
-	 * @props The properties to use
+	 * @param props The properties to use
 	 */
 	public CoreConfiguration ( Properties props ) {
 		log = KernelLoggerFactory.getCoreLogger();

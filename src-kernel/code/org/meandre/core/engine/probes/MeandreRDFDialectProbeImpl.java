@@ -17,8 +17,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 /** This class implements a probe for the engine that just dumps the information
  * to the provided PrintStream.
  * 
- * @author Xavier Llor&agrave;
- * @modified by Amit Kumar -Support for portnames
+ * @author Xavier Llor&agrave; modified by Amit Kumar -Support for portnames
  */
 public class MeandreRDFDialectProbeImpl 
 implements Probe {

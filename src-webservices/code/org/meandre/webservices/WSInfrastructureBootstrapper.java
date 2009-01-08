@@ -9,9 +9,7 @@ import org.meandre.webservices.logger.WSLoggerFactory;
 /**
  * Bootstraps a Meandre execution engine.
  *
- * @author Xavier Llor&agrave;
- * @modified Amit Kumar: Added Security Manager
- * @modified Amit Kumar: Added plugins.
+ * @author Xavier Llor&agrave; (modified Amit Kumar: Added Security Manager; Added plugins.)
  *
  */
 public class WSInfrastructureBootstrapper {
@@ -31,7 +29,7 @@ public class WSInfrastructureBootstrapper {
 	/**
 	 * Boostraps the Meandre execution engine.
 	 *
-	 * @param args
+	 * @param sArgs
 	 *            Command line arguments
 	 * @throws Exception
 	 *             Something went wrong, really wrong.

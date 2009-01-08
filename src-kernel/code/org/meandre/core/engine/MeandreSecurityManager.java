@@ -6,7 +6,6 @@ import java.security.Permission;
  * 
  * @author Amit Kumar
  * @since 1.1
- * @modified Xavier Llor&agrave;
  *
  */
 public final class MeandreSecurityManager extends SecurityManager{

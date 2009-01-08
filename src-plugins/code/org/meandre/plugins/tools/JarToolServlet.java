@@ -28,10 +28,7 @@ import org.meandre.plugins.MeandrePlugin;
 /**This plugin reads the jar file and returns attributes for
  * the jar file.
  * 
- * @author Amit Kumar
- * Created on Mar 30, 2008 6:46:54 PM
- * -Used by the eclipse plugin
- * @modified by Xavier Llor&agrave; to fix the directory mismatch + add the setCoreConfig method
+ * @author Amit Kumar (modified by Xavier Llor&agrave; to fix the directory mismatch + add the setCoreConfig method)
  */
 public class JarToolServlet extends HttpServlet 
 implements MeandrePlugin{
@@ -174,8 +171,8 @@ implements MeandrePlugin{
 
 	/**returns the hex String
 	 * 
-	 * @param file
-	 * @return
+	 * @param file The file to check
+	 * @return The MD% of the file
 	 */
 	private String getMD5(File file) {
 		byte[] bytes=null;

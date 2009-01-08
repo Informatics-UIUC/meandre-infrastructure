@@ -203,7 +203,7 @@ public class MeandreBaseClient{
      * 
 	 * 
 	 * @param sRestCommand The url suffix
-	 * @param params the http query param name-value pairs to append
+	 * @param queryParams the http query param name-value pairs to append
 	 * @param dataParts the post content parts for a multipart request, usually 
 	 * 					Files to upload.
 	 *

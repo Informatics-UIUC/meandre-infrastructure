@@ -43,7 +43,7 @@ public class ExecutableComponentInstanceDescription {
 	 * @param resComponent The component this instance belongs to
 	 * @param sName The name of the flow
 	 * @param sDescription The description of the flow
-	 * @param description The instance properties
+	 * @param pdProperties The description of the properties
 	 */
 	public  ExecutableComponentInstanceDescription (
 				Resource resExecutableComponentInstance,

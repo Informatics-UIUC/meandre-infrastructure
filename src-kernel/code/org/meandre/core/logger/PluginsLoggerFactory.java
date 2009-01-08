@@ -9,8 +9,7 @@ import java.util.logging.Logger;
 
 /** This class implements the basic factory for loggers.
  * 
- * @author Xavier Llor&agrave;
- * @modified -Amit Kumar added Formatter
+ * @author Xavier Llor&agrave; (modified -Amit Kumar added Formatter)
  */
 public class PluginsLoggerFactory {
 

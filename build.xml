@@ -267,6 +267,11 @@
                   <include name="${coordinator.src}/**"/>
                   <exclude name="**/*.properties" />
                   <exclude name="**/*.jj" />
+                  <exclude name="**/*.xml" />
+                  <exclude name="**/*.gif" />
+                  <exclude name="**/*.xslt" />
+                  <exclude name="**/*.py" />
+                  <exclude name="**/*.html" />
             </fileset>
         </javadoc>
     </target>

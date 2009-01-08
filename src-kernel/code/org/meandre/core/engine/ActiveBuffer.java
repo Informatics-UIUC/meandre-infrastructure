@@ -84,7 +84,7 @@ public class ActiveBuffer {
 	
 	/** Pushes a data component to the end of the active buffer queue.
 	 * 
-	 * @param queueObjects The object to push to the active buffer
+	 * @param obj The object to push to the active buffer
 	 * @throws ActiveBufferException An exception ocurred while aquiring the capacity semaphore
 	 */
 	public synchronized void pushDataComponent ( Object obj ) throws ActiveBufferException{

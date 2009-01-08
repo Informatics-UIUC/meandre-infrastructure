@@ -26,7 +26,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 /** This class gathers together the tests related to MrProbe.
  * 
  * @author Xavier Llor&agrave;
- * @modified by Amit Kumar -Added error message to the abort flow probe
  */
 public class MrProbeTest {
 	

@@ -19,9 +19,7 @@ import com.thoughtworks.xstream.XStream;
  * for its negative connotation and run with the probe (a little bit more neutral, not great,
  * but a little better). 
  * 
- * @author Xavier Llor&agrave;
- * @modified Amit Kumar -Added portNames as the objects that are sent to the probeComponent
- * @param <WrappedComponent>
+ * @author Xavier Llor&agrave; (modified Amit Kumar -Added portNames as the objects that are sent to the probeComponent)
  *
  */
 public class MrProbe 
@@ -132,7 +130,7 @@ extends Thread {
 	/** The flow started executing.
 	 * 
 	 * @param sFlowUniqueID The unique execution flow ID
-	 * @param ts The time stamp
+	 * @param weburl The web url
 	 */
 	public void probeFlowStart(String sFlowUniqueID, String weburl){
 		Object[] oa = {Probe.ProbeCommands.FLOW_STARTED,sFlowUniqueID,new Date(), weburl};
@@ -143,7 +141,6 @@ extends Thread {
 	/** The flow stopped executing.
 	 * 
 	 * @param sFlowUniqueID The unique execution flow ID
-	 * @param ts The time stamp
 	 */
 	public void probeFlowFinish(String sFlowUniqueID){
 		Object[] oa = {Probe.ProbeCommands.FLOW_FINISHED,sFlowUniqueID,new Date()};
@@ -154,7 +151,7 @@ extends Thread {
 	/** The flow aborted the execution.
 	 * 
 	 * @param sFlowUniqueID The unique execution flow ID
-	 * @param ts The time stamp
+	 * @param message The aborting message
 	 */
 	public void probeFlowAbort(String sFlowUniqueID,String message){
 		Object[] oa = {Probe.ProbeCommands.FLOW_ABORTED,sFlowUniqueID,new Date(),message};
