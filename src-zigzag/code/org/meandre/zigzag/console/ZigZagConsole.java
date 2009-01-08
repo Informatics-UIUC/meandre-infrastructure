@@ -123,7 +123,7 @@ public class ZigZagConsole {
 	protected void printVersion() {
 		System.out.println();
 		System.out.println("Meandre ZigZag scripting language interpreter console ["+ZigZag.ZIGZAG_VERSION+"/"+Constants.MEANDRE_VERSION+"]");
-		System.out.println("All rights reserved by DITA, NCSA, UofI (2007-2008)");
+		System.out.println("All rights reserved by DITA, NCSA, UofI (2007-2009)");
 		System.out.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		System.out.println();
 	}

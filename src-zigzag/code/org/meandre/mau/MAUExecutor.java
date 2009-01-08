@@ -162,7 +162,7 @@ public class MAUExecutor {
 	public void run () throws FileNotFoundException {
 
 		ps.println("Meandre MAU Executor [" + MAUExecutor.ZMAU_VERSION + "/" + Constants.MEANDRE_VERSION + "]");
-		ps.println("All rights reserved by DITA, NCSA, UofI (2007-2008)");
+		ps.println("All rights reserved by DITA, NCSA, UofI (2007-2009)");
 		ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		ps.println();
 		ps.flush();

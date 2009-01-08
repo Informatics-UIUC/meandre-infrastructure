@@ -4,6 +4,7 @@
 package org.meandre.webservices.servlets;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
@@ -58,38 +59,43 @@ public class WSExecuteServlet extends MeandreBaseServlet {
 	throws IOException, FileUploadException {
 
 		Model modelAcc = ModelFactory.createDefaultModel();
-		ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
-		List lstItems = upload.parseRequest(request);
-		Iterator<FileItem> itr = lstItems.iterator();
-
-		while(itr.hasNext()) {
-			FileItem item = itr.next();
-		    // Get the name of the field
-			String fieldName = item.getFieldName();
-
-			// check if the current item is a form field or an uploaded file
-			if(fieldName.equals("repository")) {
-
-				String sContent = new String(item.get());
-
-				Model modelTmp = ModelFactory.createDefaultModel();
-
-				modelTmp.setNsPrefix("", "http://www.meandre.org/ontology/");
-				modelTmp.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
-				modelTmp.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
-				modelTmp.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
-
-				//
-				// Read the location and check its consistency
-				//
-				ModelIO.attemptReadModel(modelTmp, sContent);
-
-				//
-				// Accumulate the models
-				//
-				modelAcc.add(modelTmp);
+		
+		Model modTuned = (Model) request.getAttribute("repository");
+		if ( modTuned!=null ) {
+			modelAcc = modTuned;
+		}
+		else {
+			ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
+			List lstItems = upload.parseRequest(request);
+			Iterator<FileItem> itr = lstItems.iterator();
+			while(itr.hasNext()) {
+				FileItem item = itr.next();
+			    // Get the name of the field
+				String fieldName = item.getFieldName();
+	
+				// check if the current item is a form field or an uploaded file
+				if(fieldName.equals("repository")) {
+	
+					String sContent = new String(item.get());
+	
+					Model modelTmp = ModelFactory.createDefaultModel();
+	
+					modelTmp.setNsPrefix("", "http://www.meandre.org/ontology/");
+					modelTmp.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
+					modelTmp.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
+					modelTmp.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
+	
+					//
+					// Read the location and check its consistency
+					//
+					ModelIO.attemptReadModel(modelTmp, sContent);
+	
+					//
+					// Accumulate the models
+					//
+					modelAcc.add(modelTmp);
+				}
 			}
-			
 		}
 
 		// There was no repository uploaded

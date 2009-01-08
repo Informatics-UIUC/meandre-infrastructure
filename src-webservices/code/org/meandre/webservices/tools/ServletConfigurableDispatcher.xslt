@@ -223,7 +223,7 @@
 			 		    	<li><a href="/services/about/plugins.html">Plugins</a></li>
 		 		    	</ul>
 		 		    </div>
-		 		    <br/>All rights reserved by<br/>DITA, NCSA, and UofI, 2007-2008.
+		 		    <br/>All rights reserved by<br/>DITA, NCSA, and UofI, 2007-2009.
 				</div>	
 				</td><td id="separator" valign="top" width="100%">
 				<div id="main">
@@ -508,7 +508,13 @@
 											<xsl:attribute name="onclick">return checkForFlow()</xsl:attribute>
 											run 
 						     			</a> 
-						     			- 				     			
+						     			- 		
+						     			<a>
+						     				<xsl:attribute name="href">/services/auxiliar/tune_flow.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+											<xsl:attribute name="target">_blank</xsl:attribute>
+											tune&amp;run 
+						     			</a> 
+						     			-		     			
 						     			<a>
 						     				<xsl:attribute name="href">/services/publish/publish.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
 											publish

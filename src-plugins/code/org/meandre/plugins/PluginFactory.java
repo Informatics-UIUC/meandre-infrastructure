@@ -148,7 +148,7 @@ public class PluginFactory {
 			try {
 				PrintStream ps = new PrintStream(new FileOutputStream(file.getAbsolutePath()+File.separator+"readme.txt"));
 				ps.println("Meandre Execution Engine version "+Constants.MEANDRE_VERSION);
-				ps.println("All rights reserved by DITA, NCSA, UofI (2007-2008)");
+				ps.println("All rights reserved by DITA, NCSA, UofI (2007-2009)");
 				ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 				ps.println();
 				ps.println("This directory contains all the publicly available implementations for the Meandre components.");
