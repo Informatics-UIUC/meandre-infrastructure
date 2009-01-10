@@ -245,8 +245,12 @@ public class ZigZagConsole {
 			MAUExecutor mau = new MAUExecutor(sFileName);
 			try {
 				mau.run();
-			} catch (FileNotFoundException e) {
+			} 
+			catch (FileNotFoundException e) {
 				System.out.println("\t The flow could not be executed. "+e.getMessage());
+			}
+			catch (Exception e) {
+				System.out.println("\t The flow execution finished abruptly. "+e.getMessage());
 			}
 			// Delete the mau file
 			new File(sFileName).delete();
