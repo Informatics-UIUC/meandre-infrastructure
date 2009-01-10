@@ -364,9 +364,11 @@ def repository_search_components ( request, response, format ):
                 resources = qrNew.getAvailableExecutableComponentsOrderedBy(order,limit)            
             
             for resource in resources:
-                content.append({'meandre_uri':resource.toString(),
-                                'meandre_uri_name':qr.getExecutableComponentDescription(resource).getName(),
-                                'description':qr.getExecutableComponentDescription(resource).getDescription()})
+                ecd = qr.getExecutableComponentDescription(resource)
+                if ecd is not None:
+                    content.append({'meandre_uri':resource.toString(),
+                                    'meandre_uri_name':ecd.getName(),
+                                    'description':ecd.getDescription()})
             statusOK(response)
             sendTJXContent(response,content,format) 
         else:
@@ -402,9 +404,11 @@ def repository_search_flows ( request, response, format ):
                 resources = qrNew.getAvailableFlowsOrderedBy(order,limit)            
             
             for resource in resources:
-                content.append({'meandre_uri':resource.toString(),
-                                'meandre_uri_name':qr.getFlowDescription(resource).getName(),
-                                'description':qr.getFlowDescription(resource).getDescription()})
+                fd = qr.getFlowDescription(resource)
+                if fd is not None:
+                    content.append({'meandre_uri':resource.toString(),
+                                    'meandre_uri_name':fd.getName(),
+                                    'description':fd.getDescription()})
             statusOK(response)
             sendTJXContent(response,content,format) 
         else:
