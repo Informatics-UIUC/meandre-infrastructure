@@ -140,7 +140,6 @@
 			 		    <ul>
 							<li><a href="/services/auxiliar/add_to_repository.html" >Add</a></li>
 							<li><a href="/services/repository/dump.ttl" target="_blank">Dump</a></li>
-							<li><a href="/services/repository/regenerate.html" onclick="return confirm('Are you sure you want to regenerate the repository?');">Regenerate</a></li>
 							<li><a href="/services/repository/list_components.html?order=name">Components</a> (<a href="/services/repository/list_components.html?order=date">by date</a>)</li>
 							<li><a href="/services/repository/list_flows.html?order=name">Flows</a> (<a href="/services/repository/list_flows.html?order=date">by date</a>)</li>
 							<li><a href="/services/repository/tags.html">Tags</a></li>
@@ -154,6 +153,8 @@
 									<input type="text" id="sf" name="q" value="Search flows..." onclick="document.sff.sf.value=''"/><br/>
 								</form> 
 							</li>
+							<li><a href="/services/repository/clear.html" onclick="return confirm('Are you sure you want to remove all the components and flow from the repository?');">Clear</a></li>
+							<li><a href="/services/repository/regenerate.html" onclick="return confirm('Are you sure you want to regenerate the repository?');">Regenerate</a></li>
 		 		    	</ul>
 		 		    	<p>Publish</p>
 			 		    <ul>

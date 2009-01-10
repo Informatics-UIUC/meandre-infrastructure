@@ -22,7 +22,8 @@ requestMap = {
         'describe_all_flows': 'repository_describe_all_flows',    
         'search_components': 'repository_search_components',    
         'search_flows': 'repository_search_flows',    
-        'remove': 'repository_remove'
+        'remove': 'repository_remove',    
+        'clear': 'repository_clear'
     },
     'POST': { 
         'add': 'repository_add',    
@@ -335,7 +336,23 @@ def repository_remove ( request, response, format ):
             errorExpectationFail(response)
     else:
         errorForbidden(response)  
-    
+
+
+def repository_clear ( request, response, format ):
+    '''Remove all the components and flows for the aggregated repository
+       for the requesting user in the current Meandre server.'''
+    if checkUserRole (request,Role.REPOSITORY) :
+       qr = meandre_store.getRepositoryStore(getMeandreUser(request))
+       qr.getModel().begin()
+       qr.getModel().removeAll()
+       qr.getModel().commit()
+       qr.refreshCache()
+       content = {'message':'Repository successfully emptied'}
+       statusOK(response)
+       sendTJXContent(response,content,format)
+    else:
+        errorForbidden(response)  
+        
     
 def repository_search_components ( request, response, format ):
     '''Search the components aggregated in the user repository stored in the 
