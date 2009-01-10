@@ -86,9 +86,11 @@ def repository_list_components ( request, response, format ):
         else:
             resources = qr.getAvailableExecutableComponents()
         for resource in resources:
-            content.append({'meandre_uri':resource.toString(),
-                            'meandre_uri_name':qr.getExecutableComponentDescription(resource).getName(),
-                            'description':qr.getExecutableComponentDescription(resource).getDescription()})
+            ecd = qr.getExecutableComponentDescription(resource)
+            if ecd is not None :
+                content.append({'meandre_uri':resource.toString(),
+                                'meandre_uri_name':ecd.getName(),
+                                'description':ecd.getDescription()})
         statusOK(response)
         sendTJXContent(response,content,format)
     else:
@@ -116,9 +118,11 @@ def repository_list_flows ( request, response, format ):
         else:
             resources = qr.getAvailableFlows()
         for resource in resources:
-            content.append({'meandre_uri':resource.toString(),
-                            'meandre_uri_name':qr.getFlowDescription(resource).getName(),
-                            'description':qr.getFlowDescription(resource).getDescription()})
+            fd = qr.getFlowDescription(resource)
+            if fd is not None :
+                content.append({'meandre_uri':resource.toString(),
+                                'meandre_uri_name':fd.getName(),
+                                'description':fd.getDescription()})
         statusOK(response)
         sendTJXContent(response,content,format)
     else:
