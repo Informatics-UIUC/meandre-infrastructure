@@ -819,39 +819,42 @@ public class Store {
 				Model model = qr.getModel();
 				model.begin();
 				 
+				// Pull all the jars
+				HashSet<String> hsCtxs = new HashSet<String>();
+				for ( ExecutableComponentDescription ecd:qrNew.getAvailableExecutableComponentDescriptions())
+					if ( !qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent())) 
+						for ( RDFNode rdfNode:ecd.getContext() ) {
+							boolean bFile = !rdfNode.toString().endsWith("/");
+							if ( rdfNode.isResource() && bFile ) 
+								hsCtxs.add(rdfNode.toString());
+					}				
+				for ( String sCtx:hsCtxs ) {
+					try {
+						URL urlCntx = new URL(sCtx);
+						String [] saSplit = urlCntx.getFile().split("/");
+						String sFile = saSplit[saSplit.length-1]; 
+						new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator).mkdirs();
+			    		File savedFile = new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator+sFile);
+						FileOutputStream fos = new FileOutputStream(savedFile);
+						int iChar; 
+						InputStream is = urlCntx.openStream();
+						while ( (iChar=is.read())>=0 ) fos.write(iChar);
+						fos.close();
+					} catch (Exception e) {
+						ByteArrayOutputStream  baos = new ByteArrayOutputStream();
+						PrintStream ps = new PrintStream(baos);
+						e.printStackTrace(ps);
+						log.warning("Problems pulling context "+sCtx+"\n"+baos);
+						throw new IOException(e.toString());
+					}
+				}
+						
 				// Adding components
 				for ( ExecutableComponentDescription ecd:qrNew.getAvailableExecutableComponentDescriptions())
 					if ( !qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent())) {
+						// Localize the context URL
+						localizeContexes(ecd);
 						model.add(ecd.getModel());
-						// What it should be 
-						//if ( ecd.getMode()==ExecutableComponentDescription.WEBUI_COMPONENT ) {
-						// The failsafe
-						if ( true ) {
-								for ( RDFNode rdfNode:ecd.getContext() ) {
-								boolean bFile = !rdfNode.toString().endsWith("/");
-								if ( rdfNode.isResource() && bFile ) {
-									// Need to pull the files
-									try {
-										URL urlCntx = new URL(rdfNode.toString());
-										String [] saSplit = urlCntx.getFile().split("/");
-										String sFile = saSplit[saSplit.length-1]; 
-										new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator).mkdirs();
-							    		File savedFile = new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator+sFile);
-										FileOutputStream fos = new FileOutputStream(savedFile);
-										int iChar; 
-										InputStream is = urlCntx.openStream();
-										while ( (iChar=is.read())>=0 ) fos.write(iChar);
-										fos.close();
-									} catch (Exception e) {
-										ByteArrayOutputStream  baos = new ByteArrayOutputStream();
-										PrintStream ps = new PrintStream(baos);
-										e.printStackTrace(ps);
-										log.warning("Problems pulling context "+rdfNode+"\n"+baos);
-										throw new IOException(e.toString());
-									}
-								}
-							}
-						}
 					}
 					else
 						log.warning("Component "+ecd.getExecutableComponent()+" already exist in the current repository. Discarding it.");
@@ -885,6 +888,35 @@ public class Store {
 		return bRes;
 	}
 	
+	/** Turns the contexts into local contexts to the box.
+	 * 
+	 * @param ecd The executable component to description to localize
+	 */
+	private void localizeContexes(ExecutableComponentDescription ecd) {
+		Model mod = ModelFactory.createDefaultModel();
+		Set<RDFNode> setCntxs = ecd.getContext();
+		HashSet<RDFNode> hsOldCtx = new HashSet<RDFNode>();
+		HashSet<RDFNode> hsNewCtx = new HashSet<RDFNode>();
+		for ( RDFNode rdfNode:setCntxs) {
+			boolean bFile = !rdfNode.toString().endsWith("/");
+			if ( rdfNode.isResource() && bFile ) {
+				hsOldCtx.add(rdfNode);
+				try {
+					String sJar = rdfNode.toString();
+					URL url = new URL(sJar);
+					String [] sFileName = url.getFile().split("/");
+					String sNewJarLocation = url.getProtocol()+"://"+NetworkTools.getLocalHostName()+":"+cnf.getBasePort()+"/public/resources/contexts/java/"+sFileName[sFileName.length-1];
+					hsNewCtx.add(mod.createResource(sNewJarLocation));
+				}
+				catch ( Exception e ) {
+					log.warning("Error localizing context: "+rdfNode+" because "+e.toString());
+				}
+			}
+		}
+		for ( RDFNode rdfNode:hsOldCtx ) setCntxs.remove(rdfNode);
+		for ( RDFNode rdfNode:hsNewCtx ) setCntxs.add(rdfNode);		
+	}
+
 	/** Regenerates a user repository using the current locations for the user.
 	 *
 	 * @param sUser The system store user
