@@ -51,7 +51,7 @@ def execute_flow ( request, response, format ):
                 tokens = [str(System.currentTimeMillis()) for i in range(len(uris))]
             else :
                 tokens = params['token']
-            stats = ['true' in params for i in range(len(uris))]
+            stats = ['statistics' in params for i in range(len(uris))]
             content = []
             for flow_uri, stat, token in zip(uris,stats,tokens): 
                 statusOK(response)
@@ -62,7 +62,7 @@ def execute_flow ( request, response, format ):
                 if format == 'txt' :
                     fuid = InteractiveExecution.createUniqueExecutionFlowID(flow_uri,meandre_config.getBasePort())
                     jiba.startJob(fuid)
-                    res = InteractiveExecution.executeVerboseFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,stat=='true',token,job,fuid,jiba)
+                    res = InteractiveExecution.executeVerboseFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,stat,token,job,fuid,jiba)
                     if res :
                         jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_COMPLETED)
                     else :
