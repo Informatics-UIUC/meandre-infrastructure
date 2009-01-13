@@ -101,7 +101,7 @@ public class InteractiveExecution {
 			pw.flush();
 			WebUI webui = exec.initWebUI(nextPort,sToken);
 			job.setToken(sToken);
-			job.setFlowInstanceId(sURI);
+			job.setFlowInstanceId(sFUID);
 			job.setHostname(NetworkTools.getLocalHostName());
 			job.setPort(nextPort);
 			exec.execute(webui);
@@ -247,7 +247,7 @@ public class InteractiveExecution {
 			
 			WebUI webui = exec.initWebUI(nextPort,sToken);
 			job.setToken(sToken);
-			job.setFlowInstanceId(sURI);
+			job.setFlowInstanceId(sFUID);
 			job.setHostname(NetworkTools.getLocalHostName());
 			job.setPort(nextPort);
 			exec.execute(webui);
