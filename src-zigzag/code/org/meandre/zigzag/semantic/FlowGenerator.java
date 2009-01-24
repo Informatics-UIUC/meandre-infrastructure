@@ -558,7 +558,7 @@ public class FlowGenerator {
 		// Post parellization processing
 		if ( bParallelProcess && htParallelInstances.size()>0 ) {
 			ps.println("Postprocessing flow for parallelization");
-			postProcessinParallelization(fd);
+			postProcessingParallelization(fd);
 			ps.println("Postprocessing flow for parallelization finished");
 		}
 
@@ -612,7 +612,7 @@ public class FlowGenerator {
 	 *
 	 * @param fd The current flow descriptor
 	 */
-	private void postProcessinParallelization(FlowDescription fd) {
+	private void postProcessingParallelization(FlowDescription fd) {
 
 		Model mod = fd.getModel();
 

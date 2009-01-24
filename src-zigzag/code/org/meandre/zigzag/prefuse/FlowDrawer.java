@@ -188,7 +188,7 @@ public class FlowDrawer {
 		
 		
 		final ActionList layout = new ActionList(Activity.DEFAULT_STEP_TIME);
-		layout.setDuration(50000);
+		layout.setDuration(5000);
 		ForceSimulator fsm = new ForceSimulator();
 
 		
