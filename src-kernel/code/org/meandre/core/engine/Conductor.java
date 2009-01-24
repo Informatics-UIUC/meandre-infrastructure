@@ -53,7 +53,7 @@ public class Conductor {
 	static private final String URL_SEAPARTOR = "##--##--##";
 
 	/** The default queue size for the active buffers */
-	public static final int DEFAULT_QUEUE_SIZE = 1000;
+	public static final int DEFAULT_QUEUE_SIZE = 10000;
 
 	/** Set of loadable implementations */
 	private Set<String> setLoadableComponents = null;

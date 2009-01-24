@@ -22,6 +22,8 @@ import org.meandre.core.repository.DataPortDescription;
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.PropertiesDescriptionDefinition;
 import org.meandre.core.repository.TagsDescription;
+import org.meandre.core.system.components.ext.StreamInitiator;
+import org.meandre.core.system.components.ext.StreamTerminator;
 
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -155,8 +157,17 @@ public class MapExecutableComponent implements ExecutableComponent {
 	public void execute ( ComponentContext cc ) 
 	throws ComponentExecutionException, ComponentContextException {
 		Object obj = cc.getDataComponentFromInput("object");
-		cc.pushDataComponentToOutput("object-"+iRoundRobin, obj);
-		iRoundRobin = (iRoundRobin+1)%iNumberOfMapTargets;
+		if ( obj instanceof StreamInitiator || obj instanceof StreamTerminator ) {
+			// Replicate out the object to all components
+			for ( int i=(iRoundRobin+1)%iNumberOfMapTargets ; i!=iRoundRobin ; i=(i+1)%iNumberOfMapTargets )
+				cc.pushDataComponentToOutput("object-"+i, obj);	
+			cc.pushDataComponentToOutput("object-"+iRoundRobin, obj);
+		}
+		else {
+			// Push the object and round robin
+			cc.pushDataComponentToOutput("object-"+iRoundRobin, obj);
+			iRoundRobin = (iRoundRobin+1)%iNumberOfMapTargets;
+		}
 	}
 
 	/** This method is called when the Menadre Flow execution is completed.

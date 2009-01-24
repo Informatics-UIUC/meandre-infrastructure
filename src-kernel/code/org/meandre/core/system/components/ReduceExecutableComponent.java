@@ -24,6 +24,8 @@ import org.meandre.core.repository.DataPortDescription;
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.PropertiesDescriptionDefinition;
 import org.meandre.core.repository.TagsDescription;
+import org.meandre.core.system.components.ext.StreamInitiator;
+import org.meandre.core.system.components.ext.StreamTerminator;
 
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -48,6 +50,9 @@ public class ReduceExecutableComponent implements ExecutableComponent {
 
 	/** The translation between names and queue arrary index */
 	private Hashtable<String,Integer> htTranslation;
+	
+	/** Last pushed object */
+	private Object objLast;
 	
 	/** Returns the on-the-fly descriptor generated for this component.
 	 * 
@@ -147,7 +152,6 @@ public class ReduceExecutableComponent implements ExecutableComponent {
 	@SuppressWarnings("unchecked")
 	public void initialize ( ComponentContextProperties ccp ) {
 		iNumberOfMapTargets = Integer.valueOf(ccp.getProperty("number-of-inputs"));
-		iRoundRobin = 0;
 		
 		// Create the temporary queues required to maintain the order
 		cqa = new LinkedList[iNumberOfMapTargets];
@@ -199,9 +203,22 @@ public class ReduceExecutableComponent implements ExecutableComponent {
 	private void pushOrderedData(ComponentContext cc) throws ComponentContextException {
 		while ( !cqa[iRoundRobin].isEmpty() ) {
 			// Push the data from the current queue
-			cc.pushDataComponentToOutput("object", cqa[iRoundRobin].poll());
-			// Move to the next queue
-			iRoundRobin = (iRoundRobin+1)%iNumberOfMapTargets;
+			Object obj = cqa[iRoundRobin].poll();
+			if ( objLast!=null && (objLast instanceof StreamInitiator || objLast instanceof StreamTerminator) ) {
+				if ( obj.getClass()!=objLast.getClass() ) {
+					// Need to be pushed
+					objLast = obj;
+					cc.pushDataComponentToOutput("object", obj);
+				}
+				// Move to the next queue	
+				iRoundRobin = (iRoundRobin+1)%iNumberOfMapTargets;
+			}
+			else {
+				cc.pushDataComponentToOutput("object", obj);
+				// Move to the next queue
+				objLast = obj;
+				iRoundRobin = (iRoundRobin+1)%iNumberOfMapTargets;
+			}
 		}
 	}
 
@@ -213,5 +230,6 @@ public class ReduceExecutableComponent implements ExecutableComponent {
 		iNumberOfMapTargets = iRoundRobin = 0;
 		cqa = null;
 		htTranslation = null;
+		objLast = null;
 	}
 }
