@@ -176,12 +176,13 @@ extends Thread {
 				//log.finest("Component "+ec.toString()+" ready for execution");
 				try {
 					// Execute
-					this.thdMrProbe.probeWrappedComponentFired(this);
 					synchronized (baStatusFlags) {
 						baStatusFlags[EXECUTING] = true;
 					}
 					try {
+						this.thdMrProbe.probeWrappedComponentFired(this);
 						ec.execute(cc);
+						this.thdMrProbe.probeWrappedComponentCoolingDown(this);
 					}
 					catch ( NoClassDefFoundError ncde ) {
 						synchronized (baStatusFlags) {
@@ -192,7 +193,6 @@ extends Thread {
 					synchronized (baStatusFlags) {
 						baStatusFlags[EXECUTING] = false;
 					}
-					this.thdMrProbe.probeWrappedComponentCoolingDown(this);
 					
 					//log.finest("Component "+ec.toString()+" executed");
 					
