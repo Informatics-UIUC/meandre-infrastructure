@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>	
+<comment>Generic query mapping for SQL databases</comment>
+	<entry key="DB">MySQL</entry>
+	<entry key="MARKER">@@@</entry>
+	<entry key="CREATE_JOB_STATUS_TABLE">
+			CREATE TABLE meandre_job_status 
+				(server_ID CHAR(16),
+				 job_ID CHAR(250), 
+				 status CHAR(1) default 'D', 
+				 ts TIMESTAMP,
+				 PRIMARY KEY(server_ID,job_ID))
+	</entry>
+	<entry key="CREATE_JOB_CONSOLE_TABLE">
+			CREATE TABLE meandre_job_console
+				(ID int(64) auto_increment,
+				 server_ID CHAR(16),
+				 job_ID CHAR(250), 
+				 print TEXT, 
+				 ts TIMESTAMP,
+				 INDEX ts_idx (ts),
+				 PRIMARY KEY(ID))
+	</entry>
+	<entry key="CREATE_JOB_LOG_TABLE">
+			CREATE TABLE meandre_job_log
+				(ID int(64) auto_increment,
+				 server_ID CHAR(16),
+				 job_ID CHAR(250), 
+				 level CHAR(32), 
+				 log TEXT, 
+				 ts TIMESTAMP,
+				 INDEX ts_idx (ts),
+				 PRIMARY KEY(ID))
+	</entry>
+	
+	<entry key="INSERT_JOB_CONSOLE">
+			INSERT INTO meandre_job_console (server_ID,job_ID,print)
+				VALUES (?,?,?)
+	</entry>
+	<entry key="INSERT_JOB_LOG">
+			INSERT INTO meandre_job_log (server_ID,job_ID,level,log)
+				VALUES (?,?,?,?)
+	</entry>
+	<entry key="INSERT_JOB_STATUS">
+			INSERT INTO meandre_job_status (server_ID,job_ID,status)
+				VALUES (?,?,?)
+	</entry>
+	<entry key="UPDATE_JOB_STATUS">
+			UPDATE meandre_job_status
+				SET status=?
+				WHERE server_ID=? and job_ID=?
+	</entry>
+	<entry key="UPDATE_JOB_STATUSES_SERVER">
+			UPDATE meandre_job_status
+				SET status=?
+				WHERE server_ID=? and status=?
+	</entry>
+</properties>

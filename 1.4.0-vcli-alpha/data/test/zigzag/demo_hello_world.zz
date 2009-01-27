@@ -1,0 +1,33 @@
+#
+# This flow creates a flow that concatenates two strings together
+# and then prints it to the console
+#
+# @author Xavier Llora;
+# @date March 7, 2008
+#
+
+#
+# Imports the three required components and create the component aliases
+#
+import <http://localhost:1714/public/services/demo_repository.ttl>
+alias <meandre://test.org/component/push-string> as PUSH
+alias <meandre://test.org/component/concatenate-strings> as CONCAT
+from <http://localhost:1714/public/services/demo_repository.ttl> 
+	import <meandre://test.org/component/print-object> as PRINT
+	
+#
+# Creates four instances for the flow
+#
+push_hello, push_world, concat, print = PUSH(), PUSH(), CONCAT(), PRINT() 
+	
+#
+# Sets up the properties of the instances
+#
+push_hello.message, push_world.message  = "Hello ", "world!"
+
+#
+# Describe the data-intensive flow
+#
+@phres, @pwres = push_hello(), push_world()
+@cres = concat( string_one: phres.string; string_two: pwres.string )
+print( object: cres.concatenated_string )

@@ -1,0 +1,519 @@
+1.4.0-vcli-alpha Sara
+
+* Remove the dump of the uploaded components/flows. Replaced by proper login
+
+* Expose the sorting of flows and component on the HTML rendering interface
+
+* Fix to the way realm properties are updated
+
+* Fix to make sure that tests also pass on a MS Windows platform
+
+* Added abort link on the HTML list running flow interface
+
+* Added an empty constructor to the Meandre Proxy by Amit's request
+
+* Added the avility to pass a port number and a base directory to the infrastructure
+  bootstrapper.
+  
+* The infrastructure looks for a file called meandre-default-locations.txt. Each
+  line is a location and this set of locations are added to any newly created user.
+  
+* Reenabled the global file share on the WebUIs (disabled by Amit's changes)
+
+* Added the option to select the port number from the command line on the MAUExecutor
+
+* The conductor class loader now makes sure only directories and jar files are 
+  passed as locations to pull classes from.
+  
+* Added a html face to the component and flow descriptors
+
+* All the jars when a location is add are now being pulled down to the public resources directory
+
+* Added a simple service to shutdown the server at /services/server/shutdown.html (as 
+  usual it also supports txt, json, and xml calls)
+  
+* Added a check to make sure that the add to repository won't corrupt the repository
+
+* Fix to the execute servlet flow services that did not execute when a token was provided.
+
+* Added patches to the Meandre Client and Meandre Admin Client provided by Amit. 
+  Patches add:
+  	- Capability to get a componet description
+  	- Get the component jar info
+  	- Get the server version
+  	- Ping the server
+  	- Return the plugin information in JSON format 
+ 
+* Added the following entries to the returned information 'meandre_uri', 'meandre_uri_name', 
+  'description' to both, components and flow calls (see the html interface for mer details).
+  
+* Bug fix to the upload repository service (reading from the same input stream multiple times)
+
+* Added the proxied url to the execute services execute_url and list_running_flows
+
+* Added a call that returns the proxied url on the component context properties
+
+* Hooked the webui proxy to the meandre server. This is just a bypass to the 
+  webUI handler. The secondary server is still being started.
+
+* Adding test to the WebUI infrastructure previous to the WebUI proxying. The
+  basic strategy is to stand a servlet handler on the service that tracks /webui/
+  requests and process them. 
+
+* Added a WS in the new created jobs section to pull the current console output of a job
+
+* Modified the interactive execution methods to create a new persistent print writer
+
+* Created a persistent print writer wrapper to store the execution console
+
+* Created the web service that list the status of the jobs run in the cluster so far
+
+* Added to query and mechanics to manage job statuses
+
+* Written the basic queries and mechanics to have a persistent log and console
+
+* Started creating the base infrastructure for the service.
+
+* Refactored the coordinator backend adapter to reflect the coordinator nature of it.
+
+* Added the html auxiliar facade that allows top upload and execute a repository
+
+* Added a new execute service that accepts a post of 'repository' and runs all the flows in the 
+  contained repository. It also tries to add missing components from the user repository if needed.
+  
+* Services to expose cluster information
+	- Added log service that listed the log information
+	- Added status service that listed the server's status information
+	- Added info service that listed the servers' information
+	- Added properties service that listed the properties of the server's 
+
+* Modfyied the MDX to return the log entries (had to specialize the insert status to make Derby happy)
+
+* Creates an auxiliar service that just display forms for 
+	- Adding to a repository
+	- Create a user 
+	- Roles map for granting and revoking
+
+* Added simple forms for search and the like
+
+* Created the proper XSLT transformation for all the services that do not require complex for forms
+
+* Created a first XSLT for /services/location/list.html
+
+* Created the basic mechaniscs for returning HTML pages based on XML and XSLTs
+
+* Modified the MDX connection duplications (Derby can support multiple concurrent
+  connections to the DB, as long as they are in the same JVM). This gets rid of the
+  results problem reading and the obscure message for autocommit off.
+
+* Fixed the Meandre Client and it failing tests
+
+* Fixed the Meandre Admin Client and its failing tests
+
+* Fixed non-client related failing tests
+
+* Migrated the repository calls that response to POSTs
+	- /add
+	- /add_flow_description
+	
+* Migrated the repository calls that response to GETs
+	- /dump.txt
+	- /regenerate
+	- /list_components
+	- /list_flows
+	- /tags
+	- /tags_components
+	- /tags_flows
+	- /components_by_tag (changed the parameter from q to tag)
+	- /components_by_flow (changed the parameter from q to tag)
+	- /describe_components
+	- /describe_all_components
+	- /describe_flows
+	- /describe_all_flows
+	- /search_components (still does not allow multiple q parameters)
+	- /search_flows (still does not allow multiple q parameters)
+	- /rename	 
+
+* Migrated the Security service. Also modified the following
+	- assign_roles -> grant_roles (for consistency)
+	- create_user -> create_users (for consistency)
+	- remove_user -> remove_users (for consitency)
+	- Added update_user to allow updating the user profile
+	
+* Migrated the Execution service. Also added the JSON and XML versions to the 
+  calls that Amit added involving tokens and quering information from a running
+  flow.
+
+* Migrated the Locations service to the new Python-based dispatcher
+	(!) Changed the behavior of remove location to only remove the components and
+	    flows existing in that location instead of the current regenerate and add
+	    which has the potential of getting rid of temporary components/flows added 
+	    by a developer
+
+* Migrated the Publish services to the new Python-based dispatcher
+
+* Migrated the Public services to the new Python-based dispatcher
+
+* Migrated the About services to the new Python-based dispatcher
+
+* Created an extension of the base dispatcher adding Meandre related information
+
+* Added a test servlet to test the functionalities provided by the base servlet dispatcher
+
+* Create the Python code to implement the base dispatcher
+
+* Developed a unified base servlet dispatcher 
+
+* Move the MDX branch from the experimental repository to the branch one
+
+* Revamped the backend adapters to allow the proper schema creation for Derby
+
+* Added method to the plugin interface
+
+	/** Sets the core configuration object to use.
+	 * 
+	 * @param cnf The core configuration object
+	 */
+	public void setCoreConfiguration ( CoreConfiguration cnf )
+	
+* Identified and fixed a potential concurrent problem with the consoles and the interactive run facility
+
+* Modified the engine to work with per flow output consoles
+
+* Added a console output call to the ComponentContext properties to isolate consoles during run time
+
+* Hooked the back end adapter to the meandre server
+
+* Added a properties table that gets read everytime and status update by the service is preformed.
+
+* Added /public/services/ping.txt which return "Pong" for pinguin live servers
+
+* Added the automatic marking of out of sync to the backend adapter thread service
+
+* Modified the test to remove the shutdown hooks (so test do not pile a bunch of them up all fired at once)
+
+* Added a setLevel method to all factory logger objects
+
+* Created a self contained logger
+
+* Modified the shutdown hook to close properly
+
+* Split the insert update into an update [+insert] for the server status
+
+* Refactoring to create the selfcontained coordinator
+
+* Added a transactional layer to the operations
+
+* Added a log table to handle events
+
+* Split the server info in two tables (status and info to separate dynamic versus static content)
+
+* Writing designing the tables for the Meandre server tracking
+
+* Adding shutdown hooks for proper cleaning of service status
+
+* Starting the backend adapters to allow consistent backend storage usage
+
+* Fix to the webuidispatcher set done.
+
+* More rearranging of the log levels 
+
+* Modified the log formatter. Beside rearranging the info fields, not it displays properly on different OS
+
+* Fix to avoiding the core config file to be overwritten
+
+* Fix to the store properties to avoid overwriting the existing file
+
+* Update the version number to 1.4.0-vcli-alpha 
+
+* Changed added some info login on the MeandreServer operations
+
+* Fixed VFServlet nonsensical login message levels
+
+* Fixed the JarToolServlet login of the exceptions
+
+* Reshaping the logger to make it leaner:
+	- most conductor messages move to fine
+	- store messages moved to config when possible
+	- wrapped component toned down a bit
+
+* Removing JMX and the rmi registry to avoid problems on concurrent testing
+
+* Removing terracota test
+
+
+1.3.1vcli Xuixo
+
+* Updated Xstream library to 1.3 July 19th 2008
+
+* Added simple formatter for the logger July 19th 2008
+
+
+1.3.1vcli Xuixo
+
+* Changed the software revision string to be of the format ##.##.##
+
+*Added a JMX based probe implementation for tying the component and the flow lifecycle with other applications.
+-This functionality allows the engine to send notifications to an embedded JMX server and other 
+applications (not running in the same JVM or host as the engine is) to monitor when a new 
+Flow starts/ends/aborts and the port number it starts on etc. It also allows the application to check the
+status of the components -i.e if a particular component has been fired or not  -or for example if it has
+pushedData out of the port or not.  These messages/notifications become useful when I am trying to integrate 
+with other applications where we want to be able to inform the user  running a web browser what's going on with 
+the Analytics portion of there workflow etc.
+
+* Complementary to the probe is a JMX based client side classes/adapters that external applications can use to 
+listen to these events -the code is in src-jmx folder
+
+* Added/Modified three new calls in the execute/* family. 
+
+ The /excute/flow.txt  optionally accepts a parameter called "token" -the value of this token would be any random string 
+ generated by the caller a good token could be for example System.currentTimeInMilliseconds().concat(Client's ip adress).
+ 
+ 
+ A new call which retrieves the flow properties based on this token the call is
+ /execute/uri_flow.txt?token=$uniqueTokenPassedInTheCallAbove
+ -This returns properties string as show below
+ port=1716
+ hostname=192.168.0.2
+ token=1213938009687
+ uri=http://test.org/flow/webmonkflow/1213938147793/1565344277
+
+
+ A new call that returns the list of webui fragment urls
+ execute/web_component_url.txt?uri=$flowInstanceUri for example returns
+ http://127.0.0.1:1716/http://www.seasrproject.org/components/monkadaptercomponent/monkadaptercomponent/webmonkflow
+ 
+ Another new call that returns the running port number for a given flow instance.
+ /execute/url.txt?uri=$flowInstanceUri for example returns
+	http://127.0.0.1:1716/
+
+Which is the address where the flow with instance id as the parameter value for uri is running.
+ 
+
+
+1.3vcli Xuixo
+
+* Fix to the MAU executor to only use the jars contained on it.
+
+* (!!) Modified the demo components' URIs to follow the same convention. This
+       may brake previous flows relying on the demo components. Also modified the
+       ZigZag test files to reflect the change.
+
+* Zigzag interpreter improved instance reflection information (now also shows component relation)
+
+* ZigZag interpreter adding functionality to the console
+	- show: Shows the flow built so far.
+
+* ZigZag interpreter adding functionality to the console
+	- license: Prints the University of Illinois/NCSA open source license.
+	
+* Added an ant script. It provides the following tasks:
+
+	- compile
+	- compile-tests
+	- clean
+	- run-tests
+	- test-reports
+	- javadoc
+	- dist
+	
+	You should not run the Meandre server there. The dist task generates 4 standalone jars:
+	
+	- meandre-server-X.Y.jar (Meandre server)
+	- zz-X.Y.jar (The ZigZag interpreter conole)
+	- zzc-X.Y.jar (The ZigZag compiler)
+	- zzre-X.Y.jar (The ZigZag runtime for MAU files)
+
+* ZigZag interpreter adding functionality to the console
+	- run     : Runs the current flow if possible
+	
+* ZigZag interpreter console providing the following system command
+	 - desc   : Describe the requested component.
+	 - help   : Prints the help. Type help [command] for deatiled help.
+	 - load   : Load a ZigZag script into the interpreter.
+	 - ls     : List information related to the ZigZag script built.
+	 - reset  : Resets the current constructed flow.
+	 - search : Searches for any component and flow that match the query.
+	 - save   : Save the flow built so far.
+	 - quit   : Quits the console (same as ctr+D).
+	 - version: Prints the version information.
+	
+* Hooked the ZigZag console to the compiler
+
+* Started the ZigZag interpreter console.
+	- Uses JLine for terminal emulation
+
+* Moved the ZigZag compiler and runner to used jar-based MAUs
+ 
+* Refactoring of the core to avoid intertwined dependencies and static factories
+
+1.2vcli Panellet:
+
+* Modified the Mau code generator of the ZigZag compiler to produce parallel component creation
+	- Supports AUTO parallelization
+	- Supports unforced and forced order maintenance 
+
+* Extension to the ZigZag grammar to allow parallelization of instances (ordered and unordered)
+
+* Fix to the add remove location WS (remove the corruption of descriptions problem identified by Boris)
+
+* Implemented the MAU executor
+
+* Integrated the semantic parser and MAU format generator
+
+* Implemented the ZigZag compiler and parser
+
+* Develop the ZigZag language
+
+* (!!) Cummulative updates to the core
+	- Better cleaning of webuis threads (a while ago Duane mention some apps with webuis were not finishing and this is the reason).
+    - Fix to /admin/abort.txt of a webui (was leaving behind mr propper and thus not letting the flow to be destroyed), and
+    -Webui now effectively also serve /public/resources (which will make AJAX easier so you can get the client pages form the webui /public/resources itself)
+
+* (!!) Bug fixing
+	- Fixed possible lost of data
+	- Fixed out of order data sorting (violation of fairness of the underlying FSM that runs the component)
+	- Toned down the login in the core
+	
+* WS additions
+	- Boris added extra functionally on the queries for components and flows
+	
+* Bug fixing:
+	- Fix the conductor to avoid crashing in the presence of dangling inputs
+	- Forbid pushing nulls
+
+* To the verbose flow execution WS:
+	- Added parameter statistics
+	- If true it dumps the flow execution statistics at the end of the run
+	
+* Created StatisticProbeImpl to gather general statistics about the flow execution
+	- Store the basic statistics
+	- Provides the results in JSON object
+
+* Modified MrProbe to allow installing multiple probes
+
+* Provenance and Python components
+	- Modified the dispose method of JythonExecutableComponentAdapter (removed the nullification of the interpreter to allow MrProbe to clearly clean up)
+	- The state serializations store the string representation of the locals() call
+	- Functions are missing the code, but that code is already available on the embedded component context
+	
+* Meandre provenance infrastructure.
+	- Added MeandreProbingVocabulary (native Meandre provenance dialect)
+	- Implemented the MeandreRDFDialectProbeImpl
+	- Tested and verified the spitted triples
+	
+* MrProbe merge against the Conductor, Executor, WrappedComponent, and ComponentContext
+	- Modification to allow them to be probed
+	- All the present engine tests passed for java only flows
+	
+* Added MrProbe class. This thread stands during the execution to gather information of the run
+	- New class added MrProbe
+	- New package org.meandre.core.engine.probes added
+		* This package contains different implementations of the probe mechanisms
+		* NullProbeImpl discards all the information
+		* ToPrintStreamProbreImpl diverts all the info as text to the provided print stream
+
+* Added cacheRefresh to the add/remove location services
+
+* Modified the ComponentContextProperties to provide getFlowID function [Feb 16th 2008 by Amit Kumar]
+	-Added the function implementation in ComponentContextImpl/Wrapped*Required/Conductor and WrappedComponents
+	- This distinguishes getFlowID/getFlowExecutionID
+
+* Modified the /services/repository/add and /services/repository/add_flow services
+	- Added overwrite flag (if true overwrites the component/flow descriptor)
+	- Added dump flag (if true dumps the repository after the requested modifications using the same format of requested modifications)
+
+* Modified the ConductorTest to include the Python component.
+
+* Added a Python component to the demo set
+	- The component just turns a string to upper case (named To Uppercase)
+
+* Modified the conductor to run embedded Python/Jython components
+	- Python scripts are embedded contexts
+	- Location should point to the component base URI
+	- Multiple contexts (scripts can be attached)
+	- There is no guarante about the order of scripts execution
+
+* Passed the embedding test using the upgraded (see updates ExecutableContext) E2K demo components
+	- Test demo and traditional context URIs work (Fixed a typo on the connector URI convention)
+	- Test with all the embedded components
+
+* (!!) Updated ExecutableContext. This change will break all components so far
+	- initialize() changed to initialize(ComponentContextProperties ccp)
+	- dispose() changed to dispose(ComponentContextPropoerties ccp)
+
+* Root the ComponentContext in to the root interface ComponentContextProperties
+	- ComponentContext presents the same API as before
+	- ComponentContextProperties expose the subset of the original API not related to execution
+
+* Created and tested the class JythonExecutableComponentAdapter
+	- This class acts as an adapter
+	- The adapter translate the ExcecutableComponent interface into it Jython counter part
+	- The ComponentContext instance is accessible thanks to the Jython bindings
+	- The Jython bindings turn getters/setters into pythonic assignable instance variables
+
+* Created the new package subtree org.meandre.core.environments
+	- This package is intended to group all non-java executable components
+	- The package org.meandre.core.environments.python contains Python related environments
+	- The package org.meandre.core.environments.python.jython contains the adapter to run Jython flavored executable components
+
+* Modified the Conductor to allow embedding:
+	- When preparing the URL class loader
+	- If context is a resource pass the URI to the class loader
+	- If context is a literal the content is dumped to /run/java with an encode name ending in .jar
+	- Conductor implements a cache of the already dumped flows to boost up the preparation time (unless the hash code of the literal has changed)
+
+* Modified the Repository beans to deal with RDFNodes
+	- Old URI formats to contexts (jars) are expressed as Resources (external contexts)
+	- Embeddable contexts (jars) are expressed as Literals
+	- RDFNode homogenizes the use of contexts (external or embedded)
+
+* (!!) Patched JENA to allow proper embedding:
+	- Added case Text.CLOB to line 2238 in file DriverRDB.java to allow large literals in Derby
+	- Hacked the derby.sql definition and replace the tail of the literal table to CLOB to allow long literals
+
+* The add service modified:
+	- jar parameter renamed as context
+	- Added the embed check button for contexts
+
+* Rework the repository implementation metadata processing
+	- Moved from SPARQL prototypes to the equivalent procedural version using JENA API
+	- Also used the indexer straight will manual filtering to boost search performance
+	- Performance of the repository interaction hugely improved.
+	- Remove the SPARQL injection problem on the full text search
+
+* Modified the loggers to work on a rotating scheme
+	- ./log dir destination of the loggers
+
+* Added org.meandre.core.utils.vocabulary to contain all metadata relate vocabulary.
+	- Add the repository one and patched the RepositoryImpl, ComponentDescriptionImpl, and FlowDescriptionImpl
+
+* Moved the WSCoreBootstrapper from org.meandre in the src-kernel tree to org.meandre.webservices in the src-ws tree
+
+* Main log file splitted:
+	- The kernel logging goes to meandre-kerne.log file
+	- The demo logging goes to meandre-demo.log file
+	- The WS logging goes to meandre-webservices.log file
+
+* WSCoreBootstrapper got moved to org.meandre.webservices.
+
+* Source refactoring. Will broke:
+	- ant
+	- nbproject
+
+------------------------------------------------------------------------------
+
+1.1vcli Carquinyoli:
+
+* Meandre Core Web Service Execution Engine, Repository, etc.
+
+------------------------------------------------------------------------------
+
+1.0vcli Farina:
+
+* Plain all mixed together (engine, web app demo, and basic publishing services)
+
+___
+Edited by Xavier Llora.
+	- Contributed update: Amit Kumar on Feb 16th 2008, July 08 2008
