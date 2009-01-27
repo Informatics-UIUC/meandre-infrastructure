@@ -1,21 +1,18 @@
 package org.meandre.core.store.security;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.StringWriter;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import org.meandre.webservices.MeandreServer;
 import org.meandre.core.security.SecurityManager;
-import org.meandre.core.store.security.SecurityStore;
+import org.meandre.core.utils.NetworkTools;
+import org.meandre.webservices.MeandreServer;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
@@ -37,10 +34,7 @@ public class SecurityStoreTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         log("setupBeforeClass begin");
-        try {
-            _serverUrl = InetAddress.getLocalHost().getCanonicalHostName();
-        } catch (UnknownHostException e) {
-        }
+        _serverUrl = NetworkTools.getLocalHostName();
         
         File fWorkDir = new File(_workingDir);
         if(!fWorkDir.exists()){

@@ -36,12 +36,12 @@ public class ConductorTest {
 			QueryableRepository qr) throws CorruptedDescriptionException,
 			ConductorException {
 		// Create the execution
-		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next());
 		// Redirect the output
 		PrintStream psOut = System.out;
 		PrintStream psErr = System.err;
 		ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
 		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
+		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), new PrintStream(baosOut));
 		System.setOut(new PrintStream(baosOut));
 		System.setErr(new PrintStream(baosErr));
 		WebUI webui = exec.initWebUI(1704,Math.random()+"");
@@ -54,7 +54,7 @@ public class ConductorTest {
 		assertEquals(0,baosErr.size());
 		
 		String sResult = "P1 Hello World!!! Happy Meandring!!! (P1,C0123456) Hello World!!! Happy Meandring!!! (P1,C0123456) \n";
-		assertEquals(sResult.length(),baosOut.size());
+		assertTrue(sResult.length()==baosOut.size() || sResult.length()+1==baosOut.size());
 	}
 
 	/** Run the basic hello world test with dangling outputs.
@@ -67,8 +67,6 @@ public class ConductorTest {
 	private void runHelloWorldHetereogenousFlow(Conductor conductor,
 			QueryableRepository qr) throws CorruptedDescriptionException,
 			ConductorException {
-		// Create the execution
-		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next());
 		// Redirect the output
 		PrintStream psOut = System.out;
 		PrintStream psErr = System.err;
@@ -76,19 +74,22 @@ public class ConductorTest {
 		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(baosOut));
 		System.setErr(new PrintStream(baosErr));
+		// Create the execution
+		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), new PrintStream(baosOut));
 		exec.execute(exec.initWebUI(1705,Math.random()+""));
 		System.setOut(psOut);
 		System.setErr(psErr);
 		// Restore the output
 		assertTrue(exec.hadGracefullTermination());
-		System.out.println(baosErr.toString());
+		//System.out.println(baosErr.toString());
 		assertEquals(0,exec.getAbortMessage().size());
-		System.out.println(baosErr.toString());
-		assertEquals(0,baosErr.size());
+		//System.out.println(baosErr.toString());
+		String sError = baosErr.toString();
+		assertTrue(sError.contains("jetty-"));
+		assertTrue(sError.contains("Started SocketConnector@"));
 		
 		String sResult = "HELLO WORLD!!! HAPPY MEANDRING!!!  (P1,C0123456)  HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C0123456)  \n";
-		System.out.println("***"+baosOut.toString());
-		assertEquals(sResult.length(),baosOut.size());
+		assertTrue(sResult.length()==baosOut.size() || sResult.length()+1==baosOut.size());
 	}
 
 	/** Run the basic hello world test with dangling outputs.
@@ -101,13 +102,13 @@ public class ConductorTest {
 	private void runHelloWorldMoreHetereogenousFlow(Conductor conductor,
 			QueryableRepository qr) throws CorruptedDescriptionException,
 			ConductorException {
-		// Create the execution
-		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next());
 		// Redirect the output
 		PrintStream psOut = System.out;
 		PrintStream psErr = System.err;
 		ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
 		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
+		// Create the execution
+		Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), new PrintStream(baosOut));
 		System.setOut(new PrintStream(baosOut));
 		System.setErr(new PrintStream(baosErr));
 		exec.execute(exec.initWebUI(1706,Math.random()+""));
@@ -121,7 +122,7 @@ public class ConductorTest {
 		assertEquals(0,baosErr.size());
 		
 		String sResult = "HELLO WORLD!!! HAPPY MEANDRING!!!  (P1,C0123456)  HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C0123456)  \n";
-		assertEquals(sResult.length(),baosOut.size());
+		assertTrue(sResult.length()==baosOut.size() || sResult.length()+1==baosOut.size());
 	}
 	
 	/**
@@ -136,7 +137,7 @@ public class ConductorTest {
 			// Run simple hello world
 			Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
 			QueryableRepository qr = new RepositoryImpl(model);
-			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("meandre://test.org/component/concatenate-strings")));
 			// Run the basic test
 			runHelloWorldFlow(conductor, qr);
 			
@@ -161,7 +162,7 @@ public class ConductorTest {
 			RepositoryImpl qr = new RepositoryImpl(model);
 			//for ( Resource res:qr.getAvailableExecutableComponents())
 			//	System.out.println(res);
-			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/to-uppercase")));
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("meandre://test.org/component/to-uppercase")));
 			// Run the basic test
 			runHelloWorldHetereogenousFlow(conductor, qr);
 			
@@ -186,7 +187,7 @@ public class ConductorTest {
 			RepositoryImpl qr = new RepositoryImpl(model);
 			//for ( Resource res:qr.getAvailableExecutableComponents())
 			//	System.out.println(res);
-			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/to-uppercase")));
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("meandre://test.org/component/to-uppercase")));
 			// Run the basic test
 			runHelloWorldMoreHetereogenousFlow(conductor, qr);
 			
@@ -208,9 +209,9 @@ public class ConductorTest {
 			// Run simple hello world dangling input/outputs
 			Model model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsRepository();
 			RepositoryImpl qr = new RepositoryImpl(model);
-			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("meandre://test.org/component/concatenate-strings")));
 			// Create the execution
-			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next()));
+			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),System.out));
 					
 		} catch (CorruptedDescriptionException e) {
 			fail("Corrupted description encounterd: "+e);
@@ -231,9 +232,9 @@ public class ConductorTest {
 			// Run simple hello world dangling input/outputs + fork
 			Model model = DemoRepositoryGenerator.getTestHelloWorldWithDanglingComponentsAndInAndOutForksRepository();
 			RepositoryImpl qr = new RepositoryImpl(model);
-			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("meandre://test.org/component/concatenate-strings")));
 			// Create the execution
-			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next()));
+			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),System.out));
 			
 		} catch (CorruptedDescriptionException e) {
 			fail("Corrupted description encounterd: "+e);
@@ -254,9 +255,9 @@ public class ConductorTest {
 			// Run simple hello world
 			Model model = DemoRepositoryGenerator.getTestHelloWorldPartialDanglingRepository();
 			QueryableRepository qr = new RepositoryImpl(model);
-			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("http://test.org/component/concatenate-strings")));
+			assertNotNull(qr.getExecutableComponentDescription(ModelFactory.createDefaultModel().createResource("meandre://test.org/component/concatenate-strings")));
 			// Create the execution
-			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next()));
+			assertNotNull(conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),System.out));
 				
 		} catch (CorruptedDescriptionException e) {
 			fail("Corrupted description encounterd: "+e);

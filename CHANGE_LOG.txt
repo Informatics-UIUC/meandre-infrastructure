@@ -1,8 +1,255 @@
--Updated Xstream library to 1.3 July 19th 2008
--Added simple formatter for the logger July 19th 2008
+1.4.0-vcli-alpha Sara
+
+* Remove the dump of the uploaded components/flows. Replaced by proper login
+
+* Expose the sorting of flows and component on the HTML rendering interface
+
+* Fix to the way realm properties are updated
+
+* Fix to make sure that tests also pass on a MS Windows platform
+
+* Added abort link on the HTML list running flow interface
+
+* Added an empty constructor to the Meandre Proxy by Amit's request
+
+* Added the avility to pass a port number and a base directory to the infrastructure
+  bootstrapper.
+  
+* The infrastructure looks for a file called meandre-default-locations.txt. Each
+  line is a location and this set of locations are added to any newly created user.
+  
+* Reenabled the global file share on the WebUIs (disabled by Amit's changes)
+
+* Added the option to select the port number from the command line on the MAUExecutor
+
+* The conductor class loader now makes sure only directories and jar files are 
+  passed as locations to pull classes from.
+  
+* Added a html face to the component and flow descriptors
+
+* All the jars when a location is add are now being pulled down to the public resources directory
+
+* Added a simple service to shutdown the server at /services/server/shutdown.html (as 
+  usual it also supports txt, json, and xml calls)
+  
+* Added a check to make sure that the add to repository won't corrupt the repository
+
+* Fix to the execute servlet flow services that did not execute when a token was provided.
+
+* Added patches to the Meandre Client and Meandre Admin Client provided by Amit. 
+  Patches add:
+  	- Capability to get a componet description
+  	- Get the component jar info
+  	- Get the server version
+  	- Ping the server
+  	- Return the plugin information in JSON format 
+ 
+* Added the following entries to the returned information 'meandre_uri', 'meandre_uri_name', 
+  'description' to both, components and flow calls (see the html interface for mer details).
+  
+* Bug fix to the upload repository service (reading from the same input stream multiple times)
+
+* Added the proxied url to the execute services execute_url and list_running_flows
+
+* Added a call that returns the proxied url on the component context properties
+
+* Hooked the webui proxy to the meandre server. This is just a bypass to the 
+  webUI handler. The secondary server is still being started.
+
+* Adding test to the WebUI infrastructure previous to the WebUI proxying. The
+  basic strategy is to stand a servlet handler on the service that tracks /webui/
+  requests and process them. 
+
+* Added a WS in the new created jobs section to pull the current console output of a job
+
+* Modified the interactive execution methods to create a new persistent print writer
+
+* Created a persistent print writer wrapper to store the execution console
+
+* Created the web service that list the status of the jobs run in the cluster so far
+
+* Added to query and mechanics to manage job statuses
+
+* Written the basic queries and mechanics to have a persistent log and console
+
+* Started creating the base infrastructure for the service.
+
+* Refactored the coordinator backend adapter to reflect the coordinator nature of it.
+
+* Added the html auxiliar facade that allows top upload and execute a repository
+
+* Added a new execute service that accepts a post of 'repository' and runs all the flows in the 
+  contained repository. It also tries to add missing components from the user repository if needed.
+  
+* Services to expose cluster information
+	- Added log service that listed the log information
+	- Added status service that listed the server's status information
+	- Added info service that listed the servers' information
+	- Added properties service that listed the properties of the server's 
+
+* Modfyied the MDX to return the log entries (had to specialize the insert status to make Derby happy)
+
+* Creates an auxiliar service that just display forms for 
+	- Adding to a repository
+	- Create a user 
+	- Roles map for granting and revoking
+
+* Added simple forms for search and the like
+
+* Created the proper XSLT transformation for all the services that do not require complex for forms
+
+* Created a first XSLT for /services/location/list.html
+
+* Created the basic mechaniscs for returning HTML pages based on XML and XSLTs
+
+* Modified the MDX connection duplications (Derby can support multiple concurrent
+  connections to the DB, as long as they are in the same JVM). This gets rid of the
+  results problem reading and the obscure message for autocommit off.
+
+* Fixed the Meandre Client and it failing tests
+
+* Fixed the Meandre Admin Client and its failing tests
+
+* Fixed non-client related failing tests
+
+* Migrated the repository calls that response to POSTs
+	- /add
+	- /add_flow_description
+	
+* Migrated the repository calls that response to GETs
+	- /dump.txt
+	- /regenerate
+	- /list_components
+	- /list_flows
+	- /tags
+	- /tags_components
+	- /tags_flows
+	- /components_by_tag (changed the parameter from q to tag)
+	- /components_by_flow (changed the parameter from q to tag)
+	- /describe_components
+	- /describe_all_components
+	- /describe_flows
+	- /describe_all_flows
+	- /search_components (still does not allow multiple q parameters)
+	- /search_flows (still does not allow multiple q parameters)
+	- /rename	 
+
+* Migrated the Security service. Also modified the following
+	- assign_roles -> grant_roles (for consistency)
+	- create_user -> create_users (for consistency)
+	- remove_user -> remove_users (for consitency)
+	- Added update_user to allow updating the user profile
+	
+* Migrated the Execution service. Also added the JSON and XML versions to the 
+  calls that Amit added involving tokens and quering information from a running
+  flow.
+
+* Migrated the Locations service to the new Python-based dispatcher
+	(!) Changed the behavior of remove location to only remove the components and
+	    flows existing in that location instead of the current regenerate and add
+	    which has the potential of getting rid of temporary components/flows added 
+	    by a developer
+
+* Migrated the Publish services to the new Python-based dispatcher
+
+* Migrated the Public services to the new Python-based dispatcher
+
+* Migrated the About services to the new Python-based dispatcher
+
+* Created an extension of the base dispatcher adding Meandre related information
+
+* Added a test servlet to test the functionalities provided by the base servlet dispatcher
+
+* Create the Python code to implement the base dispatcher
+
+* Developed a unified base servlet dispatcher 
+
+* Move the MDX branch from the experimental repository to the branch one
+
+* Revamped the backend adapters to allow the proper schema creation for Derby
+
+* Added method to the plugin interface
+
+	/** Sets the core configuration object to use.
+	 * 
+	 * @param cnf The core configuration object
+	 */
+	public void setCoreConfiguration ( CoreConfiguration cnf )
+	
+* Identified and fixed a potential concurrent problem with the consoles and the interactive run facility
+
+* Modified the engine to work with per flow output consoles
+
+* Added a console output call to the ComponentContext properties to isolate consoles during run time
+
+* Hooked the back end adapter to the meandre server
+
+* Added a properties table that gets read everytime and status update by the service is preformed.
+
+* Added /public/services/ping.txt which return "Pong" for pinguin live servers
+
+* Added the automatic marking of out of sync to the backend adapter thread service
+
+* Modified the test to remove the shutdown hooks (so test do not pile a bunch of them up all fired at once)
+
+* Added a setLevel method to all factory logger objects
+
+* Created a self contained logger
+
+* Modified the shutdown hook to close properly
+
+* Split the insert update into an update [+insert] for the server status
+
+* Refactoring to create the selfcontained coordinator
+
+* Added a transactional layer to the operations
+
+* Added a log table to handle events
+
+* Split the server info in two tables (status and info to separate dynamic versus static content)
+
+* Writing designing the tables for the Meandre server tracking
+
+* Adding shutdown hooks for proper cleaning of service status
+
+* Starting the backend adapters to allow consistent backend storage usage
+
+* Fix to the webuidispatcher set done.
+
+* More rearranging of the log levels 
+
+* Modified the log formatter. Beside rearranging the info fields, not it displays properly on different OS
+
+* Fix to avoiding the core config file to be overwritten
+
+* Fix to the store properties to avoid overwriting the existing file
+
+* Update the version number to 1.4.0-vcli-alpha 
+
+* Changed added some info login on the MeandreServer operations
+
+* Fixed VFServlet nonsensical login message levels
+
+* Fixed the JarToolServlet login of the exceptions
+
+* Reshaping the logger to make it leaner:
+	- most conductor messages move to fine
+	- store messages moved to config when possible
+	- wrapped component toned down a bit
+
+* Removing JMX and the rmi registry to avoid problems on concurrent testing
+
+* Removing terracota test
 
 
-1.3.0 Xuixo
+1.3.1vcli Xuixo
+
+* Updated Xstream library to 1.3 July 19th 2008
+
+* Added simple formatter for the logger July 19th 2008
+
+
+1.3.1vcli Xuixo
 
 * Changed the software revision string to be of the format ##.##.##
 
@@ -268,6 +515,5 @@ Which is the address where the flow with instance id as the parameter value for 
 * Plain all mixed together (engine, web app demo, and basic publishing services)
 
 ___
-Edited by Xavier Llor�.
-	- Contributed update: Amit Kumar on Feb 16th 2008
-    - Last updated: Amit Kumar on July 08 2008
+Edited by Xavier Llora.
+	- Contributed update: Amit Kumar on Feb 16th 2008, July 08 2008

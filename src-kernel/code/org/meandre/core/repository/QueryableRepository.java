@@ -1,5 +1,6 @@
 package org.meandre.core.repository;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,6 +39,15 @@ public interface QueryableRepository {
 	public Set<Resource> getAvailableExecutableComponents ();
 	
 
+    /**
+     * Creates a list of components sorted by either date or name and returns the first N (='limit') values
+     * @param sOrder The sorting order ("date" or "name" for now) - or null if no sorting required
+     * @param limit  The maximum number of values to be returned (or -1 if no limit)
+     * @return The list of components
+     */
+    public Collection<Resource> getAvailableExecutableComponentsOrderedBy(String sOrder, int limit) ;
+
+
 	/** Returns the set of available executable components descriptions stored
 	 * in the repository.
 	 * 
@@ -75,6 +85,14 @@ public interface QueryableRepository {
 	 */
 	public Set<Resource> getAvailableFlows();
 
+   /**
+     * Creates a list of flows sorted by either date or name and returns the first N (='limit') values
+     * @param sOrder The sorting order ("date" or "name" for now) - or null if no sorting required
+     * @param limit  The maximum number of values to be returned (or -1 if no limit)
+     * @return The list of flows
+     */
+    public Collection<Resource> getAvailableFlowsOrderedBy(String sOrder, int limit);
+	
 	/** Returns the set of available flows descriptions in the repository.
 	 * 
 	 * @return The set of resources describing the available flows

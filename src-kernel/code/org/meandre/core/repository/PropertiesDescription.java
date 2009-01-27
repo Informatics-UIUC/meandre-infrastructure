@@ -1,4 +1,4 @@
-package org.meandre.core.repository;
+ package org.meandre.core.repository;
 
 import java.util.Collection;
 import java.util.Hashtable;
@@ -18,7 +18,6 @@ public class PropertiesDescription {
 	
 	/** Create an empty property description.
 	 * 
-	 * @param htValues The values
 	 */
 	public PropertiesDescription () {
 		this.htValues = new Hashtable<String,String>();

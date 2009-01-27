@@ -128,7 +128,7 @@ implements ExecutableComponent, ScriptingEnvironmentAdapter {
 	
 	/** Process the given script on an already prepared adapter.
 	 *
-	 * @param sScript The script to process
+	 * @param script The script to process
 	 * @throws Exception Something when wrong
 	 */
 	public void process(String script) throws Exception {
@@ -193,7 +193,7 @@ implements ExecutableComponent, ScriptingEnvironmentAdapter {
 
 	/** Invokes the execute method.
 	 * 
-	 * @param ccp The component context 
+	 * @param cc The component context 
 	 * @throws ComponentExecutionException If a fatal condition arises during
 	 *         the execution of a component, a ComponentExecutionException
 	 *         should be thrown to signal termination of execution required.

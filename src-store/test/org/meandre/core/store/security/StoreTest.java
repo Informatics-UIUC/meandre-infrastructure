@@ -29,9 +29,9 @@ public class StoreTest {
 	 */
 	@Test
 	public void testStore() {
-		Store store = new Store();
 		
 		CoreConfiguration cnf = new CoreConfiguration(1714, _workingDir);
+		Store store = new Store(cnf);
 		
 		SecurityManager secStore = store.getSecurityStore();
 

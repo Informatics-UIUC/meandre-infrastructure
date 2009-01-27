@@ -14,12 +14,14 @@ import org.meandre.core.environments.python.jython.JythonExecutableComponentAdap
 import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.repository.*;
 import org.meandre.core.utils.HexConverter;
+import org.meandre.core.utils.NetworkTools;
 import org.meandre.webui.PortScroller;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -35,8 +37,6 @@ import java.util.logging.Logger;
  * which will eventually execute the flow.
  *
  * @author Xavier Llor&agrave;
- * @modified Amit Kumar -added support for parentClassloader
- *
  */
 public class Conductor {
 
@@ -53,7 +53,7 @@ public class Conductor {
 	static private final String URL_SEAPARTOR = "##--##--##";
 
 	/** The default queue size for the active buffers */
-	public static final int DEFAULT_QUEUE_SIZE = 10;
+	public static final int DEFAULT_QUEUE_SIZE = 10000;
 
 	/** Set of loadable implementations */
 	private Set<String> setLoadableComponents = null;
@@ -81,7 +81,7 @@ public class Conductor {
 	public Conductor( int iActiveBufferSize, CoreConfiguration cnf ) {
 		this.cnf = cnf;
 		
-		log.info("Creating a conductor object");
+		log.fine("Creating a conductor object");
 		this.iActiveBufferSize = iActiveBufferSize;
 		setLoadableLanguages = new HashSet<String>();
 		for ( String sLang:saExecutableComponentLanguages )
@@ -96,15 +96,32 @@ public class Conductor {
 	 *
 	 * @param qr The queryable repository containing component descriptions
 	 * @param res The resource identifying the flow to prepare for execution
+	 * @param console The output console
 	 * @return The executor object
 	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
 	 * @throws ConductorException The counductor could not create an executable flow
 	 */
-	@SuppressWarnings("unchecked")
-	public Executor buildExecutor(QueryableRepository qr, Resource res )
+	public Executor buildExecutor(QueryableRepository qr, Resource res, PrintStream console )
+	throws CorruptedDescriptionException, ConductorException {
+		String sFlowUniqueExecutionID = res.toString()+NetworkTools.getNumericIPValue()+"/"+System.currentTimeMillis()+"/"+(Math.abs(new Random().nextInt()))+"/";
+		return buildExecutor(qr,res,console,sFlowUniqueExecutionID);
+	}
+
+	/** Creates an execution object for the given flow description.
+	 *
+	 * @param qr The queryable repository containing component descriptions
+	 * @param res The resource identifying the flow to prepare for execution
+	 * @param console The output console
+	 * @param sFUID The flow execution ID
+	 * @return The executor object
+	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
+	 * @throws ConductorException The counductor could not create an executable flow
+	 */
+	public Executor buildExecutor(QueryableRepository qr, Resource res, PrintStream console, String sFUID )
 	throws CorruptedDescriptionException, ConductorException {
 		MrProbe thdMrProbe = new MrProbe(log,new NullProbeImpl(),false,false);
-		Executor exec = buildExecutor(qr, res,thdMrProbe);
+		Executor exec = buildExecutor(qr, res,thdMrProbe,console,sFUID);
+		thdMrProbe.setName(exec.getThreadGroupName()+"mr-probe");
 		exec.initWebUI(PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID()), "XStreamTest");
 		return exec;
 	}
@@ -114,15 +131,32 @@ public class Conductor {
 	 * @param qr The queryable repository containing component descriptions
 	 * @param res The resource identifying the flow to prepare for execution
 	 * @param thdMrProbe The MrProbe to use
+	 * @param console The output console
+	 * @return The executor object
+	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
+	 * @throws ConductorException The conductor could not create an executable flow
+	 */
+	public Executor buildExecutor(QueryableRepository qr, Resource res, MrProbe thdMrProbe, PrintStream console)
+	throws CorruptedDescriptionException, ConductorException {
+		String sFlowUniqueExecutionID = res.toString()+NetworkTools.getNumericIPValue()+"/"+System.currentTimeMillis()+"/"+(Math.abs(new Random().nextInt()))+"/";
+		return buildExecutor(qr,res,thdMrProbe,console,sFlowUniqueExecutionID);
+	}
+	/** Creates an execution object for the given flow description.
+	 *
+	 * @param qr The queryable repository containing component descriptions
+	 * @param res The resource identifying the flow to prepare for execution
+	 * @param thdMrProbe The MrProbe to use
+	 * @param console The output console
+	 * @param sFUID The flow unique execution ID
 	 * @return The executor object
 	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
 	 * @throws ConductorException The conductor could not create an executable flow
 	 */
 	@SuppressWarnings("unchecked")
-	public Executor buildExecutor(QueryableRepository qr, Resource res, MrProbe thdMrProbe)
+	public Executor buildExecutor(QueryableRepository qr, Resource res, MrProbe thdMrProbe, PrintStream console,String sFUID)
 	throws CorruptedDescriptionException, ConductorException {
 		// The unique execution flow ID
-		String sFlowUniqueExecutionID = res.toString()+"/"+System.currentTimeMillis()+"/"+(Math.abs(new Random().nextInt()));
+		String sFlowUniqueExecutionID = sFUID;
 		String flowID = res.toString();
 		// Map class names to classes
 		Hashtable<String,Class> htMapNameToClass = new Hashtable<String,Class>();
@@ -135,12 +169,14 @@ public class Conductor {
 		// Get the description
 		FlowDescription fd = qr.getFlowDescription(res);
 
+		log.info("Preparing flow "+sFlowUniqueExecutionID);
+		
 		// STEP 0: Gather all the required contexts and load them
-		log.info("STEP 0: Plugging the required contexts");
+		log.fine("STEP 0: Plugging the required contexts");
 		URLClassLoader urlFlowCL = plugRequiredContexts(qr, htMapNameToClass, htMapResourceToName,fd);
 
 		// STEP 1: Instantiate the flow instances
-		log.info("STEP 1: Instantiate the flow instances");
+		log.fine("STEP 1: Instantiate the flow instances");
 		Hashtable<Resource,ExecutableComponent> htECInstances = new Hashtable<Resource,ExecutableComponent>();
 		for ( ExecutableComponentInstanceDescription ec:fd.getExecutableComponentInstances() ) {
 			Resource   ins = ec.getExecutableComponentInstance();
@@ -211,7 +247,7 @@ public class Conductor {
 		}
 
 		// STEP 2: Create empty active buffers
-		log.info("STEP 2: Create empty active buffers");
+		log.fine("STEP 2: Create empty active buffers");
 		Hashtable<String,ActiveBuffer> htMapInAB = new Hashtable<String,ActiveBuffer>();
 		for ( ConnectorDescription cd:fd.getConnectorDescriptions() ) {
 			Resource resCSIns = cd.getTargetInstance();
@@ -226,7 +262,7 @@ public class Conductor {
 		}
 
 		// STEP 3: Per instance create and input/output set
-		log.info("STEP 3: Per instance create and input/output set");
+		log.fine("STEP 3: Per instance create and input/output set");
 		Hashtable<String,Set<ActiveBuffer>> htInsInputSet = new Hashtable<String,Set<ActiveBuffer>>();
 		Hashtable<String,Set<ActiveBuffer>> htInsOutputSet = new Hashtable<String,Set<ActiveBuffer>>();
 		for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() ) {
@@ -236,7 +272,7 @@ public class Conductor {
 		}
 
 		// STEP 4: Populate input/output instance sets
-		log.info("STEP 4: Populate input/output instance sets");
+		log.fine("STEP 4: Populate input/output instance sets");
 		// The output <--> input port translation
 		Hashtable<Resource,Hashtable<String,String>> htMapOutputTranslation = new Hashtable<Resource,Hashtable<String,String>>();
 		// Logic to real input port translation
@@ -284,7 +320,7 @@ public class Conductor {
 		}
 
 		// STEP 5: Reconstruct properties per instance set
-		log.info("STEP 5: Reconstruct properties per instance set");
+		log.fine("STEP 5: Reconstruct properties per instance set");
 		Hashtable<Resource,Hashtable<String,String>> htInstaceProperties =  new Hashtable<Resource,Hashtable<String,String>>();
 		for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() ) {
 			PropertiesDescriptionDefinition  ecdProp = qr.getExecutableComponentDescription(ecid.getExecutableComponent()).getProperties();
@@ -300,11 +336,11 @@ public class Conductor {
 		}
 
 		// STEP 6: Create thread groups
-		log.info("STEP 6: Create thread groups");
-		ThreadGroup tgFlow = new ThreadGroup(res.toString());
+		log.fine("STEP 6: Create thread groups");
+		ThreadGroup tgFlow = new ThreadGroup(sFlowUniqueExecutionID);
 
 		// STEP 7: Create wrapping components and add the wrapping components to the execution set
-		log.info("STEP 7: Create wrapping components and add the wrapping components to the execution set");
+		log.fine("STEP 7: Create wrapping components and add the wrapping components to the execution set");
 		Set<WrappedComponent> setWC = new HashSet<WrappedComponent>();
 		for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() ) {
 			Resource resECI = ecid.getExecutableComponentInstance();
@@ -327,7 +363,8 @@ public class Conductor {
 									sResECI,
 									htInstaceProperties.get(resECI),
 									thdMrProbe,
-									cnf
+									cnf,
+									console
 								)
 						);
 				else if ( firing.equals("any") )
@@ -346,7 +383,8 @@ public class Conductor {
 									sResECI,
 									htInstaceProperties.get(resECI),
 									thdMrProbe,
-									cnf
+									cnf,
+									console
 								)
 						);
 			} catch (InterruptedException e) {
@@ -357,9 +395,11 @@ public class Conductor {
 		}
 
 		// STEP 8: reate the executor
-		log.info("STEP 8: Create the executor");
+		log.fine("STEP 8: Create the executor");
 		try {
-			return new Executor(sFlowUniqueExecutionID,tgFlow,setWC, null);
+			Executor exec = new Executor(sFlowUniqueExecutionID,tgFlow,setWC, null);
+			log.info("Flow prepared. "+sFlowUniqueExecutionID+" waiting for execution");
+			return exec;
 		} catch (InterruptedException e) {
 			thdMrProbe.done();
 			throw new ConductorException("Condcuctor could not create the executor object\n"+e);
@@ -394,7 +434,7 @@ public class Conductor {
 
 
 		// Preparing the URLs for the class loader
-		log.info("Processing executable components contexts and locations");
+		log.fine("Processing executable components contexts and locations");
 		Set<ExecutableComponentInstanceDescription> setIns = fd.getExecutableComponentInstances();
 		for ( ExecutableComponentInstanceDescription ins:setIns ) {
 			ExecutableComponentDescription comp = qr.getExecutableComponentDescription(ins.getExecutableComponent());
@@ -506,12 +546,13 @@ public class Conductor {
 			Hashtable<Resource, String> htMapResourceToRunnable,
 			Hashtable<Resource, String> htMapResourceToFormat )
 	throws CorruptedDescriptionException {
-		log.info("Preparing the class loader");
+		log.fine("Preparing the class loader");
 		int iCnt = 0;
 		URL [] ua = new URL[setURLContext.size()];
 		for ( String sURL:setURLContext )
 			try {
-				ua[iCnt++] = new URL(sURL);
+				if ( sURL.endsWith(".jar") || sURL.endsWith("/") )
+					ua[iCnt++] = new URL(sURL);
 			} catch (MalformedURLException e) {
 				throw new CorruptedDescriptionException("Context URL "+sURL+" is not a valid URL");
 			}
@@ -527,7 +568,7 @@ public class Conductor {
 		for ( String sClassName:setURLLocations ) {
 			try {
 				if ( htMapResourceToRunnable.get(htMapNameToResource.get(sClassName)).equals("java") ) {
-					log.info("Loading java component "+sClassName);
+					log.fine("Loading java component "+sClassName);
 					Class clazz = Class.forName(sClassName, true, urlCL);
 					htMapNameToClass.put(sClassName,clazz);
 				}
@@ -555,4 +596,5 @@ public class Conductor {
 	public void setParentClassloader(ClassLoader parentClassloader) {
 		this.parentClassloader = parentClassloader;
 	}
+	
 }

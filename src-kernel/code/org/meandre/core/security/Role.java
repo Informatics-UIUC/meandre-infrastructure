@@ -35,16 +35,18 @@ public class Role {
     public static final String ROLE_GRANT_PROPERTY_URL = 
             BASE_ROLE_URL + "grant";
     
-    /** used for json keys, etc., when a role is an attribute in a data set */
-	private static final String FIELD_ROLE = "role";
-    
-	/** used for json keys, etc, when a set of roles is an attribute in
-	 * a data set*/
-	private static final String FIELD_ROLE_SET = "role_set";
-	
-    /** used for xml keys, etc, when a url identifier is a separate 
+    /** used for keys, etc., when a role is an attribute in a data set */
+	private static final String FIELD_ROLE_URI = "meandre_role_uri";
+    	
+    /** used for keys, etc, when a name identifier is a separate 
      * attribute in a data set*/
-    private static final String FIELD_MEANDRE_URL = "meandre_url";
+    @SuppressWarnings("unused")
+	private static final String FIELD_ROLE_NAME = "meandre_role_name";
+    
+
+    /** used for keys, etc, when a name identifier is a separate 
+     * attribute in a data set*/
+    private static final String FIELD_MEANDRE_RESPONSE = "meandre_item";
     
     /** the short name of a Role is the unique part of it's identifying URL.
      */
@@ -175,7 +177,7 @@ public class Role {
     public JSONObject toJSON(){
         JSONObject jo = new JSONObject();
         try{
-            jo.put(FIELD_ROLE, this.getUrl());
+            jo.put(FIELD_ROLE_URI, this.getUrl());
         }catch(JSONException je){
             //This supposedly won't ever happen
             je.printStackTrace();
@@ -186,7 +188,7 @@ public class Role {
     public static Role fromJSON(JSONObject jo) throws JSONException{
 		Role role = null;
 		try{
-			String roleUrl = jo.getString(FIELD_ROLE);
+			String roleUrl = jo.getString(FIELD_ROLE_URI);
 			role = fromUrl(roleUrl);
 		}catch(JSONException je){
 			throw new JSONException("The input JSONObject does not" +
@@ -194,30 +196,23 @@ public class Role {
 					"\n in json object: \n" + jo.toString());
 		}
 		return role;
+	}
+
+    
+    public static JSONArray setToJSON(Set<Role> roles){
+    	JSONArray ja = null;
+	    ja = new JSONArray();
+		for(Role rl : roles){
+		    ja.put(rl.toJSON());
+		}
+        return ja;
     }
     
-    public static JSONObject setToJSON(Set<Role> roles){
-		JSONObject jo = null;
-	    try{
-	        JSONArray ja = new JSONArray();
-	        for(Role rl : roles){
-	            ja.put(rl.toJSON());
-	        }
-	        jo = new JSONObject();
-	        jo.put(FIELD_ROLE_SET, ja);
-	    }catch(JSONException je){
-	        //This supposedly won't ever happen
-	        je.printStackTrace();
-	    }
-        return jo;
-    }
-    
-    public static Set<Role> setFromJSON(JSONObject jo) throws JSONException{
+    public static Set<Role> setFromJSON(JSONArray array) throws JSONException{
 		Set<Role> roles = new HashSet<Role>(15);
 		try{
-			JSONArray ja = jo.getJSONArray(FIELD_ROLE_SET);
-			for(int i = 0; i < ja.length(); i++){
-				JSONObject joRole = ja.getJSONObject(i);
+			for(int i = 0; i < array.length(); i++){
+				JSONObject joRole = array.getJSONObject(i);
 				Role rl = fromJSON(joRole);
 				roles.add(rl);
 			}
@@ -240,16 +235,8 @@ public class Role {
     public static String setToXML(Set<Role> roles){
         String sXml = null;
         try{
-            JSONArray ja = new JSONArray();
-            for(Role rl : roles){
-                JSONObject jRole = new JSONObject();
-                jRole.put(FIELD_MEANDRE_URL, rl.getUrl());
-                ja.put(jRole);
-            }
-            JSONObject jo = new JSONObject();
-            jo.put(FIELD_ROLE, ja);
-            sXml = XML.toString(jo, FIELD_ROLE_SET);
-            
+            JSONArray ja = setToJSON(roles);
+            sXml = XML.toString(ja, FIELD_MEANDRE_RESPONSE);            
         }catch(JSONException je){
             //This supposedly won't ever happen
             je.printStackTrace();

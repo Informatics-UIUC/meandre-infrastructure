@@ -1,37 +1,46 @@
 package org.meandre.webservices;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.management.ManagementFactory;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.PrintStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
-import javax.management.MBeanServer;
-import javax.management.remote.JMXConnectorServer;
-import javax.management.remote.JMXConnectorServerFactory;
-import javax.management.remote.JMXServiceURL;
 import javax.servlet.Servlet;
 
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.security.Role;
+import org.meandre.core.services.coordinator.CoordinatorServiceCallBack;
+import org.meandre.core.services.coordinator.backend.CoordinatorBackendAdapter;
+import org.meandre.core.services.coordinator.backend.CoordinatorBackendAdapterException;
 import org.meandre.core.store.Store;
+import org.meandre.core.utils.Constants;
+import org.meandre.core.utils.FileUtil;
 import org.meandre.plugins.PluginFactory;
-import org.meandre.webservices.servlets.WSAbout;
-import org.meandre.webservices.servlets.WSExecute;
-import org.meandre.webservices.servlets.WSLocations;
-import org.meandre.webservices.servlets.WSPublic;
-import org.meandre.webservices.servlets.WSPublish;
-import org.meandre.webservices.servlets.WSRepository;
-import org.meandre.webservices.servlets.WSSecurity;
-import org.meandre.webservices.utils.WSLoggerFactory;
+import org.meandre.webservices.logger.WSLoggerFactory;
+import org.meandre.webservices.servlets.WSAboutServlet;
+import org.meandre.webservices.servlets.WSAuxiliarServlet;
+import org.meandre.webservices.servlets.WSCoordinatorServlet;
+import org.meandre.webservices.servlets.WSExecuteServlet;
+import org.meandre.webservices.servlets.WSJobServlet;
+import org.meandre.webservices.servlets.WSLocationsServlet;
+import org.meandre.webservices.servlets.WSPublicServlet;
+import org.meandre.webservices.servlets.WSPublishServlet;
+import org.meandre.webservices.servlets.WSRepositoryServlet;
+import org.meandre.webservices.servlets.WSSecurityServlet;
+import org.meandre.webservices.servlets.WSServerServlet;
+import org.meandre.webservices.webuiproxy.WebUIProxy;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
@@ -39,7 +48,7 @@ import org.mortbay.jetty.security.HashUserRealm;
 import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
-import org.mortbay.management.MBeanContainer;
+import org.mortbay.thread.BoundedThreadPool;
 
 
 /**
@@ -49,6 +58,18 @@ import org.mortbay.management.MBeanContainer;
  *
  */
 public class MeandreServer {
+
+	/** Maximum jetty thread idle time */
+	private static final int MAXIMUM_JETTY_THREAD_IDLE_TIME = 3000000;
+
+	/** Maximum number of jetty theads */
+	private static final int MAXIMUM_NUMBER_OF_JETTY_THREADS = 256;
+
+	/** Minimum number of jetty threads */
+	private static final int MINIMUM_NUMBER_OF_JETTY_THREADS = 6;
+
+	/** The rate at which the realm sync file will be kept synchronized with the store */
+	private static final int SECURITY_REALM_SYNC = 20000;
 
 	/** The base URL for Meandre WS */
 	public final static String WS_BASE_URL = "http://meandre.org/services/";
@@ -71,15 +92,10 @@ public class MeandreServer {
 	/** The main Jetty server */
 	private Server server;
 
-	@SuppressWarnings("unused")
-	private Registry registry;
+	/** The backend adapter linked to this server */
+	private CoordinatorBackendAdapter baToStore = null;
 	
-	private int REG_PORT = 1099;
-	
-	private JMXConnectorServer cs =null;
-	private  MBeanServer mBeanServer =null;
-	private  MBeanContainer mBeanContainer=null;
-
+	/** Should the server be stoped? */
 	private boolean bStop = false;
 	
 	/** Creates a Meandre server with the default configuration.
@@ -88,23 +104,59 @@ public class MeandreServer {
 	public MeandreServer () {
 		log = WSLoggerFactory.getWSLogger();
 		MEANDRE_HOME = ".";
-		store = new Store();
-		cnf = new CoreConfiguration();
-		initJMXProperties();
+		
+		// Get the core configuration
+		File propFileCore = new File(MEANDRE_HOME+File.separator+"meandre-config-core.xml");
+		if ( propFileCore.exists() ) {
+			Properties propsCore = new Properties();
+			try {
+				propsCore.loadFromXML(new FileInputStream(propFileCore));
+			} catch (FileNotFoundException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				log.warning(baos.toString());
+			} catch (IOException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				log.warning(baos.toString());
+			}
+			cnf = new CoreConfiguration(propsCore);
+		}
+		else
+			cnf = new CoreConfiguration();
+		
+		// Get the store
+		File propFileStore = new File(MEANDRE_HOME+File.separator+"meandre-config-store.xml");
+		if ( propFileStore.exists() ) {
+			Properties propStore = new Properties();
+			try {
+				propStore.loadFromXML(new FileInputStream(propFileStore));
+			} catch (FileNotFoundException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				log.warning(baos.toString());
+			} catch (IOException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				log.warning(baos.toString());
+			}
+			store = new Store(propStore,cnf);
+		}
+		else
+			store = new Store(cnf);
+		
 	}
 	
-	/**
-	 * creates (or uses) a default installation in the given install dir
+	/** Creates (or uses) a default installation in the given install directory
 	 * running on the given port.  
-	 * @param port
-	 * @param sInstallDir
+	 * @param port The port
+	 * @param sInstallDir The directory
 	 */
 	public MeandreServer(int port, String sInstallDir){
         log = WSLoggerFactory.getWSLogger();
         MEANDRE_HOME = sInstallDir;
-        store = new Store(sInstallDir);
-        cnf = new CoreConfiguration(port, sInstallDir);	    
-        initJMXProperties();
+        cnf = new CoreConfiguration(port, sInstallDir);	   
+        store = new Store(sInstallDir,cnf);
 	}
 	
 	/** Creates a Meandre server running on the provided home directory and store.
@@ -118,53 +170,8 @@ public class MeandreServer {
 		MEANDRE_HOME = sMeandreHome;
 		store = storeMS;
 		cnf = config;
-		initJMXProperties();
 	}
 	
-	/** Sets the basic policies for the JMX to work.
-	 * 
-	 * 
-	 */
-	private void initJMXProperties() {
-		
-		try {
-			// Dumping the required jmxremote.access file
-			File fja = new File(cnf.getHomeDirectory()+File.separator+"jmxremote.access");
-			PrintWriter pwa = new PrintWriter(new FileWriter(fja));
-			pwa.println("monitorRole readonly");
-			pwa.println("controlRole readwrite"); 
-			pwa.close();
-			
-			// Dumping the required jmxremote.password file
-			File fjp = new File(cnf.getHomeDirectory()+File.separator+"jmxremote.password");
-			PrintWriter pwp = new PrintWriter(new FileWriter(fjp));
-			pwp.println("monitorRole  jmxAdmin");
-			pwp.println("controlRole  jmxAdmin"); 
-			pwp.close();
-			
-			// Dumping the policy file
-			String sJavaHome = System.getProperty("java.home");
-			File fjpf = new File(cnf.getHomeDirectory()+File.separator+"java.policy");
-			PrintWriter pwpf = new PrintWriter(new FileWriter(fjpf));
-			pwpf.println("grant codeBase \"file:"+sJavaHome+"/lib/ext/*\" {"); 
-			pwpf.println("        permission java.security.AllPermission;"); 
-			pwpf.println("};"); 
-			pwpf.println(); 
-			pwpf.println("grant {"); 
-			pwpf.println("        permission java.security.AllPermission;"); 
-			pwpf.println("};"); 
-			pwpf.close();
-			
-			//System.setProperty("com.sun.management.jmxremote", com.sun.management.jmx)
-			System.setProperty("com.sun.management.jmxremote.password.file", "jmxremote.password");
-			System.setProperty("java.security.policy","java.policy");
-		}
-		catch ( IOException e ) {
-			log.warning("Could not initialize the JMX properties: "+e.getMessage());
-		}
-		
-	}
-
 	/** Sets the Meandre core configuration to use for this server.
 	 * 
 	 * @param config The Meandre core configuration
@@ -196,6 +203,7 @@ public class MeandreServer {
 	 * @throws Exception Jetty could not be started or joined
 	 */
 	public void start () throws Exception {
+		log.info("Starting the WS endpoint...");
 		start(true);
 	}
 	
@@ -206,12 +214,20 @@ public class MeandreServer {
 	 * @throws Exception Jetty could not be started or joined
 	 */
 	public void start (boolean bJoin) throws Exception {
-		startRMIRegistry();
+		log.info("Starting Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+")");
+		
 		server = new Server(cnf.getBasePort());
 
+		// Overwrite the default thread pool
+		BoundedThreadPool tp = new BoundedThreadPool();
+		tp.setMinThreads(MINIMUM_NUMBER_OF_JETTY_THREADS);
+		tp.setMaxThreads(MAXIMUM_NUMBER_OF_JETTY_THREADS);
+		tp.setMaxIdleTimeMs(MAXIMUM_JETTY_THREAD_IDLE_TIME);
+		server.setThreadPool(tp);
+		
 		// Initialize global file server
 		PluginFactory pf = PluginFactory.getPluginFactory(cnf);
-		pf.initializeGlobalPublicFileServer(server,log);
+		PluginFactory.initializeGlobalPublicFileServer(server,log,cnf);
 
 		// Initialize the web services
 		Context cntxGlobal = initializeTheWebServices(server);
@@ -222,26 +238,7 @@ public class MeandreServer {
 		// Launch the server
 		server.start();
 		if ( bJoin )
-			server.join();
-	}
-	
-	/**Start the RMIRegistry used by the JMX server
-	 * 
-	 */
-	private void startRMIRegistry() {
-		try {
-			registry= LocateRegistry.createRegistry(REG_PORT);
-			WSLoggerFactory.getWSLogger().info("Starting RMI registry");
-		} catch (Exception e) {
-			System.out.println("Error creating RMI registry");
-			   try {
-		            registry = LocateRegistry.getRegistry(REG_PORT);
-		        } catch (RemoteException rex) {
-		        	WSLoggerFactory.getWSLogger().warning("Error creating RMI registry");
-		            return;
-		        }
-		}
-	
+			join();
 	}
 
 	/** Joins the main Jetty server.
@@ -250,26 +247,56 @@ public class MeandreServer {
 	 * 
 	 */
 	public void join () throws InterruptedException {
+		log.info("Joining Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+")");
 		server.join();
 		
 	}
 	
-	/** Stops the main Jetty server and MXBeanServer container
+	/** Stops the main Jetty server 
 	 * @throws Exception Jetty could not be stopped
 	 * 
 	 */
 	public void stop () throws Exception {
+		log.info("Stoping Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+")");
 		bStop  = true;
-		try {
-			cs.stop();
-		} catch (IOException e) {
-			log.warning(e.toString());
-		}finally{
-			server.stop();
-		}
-		UnicastRemoteObject.unexportObject(registry, true);
+		baToStore.close();
+		store.getJobInformation().close();
+		server.stop();
 	}
 
+	/** Stops the main Jetty server with a certain delay
+	 * 
+	 * @param iDelay
+	 * @throws Exception Jetty could not be stopped
+	 * 
+	 */
+	public void delayedStop (final int iDelay) throws Exception {
+		
+		log.info("Stoping Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+")");
+		bStop  = true;
+		baToStore.close();
+		store.getJobInformation().close();
+		
+		// Spawns a thread for the delayed stop
+		Thread th = new Thread(new Runnable(){
+
+			public void run() {
+				
+				try {
+					Thread.sleep(iDelay);
+					server.stop();
+				} catch (Exception e) {
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					PrintStream ps = new PrintStream(baos);
+					e.printStackTrace(ps);
+					log.warning("Problem arised while shutting down the server!!!\n"+baos.toString());
+				}
+			}
+			
+		});
+		th.start();		
+	}
+	
 	/** Initialize the webservices
 	 *
 	 * @param server The server object
@@ -278,11 +305,14 @@ public class MeandreServer {
 	 */
 	private Context initializeTheWebServices(Server server)
 			throws IOException {
+		
+		// Install the WebUI proxy before anyother handler
+		server.addHandler(new WebUIProxy());
+		
 		//
 		// Initializing the web services
 		//
 		Context contextWS = new Context(server,"/",Context.SESSIONS);
-
 		Constraint constraint = new Constraint();
 		constraint.setName(Constraint.__BASIC_AUTH);
 		
@@ -306,31 +336,17 @@ public class MeandreServer {
 		String sJettyHome = System.getProperty("jetty.home");
 		sJettyHome = (sJettyHome==null)?MEANDRE_HOME:sJettyHome;
 
+		// Setup the security sync service
 		final SecurityHandler sh = new SecurityHandler();
 		HashUserRealm hur = new HashUserRealm("Meandre Flow Execution Engine",store.getRealmFilename());
 		sh.setUserRealm(hur);
 		sh.setConstraintMappings(new ConstraintMapping[]{cm});
 
-		// Force the refresh of the realm
-		bStop = false;
-		new Thread (
-				new Runnable () {
-
-					public void run() {
-						while (!bStop ) {
-							try {
-								HashUserRealm hur = new HashUserRealm("Meandre Flow Execution Engine",store.getRealmFilename());
-								sh.setUserRealm(hur);
-								Thread.sleep(10000);
-							} catch (InterruptedException e) {
-								log.warning(e.toString());
-							} catch (IOException e) {
-								log.warning(e.toString());
-							}
-						}						
-					}					
-				}
-			).start();
+		// Start the security service sync between meandre and jetty
+		fireSecuritySyncService(sh);
+		
+		// Register the server to the back end
+		registerAndFireBackendAdapter();
 	
 		contextWS.addHandler(sh);
 
@@ -341,40 +357,126 @@ public class MeandreServer {
 		//
 		// Adding the publicly provided services
 		//
-		contextWS.addServlet(new ServletHolder((Servlet) new WSPublic(store)), "/public/services/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSPublicServlet(this,store,cnf)), "/public/services/*");
 		
-		//
-		// Start the MBeanServer
-		//
-		try{
-		JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi");
-		
-	     mBeanServer= ManagementFactory.getPlatformMBeanServer();
-	     mBeanContainer = new MBeanContainer(mBeanServer);
-	     server.getContainer().addEventListener(mBeanContainer);
-		 mBeanContainer.start();
-		
-		 
-		 cs=JMXConnectorServerFactory.newJMXConnectorServer(url, null, mBeanServer);
-
-
-		 cs.start();
-		}catch(Exception ex){
-			
-		}
-
 		//
 		// Adding restrictedly provided services
 		//
-		contextWS.addServlet(new ServletHolder((Servlet) new WSAbout(store,cnf)), 		"/services/about/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSLocations(store,cnf)),	"/services/locations/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSRepository(store,cnf)),	"/services/repository/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSExecute(store,cnf,mBeanServer)),		"/services/execute/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSPublish(store)),		"/services/publish/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurity(store)),		"/services/security/*");
-	
+		contextWS.addServlet(new ServletHolder((Servlet) new WSAboutServlet(this,store,cnf)), 		"/services/about/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSLocationsServlet(this,store,cnf)),	"/services/locations/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSRepositoryServlet(this,store,cnf)),	"/services/repository/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSExecuteServlet(this,store,cnf)),		"/services/execute/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSPublishServlet(this,store,cnf)),		"/services/publish/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurityServlet(this,store,cnf)),		"/services/security/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSCoordinatorServlet(this,store,cnf,baToStore)),		"/services/coordinator/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSJobServlet(this,store,cnf)),		"/services/jobs/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSServerServlet(this,store,cnf)),		"/services/server/*");
+
+		contextWS.addServlet(new ServletHolder((Servlet) new WSAuxiliarServlet(this,store,cnf)),     "/services/auxiliar/*");
+		
+		
 		return contextWS;
 	}
+
+	/** Fires the Security Sync Service. This services syncs the meandre-realm.xml used 
+	 * by the Jetty authentication to the Meandre security information.
+	 * 
+	 * @param sh The security handle	
+	 */
+	private void fireSecuritySyncService(final SecurityHandler sh) {
+		// Force the refresh of the realm
+		bStop = false;
+		new Thread (
+				new Runnable () {
+
+					public void run() {
+						while (!bStop ) {
+							try {
+								HashUserRealm hur = (HashUserRealm) sh.getUserRealm();
+								hur.setConfig(store.getRealmFilename());
+								Thread.sleep(SECURITY_REALM_SYNC);
+							} catch (Exception e) {
+								log.warning("Security realm sync service:"+e.toString());
+							} catch (Throwable t) {
+								log.warning("Security realm sync service:"+t.toString());
+							}
+						}						
+					}					
+				}
+			).start();
+	}
+
+	/** Registers and fires the backend adapter.
+	 * 
+	 */
+	private void registerAndFireBackendAdapter() {
+		// Instantiate the adaptor
+		try {
+			baToStore = (CoordinatorBackendAdapter) Class.forName(
+					"org.meandre.core.services.coordinator.backend."+store.getDatabaseFlavor()+"CoordinatorBackendAdapter"
+				).newInstance();
+			
+			// Link it to a store
+			baToStore.linkToService(store.getConnectionToDB(),cnf.getBasePort(), new CoordinatorServiceCallBack() {
+
+				public String getDescription() {
+					return "Meandre Server "+Constants.MEANDRE_VERSION;
+				}
+
+				public boolean ping(String sIP,int iPort) {
+					String sURL = "http://"+sIP+":"+iPort+"/public/services/ping.txt";
+					try {
+						URL url = new URL(sURL);
+						LineNumberReader lnr = new LineNumberReader(new InputStreamReader(url.openStream()));
+						
+						boolean bRes = false;
+						if ( lnr.readLine().equals("Pong"))
+							bRes =  true;
+						
+						return bRes;
+					} catch (MalformedURLException e) {
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						e.printStackTrace(new PrintStream(baos));
+						log.fine(baToStore.getName()+" found a malformed URL "+sURL);
+						return false;
+					} catch (IOException e) {
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						e.printStackTrace(new PrintStream(baos));
+						log.fine(baToStore.getName()+" could not ping "+sIP+" running at port "+iPort);
+						return false;
+					}
+				}
+				
+			});
+			
+			// Create the backend schema if needed
+			baToStore.createSchema();
+			
+			// Start the service
+			baToStore.start();
+			
+		} catch (InstantiationException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Backend adapter could not be instantiated for flavor "+store.getDatabaseFlavor());
+		} catch (IllegalAccessException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Backend adapter could not be reached for flavor "+store.getDatabaseFlavor());
+		} catch (ClassNotFoundException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Unknow required back end adapter for flavor "+store.getDatabaseFlavor());
+		} catch (CoordinatorBackendAdapterException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Backend adaptor could not create the default schema for the "+store.getDatabaseFlavor()+" backend flavor");
+		}
+		
+		
+		
+	}
+
 
 	/** get the Store this server is using. 
 	 *
@@ -382,6 +484,51 @@ public class MeandreServer {
 	public Store getStore(){
 	    return store;
 	    
+	}
+	
+	/**
+	 * deletes all files on disk that are used by this server, it's store,
+	 * repository, etc. This server must be stopped using the 'stop()' method
+	 * before the uninstallation can be done.
+	 * 
+	 * @throws IOException
+	 */
+	public static void uninstall(File installationDir) throws IOException{
+	    Set<File> installedFiles = getInstallationFiles(installationDir);
+	    WSLoggerFactory.getWSLogger().info(
+	            "Uninstalling Meandre files in directory: \'" + 
+	            installationDir + "\'");
+	    for(File file: installedFiles){
+	        if(file.exists()){
+	            if(file.isDirectory()){
+	                FileUtil.deleteDirRecursive(file);
+	            }else{
+	                file.delete();	                
+	            }
+	        }
+	    }
+	}
+	
+	/**
+	 * retrieves a list of files that are generated by a MeandreServer by
+	 * default. this list is actually static, and may not be complete if
+	 * changes are made to objects MeandreServer uses but this list isn't
+	 * updated. 
+	 */
+	public static Set<File> getInstallationFiles(File meandreHome){
+	    Set<File> installFiles = new HashSet<File>();
+	    
+	    installFiles.add(new File(meandreHome, "meandre-config-store.xml"));
+        installFiles.add(new File(meandreHome, "meandre-config-core.xml"));
+        installFiles.add(new File(meandreHome, "MeandreStore"));
+        installFiles.add(new File(meandreHome, "meandre-realm.properties"));
+        installFiles.add(new File(meandreHome, "meandre-config-plugins.xml"));
+        installFiles.add(new File(meandreHome, "derby.log"));
+        installFiles.add(new File(meandreHome, "published_resources"));
+        installFiles.add(new File(meandreHome, "run"));
+        installFiles.add(new File(meandreHome, "mnt"));
+        
+        return installFiles;
 	}
 
 

@@ -118,7 +118,7 @@ public class FlowDescriptionTest {
 	}
 
 	/**
-	 * Test method for {@link org.meandre.core.store.repository.FlowDescription#getName()}.
+	 * Test method for {@link org.meandre.core.store.repository.FlowDescription#getServerID()}.
 	 */
 	@Test
 	public void testGetName() {

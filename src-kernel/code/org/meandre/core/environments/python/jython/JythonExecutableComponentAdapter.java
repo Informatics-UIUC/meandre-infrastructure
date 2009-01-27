@@ -1,6 +1,8 @@
 package org.meandre.core.environments.python.jython;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.util.Properties;
 
 import org.meandre.core.ComponentContext;
 import org.meandre.core.ComponentContextException;
@@ -19,6 +21,17 @@ import org.python.util.PythonInterpreter;
 public class JythonExecutableComponentAdapter 
 implements ExecutableComponent, ScriptingEnvironmentAdapter {
 
+	/** Initialize the Python home dir properly */
+	static {
+		File fp = new File((new File(".")).toString()+File.separator+"run"+File.separator+"Jython");
+		fp.mkdir();
+		Properties props = new Properties();
+		props.setProperty("python.path", fp.toString());
+		props.setProperty("python.home", fp.toString());
+		PythonInterpreter.initialize(System.getProperties(), props,
+		                             new String[] {""});
+	}
+	
 	/** The Jython interpreter that will use this executable component. */
 	protected PythonInterpreter pi = null;
 
@@ -53,7 +66,7 @@ implements ExecutableComponent, ScriptingEnvironmentAdapter {
 
 	/** Process the given script on an already prepared adapter.
 	 *
-	 * @param sScript The scrip to process
+	 * @param sScript The script to process
 	 */
 	public void process ( String sScript ) {
 		pi.exec(sScript);

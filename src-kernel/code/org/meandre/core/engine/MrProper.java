@@ -36,7 +36,7 @@ public class MrProper extends Thread {
 	 * @throws InterruptedException The controlling flow semaphore was interrupted
 	 */
 	public MrProper(ThreadGroup tg, Set<? extends WrappedComponent> setWC) throws InterruptedException {
-		super(tg,tg.getName()+"-mr-proper");
+		super(tg,tg.getName()+"mr-proper");
 		
 		this.bNotDone    = false;
 		this.tg          = tg;
@@ -51,7 +51,7 @@ public class MrProper extends Thread {
 	 */ 
 	public void run () {
 		
-		log.info("Starting MrProper for "+tg.getName()+" flow." );
+		log.fine("Starting MrProper for "+tg.getName()+" flow." );
 		do {
 			try {
 				// Check if cleaning needed
@@ -124,14 +124,15 @@ public class MrProper extends Thread {
 		
 		// Propagate termination
 		if ( bStop )  {
-			log.info("No data available, no component executing, requesting graceful finalization" );
+			log.fine("No data available, no component executing, requesting graceful finalization" );
 			for ( WrappedComponent wc:setWC ) {
 				synchronized (wc.baStatusFlags) {
 					wc.baStatusFlags[WrappedComponent.RUNNING] = false;
 				}
 				wc.awake();
 			}
-			log.info("Requested graceful finalization propagated." );
+			log.fine("Requested graceful finalization propagated." );
+			log.info("Finishing flow "+tg.getName());
 		}
 		return bStop;
 	}
@@ -147,14 +148,14 @@ public class MrProper extends Thread {
 	 * 
 	 */
 	public void abort() {
-		log.info("Abort execution requested" );
+		log.warning("Abort execution requested" );
 		for ( WrappedComponent wc:setWC ) {
 			synchronized (wc.baStatusFlags) {
 				wc.baStatusFlags[WrappedComponent.TERMINATION] = true;
 			}
 			wc.awake();
 		}
-		log.info("Abort execution requested propagated to the executable components." );
+		log.warning("Abort execution requested propagated to the executable components." );
 		// Set MrPropper to finish and release him if slept
 		bNotDone = false;
 		semBlocking.release();

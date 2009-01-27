@@ -6,8 +6,7 @@ import org.meandre.core.engine.Probe;
 
 /** This class implements a probe for the engine that just does nothing.
  * 
- * @author Xavier Llor&agrave;
- * @modified by Amit Kumar -Support for portnames
+ * @author Xavier Llor&agrave; modified by Amit Kumar -Support for portnames
  */
 public class NullProbeImpl 
 implements Probe {
@@ -56,7 +55,7 @@ implements Probe {
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the initialization
 	 * @param ts The time stamp
-	 * @param bSerializeState The wrapped component is serialized
+	 * @param bSerializeState  The wrapped component is serialized
 	 */
 	public void probeExecutableComponentAbort(String sECID, Object owc, Date ts, boolean bSerializeState) {
 		
@@ -68,7 +67,6 @@ implements Probe {
 	 * @param owc The wrapped component done with the disposing call
 	 * @param ts The time stamp
 	 * @param bSerializeState The wrapped component is serialized
-	 * @param bSerializedData The data provided has been serialized
 	 */
 	public void probeExecutableComponentDisposed(String sECID, Object owc, Date ts, boolean bSerializeState) {
 		

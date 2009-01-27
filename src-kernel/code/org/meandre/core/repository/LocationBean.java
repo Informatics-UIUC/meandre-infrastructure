@@ -45,7 +45,7 @@ public class LocationBean {
 
 	/** Sets the location description
 	 * 
-	 * @param description the sDescription to set
+	 * @param sDescription The description to set
 	 */
 	public void setDescription(String sDescription) {
 		this.sDescription = sDescription;
@@ -62,8 +62,8 @@ public class LocationBean {
 	/**
 	 * tests if this bean has equivalent values to another one.
 	 *
-	 * @param other
-	 * @return
+	 * @param otherLocation The other location to check
+	 * @return True if both locations are the same
 	 */
 
     public boolean equals(Object otherLocation){

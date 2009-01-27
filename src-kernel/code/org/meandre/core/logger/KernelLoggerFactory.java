@@ -9,8 +9,7 @@ import java.util.logging.Logger;
 
 /** This class implements the basic factory for loggers.
  * 
- * @author Xavier Llor&agrave;
- * @modified -Amit Kumar added Formatter
+ * @author Xavier Llor&agrave; (modified -Amit Kumar added Formatter)
  */
 public class KernelLoggerFactory {
 
@@ -33,18 +32,18 @@ public class KernelLoggerFactory {
 		try {
 			new File("."+File.separator+"log").mkdir();
 			handlerCore = new FileHandler("."+File.separator+"log"+File.separator+"meandre-kernel.log",LOG_FILE_SIZE,LOG_NUM_ROTATING_FILES);
-			handlerCore.setFormatter(new ShortFormatter());
+			handlerCore.setFormatter(new MeandreFormatter());
 			logCore.addHandler(handlerCore);
 			Logger logger=logCore.getParent();
 			if(logger!=null){
 				Handler[] handlerList=logger.getHandlers();
 				for(int i=0;i< handlerList.length;i++){
-					handlerList[i].setFormatter(new ShortFormatter());
+					handlerList[i].setFormatter(new MeandreFormatter());
 				}	
 			}
 			Handler[] handlerList=logCore.getHandlers();
 			for(int i=0;i< handlerList.length;i++){
-				handlerList[i].setFormatter(new ShortFormatter());
+				handlerList[i].setFormatter(new MeandreFormatter());
 			}
 		} catch (SecurityException e) {
 			System.err.println("Could not initialize "+"."+File.separator+"log"+File.separator+"meandre-kernel.log");
@@ -63,5 +62,14 @@ public class KernelLoggerFactory {
 	public static Logger getCoreLogger() {
 		return logCore;
 	}
-		
+	
+	/** Set the level to use on for the logger and handler.
+	 * 
+	 * @param level The requested level
+	 */
+	public static void setLevel ( Level level ) {
+		logCore.setLevel(level);
+		handlerCore.setLevel(level);
+	}
+
 }

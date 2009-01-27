@@ -94,7 +94,7 @@ public interface SecurityManager {
 	/** Grants a new action role to the user.
 	 * 
      * @param usr The user to give a new role to
-	 * @param role The role to grant
+	 * @param roleToGrant The role to grant
 	 * @throws SecurityStoreException The action role is not a valid one
 	 */
 	public void grantRole (User usr, Role roleToGrant ) 
@@ -103,7 +103,7 @@ public interface SecurityManager {
 	/** Grants a set of action roles to the user.
 	 * 
      * @param usr The user to give  new roles to
-	 * @param roles The set of roles to grant
+	 * @param rolesToGrant The set of roles to grant
 	 * @throws SecurityStoreException The action role is not a valid one
 	 */
 	public void grantRoles (User usr, Set<Role> rolesToGrant ) 
@@ -113,7 +113,7 @@ public interface SecurityManager {
 	/** Revokes the given role for this user (removes the privileges of the role).
 	 * 
      * @param usr The user who is having the role taken away
-	 * @param role The role to deny
+	 * @param roleToRevoke The role to deny
 	 * @throws SecurityStoreException The action role is not a valid one
 	 */
 	public void revokeRole (User usr,  Role roleToRevoke) 
@@ -133,7 +133,7 @@ public interface SecurityManager {
 	/** Revokes the given set of roles for this user.
      *
      * @param usr The user who is having the role taken away
-	 * @param setActionRole The set of roles to remove from the user
+	 * @param rolesToRevoke The set of roles to remove from the user
 	 * @throws SecurityStoreException The action role is not a valid one
 	 */
 	public void revokeRoles (User usr,  Set<Role> rolesToRevoke ) 

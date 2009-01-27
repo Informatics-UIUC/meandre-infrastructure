@@ -4,7 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.URL;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -100,7 +101,7 @@ public class FlowGenerator {
 	public void init (String sName) {
 		// Print the welcome information
 		ps.println("Meandre ZigZag scripting language compiler ["+ZigZag.ZIGZAG_VERSION+"/"+Constants.MEANDRE_VERSION+"]");
-		ps.println("All rights reserved by DITA, NCSA, UofI (2007-2008)");
+		ps.println("All rights reserved by DITA, NCSA, UofI (2007-2009)");
 		ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		ps.println();
 		ps.flush();
@@ -142,11 +143,18 @@ public class FlowGenerator {
 	public void importRepository ( String sURI, int iLine )
 	throws ParseException {
 
-		URL url = Tools.filterURItoURL(sURI, iLine);
+		URI uri = Tools.filterURItoURL(sURI, iLine);
 
-		if ( !hsRepositoryLocations.contains(url.toString()) ) {
+		if ( !hsRepositoryLocations.contains(uri.toString()) ) {
 			// Only add the location components if not imported before
-			Model mod = Tools.pullRepository(url, iLine);
+			Model mod;
+			try {
+				mod = Tools.pullRepository(uri.toURL(), iLine);
+			} catch (MalformedURLException e) {
+				ParseException pe = new ParseException();
+				pe.setStackTrace(e.getStackTrace());
+				throw pe;
+			}
 			Model modStore = ri.getModel();
 			RepositoryImpl riNew = new RepositoryImpl(mod);
 			// Add the components
@@ -155,9 +163,9 @@ public class FlowGenerator {
 					modStore.add(ec.getModel());
 			// Ignoring the flows
 
-			ps.println("Importing repository "+url);
+			ps.println("Importing repository "+uri);
 			ri.refreshCache(modStore);
-			hsRepositoryLocations.add(url.toString());
+			hsRepositoryLocations.add(uri.toString());
 		}
 	}
 
@@ -168,10 +176,18 @@ public class FlowGenerator {
 	 * @param iLine The line where the request was done
 	 * @throws ParseException The component could not be imported
 	 */
-	public void importRepository(String sURI, String sCompURI, int iLine) throws ParseException {
-		URL url = Tools.filterURItoURL(sURI, iLine);
+	public void importRepository(String sURI, String sCompURI, int iLine) 
+	throws ParseException {
+		URI uri = Tools.filterURItoURL(sURI, iLine);
 
-		Model mod = Tools.pullRepository(url, iLine);
+		Model mod;
+		try {
+			mod = Tools.pullRepository(uri.toURL(), iLine);
+		} catch (MalformedURLException e) {
+			ParseException pe = new ParseException();
+			pe.setStackTrace(e.getStackTrace());
+			throw pe;
+		}
 		Model modStore = ri.getModel();
 		Resource resComp = modStore.createResource(Tools.filterURItoURL(sCompURI, iLine).toString());
 		RepositoryImpl riNew = new RepositoryImpl(mod);
@@ -188,7 +204,7 @@ public class FlowGenerator {
 		}
 		else
 			// The component does not exist in this repository
-			throw new ParseException("The requested component "+resComp+" does not exist in repository "+url+" (line: "+iLine+")");
+			throw new ParseException("The requested component "+resComp+" does not exist in repository "+uri+" (line: "+iLine+")");
 	}
 
 	/** Creates and alias for the given component.
@@ -199,7 +215,7 @@ public class FlowGenerator {
 	 * @throws ParseException Invalid component URI
 	 */
 	public void aliasCoponent(String sCompURI, String sAlias, int iLine) throws ParseException {
-		URL urlComp = Tools.filterURItoURL(sCompURI, iLine);
+		URI uriComp = Tools.filterURItoURL(sCompURI, iLine);
 
 		Resource resComp = ri.getModel().createResource(Tools.filterURItoURL(sCompURI, iLine).toString());
 		ExecutableComponentDescription ecd = ri.getExecutableComponentDescription(resComp);
@@ -210,7 +226,7 @@ public class FlowGenerator {
 			// Check if it is a component
 			if ( ecd!=null ) {
 				htECAlias.put(sAlias,ecd);
-				ps.println("Component "+urlComp+" aliased as "+sAlias);
+				ps.println("Component "+uriComp+" aliased as "+sAlias);
 			}
 		}
 		else if ( fd!=null ) {
@@ -481,7 +497,7 @@ public class FlowGenerator {
 		ps.println("ZigZag compilation finished successfuly!" );
 		ps.print("Preparing flow descriptor... " );
 
-		sOutputFileName = (sOutputFileName.endsWith("/"))?sOutputFileName.replaceAll("/$", ""):sOutputFileName;
+		sOutputFileName = (sOutputFileName.endsWith(File.pathSeparator))?sOutputFileName.replaceAll(File.separator+"$", ""):sOutputFileName;
 
 		// Get the flow description generated so far (inlcuding the parallel processing)
 		FlowDescription fd = getFlowDescription(sOutputFileName,true);
@@ -542,7 +558,7 @@ public class FlowGenerator {
 		// Post parellization processing
 		if ( bParallelProcess && htParallelInstances.size()>0 ) {
 			ps.println("Postprocessing flow for parallelization");
-			postProcessinParallelization(fd);
+			postProcessingParallelization(fd);
 			ps.println("Postprocessing flow for parallelization finished");
 		}
 
@@ -554,7 +570,7 @@ public class FlowGenerator {
 	 * @param sOutputFileName The output file to generate
 	 * @param fd The flow description
 	 * @param mod The model described by the repository
-	 * @throws ParserException Something went wrong
+	 * @throws ParseException Something went wrong
 	 */
 	private void generateCompressedMau(String sOutputFileName, FlowDescription fd, Model mod)
 			throws ParseException {
@@ -596,7 +612,7 @@ public class FlowGenerator {
 	 *
 	 * @param fd The current flow descriptor
 	 */
-	private void postProcessinParallelization(FlowDescription fd) {
+	private void postProcessingParallelization(FlowDescription fd) {
 
 		Model mod = fd.getModel();
 

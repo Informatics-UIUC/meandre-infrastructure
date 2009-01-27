@@ -34,6 +34,7 @@ import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.utils.Constants;
+import org.meandre.core.utils.ModelIO;
 import org.meandre.webui.PortScroller;
 import org.meandre.webui.WebUI;
 
@@ -68,7 +69,11 @@ public class MAUExecutor {
 	/** The filename to execute */
 	private String sFileName;
 
+	/** The parent class loader */
 	private ClassLoader parentClassloader;
+
+	/** The port number to use */
+	private int iPort;
 	
 	/** The main method that runs the the MAU file.
 	 *
@@ -81,11 +86,14 @@ public class MAUExecutor {
 		for ( Handler h:KernelLoggerFactory.getCoreLogger().getHandlers() )
 			h.setLevel(Level.WARNING);
 
-		if ( sArgs.length!=1 ) {
-			System.err.println("Wrong syntax!!!\nThe MAU executor requires one .mau file");
+		if ( sArgs.length<1 || sArgs.length>2 ) {
+			System.err.println("Wrong syntax!!!\nThe MAU executor requires one .mau file and " +
+					"an optional port number for the WebUI");
 		}
 		else  {
 			MAUExecutor mau = new MAUExecutor(sArgs[0]);
+			if ( sArgs.length==2 )
+				mau.setWebUIPortNumber(Integer.parseInt(sArgs[1]));
 			mau.run();
 		}
 	}
@@ -97,6 +105,15 @@ public class MAUExecutor {
 	public MAUExecutor ( String sFileName ) {
 		ps = System.out;
 		this.sFileName = sFileName;
+		this.iPort = 1715;
+	}
+	
+	/** Set the WebUI port number to use.
+	 * 
+	 * @param iPort The port number
+	 */
+	public void setWebUIPortNumber(int iPort) {
+		this.iPort = iPort;
 	}
 
 	/** Set the output stream to use.
@@ -145,7 +162,7 @@ public class MAUExecutor {
 	public void run () throws FileNotFoundException {
 
 		ps.println("Meandre MAU Executor [" + MAUExecutor.ZMAU_VERSION + "/" + Constants.MEANDRE_VERSION + "]");
-		ps.println("All rights reserved by DITA, NCSA, UofI (2007-2008)");
+		ps.println("All rights reserved by DITA, NCSA, UofI (2007-2009)");
 		ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		ps.println();
 		ps.flush();
@@ -160,7 +177,7 @@ public class MAUExecutor {
 
 		Resource resURI = qr.getAvailableFlows().iterator().next();
 		ps.println("Preparing flow: "+resURI);
-		CoreConfiguration cnf = new CoreConfiguration();
+		CoreConfiguration cnf = new CoreConfiguration(iPort-1,".");
 		Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
 
 		exec =null;
@@ -171,8 +188,9 @@ public class MAUExecutor {
 			spi = new StatisticsProbeImpl();
 			MrProbe mrProbe = new MrProbe(KernelLoggerFactory.getCoreLogger(),spi,false,false);
 			conductor.setParentClassloader(this.getParentClassloader());
-			exec = conductor.buildExecutor(qr, resURI, mrProbe);
-
+			exec = conductor.buildExecutor(qr, resURI, mrProbe, System.out);
+			mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
+			
 			ps.flush();
 
 			// Redirecting the streamers
@@ -264,7 +282,7 @@ public class MAUExecutor {
 			Model mod = ModelFactory.createDefaultModel();
 			File file = new File(sFileName);
 			URL url = new URL("jar:file:"+file.getAbsolutePath()+"!/repository/repository.ttl");
-			mod.read(url.openStream(), null,"TTL");
+			ModelIO.readModelInDialect(mod, url);
 			QueryableRepository qr = new RepositoryImpl(mod);
 
 			// Edit the contexts URI

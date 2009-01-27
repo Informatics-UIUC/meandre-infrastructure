@@ -63,7 +63,7 @@ public class DataProxy {
 	/** Sets the data component stored at the given input. 
 	 * 
 	 * @param sName The input name
-	 * @return The available component.
+	 * @param obj The object to set
 	 */
 	public void setInput ( String sName, Object obj ) {
 		synchronized ( htInputDataComponents ) {

@@ -88,9 +88,9 @@ public final class  PortScroller {
 	}
 
 	/**Return the next available port
-	 * @param sFlowUniqueExecutionID 
 	 * 
-	 * @return
+	 * @param sFlowUniqueExecutionID The unique flow execution ID
+	 * @return The next available port
 	 */
 	public int nextAvailablePort(String sFlowUniqueExecutionID){
 		if(flowPortMap.containsKey(sFlowUniqueExecutionID)){

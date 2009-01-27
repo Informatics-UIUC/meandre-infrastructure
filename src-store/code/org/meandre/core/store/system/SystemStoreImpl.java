@@ -74,7 +74,7 @@ public class SystemStoreImpl implements SystemStore {
 
     /** Create a system store for properties and configuration related stuff.
      *
-     * @param nmodel the model containing the system store
+     * @param model the model containing the system store
      * @param sHost The host name
      * @param iPort The current port number
      */

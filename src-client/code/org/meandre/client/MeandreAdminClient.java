@@ -4,14 +4,26 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.httpclient.NameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.meandre.core.security.Role;
 import org.meandre.core.security.SecurityManager;
 import org.meandre.core.security.SecurityStoreException;
 import org.meandre.core.security.User;
 
+/**
+ * A client interface to the security system of a remote meandre server. This
+ * client allows a user with admin privileges to create and modify user accounts,
+ * and assign/revoke roles of users. The client is initialized with a server's
+ * hostname and port, and the credentials of the admin user the client is 
+ * acting on behalf of. Once initialized, MeandreAdminClient acts as a
+ * SecurityManager, where all calls to the underlying SecurityManager on
+ * the server side are relayed through webservices calls.
+ *
+ * @author Peter Groves
+ *
+ */
 public class MeandreAdminClient extends MeandreBaseClient 
 implements SecurityManager{
 
@@ -19,8 +31,8 @@ implements SecurityManager{
      * urls end up being something like:
      * "http://{host}:{port}/{CMD_BASE}{CMD_XXXXX}.{ext}
      *
-     * CMD_XXXX can be CMD_ROLES_OF_USER, CMD_USERS ....
-	 * ext is json, xml, ...
+     * {CMD_XXXX} can be CMD_ROLES_OF_USER, CMD_USERS ....
+	 * {ext} is json, xml, ...
      */
     public static final String CMD_BASE = "services/security/";
 
@@ -34,16 +46,18 @@ implements SecurityManager{
     public static final String CMD_USERS = "users";
     public static final String CMD_USER = "user";
     public static final String CMD_VALID_ROLES = "valid_roles";
-    public static final String CMD_ASSIGN_ROLE = "assign_role";
-    public static final String CMD_REVOKE_ROLE = "revoke_role";
-    public static final String CMD_CREATE_USER = "create_user";
-    public static final String CMD_REMOVE_USER = "remove_user";
+    public static final String CMD_ASSIGN_ROLE = "grant_roles";
+    public static final String CMD_REVOKE_ROLE = "revoke_roles";
+    public static final String CMD_CREATE_USER = "create_users";
+    public static final String CMD_REMOVE_USER = "remove_users";
     public static final String CMD_REVOKE_ALL_ROLES = "revoke_all_roles";
 
     public static final String PARAM_USER_NAME = "user_name";
     public static final String PARAM_FULL_NAME = "user_full_name";
     public static final String PARAM_PASSWORD = "password";
     public static final String PARAM_ROLE = "role_name";
+
+
     /**
      * initialize to talk to a particular server. 
      *
@@ -54,7 +68,11 @@ implements SecurityManager{
         super(serverHost, serversPort);
     }
     
-    
+    /**
+     * create a new user with the given nickName, name, and password. This is
+     * the password the new user will have, not the password of the
+     * admin account being used to perform the operation.
+     */
     public User createUser(String nickName, String name, String password)
             throws SecurityStoreException {
         String sRestCommand = CMD_BASE + CMD_CREATE_USER + ".json";
@@ -68,7 +86,8 @@ implements SecurityManager{
 			log("calling remote create user");
 	        JSONTokener jtUser = executeGetRequestJSON(sRestCommand, nvps);
 	        log("remote create user done.");
-    	    usr = User.fromJSON(new JSONObject(jtUser));
+	        JSONArray jaUsers = new JSONArray(jtUser);
+    	    usr = User.fromJSON(jaUsers.getJSONObject(0));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -88,7 +107,7 @@ implements SecurityManager{
 		Set<Role> roles = null;
 		try{
 	        JSONTokener jtRoles = executeGetRequestJSON(sRestCommand, nvps);
-    	    roles = Role.setFromJSON(new JSONObject(jtRoles));
+    	    roles = Role.setFromJSON(new JSONArray(jtRoles));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -97,6 +116,10 @@ implements SecurityManager{
         return roles;
     }
 
+    /**
+     * get the User object of the account associated with a nickName on
+     * the server.
+     */
     public User getUser(String nickName) throws SecurityStoreException {
         String sRestCommand = CMD_BASE + CMD_USER + ".json";
 		Set<NameValuePair> nvps = new HashSet<NameValuePair>();
@@ -104,7 +127,8 @@ implements SecurityManager{
 		User usr = null;
 		try{
 	        JSONTokener jtUser = executeGetRequestJSON(sRestCommand, nvps);
-    	    usr = User.fromJSON(new JSONObject(jtUser));
+	        JSONArray ja = new JSONArray(jtUser);
+    	    usr = User.fromJSON(ja.getJSONObject(0));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -114,13 +138,13 @@ implements SecurityManager{
     }
     
     /** retrieve a list of all users from the remote Meandre server. 
-     * @throws Exception */
+     **/
     public Set<User> getUsers() throws SecurityStoreException {
         String sRestCommand = CMD_BASE + CMD_USERS + ".json";
 		Set<User> users = null;
 		try{
 	        JSONTokener jtUsers = executeGetRequestJSON(sRestCommand, null);
-    	    users = User.setFromJSON(new JSONObject(jtUsers));
+    	    users = User.setFromJSON(new JSONArray(jtUsers));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -136,6 +160,9 @@ implements SecurityManager{
     */
 
 
+    /**
+     * grants a user a role, and therefore the permissions of that role.
+     */
     public void grantRole(User usr, Role roleToGrant)
             throws SecurityStoreException {
         String sRestCommand = CMD_BASE + CMD_ASSIGN_ROLE + ".json";
@@ -148,7 +175,8 @@ implements SecurityManager{
 		try{
 	        JSONTokener jtUser = executeGetRequestJSON(sRestCommand, nvps);
     	    //retrievedUsr = User.fromJSON(new JSONObject(jtUser));
-    	    User.fromJSON(new JSONObject(jtUser));
+	        JSONArray jaUsers = new JSONArray(jtUser);
+    	    User.fromJSON(jaUsers.getJSONObject(0));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -172,7 +200,7 @@ implements SecurityManager{
 
 	/**
 	 * calls getRolesOfUsers to retrieve the roles of the user from
-	 * the server and then checks it for the input role
+	 * the server and then checks it for the input roleToCheck.
 	 */
     public boolean hasRoleGranted(User usr, Role roleToCheck)
             throws SecurityStoreException {
@@ -190,7 +218,8 @@ implements SecurityManager{
 		try{
 	        JSONTokener jtUser = executeGetRequestJSON(sRestCommand, nvps);
     	    //usr = User.fromJSON(new JSONObject(jtUser));
-    	    User.fromJSON(new JSONObject(jtUser));
+	        JSONArray jaUsers = new JSONArray(jtUser);
+    	    User.fromJSON(jaUsers.getJSONObject(0));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -200,6 +229,7 @@ implements SecurityManager{
         
     }
 
+    /** remove the roleToRevoke from the user's set of roles on the server */
     public void revokeRole(User usr, Role roleToRevoke)
             throws SecurityStoreException {
 
@@ -211,7 +241,8 @@ implements SecurityManager{
 		try{
 	        JSONTokener jtUser = executeGetRequestJSON(sRestCommand, nvps);
 	        //retrievedUsr = User.fromJSON(new JSONObject(jtUser));
-	        User.fromJSON(new JSONObject(jtUser));
+	        JSONArray jaUsers = new JSONArray(jtUser);
+    	    User.fromJSON(jaUsers.getJSONObject(0));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -242,7 +273,8 @@ implements SecurityManager{
 		try{
 	        JSONTokener jtUser = executeGetRequestJSON(sRestCommand, nvps);
 	        //retrievedUsr = User.fromJSON(new JSONObject(jtUser));
-	        User.fromJSON(new JSONObject(jtUser));
+	        JSONArray jaUsers = new JSONArray(jtUser);
+	        User.fromJSON(jaUsers.getJSONObject(0));
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){
@@ -260,7 +292,8 @@ implements SecurityManager{
 		Set<Role> roles = null;
 		try{
 	        JSONTokener jtRoles = executeGetRequestJSON(sRestCommand, null);
-    	    roles = Role.setFromJSON(new JSONObject(jtRoles));
+	        JSONArray jaRoles = new JSONArray(jtRoles);
+    	    roles = Role.setFromJSON(jaRoles);
 		}catch(TransmissionException te){
 			throw new SecurityStoreException(te);
 		}catch(JSONException je){

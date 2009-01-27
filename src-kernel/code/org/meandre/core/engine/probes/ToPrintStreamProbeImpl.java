@@ -8,8 +8,7 @@ import org.meandre.core.engine.Probe;
 /** This class implements a probe for the engine that just dumps the information
  * to the provided PrintStream.
  * 
- * @author Xavier Llor&agrave;
- * @modified by Amit Kumar -Support for portnames
+ * @author Xavier Llor&agrave; (modified by Amit Kumar -Support for portnames)
  */
 public class ToPrintStreamProbeImpl 
 implements Probe {
@@ -57,7 +56,7 @@ implements Probe {
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the initialization
 	 * @param ts The time stamp
-	 * @param bSerializeState The wrapped component is serialized
+	 * @param bSerializedState The wrapped component is serialized
 	 */
 	public void probeExecutableComponentInitialized(String sECID, Object owc, Date ts, boolean bSerializedState) {
 		psOut.println("Executable component "+sECID+" inialized at "+ts+" to state "+owc.toString());
@@ -68,7 +67,7 @@ implements Probe {
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the initialization
 	 * @param ts The time stamp
-	 * @param bSerializeState The wrapped component is serialized
+	 * @param bSerializedState The wrapped component is serialized
 	 */
 	public void probeExecutableComponentAbort(String sECID, Object owc, Date ts, boolean bSerializedState) {
 		psOut.println("Executable component "+sECID+" requested execution abortion at "+ts+" to state "+owc.toString());
@@ -79,7 +78,7 @@ implements Probe {
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the disposing call
 	 * @param ts The time stamp
-	 * @param bSerializeState The wrapped component is serialized
+	 * @param bSerializedState The wrapped component is serialized
 	 */
 	public void probeExecutableComponentDisposed(String sECID, Object owc, Date ts, boolean bSerializedState) {
 		psOut.println("Executable component "+sECID+" disposed at "+ts+" to state "+owc.toString());		
@@ -92,7 +91,7 @@ implements Probe {
 	 * @param owc The wrapped component done with the disposing call
 	 * @param odata The data being pushed
 	 * @param ts The time stamp
-	 * @param bSerializeState The wrapped component is serialized
+	 * @param bSerializedState The wrapped component is serialized
 	 * @param bSerializedData The serialized data
 	 */
 	public void probeExecutableComponentPushData(String sECID, Object owc, Object odata, Date ts,String portName, boolean bSerializedState, boolean bSerializedData) {
@@ -105,7 +104,7 @@ implements Probe {
 	 * @param owc The wrapped component done with the disposing call
 	 * @param odata The data being pulled
 	 * @param ts The time stamp
-	 * @param bSerializeState The wrapped component is serialized
+	 * @param bSerializedState The wrapped component is serialized
 	 * @param bSerializedData The serialized data
 	 */
 	public void probeExecutableComponentPullData(String sECID, Object owc, Object odata, Date ts, String portName,boolean bSerializedState, boolean bSerializedData) {
@@ -117,7 +116,7 @@ implements Probe {
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the disposing call
 	 * @param ts The time stamp
-	 * @param bSerializeState The wrapped component is serialized
+	 * @param bSerializedState The wrapped component is serialized
 	 */
 	public void probeExecutableComponentFired(String sECID, Object owc, Date ts, boolean bSerializedState) {
 		psOut.println("Executable component "+sECID+" fire at "+ts+" to state "+owc.toString());		
@@ -129,7 +128,7 @@ implements Probe {
 	 * @param sECID The unique executable component ID
 	 * @param owc The wrapped component done with the disposing call
 	 * @param ts The time stamp
-	 * @param bSerializeState The wrapped component is serialized
+	 * @param bSerializedState The wrapped component is serialized
 	 */
 	public void probeExecutableComponentCoolingDown(String sECID, Object owc, Date ts, boolean bSerializedState) {
 		psOut.println("Executable component "+sECID+" is cooling down at "+ts+" to state "+owc.toString());		

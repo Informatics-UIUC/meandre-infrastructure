@@ -90,7 +90,6 @@ extends Thread {
 	 * @param cnf The core configuration object
 	 * @throws InterruptedException The semaphore could not be adquired twice
 	 */
-	@SuppressWarnings("unchecked")
 	public WrappedComponent(String sFlowUniqueID, String flowID,String sComponentInstanceID,
 			ExecutableComponent ec, Set<ActiveBuffer> setInputs,
 			Set<ActiveBuffer> setOutputs,
@@ -98,14 +97,15 @@ extends Thread {
 			Hashtable<String, String> htInputLogicNameMap,
 			Hashtable<String, String> htOutputLogicNameMap, ThreadGroup tg,
 			String sThreadName, Hashtable<String, String> htProperties, MrProbe thdMrProbe, 
-			CoreConfiguration cnf )
+			CoreConfiguration cnf,
+			PrintStream console )
 			throws InterruptedException {
 		super(tg,sThreadName);
 
 		// Basic initialization
 		this.ec            = ec;
 		this.semBlocking   = new Semaphore(1,true); // With fairness
-		this.cc            = new ComponentContextImpl(sFlowUniqueID,flowID,sComponentInstanceID, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, htProperties, thdMrProbe, this, cnf);
+		this.cc            = new ComponentContextImpl(sFlowUniqueID,flowID,sComponentInstanceID, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, htProperties, thdMrProbe, this, cnf, console);
 		this.hasNInputs     = htInputLogicNameMap.size();
 		// Setting execution flags
 		this.baStatusFlags = new boolean [4];
@@ -146,7 +146,7 @@ extends Thread {
 	 *
 	 */
 	public void run () {
-		log.info("Initializing a the wrapping component "+ec.toString());
+		log.fine("Initializing a the wrapping component "+ec.toString());
 		
 		// Initialize the executable component
 		try {
@@ -176,12 +176,13 @@ extends Thread {
 				//log.finest("Component "+ec.toString()+" ready for execution");
 				try {
 					// Execute
-					this.thdMrProbe.probeWrappedComponentFired(this);
 					synchronized (baStatusFlags) {
 						baStatusFlags[EXECUTING] = true;
 					}
 					try {
+						this.thdMrProbe.probeWrappedComponentFired(this);
 						ec.execute(cc);
+						this.thdMrProbe.probeWrappedComponentCoolingDown(this);
 					}
 					catch ( NoClassDefFoundError ncde ) {
 						synchronized (baStatusFlags) {
@@ -192,7 +193,6 @@ extends Thread {
 					synchronized (baStatusFlags) {
 						baStatusFlags[EXECUTING] = false;
 					}
-					this.thdMrProbe.probeWrappedComponentCoolingDown(this);
 					
 					//log.finest("Component "+ec.toString()+" executed");
 					
@@ -267,9 +267,9 @@ extends Thread {
 			}
 			//thdMrProper.awake();
 		}
-		log.info("Disposing WebUI if any." );
+		log.finer("Disposing WebUI if any." );
 		cc.stopAllWebUIFragments();
-		log.info("Finalizing the execution of the wrapping component "+ec.toString());
+		log.fine("Finalizing the execution of the wrapping component "+ec.toString());
 		try {
 			ec.dispose(cc);
 		} catch (ComponentExecutionException e) {
@@ -361,7 +361,6 @@ extends Thread {
 	 *
 	 * @param sInput The updated input active buffer
 	 */
-	@SuppressWarnings("unchecked")
 	public void awake(String sInput) {
 		semBlocking.release();
 	}
@@ -369,7 +368,6 @@ extends Thread {
 	/** Awakes the modules due a termination request.
 	 *
 	 */
-	@SuppressWarnings("unchecked")
 	public void awake() {
 		semBlocking.release();
 	}

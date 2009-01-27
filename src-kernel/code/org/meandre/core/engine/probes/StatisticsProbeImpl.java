@@ -12,8 +12,7 @@ import org.meandre.core.engine.ProbeException;
 /** This class implements a probe for the engine that collects statistics of the 
  * execution.
  * 
- * @author Xavier Llor&agrave;
- * @modified Amit Kumar on June 25th 2008 -Added portName
+ * @author Xavier Llor&agrave; (modified Amit Kumar on June 25th 2008 -Added portName)
  */
 public class StatisticsProbeImpl 
 implements Probe {
@@ -164,7 +163,6 @@ implements Probe {
 	 * @param owc The wrapped component done with the disposing call
 	 * @param ts The time stamp
 	 * @param bSerializeState The wrapped component is serialized
-	 * @param bSerializedData The data provided has been serialized
 	 */
 	public void probeExecutableComponentDisposed(String sECID, Object owc, Date ts, boolean bSerializeState) {
 		// Update the timestamp

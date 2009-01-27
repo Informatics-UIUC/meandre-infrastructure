@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
@@ -21,6 +23,7 @@ import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.ExecutableComponentInstanceDescription;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
+import org.meandre.core.utils.ModelIO;
 import org.meandre.zigzag.parser.ParseException;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -43,12 +46,12 @@ public abstract class Tools {
 	 * @return The resulting URL
 	 * @throws ParseException The URI is not a valid repository URL
 	 */
-	public static URL filterURItoURL ( String sURI, int iLine ) 
+	public static URI filterURItoURL ( String sURI, int iLine ) 
 	throws ParseException {
 		String sURL = sURI.substring(1, sURI.length()-1).trim();
 		try {
-			return new URL(sURL);
-		} catch (MalformedURLException e) {
+			return new URI(sURL);
+		} catch (URISyntaxException e) {
 			throw new ParseException ( "The URL "+sURL+" is not a valid repository one (line: "+2+")");
 		}
 	}
@@ -73,17 +76,9 @@ public abstract class Tools {
 	public static Model pullRepository(URL url, int iLine) throws ParseException {
 		Model mod = ModelFactory.createDefaultModel();
 		try {
-			mod.read(url.openStream(),null,"TTL");
+			ModelIO.readModelInDialect(mod, url);
 		} catch (Exception e) {
-			try {
-				mod.read(url.openStream(),null,"N-TRIPLE");
-			} catch (Exception e1) {
-				try {
-					mod.read(url.openStream(),null);
-				} catch (Exception e2) {
-					throw new ParseException("Could not retrieve repository from "+url+" (line: "+iLine+")");
-				}
-			}
+			throw new ParseException("Could not retrieve repository from "+url+" (line: "+iLine+")");
 		}
 		return mod;
 	}
@@ -108,7 +103,7 @@ public abstract class Tools {
 	 *
 	 * @param fd The flow descriptor
 	 * @param qr The repository implementation
-	 * @param fileDirCntxs The folder containing the contexts
+	 * @param fileFolderContexts The folder containing the contexts
 	 * @throws ParserException Something went really wrong
 	 */
 	public static void prepareJarsToTheFileSystem(FlowDescription fd, QueryableRepository qr, File fileFolderContexts ) 
@@ -125,10 +120,10 @@ public abstract class Tools {
 					try {
 						// Pull the URL and dump it to the local file
 						Resource res = (Resource)node;
-						URL url = new URL(res.getURI().replaceAll(" ", "%20"));
-						if ( url.toString().endsWith(".jar")) {
-							String [] sa = url.getPath().split("/");
-							InputStream is = url.openStream();
+						URI uri = new URI(res.getURI().replaceAll(" ", "%20"));
+						if ( uri.toString().endsWith(".jar")) {
+							String [] sa = uri.getPath().split("/");
+							InputStream is = uri.toURL().openStream();
 							FileOutputStream fos = new FileOutputStream(new File(fileFolderContexts.toString()+File.separator+sa[sa.length-1]));
 							int iTmp;
 							while ( (iTmp=is.read())!=-1 )
@@ -138,6 +133,8 @@ public abstract class Tools {
 					} catch (MalformedURLException e) {
 						throw new ParseException(e.toString());
 					} catch (IOException e) {
+						throw new ParseException(e.toString());
+					} catch (URISyntaxException e) {
 						throw new ParseException(e.toString());
 					}
 				}
@@ -218,8 +215,11 @@ public abstract class Tools {
 					File file = new File(fileDir+File.separator+sFile);
 					if ( file.isDirectory() )
 						queuePending.offer(file);
-					else
-						res.add(new File(file.toString().replaceAll(fileDirectory.toString(), "")));
+					else {
+						int iDirLen = fileDirectory.toString().length();
+						String sNewFileName = file.toString().substring(iDirLen);
+						res.add(new File(sNewFileName));
+					}
 				}
 			}
 		}

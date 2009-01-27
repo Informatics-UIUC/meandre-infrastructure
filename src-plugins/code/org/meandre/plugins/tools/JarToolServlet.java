@@ -1,9 +1,11 @@
 package org.meandre.plugins.tools;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.util.Iterator;
@@ -20,14 +22,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.meandre.configuration.CoreConfiguration;
 import org.meandre.plugins.MeandrePlugin;
 
 /**This plugin reads the jar file and returns attributes for
  * the jar file.
  * 
- * @author Amit Kumar
- * Created on Mar 30, 2008 6:46:54 PM
- * -Used by the eclipse plugin
+ * @author Amit Kumar (modified by Xavier Llor&agrave; to fix the directory mismatch + add the setCoreConfig method)
  */
 public class JarToolServlet extends HttpServlet 
 implements MeandrePlugin{
@@ -43,17 +44,30 @@ implements MeandrePlugin{
 	// the directory where java jars are stored
 	private static  String PLUGIN_JAR_DIR = "published_resources"+File.separator+"contexts"+File.separator+"java"; 
 			
-	
 	//alias path
 	private String aliasPath = "/plugins/jar/*";
 
 	/** Get the plugin logger */
 	protected Logger log;
 	
-	private boolean inited = Boolean.FALSE;
+	private boolean bInited = Boolean.FALSE;
 	
+
+	/** Core configuration object */
+	@SuppressWarnings("unused")
+	private CoreConfiguration cnf = new CoreConfiguration();
+
+	
+	/** Sets the core configuration object to use.
+	 * 
+	 * @param cnf The core configuration object
+	 */
+	public void setCoreConfiguration ( CoreConfiguration cnf ) {
+		this.cnf = cnf;
+	}
+
 	public void init() throws ServletException{
-		log.info("Initing the JarToolServlet...");
+		log.fine("Initing the JarToolServlet...");
 	}
 	
 	public void setLogger ( Logger log ) {
@@ -100,13 +114,13 @@ implements MeandrePlugin{
 	@SuppressWarnings("unchecked")
 	private void processRequest(String command, String fileName,
 			HttpServletResponse res) throws IOException, JSONException {
-		//log.info("the command is " + command);
+		log.finest("the command is " + command);
 		JSONObject joRes = new JSONObject();
 		File file = new File(PLUGIN_JAR_DIR,fileName);
 		if(command.equalsIgnoreCase("manifest")){
 			Manifest manifest = getManifest(file);
 			if(manifest!=null){
-			//log.info("getting manifest " + manifest.toString());
+			log.finest("getting manifest " + manifest.toString());
 			Attributes attributes=manifest.getMainAttributes();
 			Iterator it = attributes.keySet().iterator();
 			Object key = null;
@@ -115,7 +129,7 @@ implements MeandrePlugin{
 				joRes.put(key+"", attributes.get(key));
 			}
 			}else{
-				log.info("manifest does not exist.." + fileName);
+				log.warning("manifest does not exist.." + fileName);
 				res.sendError(HttpServletResponse.SC_NOT_FOUND);
 				return;
 			}
@@ -135,7 +149,7 @@ implements MeandrePlugin{
 		
 			Manifest manifest = getManifest(file);
 			if(manifest!=null){
-			//log.info("getting manifest " + manifest.toString());
+			log.finest("getting manifest " + manifest.toString());
 			Attributes attributes=manifest.getMainAttributes();
 			Iterator it = attributes.keySet().iterator();
 			Object key = null;
@@ -157,16 +171,17 @@ implements MeandrePlugin{
 
 	/**returns the hex String
 	 * 
-	 * @param file
-	 * @return
+	 * @param file The file to check
+	 * @return The MD% of the file
 	 */
 	private String getMD5(File file) {
 		byte[] bytes=null;
 		try {
 			bytes=createChecksum(file);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ByteArrayOutputStream boas = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(boas));
+			log.warning(boas.toString());
 		}
 		if(bytes==null){
 			return null;
@@ -177,8 +192,9 @@ implements MeandrePlugin{
 		try {
 		hexString=	StringUtils.getHexString(bytes);
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ByteArrayOutputStream boas = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(boas));
+			log.warning(boas.toString());
 		}
 		return hexString;
 	}
@@ -233,7 +249,7 @@ implements MeandrePlugin{
 }
 
 	public void inited(Boolean success) {
-		this.inited = success;
+		this.bInited = success;
 	}
 
 
@@ -241,7 +257,7 @@ implements MeandrePlugin{
 	 * 
 	 */
 	public boolean isInited() {
-		return inited;
+		return bInited;
 	}
 
 	/**This is a servlet not a filter

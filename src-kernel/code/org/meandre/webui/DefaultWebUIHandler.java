@@ -34,7 +34,7 @@ public class DefaultWebUIHandler extends AbstractHandler {
 	 * @param target The target path
 	 * @param request The request object
 	 * @param response The response object
-	 * @param dispath The dispatch flag
+	 * @param dispatch The dispatch flag
 	 * @throws IOException An IO exception arised when processing the request
 	 * @throws ServletException The servlet could not complete the request
 	 */
@@ -43,9 +43,9 @@ public class DefaultWebUIHandler extends AbstractHandler {
 		Request base_request = (request instanceof Request) ? 
 				                  (Request) request : 
 				                  HttpConnection.getCurrentConnection().getRequest();
-				                  
-		if (response.isCommitted() || base_request.isHandled())
-			return;
+		
+        if (response.isCommitted() || base_request.isHandled())
+		      return;
 		base_request.setHandled(true);
 
 		response.setContentType("text/html");
@@ -58,14 +58,30 @@ public class DefaultWebUIHandler extends AbstractHandler {
 				"\t<meta http-equiv=\"content-language\" content=\"EN\" />\n"+
 				"\t<meta name=\"ROBOTS\" content=\"NOINDEX,NOFOLLOW\"/>\n"+
 				"\t<meta name=\"description\" content=\"Meandre Flow\"/>\n"+
-				"\t<meta http-equiv=\"refresh\" content=\"2\" />\n"+
+				"\t<meta http-equiv=\"refresh\" content=\"6\" />\n"+
+				"\t<style type=\"text/css\">\n"+
+				"\timg {" +
+				"	border: 0px none white; " +
+				"   float: right; " +
+				"\t}\n" +
+				"\tbody { " +
+				"\t   color: #888; " +
+				"\t   background: white; " +
+				"\t   font-family: Helvetica, Arial, Verdana; " +
+				"\t   font-size:11px; " +
+				"\t}\n" +
+				"\t#main p {" +
+				"\t   text-align:center; " +
+				"\t   margin:200px auto 200px auto;" +
+				"}"+
+				"</style>"+
 				"</head>\n"+
 				"<body>\n" +
 				"<div id=\"menu\"> \n" +
-				"<h1>Meandre</h1>\n" +
+				"<img src=\"/public/resources/system/logo-meandre.gif\" />\n" +
 				"<div id=\"main\">\n"+
-				"No GUI component available at this point of execution.<br/>"+
-				new Date()+
+				"<p>No WebUI available at this point of execution.</br>"+
+				new Date()+"</p>"+
 				"</div>\n"+
 				"</div>\n"+
 				"</body>\n"+

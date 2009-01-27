@@ -2,10 +2,13 @@ package org.meandre.core.repository;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,7 +18,12 @@ import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.utils.vocabulary.RepositoryVocabulary;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolutionMap;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.larq.IndexBuilderString;
 import com.hp.hpl.jena.query.larq.IndexLARQ;
 import com.hp.hpl.jena.query.larq.LARQ;
@@ -102,7 +110,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 */
 	public RepositoryImpl ( Model mod ) {
 		// Initializing the repository
-		log.info("Initializing the repository");
+		log.finer("Initializing the repository");
 
 		this.model = mod;
 
@@ -124,7 +132,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 */
 	public void refreshCache () {
 		// Flushing the cache
-		log.info("Flushing the cached descriptions");
+		log.fine("Refreshing cached descriptions");
 		htComDescMap.clear();
 		setComRes.clear();
 		htFlowDescMap.clear();
@@ -134,7 +142,7 @@ public class RepositoryImpl implements QueryableRepository {
 
 		LARQ.removeDefaultIndex();
 
-		log.info("Refreshing cached descriptions");
+		log.finer("Refreshing cached descriptions");
 		// Query all the components
 		setComRes = getAvailableExecutableComponentsFromModel();
 		for ( Resource res:setComRes ) {
@@ -1028,6 +1036,48 @@ public class RepositoryImpl implements QueryableRepository {
 	public Set<Resource> getAvailableExecutableComponents () {
 		return setComRes;
 	}
+	
+
+    /**
+     * Creates a list of components sorted by either date or name and returns the first N (='limit') values
+     * @param sOrder The sorting order ("date" or "name" for now) - or null if no sorting required
+     * @param limit  The maximum number of values to be returned (or -1 if no limit)
+     * @return The list of components
+     */
+    public Collection<Resource> getAvailableExecutableComponentsOrderedBy(String sOrder, int limit) {
+        String sOrderBy = "";
+        if ( sOrder != null ) {
+            if ( sOrder.equals("date") )
+                sOrderBy = "DESC(?date) ?name";
+            else if ( sOrder.equals("name") )
+                sOrderBy = "?name DESC(?date)";
+        }
+
+        final String QUERY =
+            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
+            "PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
+            "PREFIX dc: <http://purl.org/dc/elements/1.1/>\n" +
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
+            "SELECT DISTINCT ?component " +
+            "WHERE {" +
+            "   ?component rdf:type meandre:executable_component ." +
+            "   ?component meandre:name ?name ." +
+            "   ?component dc:date ?date " +
+            "} " +
+            (sOrder != null ? "ORDER BY " + sOrderBy + " " : "") +
+            (limit >= 0 ? "LIMIT " + limit : "");
+
+        Query query = QueryFactory.create(QUERY) ;
+        QueryExecution exec = QueryExecutionFactory.create(query, model, null);
+        ResultSet results = exec.execSelect();
+
+        Collection<Resource> lstComponents = new LinkedList<Resource>();
+        while ( results.hasNext() )
+            lstComponents.add(results.nextSolution().getResource("component"));
+
+        return lstComponents;
+    }
+
 
 	/** Returns the set of available executable components stored
 	 * in the repository.
@@ -1157,6 +1207,47 @@ public class RepositoryImpl implements QueryableRepository {
 	public Set<Resource> getAvailableFlows() {
 		return setFlowRes;
 	}
+	
+    /**
+     * Creates a list of flows sorted by either date or name and returns the first N (='limit') values
+     * @param sOrder The sorting order ("date" or "name" for now) - or null if no sorting required
+     * @param limit  The maximum number of values to be returned (or -1 if no limit)
+     * @return The list of flows
+     */
+    public Collection<Resource> getAvailableFlowsOrderedBy(String sOrder, int limit) {
+        String sOrderBy = "";
+        if ( sOrder != null ) {
+            if ( sOrder.equals("date") )
+                sOrderBy = "DESC(?date) ?name";
+            else if ( sOrder.equals("name") )
+                sOrderBy = "?name DESC(?date)";
+        }
+
+        final String QUERY =
+            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
+            "PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
+            "PREFIX dc: <http://purl.org/dc/elements/1.1/>\n" +
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
+            "SELECT DISTINCT ?flow " +
+            "WHERE {" +
+            "   ?flow rdf:type meandre:flow_component ." +
+            "   ?flow meandre:name ?name ." +
+            "   ?flow dc:date ?date " +
+            "} " +
+            (sOrder != null ? "ORDER BY " + sOrderBy + " " : "") +
+            (limit >= 0 ? "LIMIT " + limit : "");
+
+        Query query = QueryFactory.create(QUERY) ;
+        QueryExecution exec = QueryExecutionFactory.create(query, model, null);
+        ResultSet results = exec.execSelect();
+
+        Collection<Resource> lstFlows = new ArrayList<Resource>();
+        while ( results.hasNext() )
+            lstFlows.add(results.nextSolution().getResource("flow"));
+
+        return lstFlows;
+    }
+
 
 
 	/** Returns the set of available flows descriptions in the repository.
@@ -1355,5 +1446,13 @@ public class RepositoryImpl implements QueryableRepository {
 	public Set<FlowDescription> getFlowsByTag ( String sTag ) {
 		return htFlowTags.get(sTag);
 	}
+
+	public Collection<Resource> getgetAvailableExecutableComponentsOrderedBy(
+			String order, int limit) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
 
 }

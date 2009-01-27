@@ -64,7 +64,7 @@ public class JythonExecutableComponentAdapterTest {
 		}
 		jeca.untrapOutputAndErrorStreams();
 		String sRes = jeca.getOutput().toString();
-		assertEquals("Hello World!\n",sRes);
+		assertTrue(sRes.indexOf("Hello World!")>=0);
 		assertEquals(0, jeca.getError().size());
 	}
 
@@ -90,16 +90,17 @@ public class JythonExecutableComponentAdapterTest {
 				new Hashtable<String, String> (),
 				new Hashtable<String, String> (),
 				new Hashtable<String, String> (), null,
-				"nothing", new Hashtable<String, String> (), thdMrProbe,cnf);
+				"nothing", new Hashtable<String, String> (), thdMrProbe,cnf, System.out);
 				
-		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf);
+		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf, System.out);
 		jeca.initialize(cc);
 		jeca.untrapOutputAndErrorStreams();
 		sRes = jeca.getOutput().toString();
-		assertEquals("Initialize called\n",sRes);
+		assertTrue(sRes.indexOf("Initialize called")>=0);
 		jeca.dispose(cc);
 		sRes = jeca.getOutput().toString();
-		assertEquals("Initialize called\nDispose called\n",sRes);
+		assertTrue(sRes.indexOf("Initialize called")>=0);
+		assertTrue(sRes.indexOf("Dispose called")>=0);
 		thdMrProbe.done();
 	}
 
@@ -124,8 +125,8 @@ public class JythonExecutableComponentAdapterTest {
 				new Hashtable<String, String> (),
 				new Hashtable<String, String> (),
 				new Hashtable<String, String> (), null,
-				"nothing", new Hashtable<String, String> (), thdMrProbe,cnf);
-		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf);
+				"nothing", new Hashtable<String, String> (), thdMrProbe,cnf, System.out);
+		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf, System.out);
 		try {
 			jeca.initialize(cc);
 			jeca.execute(cc);

@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.engine.MrProbe;
 import org.meandre.core.engine.MrProper;
+import org.meandre.plugins.PluginFactory;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
@@ -47,7 +48,9 @@ public class WebUI {
 	 * @param cnf The core configuration object
 	 * @throws WebUIException The server could not be started
 	 */
-	public WebUI(String flowUniqueID, MrProper mrProper, MrProbe mrProbe, int iPort, Logger log, CoreConfiguration cnf) throws WebUIException {
+	public WebUI(String flowUniqueID, MrProper mrProper, MrProbe mrProbe, 
+			int iPort, Logger log, CoreConfiguration cnf) 
+	throws WebUIException {
 		// Storing config values
 		this.sFlowUniqueID = flowUniqueID;
 		this.mrProper = mrProper;
@@ -61,7 +64,7 @@ public class WebUI {
 		this.server.setConnectors(new Connector[] { connector });
 
 		// Initialize the plugins
-		//PluginFactory.initializeGlobalPublicFileServer(server, log);
+		PluginFactory.initializeGlobalPublicFileServer(this.server,log,cnf);
 		//PluginFactory.initializeGlobalCorePlugins(server, log);
 
 		// Add the default WebUI dispatcher handler
@@ -80,8 +83,8 @@ public class WebUI {
 	 */
 	public void shutdown() throws Exception {
 		try{
-		this.server.stop();
-		this.server.getGracefulShutdown();
+			this.server.stop();
+			this.server.getGracefulShutdown();
 		}catch(Exception ex){
 			throw new Exception(ex);
 		}finally{

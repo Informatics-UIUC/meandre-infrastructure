@@ -6,7 +6,6 @@ import org.meandre.plugins.MeandrePlugin;
  * during the execution of a component.
  *
  * @author Xavier Llor&agrave;
- * @last-modified: Amit Kumar added the getFlowExecutionInstanceID function defn
  *
  */
 public interface ComponentContext 

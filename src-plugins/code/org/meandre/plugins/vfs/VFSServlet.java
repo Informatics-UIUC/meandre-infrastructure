@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.meandre.configuration.CoreConfiguration;
 import org.meandre.plugins.MeandrePlugin;
 
 import de.schlichtherle.io.File;
@@ -21,9 +22,7 @@ import de.schlichtherle.io.FileInputStream;
  * the zip/jar/tar.gz files. The files are mounted
  * as a Virtual file system.
  *
- * @author Amit Kumar
- * Created on Oct 25, 2007 1:00:45 AM
- * @modified for the core on Feb 23rd 2008
+ * @author Amit Kumar (modified by Xavier Llor&agrave; to fix the directory mismatch + add the setCoreConfig method)
  *
  */
 public class VFSServlet  
@@ -34,7 +33,7 @@ implements MeandrePlugin{
 	private static final long serialVersionUID = 1L;
 
 	/** Location of the vfs files*/
-	private static  String PUBLIC_RESOURCES_DIR = "resources/public";
+	private static  String PUBLIC_RESOURCES_DIR = "mnt";
 	
 	/** Unknow mime type */
 	public static final String UNKNOWN_MIME_TYPE = "application/x-unknown-mime-type";
@@ -51,7 +50,12 @@ implements MeandrePlugin{
 	/** Get the plugin logger */
 	protected Logger log;
 	
-	private Boolean inited;
+	/** Flag of already initiated */
+	private Boolean bInited;
+	
+	/** Core configuration object */
+	@SuppressWarnings("unused")
+	private CoreConfiguration cnf = new CoreConfiguration();
 
 	/** Sets the pluggin logger 
 	 * 
@@ -59,6 +63,15 @@ implements MeandrePlugin{
 	 */
 	public void setLogger ( Logger log ) {
 		this.log = log;
+	}
+	
+	
+	/** Sets the core configuration object to use.
+	 * 
+	 * @param cnf The core configuration object
+	 */
+	public void setCoreConfiguration ( CoreConfiguration cnf ) {
+		this.cnf = cnf;
 	}
 	
 	/**Initialize the property file
@@ -80,19 +93,13 @@ implements MeandrePlugin{
 		    }
 		    PUBLIC_RESOURCES_DIR = vfsProperties.getProperty("mount_dir", "mnt");
 
-		    log.info("Mounting from folder: " + PUBLIC_RESOURCES_DIR );
+		    log.finest("Mounting from folder: " + PUBLIC_RESOURCES_DIR );
 		    File file = new File( PUBLIC_RESOURCES_DIR);
 
 		    if(!file.exists()){
-		    	log.info("Creating the folder... "+ file.getAbsolutePath());
+		    	log.fine("Creating the folder... "+ file.getAbsolutePath());
 		    	file.mkdirs();
 		    }
-
-		    String[] fileName = file.list();
-		    for(int i=0; i < fileName.length; i++){
-		    	log.info("Mounting file: "+fileName[i]);
-		    }
-
 	}
 
 	/** Responds to a get request.
@@ -169,17 +176,17 @@ implements MeandrePlugin{
 	private java.io.File getFile(File file, String sFileName) {
 		// check of jar file exists
 		File compressedFileSystem = new File(file,sFileName+".jar");
-		log.info("Checking: "+ compressedFileSystem.getAbsolutePath());
+		log.finest("Checking: "+ compressedFileSystem.getAbsolutePath());
 		if(compressedFileSystem.exists()){
 			return compressedFileSystem;
 		}
 
-		log.info("Checking: "+ compressedFileSystem.getAbsolutePath());
+		log.finest("Checking: "+ compressedFileSystem.getAbsolutePath());
 		compressedFileSystem = new File(file,sFileName+".zip");
 		if(compressedFileSystem.exists()){
 			return compressedFileSystem;
 		}
-		log.info("Not found returning... null");
+		log.finest("Not found returning... null");
 		return null;
 	}
 
@@ -261,14 +268,14 @@ implements MeandrePlugin{
 	}
 
 	public void inited(Boolean success) {
-		this.inited= success;
+		this.bInited= success;
 	}
 
 	/**Return the status of the plugin
 	 * 
 	 */
 	public boolean isInited() {
-		return inited;
+		return bInited;
 	}
 	
 	/**This is a servlet not a filter

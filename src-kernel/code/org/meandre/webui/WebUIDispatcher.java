@@ -3,7 +3,6 @@ package org.meandre.webui;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,13 +27,11 @@ import org.mortbay.jetty.servlet.Context;
 /** This class dispatches the webui calls.
  * 
  * @author Xavier Llor&agrave;
- * @modified June 19th 2008 -fix for multipart requests.
  *
  */
 public class WebUIDispatcher extends AbstractHandler {
 
 	/** The parent of this handler */
-	@SuppressWarnings("unused")
 	private WebUI webUIParent = null;
 
 	/** The list of attached UI handlers */
@@ -79,7 +76,7 @@ public class WebUIDispatcher extends AbstractHandler {
 	 *            The request object
 	 * @param response
 	 *            The response object
-	 * @param dispath
+	 * @param dispatch
 	 *            The dispatch flag
 	 * @throws IOException
 	 *             An IO exception arised when processing the request
@@ -90,23 +87,23 @@ public class WebUIDispatcher extends AbstractHandler {
 			HttpServletResponse response, int dispatch) throws IOException,
 			ServletException {
 		
-		if ( target.startsWith("/admin/") )
+		target = target.replaceAll("^(/)+", "/");
+		if ( target.startsWith("/admin/") ) {
 			processAdminRequest(target,request,response,dispatch);
+		}
 		else if ( target.startsWith("/public/resources") ) {
 			resource_handler.handle(target, request, response, dispatch);
 		}
 		else {
-		
 			if (lstHandlers.size() > 0) {
 				Request base_request = (request instanceof Request) ? 
 		                (Request) request : 
-		                    HttpConnection.getCurrentConnection().getRequest();
+		                HttpConnection.getCurrentConnection().getRequest();
 
-		    		if (response.isCommitted() || base_request.isHandled())
-		    			return;
-		    		base_request.setHandled(true);
-		    		
-		    	// Seting the request and response status
+				if (response.isCommitted() || base_request.isHandled())
+					return;
+				base_request.setHandled(true);
+
 				response.setStatus(HttpServletResponse.SC_OK);
 				response.setContentType("text/html");
 				
@@ -115,7 +112,9 @@ public class WebUIDispatcher extends AbstractHandler {
 				boolean bHasParams = !request.getParameterMap().isEmpty();
 				String contentType = request.getContentType();
 				boolean isMultiPart = Boolean.FALSE;
-				if(contentType!=null &&contentType.startsWith("multipart/form-data")){
+				if ( (contentType!=null && contentType.startsWith("multipart/form-data")) || 
+					  request.getMethod().equalsIgnoreCase("post") || 
+					  request.getMethod().equalsIgnoreCase("put")  ){
 					isMultiPart = Boolean.TRUE;
 				}
 				int iSize = lstHandlers.size();
@@ -168,7 +167,7 @@ public class WebUIDispatcher extends AbstractHandler {
 				: HttpConnection.getCurrentConnection().getRequest();
 		base_request.setHandled(true);
 		
-		String [] saParts = new URL(request.getRequestURL().toString()).getPath().split("\\.");
+		String [] saParts = target.split("\\.");
    		String sTarget = saParts[0];
 		String sExtension = "";
 		PrintWriter pw = response.getWriter();	

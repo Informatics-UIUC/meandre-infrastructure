@@ -9,8 +9,7 @@ import java.util.logging.Logger;
 
 /** This class implements the basic factory for loggers.
  * 
- * @author Xavier Llor&agrave;
- * @modified -Amit Kumar added Formatter
+ * @author Xavier Llor&agrave; (modified -Amit Kumar added Formatter)
  */
 public class PluginsLoggerFactory {
 
@@ -32,18 +31,18 @@ public class PluginsLoggerFactory {
 		logPlugins.setLevel(Level.INFO);
 		try {
 			handlerPlugins = new FileHandler("."+File.separator+"log"+File.separator+"meandre-plugins.log",LOG_FILE_SIZE,LOG_NUM_ROTATING_FILES);
-			handlerPlugins.setFormatter(new ShortFormatter());
+			handlerPlugins.setFormatter(new MeandreFormatter());
 			logPlugins.addHandler(handlerPlugins);
 			Logger logger=logPlugins.getParent();
 			if(logger!=null){
 				Handler[] handlerList=logger.getHandlers();
 				for(int i=0;i< handlerList.length;i++){
-					handlerList[i].setFormatter(new ShortFormatter());
+					handlerList[i].setFormatter(new MeandreFormatter());
 				}	
 			}
 			Handler[] handlerList=logPlugins.getHandlers();
 			for(int i=0;i< handlerList.length;i++){
-				handlerList[i].setFormatter(new ShortFormatter());
+				handlerList[i].setFormatter(new MeandreFormatter());
 			}
 		} catch (SecurityException e) {
 			System.err.println("Could not initialize "+"."+File.separator+"log"+File.separator+"meandre-plugins.log");

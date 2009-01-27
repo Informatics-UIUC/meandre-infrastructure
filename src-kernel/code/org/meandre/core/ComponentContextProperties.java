@@ -1,5 +1,6 @@
 package org.meandre.core;
 
+import java.io.PrintStream;
 import java.net.URL;
 import java.util.logging.Logger;
 
@@ -66,7 +67,7 @@ public interface ComponentContextProperties {
 	 */
 	public void stopAllWebUIFragments ();
 
-	/** Get the webUI URL.
+	/** Gets the webUI URL.
 	 *
 	 * @param bName True if the url needs to be build using the name.
 	 *              False build the URL using the IP address.
@@ -77,6 +78,17 @@ public interface ComponentContextProperties {
 	 */
 	public URL getWebUIUrl ( boolean bName ) throws ComponentContextException;
 
+	/** Gets the proxied webUI URL.
+	 *
+	 * @param bName True if the url needs to be build using the name.
+	 *              False build the URL using the IP address.
+	 * @return The proxy webUI URL
+	 * @throws ComponentContextException Problem recovering the IP
+	 *
+	 *
+	 */
+	public URL getProxyWebUIUrl ( boolean bName ) throws ComponentContextException;
+
 	/** Returns the unique ID of the executable instance for the current flow.
 	 *
 	 * @return The unique execution instance ID
@@ -84,7 +96,7 @@ public interface ComponentContextProperties {
 	
 	public String getExecutionInstanceID ();
 	
-	/** Return the unique ID of the running flow.
+	/** Returns the unique ID of the running flow.
 	 *
 	 * @return The unique ID of the running flow
 	 */
@@ -96,10 +108,16 @@ public interface ComponentContextProperties {
 	 */
 	public String getFlowID();
 	
-	/**Return the plugin 
+	/** Returns the plugin 
 	 * 
-	 * @param id
-	 * @return
+	 * @param id The plugin id
+	 * @return The meandre plugin
 	 */
 	public MeandrePlugin getPlugin(String id);
+	
+	/** Returns the output console for the flow.
+	 * 
+	 * @return The output console
+	 */
+	public PrintStream getOutputConsole();
 }

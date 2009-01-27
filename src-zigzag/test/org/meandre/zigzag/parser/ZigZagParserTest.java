@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 
 import org.junit.Test;
+import org.meandre.configuration.CoreConfiguration;
 import org.meandre.webservices.MeandreServer;
 import org.meandre.zigzag.semantic.FlowGenerator;
 
@@ -26,7 +27,9 @@ public class ZigZagParserTest {
 	 */
 	@Test
 	public void testZigZagParserObject () throws Exception {
+		CoreConfiguration cnf = new CoreConfiguration();
 		MeandreServer ms = new MeandreServer();
+		ms.setCoreConfiguration(cnf);
 		ms.start(false);
 		
 		Thread.sleep(10000);
@@ -41,8 +44,10 @@ public class ZigZagParserTest {
 				 parser.start(); 
 		    }
 		    catch ( ParseException pe ) {
-		    	fail(pe.toString());
+			    ms.stop();
+			    fail(pe.toString());
 		    } catch (FileNotFoundException e) {
+		    	ms.stop();
 		    	fail(e.toString());
 			} 
 		}
@@ -75,7 +80,9 @@ public class ZigZagParserTest {
 	 */
 	@Test
 	public void testZigZagParserObjectAndMauGenerator () throws Exception {
+		CoreConfiguration cnf = new CoreConfiguration();
 		MeandreServer ms = new MeandreServer();
+		ms.setCoreConfiguration(cnf);
 		ms.start(false);
 		
 		Thread.sleep(10000);
@@ -91,8 +98,10 @@ public class ZigZagParserTest {
 				 parser.fg.generateMAU(file.getAbsolutePath().replaceAll(".zz$", ".mau"));
 		    }
 		    catch ( ParseException pe ) {
+		    	ms.stop();
 		    	fail(pe.toString());
 		    } catch (FileNotFoundException e) {
+		    	ms.stop();
 		    	fail(e.toString());
 			} 
 		}

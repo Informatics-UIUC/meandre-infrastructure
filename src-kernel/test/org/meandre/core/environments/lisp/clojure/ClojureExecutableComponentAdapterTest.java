@@ -1,7 +1,6 @@
 package org.meandre.core.environments.lisp.clojure;
 
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -64,13 +63,12 @@ public class ClojureExecutableComponentAdapterTest {
 					new Hashtable<String, String> (),
 					new Hashtable<String, String> (),
 					new Hashtable<String, String> (), null,
-					"nothing", new Hashtable<String, String> (), thdMrProbe, cnf);
+					"nothing", new Hashtable<String, String> (), thdMrProbe, cnf, System.out);
 					
-			@SuppressWarnings("unused")
-			ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf);
+			ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf, System.out);
 			ceca.initialize(cc);
 			ceca.untrapOutputAndErrorStreams();
-			assertEquals("Initialize Called\n",ceca.getOutput().toString());
+			assertTrue(ceca.getOutput().toString().indexOf("Initialize Called")>=0);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.toString());
@@ -100,16 +98,18 @@ public class ClojureExecutableComponentAdapterTest {
 					new Hashtable<String, String> (),
 					new Hashtable<String, String> (),
 					new Hashtable<String, String> (), null,
-					"nothing", new Hashtable<String, String> (), thdMrProbe,cnf);
+					"nothing", new Hashtable<String, String> (), thdMrProbe,cnf, System.out);
 					
-			ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf);
+			ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf, System.out);
 			
 			ceca.initialize(cc);
 			ceca.execute(cc);
 			
 			ceca.untrapOutputAndErrorStreams();
 			
-			assertEquals("Initialize Called\nNothing\n", ceca.getOutput().toString());
+			assertTrue(ceca.getOutput().toString().indexOf("Initialize Called")>=0);
+			assertTrue(ceca.getOutput().toString().indexOf("Nothing")>=0);
+
 			assertTrue(ceca.getError().size()==0);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -142,9 +142,9 @@ public class ClojureExecutableComponentAdapterTest {
 					new Hashtable<String, String> (),
 					new Hashtable<String, String> (),
 					new Hashtable<String, String> (), null,
-					"nothing", new Hashtable<String, String> (), thdMrProbe,cnf);
+					"nothing", new Hashtable<String, String> (), thdMrProbe,cnf, System.out);
 					
-			ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf);
+			ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf, System.out);
 			
 			ceca.initialize(cc);
 			ceca.execute(cc);
@@ -152,7 +152,10 @@ public class ClojureExecutableComponentAdapterTest {
 			
 			ceca.untrapOutputAndErrorStreams();
 			
-			assertEquals("Initialize Called\nNothing\nDispose Called\n", ceca.getOutput().toString());
+			assertTrue(ceca.getOutput().toString().indexOf("Initialize Called")>=0);
+			assertTrue(ceca.getOutput().toString().indexOf("Nothing")>=0);
+			assertTrue(ceca.getOutput().toString().indexOf("Dispose Called")>=0);
+			
 			assertTrue(ceca.getError().size()==0);
 		} catch (Exception e) {
 			e.printStackTrace();

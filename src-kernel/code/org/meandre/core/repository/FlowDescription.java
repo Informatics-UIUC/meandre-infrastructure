@@ -204,7 +204,7 @@ public class FlowDescription {
 
 	/** Sets the creation date of the flow.
 	 *
-	 * @param date The date
+	 * @param d The date
 	 */
 	public void setCreationDate ( Date d ) {
 		dateCreation = d;
@@ -230,6 +230,25 @@ public class FlowDescription {
 
 		return (ecd==null)?null:ecd.getExecutableComponent();
 
+	}
+	
+	/** Returns the executable component instance description based on the resource.
+	 * 
+	 * @param res The requested resource
+	 * @return The Executable component instance description
+	 */
+	public ExecutableComponentInstanceDescription getExecutableComponentInstanceDescription ( Resource res ) {
+		return htExecutableComponentInstances.get(res);
+	}
+
+	/** Returns the executable component instance description based on the stringfyed resource.
+	 * 
+	 * @param sRes The requested resource
+	 * @return The Executable component instance description
+	 */
+	public ExecutableComponentInstanceDescription getExecutableComponentInstanceDescription ( String sRes ) {
+		Resource res = ModelFactory.createDefaultModel().createResource(sRes);
+		return htExecutableComponentInstances.get(res);
 	}
 
 	/** Adds an executable component instance.

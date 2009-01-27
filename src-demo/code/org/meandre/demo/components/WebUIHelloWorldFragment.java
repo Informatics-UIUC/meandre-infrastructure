@@ -16,7 +16,7 @@ import org.meandre.webui.WebUIFragmentCallback;
 
 /** A demo of a web UI callback.
  *
- * @author Xavier llor&agrave;
+ * @author Xavier Llor&agrave;
  *
  */
 public class WebUIHelloWorldFragment implements ExecutableComponent, WebUIFragmentCallback {
@@ -64,7 +64,6 @@ public class WebUIHelloWorldFragment implements ExecutableComponent, WebUIFragme
 	/** This method gets called when a call with parameters is done to a given component
 	 * webUI fragment
 	 *
-	 * @param target The target path
 	 * @param request The request object
 	 * @param response The response object
 	 * @throws WebUIException A problem occurred during the call back
@@ -72,7 +71,7 @@ public class WebUIHelloWorldFragment implements ExecutableComponent, WebUIFragme
 	public void handle(HttpServletRequest request, HttpServletResponse response)
 	throws WebUIException {
 		String sDone = request.getParameter("done");
-		if ( sDone!=null ) {
+		if ( sDone!=null && sDone.equalsIgnoreCase("true") ) {
 			sem.release();
 		}
 		else
@@ -110,7 +109,7 @@ public class WebUIHelloWorldFragment implements ExecutableComponent, WebUIFragme
 			sem.acquire();
 			sem.release();
 			
-			System.out.println(">>>Done");
+			cc.getOutputConsole().println(">>>Done");
 			cc.stopWebUIFragment(this);
 		}
 		catch ( Exception e ) {

@@ -1,10 +1,9 @@
 package org.meandre.core;
 
 
-import java.net.InetAddress;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Set;
@@ -17,6 +16,7 @@ import org.meandre.core.engine.MrProbe;
 import org.meandre.core.engine.MrProper;
 import org.meandre.core.engine.WrappedComponent;
 import org.meandre.core.logger.KernelLoggerFactory;
+import org.meandre.core.utils.NetworkTools;
 import org.meandre.plugins.MeandrePlugin;
 import org.meandre.plugins.PluginFactory;
 import org.meandre.webui.PortScroller;
@@ -29,10 +29,6 @@ import org.meandre.webui.WebUIFragmentCallback;
 /** This class implement the component context for executable components.
  *
  * @author Xavier Llor&agrave;
- * @last-modified: Amit Kumar -added the getter for sFlowUniqueExecutionID
- * @last-modified: Amit Kumar -added support for flowID
- * @last-mofified: Amit Kumar -added support for getPlugin
- *
  *
  */
 public class ComponentContextImpl
@@ -94,9 +90,10 @@ implements ComponentContext {
 
 	/** The wrapped component parent */
 	private CoreConfiguration ccCnf = null;
+
+	/** The output console for the flow */
+	private PrintStream console = null;
 	
-
-
 	/** Create a component context with the given input and output active buffers
 	 * for a given wrapped component.
 	 *
@@ -110,6 +107,7 @@ implements ComponentContext {
 	 * @param htProperties The component properties
 	 * @param thdMrProbe The MrProbe thread
 	 * @param cnf The core configuration
+	 * @param console The output console
 	 */
 	public ComponentContextImpl(String sFlowUniqueID,String flowID,
 			String sComponentInstanceID, Set<ActiveBuffer> setInputs,
@@ -120,7 +118,8 @@ implements ComponentContext {
 			Hashtable<String, String> htProperties,
 			MrProbe thdMrProbe,
 			WrappedComponent wc,
-			CoreConfiguration cnf ) {
+			CoreConfiguration cnf,
+			PrintStream console) {
 
 		// Create the data proxy
 		this.sFlowUniqueExecutionID = sFlowUniqueID;
@@ -129,6 +128,7 @@ implements ComponentContext {
 		this.thdMrProbe = thdMrProbe;
 		this.wcParent = wc;
 		this.ccCnf = cnf;
+		this.console = console;
 
 		this.htInputLogicNameMap = htInputLogicNameMap;
 		this.htOutputLogicNameMap = htOutputLogicNameMap;
@@ -217,7 +217,7 @@ implements ComponentContext {
 
 	/** Returns the current data component on the given active buffer.
 	 *
-	 * @param The name of the input
+	 * @param sInputBuffer The name of the input
 	 * @return The data component
 	 * @throws ComponentContextException Violation of the component context detected
 	 */
@@ -357,27 +357,37 @@ implements ComponentContext {
 	 */
 	public URL getWebUIUrl ( boolean bName ) throws ComponentContextException {
 		URL urlRes = null;
-
+		
 		try {
-
-			InetAddress addr = InetAddress.getLocalHost();
-			String sHostName = null;
-
-			if ( bName )
-				sHostName = "http://"+addr.getCanonicalHostName()+":"+webui.getPort()+"/";
-			else
-				sHostName = "http://"+addr.toString()+":"+webui.getPort()+"/";
-
-			urlRes = new URL(sHostName);
-
-		} catch ( UnknownHostException e ) {
-			throw new ComponentContextException(e);
+			urlRes = new URL("http://"+NetworkTools.getLocalHostName()+":"+webui.getPort()+"/");
 		} catch (MalformedURLException e) {
 			throw new ComponentContextException(e);
 		}
 
 		return urlRes;
 	}
+	
+	/** Gets the proxied webUI URL.
+	 *
+	 * @param bName True if the url needs to be build using the name.
+	 *              False build the URL using the IP address.
+	 * @return The proxy webUI URL
+	 * @throws ComponentContextException Problem recovering the IP
+	 *
+	 *
+	 */
+	public URL getProxyWebUIUrl ( boolean bName ) throws ComponentContextException {
+		URL urlRes = null;
+		
+		try {
+			urlRes = new URL("http://"+NetworkTools.getLocalHostName()+":"+ccCnf.getBasePort()+"/webui/"+webui.getPort()+"/");
+		} catch (MalformedURLException e) {
+			throw new ComponentContextException(e);
+		}
+
+		return urlRes;
+	}
+
 
 	/** Returns the logging facility.
 	 *
@@ -445,10 +455,20 @@ implements ComponentContext {
 	/**Returns the plugin or null if there was a failure initing
 	 * the plugin
 	 * 
+	 * @param id The plugin id
+	 * @return The Meandre plugin
 	 */
 	public MeandrePlugin getPlugin(String id) {
 		PluginFactory  pluginFactory = PluginFactory.getPluginFactory(ccCnf);
 		MeandrePlugin mp=pluginFactory.getPlugin(id);
 		return mp;
+	}
+	
+	/** Returns the output console for the flow.
+	 * 
+	 * @return The output console
+	 */
+	public PrintStream getOutputConsole() {
+		return console;
 	}
 }

@@ -26,12 +26,11 @@ import com.hp.hpl.jena.rdf.model.Model;
 /** This class gathers together the tests related to MrProbe.
  * 
  * @author Xavier Llor&agrave;
- * @modified by Amit Kumar -Added error message to the abort flow probe
  */
 public class MrProbeTest {
 	
 	/** The base URI for the tests */
-	private static final String BASE_TEST_URI = "http://test.org/flow/0";
+	private static final String BASE_TEST_URI = "meandre://test.org/flow/0";
 
 	/** The number of repetitions of the battery of calls */
 	private final int NUMBER_OF_REPETITIONS = 10;
@@ -110,40 +109,42 @@ public class MrProbeTest {
 			
 			// Basic test running the NullProbeImpl
 			Conductor conductor = new Conductor(10,cnf);
-			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next());
-			runExecutor(exec);
+			ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
+			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), new PrintStream(baosOut));
+			runExecutor(exec,baosOut);
 
 			// Basic test running basic provenance to an RDF model
+			ByteArrayOutputStream baosOutProv = new ByteArrayOutputStream();
 			MeandreRDFDialectProbeImpl rdfModProbe = new MeandreRDFDialectProbeImpl();
 			MrProbe mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,false,false);
 			conductor = new Conductor(10,cnf);
-			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
-			runExecutor(exec);
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProv));
+			runExecutor(exec,baosOutProv);
 
 			// Basic test running basic provenance and data serialization to an RDF model
+			ByteArrayOutputStream baosOutProv2 = new ByteArrayOutputStream();
 			rdfModProbe = new MeandreRDFDialectProbeImpl();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,true,false);
 			conductor = new Conductor(10,cnf);
-			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
-			runExecutor(exec);
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProv2));
+			runExecutor(exec,baosOutProv2);
 
 			// Basic test running state storage provenance to an RDF model
+			ByteArrayOutputStream baosOutProvSto = new ByteArrayOutputStream();
 			rdfModProbe = new MeandreRDFDialectProbeImpl();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,false,true);
 			conductor = new Conductor(10,cnf);
-			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
-			runExecutor(exec);
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProvSto));
+			runExecutor(exec,baosOutProvSto);
 
 			// Basic test running state storage provenance to an RDF model
+			ByteArrayOutputStream baosOutProvSto3 = new ByteArrayOutputStream();
 			rdfModProbe = new MeandreRDFDialectProbeImpl();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,true,true);
 			conductor = new Conductor(10,cnf);
-			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
-			runExecutor(exec);
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProvSto3));
+			runExecutor(exec,baosOutProvSto3);
 			
-			// Model mod = rdfModProbe.getModel();
-			// mod.write(System.out,"TTL",null);
-			// System.out.println(mod.size());
 		}
 		catch ( Exception e ) {
 			e.printStackTrace();
@@ -164,8 +165,9 @@ public class MrProbeTest {
 			Conductor conductor = new Conductor(10,cnf);
 			StatisticsProbeImpl spi = new StatisticsProbeImpl();
 			MrProbe mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),spi,false,false);
-			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe);
-			runExecutor(exec);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baos));
+			runExecutor(exec,baos);
 			
 			// Test the stats are there
 			JSONObject jsonStats = spi.getSerializedStatistics();
@@ -197,12 +199,11 @@ public class MrProbeTest {
 	/** Runs an executor for the demo hello world example.
 	 * 
 	 * @param exec The executor to use
-	 * @return
+	 * @param baosOut The output stream
 	 */
-	private void runExecutor(Executor exec) {
+	private void runExecutor(Executor exec, ByteArrayOutputStream baosOut) {
 		PrintStream psOut = System.out;
 		PrintStream psErr = System.err;
-		ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
 		ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(baosOut));
 		System.setErr(new PrintStream(baosErr));
@@ -216,7 +217,7 @@ public class MrProbeTest {
 		assertEquals(0,baosErr.size());
 		
 		String sResult = "HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C01234567) HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C01234567)  \n";
-		assertEquals(sResult.length(),baosOut.size());
+		assertTrue(sResult.length()==baosOut.size() || sResult.length()+1==baosOut.size());
 	}
 
 	/** Creates a MrProbe thread for the given probe, runs a battery of probe calls
@@ -253,7 +254,7 @@ public class MrProbeTest {
 			QueryableRepository qr = new RepositoryImpl(model);
 			CoreConfiguration cnf = new CoreConfiguration();
 			Conductor cnd = new Conductor(10,cnf);
-			Executor exec = cnd.buildExecutor(qr, qr.getAvailableFlowDescriptions().iterator().next().getFlowComponent());
+			Executor exec = cnd.buildExecutor(qr, qr.getAvailableFlowDescriptions().iterator().next().getFlowComponent(), System.out);
 			WrappedComponent wc = exec.getWrappedComponents().iterator().next();
 			// Run the tests
 			//String rands=Math.random()+"";

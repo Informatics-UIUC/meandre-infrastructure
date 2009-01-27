@@ -3,8 +3,6 @@ package org.meandre.client;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -13,7 +11,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.meandre.core.security.SecurityManager;
 import org.meandre.core.store.security.SecurityManagerProctor;
+import org.meandre.core.utils.NetworkTools;
 import org.meandre.webservices.MeandreServer;
+import org.meandre.webservices.logger.WSLoggerFactory;
 
 
 /**
@@ -32,7 +32,8 @@ public class MeandreAdminClientTest {
     private static String _serverUrl = "localhost";
     private static int _serverPort = 1704;
     
-    private static String _workingDir = "./test/output/";
+    //made crossplatform in setupBeforeClass
+    private static String _workingDir = "./test/output/MeandreAdminClientTest";
 
 
     
@@ -42,10 +43,9 @@ public class MeandreAdminClientTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         log("setupBeforeClass begin");
-        try {
-            _serverUrl = InetAddress.getLocalHost().getCanonicalHostName();
-        } catch (UnknownHostException e) {
-        }
+        _serverUrl = NetworkTools.getLocalHostName();
+        
+        _workingDir = _workingDir.replace('/', File.separatorChar);
         
         File fWorkDir = new File(_workingDir);
         if(!fWorkDir.exists()){
@@ -75,6 +75,7 @@ public class MeandreAdminClientTest {
         log("tearDownAfterClass begin");
          _secManager = null;
         _server.stop();
+        MeandreServer.uninstall(new File(_workingDir));
         _server = null;
         log("tearDownAfterClass end");        
     }
@@ -82,6 +83,7 @@ public class MeandreAdminClientTest {
     @Before
     public void setUp() throws Exception {
         log("setup begin");
+        SecurityManagerProctor.removeAllButAdmin(_secManager);
         log("setup end");
     }
 
@@ -107,12 +109,6 @@ public class MeandreAdminClientTest {
     public void testRemoveUser() {
         SecurityManagerProctor.testRemoveUser(_secManager);
     }
-
- /*   @Test
-    public void testGetUsersNickNames() {
-        SecurityManagerProctor.testGetUsersNickNames(_secManager);
-    }
-    */
 
     @Test
     public void testGetUsers() {
@@ -186,7 +182,7 @@ public class MeandreAdminClientTest {
     }
   */  
     private static void log(String msg){
-        System.out.println("MeandreAdminClientTest." + msg);
+        WSLoggerFactory.getWSLogger().info("MeandreAdminClientTest." + msg);
     }
 
 }

@@ -1,7 +1,5 @@
 package org.meandre.core.engine;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -9,6 +7,7 @@ import java.util.logging.Logger;
 
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.logger.KernelLoggerFactory;
+import org.meandre.core.utils.NetworkTools;
 import org.meandre.webui.WebUI;
 import org.meandre.webui.WebUIException;
 import org.meandre.webui.WebUIFactory;
@@ -31,7 +30,6 @@ public class Executor {
 	private Set<? extends WrappedComponent> setWC = null;
 
 	/** The monitoring and cleaning thread for this Meandre Flow */
-	@SuppressWarnings("unused")
 	private MrProper thdMrPropper = null;
 
 	/** The flow unique execution ID */
@@ -65,6 +63,7 @@ public class Executor {
 	 * @param iPriority The execution priority
 	 */
 	public void execute ( int iPriority, WebUI webui ) {
+		log.info("Executing flow "+sFlowUniqueExecutionID);
 		// Setting up MrProbe info
 		WrappedComponent wcTmp = setWC.iterator().next();
 		MrProbe thdMrProbe = wcTmp.thdMrProbe;
@@ -84,8 +83,7 @@ public class Executor {
 		}
 		
 		try {
-			if ( webui!=null )
-				WebUIFactory.disposeWebUI(sFlowUniqueExecutionID);
+			WebUIFactory.disposeWebUI(sFlowUniqueExecutionID);
 		} catch (WebUIException e) {
 			log.warning("WebUI could not be stoped: "+e.getMessage());
 		}
@@ -140,21 +138,14 @@ public class Executor {
 	/**This function is protocol dependent. When changing the application
 	 * to Https -we need to modify this function
 	 * 
-	 * @param nextPortForUse
-	 * @return
+	 * @param nextPortForUse Use the provided port
+	 * @return Returns the host web URL
 	 */
 	private String getHostWebUrl(int nextPortForUse) {
-			try {
-				return 	"http://"+InetAddress.getLocalHost().getCanonicalHostName()+":"+ nextPortForUse+"/";
-			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			};
-			return "http://127.0.0.1:"+nextPortForUse+"/";
-		}
-		
-		
-
+			String sServer = NetworkTools.getLocalHostName();
+			return "http://"+sServer+":"+nextPortForUse+"/";
+	}
+	
 	/** Fires the execution of a given MeandreFlow.
 	 * 
 	 * 
@@ -206,6 +197,14 @@ public class Executor {
 	 */
 	public String getFlowUniqueExecutionID() {
 		return sFlowUniqueExecutionID;
+	}
+
+	/** Returns the name of the thread groups.
+	 * 
+	 * @return The name of the thread group
+	 */
+	public String getThreadGroupName() {
+		return tg.getName();
 	}
 
 }

@@ -127,7 +127,7 @@ public class ExecutableComponentInstanceDescriptionTest {
 	}
 
 	/**
-	 * Test method for {@link org.meandre.core.store.repository.ExecutableComponentInstanceDescription#getName()}.
+	 * Test method for {@link org.meandre.core.store.repository.ExecutableComponentInstanceDescription#getServerID()}.
 	 */
 	@Test
 	public void testGetName() {

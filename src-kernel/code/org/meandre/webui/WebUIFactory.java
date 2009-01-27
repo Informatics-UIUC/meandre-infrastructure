@@ -26,8 +26,11 @@ public class WebUIFactory {
 	// /** The incremental port counter to start execution ports */
 	// private static int iPortScroller = -1;
 	
-	/** The hashtable maintaning the current active webUIs */
+	/** The hashtable maintanins the current active webUIs */
 	protected static Hashtable<String,WebUI> htActiveWebUI = new Hashtable<String,WebUI>();
+	
+	/** This hashtable maintains the port mapping to the webUI */
+	protected static Hashtable<Integer,WebUI> htActivePortWebUI = new Hashtable<Integer, WebUI>();
 	
 	/** Get a WebUI for the given executing flow. If the webui does not exist
 	 * for the given flow, it gets created and initalized the first 
@@ -38,18 +41,20 @@ public class WebUIFactory {
 	 * @return The webui object
 	 * @throws WebUIException An exception occurred while initializing a web
 	 */
-	static public WebUI getWebUI ( String sFlowUniqueID, MrProper mrProper, MrProbe mrProbe, CoreConfiguration cnf, int port ) throws WebUIException {
+	static public WebUI getWebUI ( String sFlowUniqueID, MrProper mrProper, MrProbe mrProbe, CoreConfiguration cnf, int port ) 
+	throws WebUIException {
 		WebUI webui = htActiveWebUI.get(sFlowUniqueID);
 		
 		if ( webui==null ) {
 			webui = new WebUI(sFlowUniqueID,mrProper,mrProbe,port,log,cnf);
 			htActiveWebUI.put(sFlowUniqueID, webui);
+			htActivePortWebUI.put(port, webui);
 		}
 		
 		return webui;
 	}
 	
-	/** Get a WebUI for the given executing flow. If the webui does not exist
+	/** Gets a WebUI for the given executing flow. If the webui does not exist
 	 * returns null.
 	 * 
 	 * @param sFlowUniqueID The flow execution unique ID
@@ -61,6 +66,17 @@ public class WebUIFactory {
 		
 		return webui;
 	}
+	
+	/** Gets a WebUI for the given port. If the webui does not exist
+	 * returns null.
+	 * 
+	 * @param iPort The port associated to the web ui
+	 * @return The webui object
+	 * @throws WebUIException An exception occurred while initializing a web
+	 */
+	static public WebUI getExistingWebUIOnPort ( int iPort ) {
+		return htActivePortWebUI.get(iPort);
+	}
 
 
 	/** Shuts down all the WebUI for the given executing flow. It
@@ -70,8 +86,9 @@ public class WebUIFactory {
 	 * @param sFlowUniqueID The flow execution unique ID
 	 * @throws WebUIException The server could not be shuted down
 	 */
-	static public void disposeWebUI (  String sFlowUniqueID ) throws WebUIException {
+	static public void disposeWebUI ( String sFlowUniqueID ) throws WebUIException {
 		WebUI webui = htActiveWebUI.get(sFlowUniqueID);
+		int iPort = webui.getPort();
 		
 		if ( webui!=null ) {
 			try {
@@ -80,6 +97,7 @@ public class WebUIFactory {
 				throw new WebUIException(e);
 			}
 			htActiveWebUI.remove(sFlowUniqueID);
+			htActivePortWebUI.remove(iPort);
 		}		
 	}
 	
@@ -91,5 +109,12 @@ public class WebUIFactory {
 		return htActiveWebUI.keySet();
 	}
 	
+	/** Returns the set of ports running flows.
+	 * 
+	 * @return The set of currently in use ports
+	 */
+	static public Set<Integer> getActivePorts () {
+		return htActivePortWebUI.keySet();
+	}
 
 }

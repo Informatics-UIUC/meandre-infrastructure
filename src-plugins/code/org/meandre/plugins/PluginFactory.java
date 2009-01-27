@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,8 +29,6 @@ import org.mortbay.jetty.servlet.ServletHolder;
 /**This class provides a basic factory for managing plugins.
  *
  * @author Xavier Llor&agrave;
- * @modified Amit Kumar -added support for Filters and getter Method for
- * plugin information June 27th 2008
  */
 public class PluginFactory {
 
@@ -47,6 +47,12 @@ public class PluginFactory {
 	/** The core configuration object */
 	private CoreConfiguration cnf;
 
+	/** Files to transfer to the public directory */
+	private final static String [] saResources = { "logo-meandre.gif" };
+	
+	/** The target directory insed the public resources dir */
+	private final static String sRescoureDestination = "system/";
+		
 	/** Creates an unitialized plugin factory and avoids other to instantiate it.
 	 *
 	 */
@@ -126,8 +132,9 @@ public class PluginFactory {
 	 *
 	 * @param server The server to user
 	 * @param log The logger to use
+	 * @param cnf The core configuration object
 	 */
-	public void initializeGlobalPublicFileServer(Server server, Logger log) {
+	public static void initializeGlobalPublicFileServer(Server server, Logger log, CoreConfiguration cnf) {
 		//
 		// Initializing the public file server
 		//
@@ -139,15 +146,38 @@ public class PluginFactory {
 			try {
 				PrintStream ps = new PrintStream(new FileOutputStream(file.getAbsolutePath()+File.separator+"readme.txt"));
 				ps.println("Meandre Execution Engine version "+Constants.MEANDRE_VERSION);
-				ps.println("All rights reserved by DITA, NCSA, UofI (2007-2008)");
+				ps.println("All rights reserved by DITA, NCSA, UofI (2007-2009)");
 				ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 				ps.println();
 				ps.println("This directory contains all the publicly available implementations for the Meandre components.");
 				ps.println();
 				ps.println("Created on "+new Date());
+				
 				log.warning("The resource directory does not exist - creating a new one...");
+				
 			} catch (FileNotFoundException e) {
 				log.warning("Could not create the resource directory");
+			}
+		}
+		
+		File fileResDir = new File(file.getAbsolutePath()+File.separator+sRescoureDestination);
+		if  ( fileResDir.mkdir() )  {
+			try {
+				for ( String sFile:saResources ) {
+					InputStream fis = PluginFactory.class.getResourceAsStream(sFile);
+					FileOutputStream fos = new FileOutputStream(fileResDir.getAbsolutePath()+File.separator+sFile);
+					int iTmp;
+					while ( (iTmp=fis.read())!=-1 )
+						fos.write(iTmp);
+					fos.close();
+					fis.close();
+				}
+				
+				log.warning("The system resources missing. Adding them...");
+			} catch (FileNotFoundException e) {
+				log.warning("Could not create the resource directory");
+			} catch (IOException e) {
+				log.warning("Could not unpack public system resources");
 			}
 		}
 
