@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Meandre-Infrastructure" basedir="." default="dist">
-    <!-- Check whether Java 1.5 is being used -->
+    <!-- Check whether Java 1.5+ is being used -->
     <condition property="using.java.1.5">
         <or>
-            <contains string="${java.version}" substring="1.5"/>
+            <equals arg1="${ant.java.version}" arg2="1.5"/>
+            <equals arg1="${ant.java.version}" arg2="1.6"/>
         </or>
     </condition>
 
@@ -13,8 +14,9 @@
     </condition>
 
     <!-- Make sure we're running under the correct environment -->
-    <fail message="This package requires Ant 1.7." unless="using.ant.1.7"/>
-    <fail message="This package requires Java 5. Please set JAVA_HOME to point to where JDK 1.5 is installed."
+    <fail message="This project requires Ant 1.7, and you have Ant ${ant.version}. Please update your Ant version."
+    	  unless="using.ant.1.7"/>
+    <fail message="This project requires Java 5 or greater. Please set JAVA_HOME to point to the proper JDK location."
           unless="using.java.1.5"/>
 
     <!-- import properties (app settings, classpath, jar file locations) -->
