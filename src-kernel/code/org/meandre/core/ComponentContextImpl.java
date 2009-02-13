@@ -19,6 +19,7 @@ import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.utils.NetworkTools;
 import org.meandre.plugins.MeandrePlugin;
 import org.meandre.plugins.PluginFactory;
+import org.meandre.webui.ConfigurableWebUIFragmentCallback;
 import org.meandre.webui.PortScroller;
 import org.meandre.webui.WebUI;
 import org.meandre.webui.WebUIException;
@@ -316,7 +317,13 @@ implements ComponentContext {
 	 */
 	public void startWebUIFragment ( WebUIFragmentCallback wuiCall ) {
 		synchronized ( htWebUIframent ) {
-			WebUIFragment wuif = new WebUIFragment(sComponentInstanceID, wuiCall);
+			WebUIFragment wuif = null;
+			try {
+				wuif = new WebUIFragment(sComponentInstanceID,(ConfigurableWebUIFragmentCallback)wuiCall);
+			}
+			catch ( ClassCastException e) {
+				wuif = new WebUIFragment(sComponentInstanceID, wuiCall);
+			}
 			webui.addFragment(wuif);
 			htWebUIframent.put(wuiCall,wuif);
 		}
