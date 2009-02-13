@@ -51,9 +51,13 @@ def execute_flow ( request, response, format ):
                 tokens = [str(System.currentTimeMillis()) for i in range(len(uris))]
             else :
                 tokens = params['token']
-            stats = ['statistics' in params for i in range(len(uris))]
+            if 'statistics' not in params :
+                stats = ['true' in params for i in range(len(uris))]
+            else :
+                stats = params['statistics']
             content = []
             for flow_uri, stat, token in zip(uris,stats,tokens): 
+                stat = stat=='true'
                 statusOK(response)
                 qr = meandre_store.getRepositoryStore(getMeandreUser(request))
                 job = JobDetail()
@@ -61,7 +65,7 @@ def execute_flow ( request, response, format ):
                 jiba = meandre_store.getJobInformation()
                 if format == 'txt' :
                     fuid = InteractiveExecution.createUniqueExecutionFlowID(flow_uri,meandre_config.getBasePort())
-                    jiba.startJob(fuid)
+                    jiba.startJob(fuid,getMeandreUser(request))
                     res = InteractiveExecution.executeVerboseFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,stat,token,job,fuid,jiba)
                     if res :
                         jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_COMPLETED)
@@ -69,7 +73,7 @@ def execute_flow ( request, response, format ):
                         jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_ABORTED)
                 elif format == 'silent': 
                     fuid = InteractiveExecution.createUniqueExecutionFlowID(flow_uri,meandre_config.getBasePort())
-                    jiba.startJob(fuid)
+                    jiba.startJob(fuid,getMeandreUser(request))
                     res = InteractiveExecution.executeSilentFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,token,job,fuid,jiba)
                     if res :
                         jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_COMPLETED)
@@ -203,7 +207,7 @@ def execute_repository ( request, response, format ):
                 jiba = meandre_store.getJobInformation()
                 if format == 'txt' :
                     fuid = InteractiveExecution.createUniqueExecutionFlowID(flow_uri,meandre_config.getBasePort())
-                    jiba.startJob(fuid)
+                    jiba.startJob(fuid,getMeandreUser(request))
                     res = InteractiveExecution.executeVerboseFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,stat,token,job,fuid,jiba)
                     if res :
                         jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_COMPLETED)
@@ -211,7 +215,7 @@ def execute_repository ( request, response, format ):
                         jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_ABORTED)
                 elif format == 'silent': 
                     fuid = InteractiveExecution.createUniqueExecutionFlowID(flow_uri,meandre_config.getBasePort())
-                    jiba.startJob(fuid)
+                    jiba.startJob(fuid,getMeandreUser(request))
                     res = InteractiveExecution.executeSilentFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,token,job,fuid,jiba)
                     if res :
                         jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_COMPLETED)

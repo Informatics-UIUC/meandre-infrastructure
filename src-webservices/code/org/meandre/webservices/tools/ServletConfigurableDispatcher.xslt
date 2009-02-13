@@ -342,6 +342,9 @@
 			          				</xsl:if>
 			          				<xsl:if test="status">
 			          					<th>Status</th>
+			          				</xsl:if>	
+			          				<xsl:if test="user_id">
+			          					<th>User</th>
 			          				</xsl:if>		
 			          				<xsl:if test="uptime">
 			          					<th>Uptime</th>
@@ -606,6 +609,14 @@
 		          				</xsl:if>
 		          				<xsl:if test="status">
 		          					<td><xsl:value-of select="status"/></td>
+		          				</xsl:if>	
+		          				<xsl:if test="user_id">
+		          					<td>
+		          						<a>
+						     				<xsl:attribute name="href">/services/security/user.html?user_name=<xsl:value-of select="user_id"/></xsl:attribute> 
+											<xsl:value-of select="user_id"/>
+					     				</a>
+				     				</td>
 		          				</xsl:if>		
 		          				<xsl:if test="uptime">
 		          					<td><xsl:value-of select="uptime"/></td>

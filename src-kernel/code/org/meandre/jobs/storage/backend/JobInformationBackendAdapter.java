@@ -513,14 +513,16 @@ public abstract class JobInformationBackendAdapter {
 	/** Records that a job started.
 	 * 
 	 * @param sJobID The job ID login the entry
+	 * @param sUser The user ID
 	 */
-	public void startJob ( String sJobID ) {
+	public void startJob ( String sJobID, String sUser ) {
 		try {
 			String sQueryIJS = propQueryMapping.getProperty(QUERY_INSERT_JOB_STATUS);
 			Object [] oaValuesUpdate = {
 					sServerID,
 					sJobID,
-					JOB_STATUS_RUNNING
+					JOB_STATUS_RUNNING,
+					sUser
 				};
 			executeUpdateQueryWithParams(sQueryIJS, oaValuesUpdate);
 			

@@ -9,6 +9,7 @@
 				(server_ID CHAR(16),
 				 job_ID CHAR(250), 
 				 status CHAR(1) default 'U', 
+				 user_id char(40) default 'unknown',
 				 ts timestamp,
 				 PRIMARY KEY(server_ID,job_ID))
 	</entry>
@@ -40,8 +41,8 @@
 				VALUES (?,?,?,?,CURRENT TIMESTAMP)
 	</entry>
 	<entry key="INSERT_JOB_STATUS">
-			INSERT INTO meandre_job_status (server_ID,job_ID,status,ts)
-				VALUES (?,?,?,CURRENT TIMESTAMP)
+			INSERT INTO meandre_job_status (server_ID,job_ID,status,user_id,ts)
+				VALUES (?,?,?,?,CURRENT TIMESTAMP)
 	</entry>
 	<entry key="UPDATE_JOB_STATUS">
 			UPDATE meandre_job_status

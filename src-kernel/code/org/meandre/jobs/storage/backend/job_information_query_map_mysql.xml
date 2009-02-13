@@ -8,7 +8,8 @@
 			CREATE TABLE meandre_job_status 
 				(server_ID CHAR(16),
 				 job_ID CHAR(250), 
-				 status CHAR(1) default 'D', 
+				 status CHAR(1) default 'U', 
+				 user_id char(40) default 'unknown',
 				 ts TIMESTAMP,
 				 PRIMARY KEY(server_ID,job_ID))
 	</entry>
@@ -43,8 +44,8 @@
 				VALUES (?,?,?,?)
 	</entry>
 	<entry key="INSERT_JOB_STATUS">
-			INSERT INTO meandre_job_status (server_ID,job_ID,status)
-				VALUES (?,?,?)
+			INSERT INTO meandre_job_status (server_ID,job_ID,status,user_id)
+				VALUES (?,?,?,?)
 	</entry>
 	<entry key="UPDATE_JOB_STATUS">
 			UPDATE meandre_job_status

@@ -73,6 +73,11 @@ public class InteractiveExecution {
 
 		// Create the execution
 		FlowDescription fd = qr.getFlowDescription(qr.getModel().createResource(sURI));
+		if ( fd == null ) {
+			pw.println("Requested flow "+sURI+" does not exist in the users repository");
+			return false;
+		}
+			
 		Resource resURI = fd.getFlowComponent();
 		pw.println("Preparing flow: "+sURI);
 		Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);

@@ -228,7 +228,7 @@ public class JobInformationBackendAdapterTest {
 		
 		// Start jobs
 		for ( int i=0; i<TIMES; i++ )
-			ba.startJob(JID+i);
+			ba.startJob(JID+i,"test");
 		
 		// Retrieve jobs
 		for ( int i=0; i<TIMES; i++ )
@@ -239,11 +239,16 @@ public class JobInformationBackendAdapterTest {
 		
 		// Retrieve all the jobs
 		for ( Map<String,String> mapStatus:ba.getJobStatuses() )
-			if ( mapStatus.get("job_id").startsWith(JID) )
+			if ( mapStatus.get("job_id").startsWith(JID) ) {
 				assertEquals(
 						JobInformationBackendAdapter.JOB_STATUS_RUNNING, 
 						mapStatus.get("status")
 					);
+				assertEquals(
+						"test", 
+						mapStatus.get("user_id")
+					);
+			}
 		
 		// Change jobs status
 		for ( int i=0; i<TIMES; i++ )
