@@ -14,8 +14,14 @@ public class WebUIFragment implements WebUIFragmentCallback {
 	/** The fragment ID */
 	private String eciID = null;
 	
-	/** the webui fragment callback */
+	/** The webui fragment callback */
 	private WebUIFragmentCallback wuif = null;
+
+	/** Should this behave as a configurable WebUI? */
+	private boolean configurable;
+
+	/** If it is a configurable WebUI this contains the path we should response to */
+	private String path;
 
 	/** Creates a webui fragment for the given component instance
 	 * using the provided callback methods.
@@ -26,6 +32,21 @@ public class WebUIFragment implements WebUIFragmentCallback {
 	public WebUIFragment ( String eciID, WebUIFragmentCallback wuif ) {
 		this.eciID = eciID;
 		this.wuif = wuif;
+		this.configurable = false;
+		this.path = null;
+	}
+	
+	/** Creates a webui fragment for the given component instance
+	 * using the provided a configurable callback methods.
+	 * 
+	 * @param eciID The executable component ID
+	 * @param wuif
+	 */
+	public WebUIFragment ( String eciID, ConfigurableWebUIFragmentCallback wuif ) {
+		this.eciID = eciID;
+		this.wuif = wuif;
+		this.configurable = true;
+		this.path = wuif.getContextPath();
 	}
 	
 	/** Returns the fragment ID.
@@ -59,4 +80,28 @@ public class WebUIFragment implements WebUIFragmentCallback {
 		wuif.handle(request, response);
 	}
 
+	/** Based on the request URL path, this methods checks if this fragment should
+	 *  response to this request.
+	 *  
+	 * @param sTarget The requested target
+	 * @return True if this fragment should response to this fragment, false otherwise
+	 */
+	public boolean canHandleRequest ( String sTarget ) {
+		boolean bRes = false;
+		
+		if ( this.configurable )
+			bRes = sTarget.startsWith(this.path);
+		else
+			bRes = sTarget.startsWith("/"+this.eciID);
+		
+		return bRes;
+	}
+	
+	/** True if this is a configurable webui fragment.
+	 * 
+	 * @return True if configurable, false otherwise 
+	 */
+	public boolean isConfigurable() {
+		return this.configurable;
+	}
 }

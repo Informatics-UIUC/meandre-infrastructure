@@ -203,4 +203,66 @@ public class WebUITest {
 	}
 
 
+	/** Test a single configurable fragment call.
+	 * 
+	 */
+	@Test
+	public void WebuUIConfigurableFragmentTest () {
+		
+		final String URL_FRAGMENT_PATH = "/test/url";
+		 try {
+			WebUI  webui = WebUIFactory.getWebUI(this.sFlowUniqueID, this.mrProper, this.mrProbe, this.cnf, this.port);
+			assertNotNull(webui);
+			
+			// Create a dummy fagment
+			WebUIFragment wuif = new WebUIFragment("a-fragment", new ConfigurableWebUIFragmentCallback(){
+
+				public void emptyRequest(HttpServletResponse response)
+						throws WebUIException {
+					fail("Empty should have never been called");
+				}
+
+				public void handle(HttpServletRequest request,
+						HttpServletResponse response) throws WebUIException {
+					String sParam = request.getParameter("param");
+					try {
+						response.setStatus(HttpServletResponse.SC_OK);
+						response.setContentType("plain/text");
+						response.getWriter().print("Not empty: "+sParam);
+					} catch (IOException e) {
+						throw new WebUIException(e);
+					}
+				}
+
+				public String getContextPath() {
+					return URL_FRAGMENT_PATH;
+				}
+			}) ;
+			
+			// Add the fragment
+			webui.addFragment(wuif);
+			
+			// Test the empty request
+			String sEmpytResponse = getGetRequestContent("/");
+			//System.out.println(sEmpytResponse);
+			assertEquals("",sEmpytResponse);
+			
+			// Test the none empty request
+			String sNotEmptyResponse = getGetRequestContent(URL_FRAGMENT_PATH+"?param=Hello");
+			//System.out.println(sNotEmptyResponse);
+			assertEquals("Not empty: Hello",sNotEmptyResponse);
+			
+			// Dispose the webui
+			WebUIFactory.disposeWebUI(this.sFlowUniqueID);
+			
+		 } catch (WebUIException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			PrintStream ps = new PrintStream(baos);
+			e.printStackTrace(ps);
+			fail("Failed to create webui "+baos.toString());
+		}
+		
+	}
+
+
 }

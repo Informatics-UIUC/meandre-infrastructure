@@ -122,22 +122,29 @@ public class WebUIDispatcher extends AbstractHandler {
 				for ( ; iCnt<iSize ; iCnt++ ) {
 					WebUIFragment wuif = lstHandlers.get(iCnt);
 					try {
-						// Check if any paramater has been passed
-						if (bHasParams || isMultiPart) {
-							// Only pass them them to the target
-							if (target.startsWith("/" + wuif.getFragmentID()))
+						if ( wuif.isConfigurable() ) {
+							if (wuif.canHandleRequest(target)) 
 								wuif.handle(request, response);
-							else
-								wuif.emptyRequest(response);
-						} else {
-							// Empty call updated all fragments
-							wuif.emptyRequest(response);
 						}
-						// This implementations avoid concurrent access to the
-						// list.
-						if ( iSize != lstHandlers.size() ) {
-							iSize--;
-							iCnt--;
+						else {
+							// Not configurable WebUIs
+							// Check if any paramater has been passed
+							if (bHasParams || isMultiPart) {
+								// Only pass them them to the target
+								if (wuif.canHandleRequest(target))
+									wuif.handle(request, response);
+								else
+									wuif.emptyRequest(response);
+							} else {
+								// Empty call updated all fragments
+								wuif.emptyRequest(response);
+							}
+							// This implementations avoid concurrent access to the
+							// list.
+							if ( iSize != lstHandlers.size() ) {
+								iSize--;
+								iCnt--;
+							}
 						}
 							
 					} catch (WebUIException e) {
