@@ -74,8 +74,8 @@ public class ZigZagConsole {
 	 */
 	public void resetFlowDescriptor() {
 		fg = new FlowGenerator();
-		//fg.setPrintStream(new PrintStream(new NullOuputStream()));
-		fg.setPrintStream(System.out);
+		fg.setPrintStream(new PrintStream(new NullOuputStream()));
+		//fg.setPrintStream(System.out);
 	    fg.init(null);
 	}
 
