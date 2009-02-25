@@ -64,6 +64,8 @@ public class MeandreProxy{
 	 */
 	public MeandreProxy () {
 		bIsReady = bWasCallOK = false;
+        //set logger to default client logger
+        setLogger(ClientLoggerFactory.getClientLogger());
 		qrCached = new RepositoryImpl(ModelFactory.createDefaultModel());
 	}
 
@@ -77,6 +79,8 @@ public class MeandreProxy{
 	 */
 	public MeandreProxy ( String sUser, String sPasswd, String sServerHost,
             int iServerPort ) {
+        //set logger to default client logger
+        setLogger(ClientLoggerFactory.getClientLogger());
 		update(sUser,sPasswd,sServerHost,iServerPort);
 	}
 	
@@ -632,5 +636,29 @@ public class MeandreProxy{
 		}
 		return pluginString;
 	}
+
+    public String getUserName() {
+        return sUserName;
+    }
+
+    public void setUserName(String userName) {
+        sUserName = userName;
+    }
+
+    public String getPassword() {
+        return sPassword;
+    }
+
+    public void setPassword(String password) {
+        sPassword = password;
+    }
+
+    public String getBaseURL() {
+        return sBaseURL;
+    }
+
+    public void setBaseURL(String baseURL) {
+        sBaseURL = baseURL;
+    }
 	
 }

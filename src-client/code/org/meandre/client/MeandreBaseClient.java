@@ -7,10 +7,15 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Set;
 
+import java.util.logging.Logger;
+
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -20,6 +25,7 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.json.JSONTokener;
+import org.meandre.core.logger.MeandreFormatter;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -35,11 +41,8 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
  */
 public class MeandreBaseClient{
 
-	/** handles low level communication with a meandre server */
-	private HttpClient _httpClient  = null;
-
 	/** authorization for accessing a meandre server */
-	private  Credentials _credentials = null;
+	private  UsernamePasswordCredentials _credentials = null;
 
 	/**base url of the server to interact with. */
     private String _serverHost = null;
@@ -47,7 +50,23 @@ public class MeandreBaseClient{
     /**port number the server is listening on.*/
     private int _port;
 
+	/** logger for request/response contents*/
+	private Logger _log;
 	
+	/**
+	 * initialize a client that talks to a Meandre server located at the input
+	 * url and port. The default global logger will be used until setLogger()
+	 * is called.
+     *
+     * @param serverHost just the hostname, e.g. "localhost", 
+     *      NOT "http://localhost"
+     * @param serversPort the port on the serverhost that the server is listening
+	 */
+	public MeandreBaseClient(String serverHost, int serversPort){
+		setServerAddress(serverHost, serversPort);
+		setLogger(ClientLoggerFactory.getClientLogger());
+	}
+
 	/**
 	 * initialize a client that talks to a Meandre server located at the input
 	 * url and port.
@@ -56,21 +75,11 @@ public class MeandreBaseClient{
      *      NOT "http://localhost"
      * @param serversPort the port on the serverhost that the server is listening
 	 */
-	public MeandreBaseClient(String serverHost, int serversPort){
-	    _httpClient = new HttpClient();
+	public MeandreBaseClient(String serverHost, int serversPort, Logger log){
 		setServerAddress(serverHost, serversPort);
+		setLogger(log);
 	}
 
-
-	/**
-	 * initialize a client that talks to a Meandre server located at 
-	 * http://localhost on port 1714. 
-     * <p>same as MeandreBaseClient("localhost", 1714)
-	 */
-
-	public MeandreBaseClient(){
-		this("localhost", 1714);
-	}
 
     /**
      * set the username and password that this client will use when sending
@@ -78,7 +87,7 @@ public class MeandreBaseClient{
      * authentication are made.
      */
     public void setCredentials(String userName, String password){
-        updateCredentials(userName, password);
+		_credentials = new UsernamePasswordCredentials(userName, password);
     }
 
     /**
@@ -90,12 +99,6 @@ public class MeandreBaseClient{
     public void setServerAddress(String serverHost, int serversPort){
         _serverHost = serverHost;
         _port = serversPort;
-		updateConnection();
-    }
-
-    private void updateCredentials(String userName, String password){
-		_credentials = new UsernamePasswordCredentials(userName, password);
-		updateConnection();
     }
 
     public int getPort(){
@@ -106,11 +109,19 @@ public class MeandreBaseClient{
         return _serverHost;
     }
 
+	public Logger getLogger(){
+		return _log;
+	}
+
+	public void setLogger(Logger log){
+		_log = log;
+	}
+
 	/**
 	 * synchronizes the open http connection with this MeandreClient's
 	 * internal variables (server, port, credentials).
 	 */
-	private void updateConnection(){
+	/*private void updateConnection(){
 	    HostConfiguration config = new HostConfiguration();
         config.setHost(_serverHost, _port);
         _httpClient.setHostConfiguration(config);
@@ -118,7 +129,29 @@ public class MeandreBaseClient{
             AuthScope scope = new AuthScope(null, _port, null);
 			_httpClient.getState().setCredentials(scope, _credentials);
 		}
-	}
+	}*/
+
+
+    /**
+     * returns a new http client with this meandre client's credentials.
+     * a new one is returned every time b/c executing http methods on
+     * an httpclient blocks, while MeandreBaseClient is expected to 
+     * allow multiple requests to be dispatched at asynchronously.
+     */
+    private HttpClient getHttpClient(){
+        HttpClient httpClient = new HttpClient();
+	    HostConfiguration config = new HostConfiguration();
+        config.setHost(_serverHost, _port);
+        httpClient.setHostConfiguration(config);
+
+        //if credentials are not set, we will assume we don't need authorization
+		if(_credentials != null){
+            AuthScope scope = new AuthScope(null, _port, null);
+			httpClient.getState().setCredentials(scope, _credentials);
+        }
+		
+        return httpClient;
+    }
 
 
     /** Does an authenticated GET request against the server using the
@@ -146,12 +179,17 @@ public class MeandreBaseClient{
 		    get.setQueryString(nvp);
 		}
 		byte[] baResponse = null;
+		_log.fine("executing GET:  " + extractMethodsURIString(get));
 		try{
-			System.out.println("executing get:" + get.getURI());
-			_httpClient.executeMethod(get);
+			getHttpClient().executeMethod(get);
+			verifyResponseOK(get);
 			baResponse = get.getResponseBody();
+		}catch (TransmissionException te){
+			throw te;
 		}catch(Exception e){
-		    e.printStackTrace();
+		    //e.printStackTrace();
+			_log.severe("unanticipated exception performing http GET: " +
+			        extractMethodsURIString(get));
 			throw new TransmissionException(e);
 		}
 		return baResponse;
@@ -185,12 +223,16 @@ public class MeandreBaseClient{
             get.setQueryString(nvp);
         }
         InputStream insResponse = null;
+        _log.fine("executing GET:" + extractMethodsURIString(get));
         try{
-            System.out.println("executing get:" + get.getURI());
-            _httpClient.executeMethod(get);
+            getHttpClient().executeMethod(get);
+			verifyResponseOK(get);
             insResponse = get.getResponseBodyAsStream();
+		}catch (TransmissionException te){
+			throw te;
         }catch(Exception e){
-            e.printStackTrace();
+            _log.severe("unanticipated exception - GET: " + 
+                    extractMethodsURIString(get));
             throw new TransmissionException(e);
         }
         return insResponse;
@@ -236,18 +278,42 @@ public class MeandreBaseClient{
         post.getParams().setBooleanParameter(
 				HttpMethodParams.USE_EXPECT_CONTINUE, true);
         byte[] baResponse = null;
+        _log.fine("executing POST: " + extractMethodsURIString(post));
+        _log.finer("POST contents:\n" + post.toString());
         try{
-            System.out.println(post.getURI());
-            System.out.println(post.toString());
-            _httpClient.executeMethod(post);
+            getHttpClient().executeMethod(post);
+			verifyResponseOK(post);
             baResponse = post.getResponseBody();
+		}catch (TransmissionException te){
+			throw te;
         }catch(Exception e){
-            e.printStackTrace();
+			_log.severe("unanticipated exception - POST: " + 
+			        extractMethodsURIString(post));
             throw new TransmissionException(e);
         }
         return baResponse;
 	}
 
+
+	/**
+	 * performs a GET request and returns the response data as a string.
+     * see <code>executePostRequestBytes</code> for info on params
+	 *
+	 */
+	public String executeGetRequestString(String sRestCommand,
+			Set<NameValuePair> queryParams) throws TransmissionException {
+	   
+        byte[] baRetrieved = executeGetRequestBytes(sRestCommand, queryParams);
+        String sRetrieved;
+	    try {
+	        sRetrieved = new String(baRetrieved, "UTF-8");
+	    } catch (UnsupportedEncodingException e) {
+	        throw new TransmissionException(
+	                "Server response couldn't be converted to UTF-8 text", e);
+	    }
+        _log.finer("Response from GET:\n" + sRetrieved);
+        return sRetrieved;
+	}
 
 	/***
 	 * performs a GET request and returns the response in json format.
@@ -259,42 +325,20 @@ public class MeandreBaseClient{
 			Set<NameValuePair> queryParams) throws TransmissionException {
 
 	    String sRaw = executeGetRequestString(sRestCommand, queryParams);
-	    System.out.println("executeGetRequestJSON: response: \n" + sRaw);
 	    if(sRaw.equals("")){
+        //TODO: there should be a better response than returning null
 	        return null;
 	    }
 	    JSONTokener jtRaw = new JSONTokener(sRaw);
 	    return jtRaw;
 	}
-
-	/**
-	 * performs a GET request and returns the response data as a string.
-     * see <code>executePostRequestBytes</code> for info on params
-	 *
-	 */
-	public String executeGetRequestString(String sRestCommand,
-			Set<NameValuePair> queryParams) throws TransmissionException {
-	   
-	    try {
-	        byte[] baRetrieved = executeGetRequestBytes(sRestCommand, queryParams);
-	        String sRetrieved = new String(baRetrieved, "UTF-8");
-	        return sRetrieved;
-	    } catch (UnsupportedEncodingException e) {
-	        throw new TransmissionException(
-	                "Server response couldn't be converted to UTF-8 text", e);
-	    }catch(TransmissionException e){
-	        throw e;
-	    }
-	}
-
 	/**
 	 * performs a GET request and returns the response data as an RDF
 	 * Jena Model. The sRestCommand must request the model data in 
 	 * the N-Triple format (*.nt file)
-     * see <code>executePostRequestBytes</code> for info on params
+     * see <code>executePos1tRequestBytes</code> for info on params
 	 *
 	 */
-
 	public Model executeGetRequestModel(String sRestCommand,
 			Set<NameValuePair> queryParams) throws TransmissionException {
 	    
@@ -302,17 +346,76 @@ public class MeandreBaseClient{
 	    Model mRetrieved = ModelFactory.createDefaultModel();
 	    try{
 	        mRetrieved.read(new ByteArrayInputStream(baRetrieved),null,"N-TRIPLE");
-	    }catch(NullPointerException e){
-            throw new TransmissionException("Problem constructing Jena Model: " +
-                    "Usually this means the server returned an empty string," +
-                    "meaning the requested rdf resource was not found.", e);
+	    //}catch(NullPointerException e){
+        //    throw new TransmissionException("Problem constructing Jena Model: " +
+        //           "Usually this means the server returned an empty string," +
+        //            "meaning the requested rdf resource was not found.", e);
 	    }catch(Exception e){
-	        throw new TransmissionException("Problem constructing Jena Model: "
-	                + e.toString(), e);
+	        throw new TransmissionException(
+				"Problem constructing Jena Model from downloaded bytes", e);
 	    }
         return mRetrieved;
 
 	}
+
+	/**
+	 * checks that the method has executed properly and it's response 
+	 * code indicates a successful operation. throws an exception
+	 * with a description of the failure.
+     *
+     * currently, any 2XX code is considered OK, and all others are
+     * considered failures and result in an Exception.
+	 */
+	protected void verifyResponseOK(HttpMethod method) 
+			throws TransmissionException{
+        int iStat = method.getStatusCode();
+        if( (iStat < 200) || (iStat > 299) ) {
+            String reason = HttpStatus.getStatusText(iStat);
+            String sFailedUrl = extractMethodsURIString(method);
+            StringBuffer errBuf = new StringBuffer();
+            errBuf.append("Problem contacting the Meandre Server at \'");
+            errBuf.append(_serverHost);
+            errBuf.append("\', port:");
+            errBuf.append(_port);
+            errBuf.append(", as user:\'");
+            errBuf.append(_credentials.getUserName());
+            errBuf.append("\' \n ");
+            errBuf.append(method.getName());
+            errBuf.append(" ");
+            errBuf.append(sFailedUrl);
+            errBuf.append("\' \n HTTP Response Code ");
+            errBuf.append(iStat);
+            errBuf.append(" -> ");
+            errBuf.append(reason);
+
+            _log.severe(errBuf.toString());
+
+		    throw new TransmissionException(iStat + " " + reason + " " +
+                sFailedUrl);
+        }
+		return;
+	}
+
+	/**
+	 * A convience method for getting the URI that a GET or POST method
+	 * is using. Intended for logging: if extracting the URI fails then
+	 * "UNKNOWN_URL" is returned but no indication of failure will be
+	 * given.
+	 * 
+	 * @param method an HttpMethod, usually a POST or GET with all it's
+	 * parameters set.
+	 * @return the url the http method visited as a String
+	 */
+    private String extractMethodsURIString(HttpMethod method) {
+        String sFailedUrl = "";
+        try{
+            sFailedUrl = method.getURI().toString();
+            //sFailedUrl = method.toString();
+        }catch(URIException e){
+            sFailedUrl = "UNKNOWN_URL";
+        }
+        return sFailedUrl;
+    }
 
 
 }
