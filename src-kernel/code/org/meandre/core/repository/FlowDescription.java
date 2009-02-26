@@ -272,6 +272,14 @@ public class FlowDescription {
 		}
 	}
 
+	/** Remove all the executable component instances from this flow.
+	 * 
+	 */
+	public void removeAllExecutableComponentInstances () {
+		setExecutableComponentInstances.clear();
+		htExecutableComponentInstances.clear();
+	}
+	
 	/** Removes an executable component instance.
 	 *
 	 * @param ecd The executable component instances to remove

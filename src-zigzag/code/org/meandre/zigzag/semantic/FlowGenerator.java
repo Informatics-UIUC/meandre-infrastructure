@@ -12,6 +12,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Set;
 
 import org.meandre.core.repository.ConnectorDescription;
@@ -131,7 +132,7 @@ public class FlowGenerator {
 		hsConnectors = new HashSet<ConnectorDescription>();
 
 		// The base URL
-		sBaseURL = "http://meandre.org/zigzag/"+sName+"/"+System.currentTimeMillis()+"/";
+		sBaseURL = "meandre://seasr.org/zigzag/"+System.currentTimeMillis()+"/"+Math.abs((new Random()).nextLong())+"/";
 
 	}
 
@@ -539,9 +540,10 @@ public class FlowGenerator {
 	public FlowDescription getFlowDescription(String sOutputFileName,boolean bParallelProcess) {
 
 		FlowDescription fd = new FlowDescription();
-
+		String sBaseURI = sBaseURL+"flow/"+sOutputFileName.replaceAll("\"", "").replaceAll("'", "").replaceAll("\\"+".", "-")+"/";
+		
 		// Set the basic flow properties
-		fd.setFlowComponent(ri.getModel().createResource(sBaseURL+"flow/"+sOutputFileName));
+		fd.setFlowComponent(ri.getModel().createResource(sBaseURI));
 		fd.setName(sOutputFileName);
 		fd.setRights("NCSA/UofI open source license");
 		fd.setDescription("Automatically compiled from ZigZag file "+sOutputFileName);
@@ -561,8 +563,48 @@ public class FlowGenerator {
 			postProcessingParallelization(fd);
 			ps.println("Postprocessing flow for parallelization finished");
 		}
+		
+		return uriRewrite(fd,sBaseURI);
+	}
 
-		return fd;
+	/** Rewrites the URLs to make them happy and convention complaining
+	 * 
+	 * @param fdOrig The flow description to arranges
+	 * @param baseURI The base URI
+	 * @return The new flow description
+	 */
+	private FlowDescription uriRewrite(FlowDescription fdOrig, String baseURI) {
+		
+		RepositoryImpl ri = new RepositoryImpl(fdOrig.getModel());
+		Model mod = ri.getModel();
+		FlowDescription fdn = ri.getAvailableFlowDescriptions().iterator().next();
+		Hashtable<Resource,Resource> htTranslate = new Hashtable<Resource,Resource>();
+		HashSet<ExecutableComponentInstanceDescription> hsSet = new HashSet<ExecutableComponentInstanceDescription>();
+		
+		// Replace the uri name in the instances
+		for ( ExecutableComponentInstanceDescription ecid:fdn.getExecutableComponentInstances()) {
+			String sName = ecid.getName().replaceAll(" ", "-").replaceAll("\t", "-");
+			Resource newRes = mod.createResource(baseURI+"instance/"+sName);
+			htTranslate.put(ecid.getExecutableComponentInstance(), newRes);
+			ecid.setExecutableComponentInstance(newRes);
+			hsSet.add(ecid);
+		}
+		fdn.removeAllExecutableComponentInstances();
+		for ( ExecutableComponentInstanceDescription ecidMod:hsSet )
+			fdn.addExecutableComponentInstance(ecidMod);
+		
+		// Replace the uri in the components
+		int iCnt = 0;
+		for( ConnectorDescription cd:fdn.getConnectorDescriptions() ) {
+			Resource newRes = mod.createResource(baseURI+"connector/"+iCnt++);
+			cd.setConnector(newRes);
+			// Fix source
+			cd.setSourceInstance(htTranslate.get(cd.getSourceInstance()));
+			// Fix target
+			cd.setTargetInstance(htTranslate.get(cd.getTargetInstance()));
+		}
+		
+		return fdn;
 	}
 
 	/** Generates the compressed MAU file.

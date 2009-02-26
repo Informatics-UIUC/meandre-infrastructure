@@ -338,7 +338,11 @@ def __render_flow ( flow_desc, edit, qr ):
             for key in props.getKeys() :
                 if key.find('wb_')<0 :
                     if edit is False:
-                        html += '<tr><td style="text-align: right;">'+key+' = </td><td>'+props.getValue(key)+'</td></tr>'
+                        val = ecid.getProperties().getValue(key)
+                        if val is None :
+                            html += '<tr><td style="text-align: right;">'+key+' = </td><td>'+props.getValue(key)+'</td></tr>'
+                        else :
+                            html += '<tr><td style="text-align: right;">'+key+' = </td><td>'+val+'</td></tr>'
                     else:
                         html += '<input type="hidden" name="flow_uri" value="'+flow_desc.getFlowComponent().toString()+'" />'
                         html += '<input type="hidden" name="flow_component_instance" value="'+ecid.getExecutableComponentInstance().toString()+'" />'
