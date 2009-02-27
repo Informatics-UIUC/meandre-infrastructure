@@ -268,6 +268,10 @@ public class JobInformationBackendAdapterTest {
 				JobInformationBackendAdapter.JOB_STATUS_COMPLETED, 
 				JobInformationBackendAdapter.JOB_STATUS_KILLED)
 			;
+		ba.updateJobStatusInServer(
+				JobInformationBackendAdapter.JOB_STATUS_ABORTED, 
+				JobInformationBackendAdapter.JOB_STATUS_KILLED)
+			;
 		
 		// Check the changes statuses
 		for ( Map<String,String> mapStatus:ba.getJobStatuses() )

@@ -489,6 +489,8 @@ public class Conductor {
 		// Load the component classes
 		return loadExecutableComponentImplementation(setContexts, setURLLocations, htMapNameToClass, htMapNameToResource, htMapResourceToRunnable, htMapResourceToFormat);
 	}
+	
+	
 
 	/** This methods dump the Literal to the file system and creates a URI for the class loader.
 	 *
@@ -551,17 +553,21 @@ public class Conductor {
 		URL [] ua = new URL[setURLContext.size()];
 		for ( String sURL:setURLContext )
 			try {
-				if ( sURL.endsWith(".jar") || sURL.endsWith("/") )
+				if (sURL.endsWith("/") )
 					ua[iCnt++] = new URL(sURL);
+				else if (sURL.endsWith(".jar")) {
+					ua[iCnt++] = new URL("jar:"+sURL+"!/");
+				}
+					
 			} catch (MalformedURLException e) {
 				throw new CorruptedDescriptionException("Context URL "+sURL+" is not a valid URL");
 			}
 			// Initializing the java class loader
 			URLClassLoader urlCL=null;
 			if(this.getParentClassloader()==null){
-	    	 urlCL= new URLClassLoader(ua);	
+				urlCL=  URLClassLoader.newInstance(ua);	
 			}else{
-	    	 urlCL = new URLClassLoader(ua, this.getParentClassloader());
+				urlCL = URLClassLoader.newInstance(ua, this.getParentClassloader());
 			}
 		 
 	
@@ -572,7 +578,12 @@ public class Conductor {
 					Class clazz = Class.forName(sClassName, true, urlCL);
 					htMapNameToClass.put(sClassName,clazz);
 				}
-			} catch (ClassNotFoundException e) {
+			}  
+			catch (java.lang.LinkageError e){
+				log.warning("Class "+sClassName+" appearing multiple times. Discarding the copies.");
+				log.warning("Having multiple copies of class"+sClassName+" can cause erratic behavior if they do not align!");
+			}
+			catch (ClassNotFoundException e) {
 				log.severe("Class "+sClassName+" could not be loaded");
 				throw new CorruptedDescriptionException(e);
 			}
