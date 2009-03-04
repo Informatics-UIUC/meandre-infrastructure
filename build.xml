@@ -441,6 +441,7 @@
              </fileset>
         </unjar>
         <delete file="${dist.dir}/tmp/META-INF/MANIFEST.MF" />
+        <delete file="${dist.dir}/tmp/LICENSE" />
 
         <!-- Creating the Meandre server jar distribution -->
         <jar destfile="${dist.dir}/${app.name}-server-${build.version}.jar" >
