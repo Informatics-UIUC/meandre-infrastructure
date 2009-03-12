@@ -49,11 +49,11 @@ public class PluginFactory {
 
 	/** Files to transfer to the public directory */
 	private final static String [] saResources = { "logo-meandre.gif" };
-	
-	/** The target directory insed the public resources dir */
+
+	/** The target directory inside the public resources dir */
 	private final static String sRescoureDestination = "system/";
-		
-	/** Creates an unitialized plugin factory and avoids other to instantiate it.
+
+	/** Creates an uninitialized plugin factory and avoids other to instantiate it.
 	 *
 	 */
 	private PluginFactory (CoreConfiguration crcnf) {
@@ -152,14 +152,14 @@ public class PluginFactory {
 				ps.println("This directory contains all the publicly available implementations for the Meandre components.");
 				ps.println();
 				ps.println("Created on "+new Date());
-				
+
 				log.warning("The resource directory does not exist - creating a new one...");
-				
+
 			} catch (FileNotFoundException e) {
 				log.warning("Could not create the resource directory");
 			}
 		}
-		
+
 		File fileResDir = new File(file.getAbsolutePath()+File.separator+sRescoureDestination);
 		if  ( fileResDir.mkdir() )  {
 			try {
@@ -172,7 +172,7 @@ public class PluginFactory {
 					fos.close();
 					fis.close();
 				}
-				
+
 				log.warning("The system resources missing. Adding them...");
 			} catch (FileNotFoundException e) {
 				log.warning("Could not create the resource directory");
@@ -203,6 +203,7 @@ public class PluginFactory {
 			try {
 				String sClassName = propPluginFactoryConfig.getProperty(oKey.toString());
 				MeandrePlugin mpPlugin = (MeandrePlugin) Class.forName(sClassName).newInstance();
+				mpPlugin.setCoreConfiguration(cnf);
 				if ( mpPlugin.isServlet() ) {
 					mpPlugin.setLogger(log);
 					cntxGlobal.addServlet(new ServletHolder((Servlet)mpPlugin), mpPlugin.getAlias());

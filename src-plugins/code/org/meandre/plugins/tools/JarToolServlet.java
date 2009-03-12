@@ -27,53 +27,54 @@ import org.meandre.plugins.MeandrePlugin;
 
 /**This plugin reads the jar file and returns attributes for
  * the jar file.
- * 
+ *
  * @author Amit Kumar (modified by Xavier Llor&agrave; to fix the directory mismatch + add the setCoreConfig method)
  */
-public class JarToolServlet extends HttpServlet 
+public class JarToolServlet extends HttpServlet
 implements MeandrePlugin{
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	/** The URL separator */
 	private static final String URL_SEP="/";
-	
+
 	// the directory where java jars are stored
-	private static  String PLUGIN_JAR_DIR = "published_resources"+File.separator+"contexts"+File.separator+"java"; 
-			
+	private static  String PLUGIN_JAR_DIR = null;
+
 	//alias path
 	private String aliasPath = "/plugins/jar/*";
 
 	/** Get the plugin logger */
 	protected Logger log;
-	
+
 	private boolean bInited = Boolean.FALSE;
-	
+
 
 	/** Core configuration object */
 	@SuppressWarnings("unused")
 	private CoreConfiguration cnf = new CoreConfiguration();
 
-	
+
 	/** Sets the core configuration object to use.
-	 * 
+	 *
 	 * @param cnf The core configuration object
 	 */
 	public void setCoreConfiguration ( CoreConfiguration cnf ) {
 		this.cnf = cnf;
+		PLUGIN_JAR_DIR = cnf.getPublicResourcesDirectory() + File.separator + "contexts" + File.separator + "java";
 	}
 
 	public void init() throws ServletException{
 		log.fine("Initing the JarToolServlet...");
 	}
-	
+
 	public void setLogger ( Logger log ) {
 		this.log = log;
 	}
-	
+
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 	throws ServletException, IOException {
 		String path = req.getPathInfo();
@@ -86,8 +87,8 @@ implements MeandrePlugin{
 		if (locations.length <2) {
 			res.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
-		} 
-		
+		}
+
 		res.setStatus(HttpServletResponse.SC_OK);
 		String fileName = locations[1];
 		if(locations.length==2){
@@ -106,9 +107,9 @@ implements MeandrePlugin{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		}
-	
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -146,7 +147,7 @@ implements MeandrePlugin{
 			String md5 = getMD5(file);
 			result = result+"md5="+md5+"|";
 			result = result+"name="+file.getName()+"|";
-		
+
 			Manifest manifest = getManifest(file);
 			if(manifest!=null){
 			log.finest("getting manifest " + manifest.toString());
@@ -160,7 +161,7 @@ implements MeandrePlugin{
 			}
 			res.getOutputStream().print(result);
 			res.flushBuffer();
-			return;	
+			return;
 		}else{
 			res.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
@@ -170,7 +171,7 @@ implements MeandrePlugin{
 	}
 
 	/**returns the hex String
-	 * 
+	 *
 	 * @param file The file to check
 	 * @return The MD% of the file
 	 */
@@ -198,11 +199,11 @@ implements MeandrePlugin{
 		}
 		return hexString;
 	}
-	
+
 
 	private Manifest getManifest(File file) throws IOException {
 		JarFile jarFile = new JarFile(file);
-		
+
 		//int len = jarFile.size();
 		//System.out.println("len is: " + len);
 		return jarFile.getManifest();
@@ -231,7 +232,7 @@ implements MeandrePlugin{
 	public boolean isServlet() {
 		return true;
 	}
-	
+
 	public  byte[] createChecksum(File file) throws
     Exception{
 		InputStream fis =  new FileInputStream(file);
@@ -254,14 +255,14 @@ implements MeandrePlugin{
 
 
 	/**Return the status of the plugin
-	 * 
+	 *
 	 */
 	public boolean isInited() {
 		return bInited;
 	}
 
 	/**This is a servlet not a filter
-	 * 
+	 *
 	 */
 	public boolean isFilter() {
 		return false;
