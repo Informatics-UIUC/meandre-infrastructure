@@ -120,4 +120,20 @@ public interface ComponentContextProperties {
 	 * @return The output console
 	 */
 	public PrintStream getOutputConsole();
+	
+
+	/** Returns the path to the public resources directory.
+	 * 
+	 * @return Path to public resources directory.
+	 */
+	public String getPublicResourcesDirectory ();
+	
+
+	/** Returns the path to the run directory.
+	 * 
+	 * @return Path to public resources directory.
+	 */
+	public String getRunDirectory ();
+
+
 }

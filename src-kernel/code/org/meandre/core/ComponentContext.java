@@ -43,12 +43,6 @@ extends ComponentContextProperties {
 	 * @return True if the flow is aborting
 	 */
 	public boolean isFlowAborting();
-
-	/** Returns the path to the public resources directory.
-	 * 
-	 * @return Path to public resources directory.
-	 */
-	public String getPublicResourcesDirectory ();
 	
 	/**Return the MeandrePlugin for a particular id
 	 * 

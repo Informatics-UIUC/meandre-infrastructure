@@ -183,6 +183,15 @@ implements ComponentContext {
 	public String getPublicResourcesDirectory () {
 		return ccCnf.getPublicResourcesDirectory();
 	}
+	
+
+	/** Returns the path to the run directory.
+	 * 
+	 * @return Path to public resources directory.
+	 */
+	public String getRunDirectory () {
+		return ccCnf.getRunResourcesDirectory();
+	}
 
 	
 	/** The name of the available inputs.
