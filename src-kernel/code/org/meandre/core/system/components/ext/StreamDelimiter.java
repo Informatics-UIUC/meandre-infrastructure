@@ -1,8 +1,8 @@
 package org.meandre.core.system.components.ext;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** Objects of this class just denotes a stream delimiter of 
  * a stream sequence.
@@ -13,7 +13,7 @@ import java.util.Set;
 public abstract class StreamDelimiter {
 	
 	/** Properties that can be attached to the stream delimiter */
-	private Map<String,Object> mapValues= new HashMap<String,Object>();
+	private Map<String,Object> mapValues= new ConcurrentHashMap<String,Object>();
 	 
 	/** Assigns a value to with the given key.
 	 * 
