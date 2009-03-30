@@ -97,17 +97,17 @@ public class Store {
      * The default configuration path to the file name
      */
     private String sConfigPath = ".";
-    
+
     /**
      * The directory path to install working files.
      */
     private String sInstallDirPath = ".";
-    
+
     /**
      * The default configuration file name
      */
     private String sConfigFile = "meandre-config-store.xml";
-    
+
     /**
      * The default configuration file name
      */
@@ -185,7 +185,7 @@ public class Store {
 	private JobInformationBackendAdapter baJobInfo;
 
     /** Initialize a default store.
-     * 
+     *
      * @param cnf The core configuration object
      */
     public Store(CoreConfiguration cnf) {
@@ -194,11 +194,11 @@ public class Store {
     	initializeDefaultProperties();
         initializeStore();
     }
-    
+
     /** Initialize a default store to install its file resources in a
      * specified directory. The resources are the store's config file
      * and jena database files.
-     * 
+     *
      * @param sInstallDir The base install directory
      * @param cnf The core configuration object
      */
@@ -209,9 +209,9 @@ public class Store {
         propStoreConfig = new Properties();
         initializeDefaultProperties();
         initializeStore();
-    }  
+    }
     /** Initialize a store with the provided properties
-     * 
+     *
      * @param props The properties for the store
      * @param cnf The core configuration object
      */
@@ -220,23 +220,28 @@ public class Store {
     	propStoreConfig = props;
     	initializeStore();
     }
-    
+
     /** Initialize a Store with the given properties.
-     * 
+     *
      * @param props The properties to use to initialize the store
      */
     public void initializeStore ( Properties props ) {
     	propStoreConfig = props;
     	initializeStore();
     }
-    
-     
+
+
     /** The initialization of the store based on properties.
      */
     protected void initializeStore() {
-        //the fully expanded path to the config file        
+
+        // this forces the derby.log file to be created in the log/ folder
+        // TODO: the log folder should normally be obtained from a CoreConfiguration object
+        System.setProperty("derby.stream.error.file", "log/derby.log");
+
+        //the fully expanded path to the config file
         String sConfigFileAbs = sConfigPath + File.separator + sConfigFile;
-        
+
         // Try to open the config file
     	FileInputStream fis;
         try {
@@ -270,7 +275,7 @@ public class Store {
 
             }
         }
-        
+
 
         // Try to open the default location file
     	try {
@@ -313,7 +318,7 @@ public class Store {
 
         log.config("Initialization of JENA RDBModelMaker done");
         initializeSecurityStore();
-        
+
         // Initialize the Job Information backend adapter
         try {
 			 // Instantiate the adaptor
@@ -334,8 +339,8 @@ public class Store {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
 			log.severe("Could not found class for job information backend adapter! "+baos.toString());
-		}	
-		
+		}
+
     }
 
     /**
@@ -358,7 +363,7 @@ public class Store {
         // MeandreStore/log/
         String logDir = sInstallDirPath + File.separator + "MeandreStore";
         String derbyUrl = "jdbc:derby:" + storeDir + ";create=true" + ";logDevice=" + logDir;
-        		
+
         propStoreConfig.setProperty(JENA_DB_DRIVER_CLASS_NAME, "org.apache.derby.jdbc.EmbeddedDriver");
         propStoreConfig.setProperty(JENA_DB_URL, derbyUrl);
         propStoreConfig.setProperty(JENA_DB_USER_NAME, "");
@@ -457,7 +462,7 @@ public class Store {
      */
     public SystemStore getSystemStore(CoreConfiguration cnf, String sNickName) {
     	String sHostName = NetworkTools.getLocalHostName();
-    	
+
         return new SystemStoreImpl(
         		getMaker().createModel(BASE_SYSTEM_STORE_URL + sNickName),
         		sHostName,
@@ -523,7 +528,7 @@ public class Store {
 
 	/**
 	 * Returns the paths to the configuration files
-	 * 
+	 *
 	 * @return The path to the configuration files
 	 */
 	public String getConfigurationPath() {
@@ -532,20 +537,20 @@ public class Store {
 
 	/**
 	 * Sets the paths to the configuration files.
-	 * 
+	 *
 	 * @param sPath The path to the configuration files
 	 */
 	public void setConfigurationPath(String sPath) {
 		sConfigPath = sPath;
 	}
-	
+
 	/** Returns the JDBC connection to the database backend. This call should
 	 * be used carefully. Just access the database backend if your really know
 	 * your way around. Otherwise you could end rendering the store in inconsistent
 	 * states or even worst. Derby is left on auto commit since its embedded usage.
 	 * For all other database types it returns a new connection with auto commit off.
-	 * 
-	 * @return The JDBC database connection object. Returns null if the connection 
+	 *
+	 * @return The JDBC database connection object. Returns null if the connection
 	 *         object could not be retrieved.
 	 */
 	public Connection getConnectionToDB () {
@@ -560,32 +565,32 @@ public class Store {
 			return null;
 		}
 	}
-	
+
 	/** Returns the database flavor of the backend currently used.
-	 * 
+	 *
 	 * @return The database flavour
 	 */
 	public String getDatabaseFlavor () {
 		return dbConn.getDatabaseType();
 	}
-	
+
 	/** Publishes the component described by the URI. If the URI already
 	 * exist, the call returns false not modifying the published description;
 	 * return true otherwise.
-	 * 
+	 *
 	 * @param sURI The URI to publish
 	 * @param sRemoteUser The publishing user.
 	 */
 	public boolean publishURI(String sURI, String sRemoteUser) {
-		
+
 		boolean bPublished = false;
 		QueryableRepository qr = getRepositoryStore(sRemoteUser);
 		Resource resURI = qr.getModel().createResource(sURI);
 		Model modToPublish = null;
 		Model modPublic = getPublicRepositoryStore();
 		QueryableRepository qrPublic = new RepositoryImpl(modPublic);
-		
-		if ( qrPublic.getExecutableComponentDescription(resURI)==null && 
+
+		if ( qrPublic.getExecutableComponentDescription(resURI)==null &&
 			 qrPublic.getFlowDescription(resURI)==null ) {
 			// The URI does not exist
 			ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(resURI);
@@ -596,37 +601,37 @@ public class Store {
 			else if ( fd!=null ) {
 				modToPublish = fd.getModel();
 			}
-			
-			if ( modToPublish!=null ) {	
+
+			if ( modToPublish!=null ) {
 				bPublished = true;
 				modPublic.begin();
 				modPublic.add(modToPublish);
 				modPublic.commit();
 			}
 		}
-		
+
 		return bPublished;
 	}
-	
+
 
 	/** Unpublishes the component described by the URI. If the URI already
 	 * exist, the call returns false not modifying the published description;
 	 * return true otherwise.
-	 * 
+	 *
 	 * @param sURI The URI to publish
 	 * @param sRemoteUser The publishing user.
 	 * @return Try if the URI was unpublished
 	 */
 	public boolean unpublishURI(String sURI, String sRemoteUser) {
-		
+
 		boolean bUnpublished = false;
 		QueryableRepository qr = getRepositoryStore(sRemoteUser);
 		Resource resURI = qr.getModel().createResource(sURI);
 		Model modToUnpublish = null;
 		Model modPublic = getPublicRepositoryStore();
 		QueryableRepository qrPublic = new RepositoryImpl(modPublic);
-		
-		if ( qrPublic.getExecutableComponentDescription(resURI)!=null || 
+
+		if ( qrPublic.getExecutableComponentDescription(resURI)!=null ||
 			 qrPublic.getFlowDescription(resURI)!=null ) {
 			// The URI does not exist
 			ExecutableComponentDescription ecd = qrPublic.getExecutableComponentDescription(resURI);
@@ -637,7 +642,7 @@ public class Store {
 			else if ( fd!=null ) {
 				modToUnpublish = fd.getModel();
 			}
-						
+
 			if ( modToUnpublish!=null ) {
 				bUnpublished = true;
 				modPublic.begin();
@@ -645,13 +650,13 @@ public class Store {
 				modPublic.commit();
 			}
 		}
-		
+
 		return bUnpublished;
 	}
-	
+
 
 	/** Checks if a location already exist on the users system repository.
-	 * 
+	 *
 	 * @param ss The users system repository
 	 * @param sLocation The location
 	 * @return True if the location already exist
@@ -659,7 +664,7 @@ public class Store {
 	private boolean isAlreadyAUsedLocation(SystemStore ss, String sLocation) {
 		boolean bExist = false;
 		Set<Hashtable<String, String>> setProps = ss.getProperty(SystemStore.REPOSITORY_LOCATION);
-		
+
 		for ( Hashtable<String, String> ht:setProps )
 			if ( ht.get("value").equals(sLocation) ) {
 				bExist = true;
@@ -670,7 +675,7 @@ public class Store {
 	}
 
 	/** Removes a location from the repository.
-	 * 
+	 *
 	 * @param sUser The system store user
 	 * @param sLocation The location to remove
 	 * @param cnf The core configuration object
@@ -678,10 +683,10 @@ public class Store {
 	 */
 	public boolean removeLocation(String sUser, String sLocation, CoreConfiguration cnf) {
 		boolean bRes = true;
-		
+
 		// Retrieve system store
 		SystemStore ss = getSystemStore(cnf,sUser);
-	    
+
 		if ( !isAlreadyAUsedLocation(ss, sLocation)) {
 			//
 			// Location does not exist
@@ -692,22 +697,22 @@ public class Store {
 			//
 			// Location does exist
 			//
-			
+
 			//
 			// Regenerate the users repository
 			//
 			QueryableRepository qr = getRepositoryStore(sUser);
 			Model mod = qr.getModel();
-			
+
 			try {
 				URL url = new URL(sLocation);
 				Model modelTmp = ModelFactory.createDefaultModel();
-					
+
 				modelTmp.setNsPrefix("", "http://www.meandre.org/ontology/");
 				modelTmp.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
 					modelTmp.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
 				modelTmp.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
-	    
+
 				//
 				// Read the location and check its consistency
 				//
@@ -720,12 +725,12 @@ public class Store {
                             e.toString());
                     bRes = false;
                     return bRes;
-                    
+
                 }
-               
+
                 // Check the pulled repository consistency
                 QueryableRepository qrTmp = new RepositoryImpl(modelTmp);
-				
+
 				//
 				// Remove the components provided by the location
 				//
@@ -738,7 +743,7 @@ public class Store {
 						mod.commit();
 					}
 				}
-				
+
 				for ( Resource rfd:qrTmp.getAvailableFlows() ) {
 					FlowDescription fd = qr.getFlowDescription(rfd);
 					if ( fd!=null ) {
@@ -747,7 +752,7 @@ public class Store {
 						mod.commit();
 					}
 				}
-				
+
 				qr.refreshCache();
 				bRes = true;
 			}
@@ -756,21 +761,21 @@ public class Store {
 				bRes = false;
 				qr.refreshCache();
 			}
-			
-			// 
+
+			//
 			// Remove the location form the system properties
 			//
 			ss.removeProperty(SystemStore.REPOSITORY_LOCATION, sLocation);
-			
+
 		}
-		
+
 		return bRes;
 	}
 
 
 	/** This method adds a location to the user repository. Also checks that is
 	 * a valid description of it.
-	 * 
+	 *
 	 * @param sUser The user adding the location
 	 * @param sLocation The location to add
 	 * @param sDescription The description of the location to add
@@ -778,65 +783,65 @@ public class Store {
 	 * @return True if the location could be successfully added
 	 */
 	public boolean addLocation(String sUser, String sLocation, String sDescription, CoreConfiguration cnf) {
-		
+
 		boolean bRes = false;
-		
+
 		// Retrieve system store
 		SystemStore ss = getSystemStore(cnf,sUser);
-	    
+
 		if ( !isAlreadyAUsedLocation(ss,sLocation) ) {
 			//
 			// New location
 			//
 			try {
-					
+
 				URL url = new URL(sLocation);
 				Model modelTmp = ModelFactory.createDefaultModel();
-					
+
 				modelTmp.setNsPrefix("", "http://www.meandre.org/ontology/");
 				modelTmp.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
 					modelTmp.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
 				modelTmp.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
-	    
+
 				//
 				// Read the location and check its consistency
-				//			
+				//
 				ModelIO.readModelInDialect(modelTmp, url);
-				
+
 				//
 				// Test the location
 				//
 				QueryableRepository qrNew = new RepositoryImpl(modelTmp);
-				
+
 				//
 				// If now exception was thrown, add the location to the list
-				// and update the user repository 
+				// and update the user repository
 				//
 				ss.setProperty(SystemStore.REPOSITORY_LOCATION, sLocation, sDescription);
 				QueryableRepository qr = getRepositoryStore(sUser);
-				
+
 				// Modifying the repository
 				Model model = qr.getModel();
 				model.begin();
-				 
+
 				// Pull all the jars
 				HashSet<String> hsCtxs = new HashSet<String>();
 				for ( ExecutableComponentDescription ecd:qrNew.getAvailableExecutableComponentDescriptions())
-					if ( !qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent())) 
+					if ( !qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent()))
 						for ( RDFNode rdfNode:ecd.getContext() ) {
 							boolean bFile = !rdfNode.toString().endsWith("/");
-							if ( rdfNode.isResource() && bFile ) 
+							if ( rdfNode.isResource() && bFile )
 								hsCtxs.add(rdfNode.toString());
-					}				
+					}
 				for ( String sCtx:hsCtxs ) {
 					try {
 						URL urlCntx = new URL(sCtx);
 						String [] saSplit = urlCntx.getFile().split("/");
-						String sFile = saSplit[saSplit.length-1]; 
+						String sFile = saSplit[saSplit.length-1];
 						new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator).mkdirs();
 			    		File savedFile = new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator+sFile);
 						FileOutputStream fos = new FileOutputStream(savedFile);
-						int iChar; 
+						int iChar;
 						InputStream is = urlCntx.openStream();
 						while ( (iChar=is.read())>=0 ) fos.write(iChar);
 						fos.close();
@@ -848,7 +853,7 @@ public class Store {
 						throw new IOException(e.toString());
 					}
 				}
-						
+
 				// Adding components
 				for ( ExecutableComponentDescription ecd:qrNew.getAvailableExecutableComponentDescriptions())
 					if ( !qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent())) {
@@ -858,14 +863,14 @@ public class Store {
 					}
 					else
 						log.warning("Component "+ecd.getExecutableComponent()+" already exist in the current repository. Discarding it.");
-				
+
 				// Adding flows
 				for ( FlowDescription fd:qrNew.getAvailableFlowDescriptions())
 					if ( !qr.getAvailableFlows().contains(fd.getFlowComponent()))
 						model.add(fd.getModel());
 					else
 						log.warning("Flow "+fd.getFlowComponent()+" already exist in the current repository. Discarding it.");
-				
+
 				model.commit();
 				getRepositoryStore(sUser).refreshCache(model);
 				bRes = true;
@@ -884,12 +889,12 @@ public class Store {
 			ss.setProperty(SystemStore.REPOSITORY_LOCATION, sLocation, sDescription);
 		}
 
-		
+
 		return bRes;
 	}
-	
+
 	/** Turns the contexts into local contexts to the box.
-	 * 
+	 *
 	 * @param ecd The executable component to description to localize
 	 */
 	private void localizeContexes(ExecutableComponentDescription ecd) {
@@ -914,7 +919,7 @@ public class Store {
 			}
 		}
 		for ( RDFNode rdfNode:hsOldCtx ) setCntxs.remove(rdfNode);
-		for ( RDFNode rdfNode:hsNewCtx ) setCntxs.add(rdfNode);		
+		for ( RDFNode rdfNode:hsNewCtx ) setCntxs.add(rdfNode);
 	}
 
 	/** Regenerates a user repository using the current locations for the user.
@@ -926,7 +931,7 @@ public class Store {
 		boolean bRes = true;
 
 		// Preserves the current components uploaded not belonging to a location
-		
+
 		// Regenerating the user repository entries
 		SystemStore ss = getSystemStore(cnf,sUser);
 		Set<Hashtable<String, String>> setProps = ss.getProperty(SystemStore.REPOSITORY_LOCATION);
@@ -939,12 +944,12 @@ public class Store {
 		return bRes;
 	}
 
-	
+
 	/** Add the given flows in RDF into the the user model.
 	 *
 	 * @param sUser The system store user
 	 * @param sRDF The repository to add
-	 * @param bOverwrite Should components be overwritten 
+	 * @param bOverwrite Should components be overwritten
 	 * @return The set of added flow
 	 */
 	public Set<String> addFlowsToRepository(String sUser, String sRDF, boolean bOverwrite) {
@@ -958,7 +963,7 @@ public class Store {
 
 		StringReader srModel = new StringReader(sRDF);
 		boolean bValidModel = true;
-		
+
 		try {
 			modNew.read(srModel,null,"TTL");
 		}
@@ -1011,31 +1016,31 @@ public class Store {
 			}
 			qr.refreshCache();
 		}
-			
-		return setURIs;	
+
+		return setURIs;
 	}
-	
+
 	/** Returns the list of published components and flows in the current server.
-	 * 
+	 *
 	 * @return The set of published components' URI
 	 */
 	public Set<String> getPublishedComponentsAndFlows () {
 		Set<String> setRes = new HashSet<String>();
 		Model modPublic = getPublicRepositoryStore();
 		QueryableRepository qrPublic = new RepositoryImpl(modPublic);
-		
+
 		for ( ExecutableComponentDescription ecd:qrPublic.getAvailableExecutableComponentDescriptions() )
 			setRes.add(ecd.getExecutableComponent().toString());
-		
+
 		for ( FlowDescription fd:qrPublic.getAvailableFlowDescriptions() )
 			setRes.add(fd.getFlowComponent().toString());
-		
-		
+
+
 		return setRes;
 	}
-	
+
 	/** Returns the job information backend adapter object linked to this store.
-	 * 
+	 *
 	 * @return The backend adapter to the job information
 	 */
 	public JobInformationBackendAdapter getJobInformation () {
