@@ -2,11 +2,11 @@
 <project>
     <!-- app name-->
     <property name="app.name" value="meandre"/>
-    
-    <!-- when you modify this version make sure to modify the 
+
+    <!-- when you modify this version make sure to modify the
         org.meandre.core.utils.Constants.java  in the src-kernel/code
     -->
-    <property name="build.version" value="1.4.3"/>
+    <property name="build.version" value="1.4.4"/>
 
     <!-- Directory structure of the project -->
     <property name="build.dir" value="${basedir}/bin"/>
@@ -28,7 +28,7 @@
     <property name="client.src" value="src-client/code"/>
     <property name="annotation.src" value="src-annotation/code"/>
     <property name="coordinator.src" value="src-coordinator/code"/>
-    
+
     <!-- Test code locations -->
     <property name="kernel.test" value="src-kernel/test"/>
     <property name="zigzag.test" value="src-zigzag/test"/>
@@ -38,7 +38,7 @@
     <property name="store.test" value="src-store/test"/>
     <property name="client.test" value="src-client/test"/>
     <property name="coordinator.test" value="src-coordinator/test"/>
-    
+
     <!-- The generic classpath to all the code (includes code and tests) -->
     <path id="meandre.javadoc.src">
         <fileset dir="${kernel.src}" includes="*"/>
@@ -58,7 +58,7 @@
         <fileset dir="${coordinator.src}" includes="*"/>
         <fileset dir="${coordinator.test}" includes="*"/>
     </path>
-        
+
     <!-- Default options for code-generation, compiling and junit-testing -->
     <property name="javac.debug" value="true"/>
     <property name="compile.deprecation" value="true"/>
