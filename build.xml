@@ -17,7 +17,7 @@
     <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
     
     <!--#################### Project Properties #########################-->
-    <property name="version" value="1.4.3"/>
+    <property name="version" value="1.4.4"/>
     <property name="release_tag" value="Sara"/>
     
     <property name="build.dir" value="${basedir}/build"/>
@@ -156,6 +156,7 @@
     
     <target name="prepare" depends="resolve">
         <ivy:cachepath pathid="meandre.core.classpath" conf="meandre-core"/>
+        <ivy:cachepath pathid="meandre.server.classpath" conf="meandre-server"/>
         <ivy:cachepath pathid="test.classpath" conf="test"/>
         <ivy:cachefileset setid="meandre.server.libs" type="jar" conf="meandre-server"/>
     </target>
@@ -179,7 +180,7 @@
         <javac destdir="${build.test.dir}" updatedproperty="src.test.updated">
             <src refid="src.test.dirs"/>
             <classpath>
-                <path refid="meandre.core.classpath"/>
+                <path refid="meandre.server.classpath"/>
                 <path refid="test.classpath"/>
                 <pathelement location="${build.src.dir}"/>
             </classpath>
@@ -196,11 +197,20 @@
     </target>
     
     <target name="check.tests.upToDate">
-        <condition property="tests.upToDate" value="false" else="true">
-            <or>
-                <isset property="src.code.updated"/>
-                <isset property="src.test.updated"/>
-            </or>
+        <condition property="tests.upToDate">
+            <and>
+                <not>
+                    <or>
+                        <isset property="src.code.updated"/>
+                        <isset property="src.test.updated"/>
+                    </or>
+                </not>
+                
+                <uptodate>
+                    <srcfiles dir="${build.test.dir}" includes="**/*Test.class"/>
+                    <mapper type="package" from="*Test.class" to="${test.dir}/xml/TEST-*Test.xml"/>
+                </uptodate>
+            </and>
         </condition>
     </target>
     
@@ -212,7 +222,7 @@
             <jvmarg value="-Duser.language=en"/>
             
             <classpath>
-                <path refid="meandre.core.classpath"/>
+                <path refid="meandre.server.classpath"/>
                 <path refid="test.classpath"/>
                 <pathelement location="${build.src.dir}"/>
                 <pathelement location="${build.test.dir}"/>
@@ -389,7 +399,7 @@
     
     <target name="dist" depends="dist-libs, dist-standalone" description="-> creates distribution suite"/>
     
-    <target name="publish" depends="dist">
+    <target name="publish" depends="run-tests, dist" description="-> publishes the build artifacts to the ivy repository">
         <ivy:publish 
             resolver="seasr" 
             pubrevision="${version}" 
