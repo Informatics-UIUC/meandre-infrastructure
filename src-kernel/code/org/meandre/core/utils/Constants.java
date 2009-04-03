@@ -9,10 +9,10 @@ import java.util.Calendar;
 public class Constants {
 
 	/** The engine version */
-    public final static String MEANDRE_RELEASE_TAG ="Sara";
+    public final static String MEANDRE_RELEASE_TAG = Version.getReleaseTag();
 
     /** The version identifier */
-    public final static String MEANDRE_VERSION = "1.4.4";
+    public final static String MEANDRE_VERSION = Version.getFullVersion();
 
     /** The meandre qualifier based on the date */
 	public static String MEANDRE_QUALIFIER = null;

@@ -21,7 +21,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Test;
 import org.meandre.demo.repository.DemoRepositoryGenerator;
-import org.meandre.webservices.tools.ServletConfigurableDispatcherTest;
+import org.meandre.webservices.tools.ServletConfigurableDispatcherTestBase;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -32,21 +32,21 @@ import com.hp.hpl.jena.rdf.model.Model;
 
 /** Extends the base servlet test class to test a TestServlet built on the
  * Python-based dispatcher
- * 
+ *
  * @author Xavier Llor&agrave;
  *
  */
-public class SimpleServletTest 
-extends ServletConfigurableDispatcherTest {
+public class SimpleServletTest
+extends ServletConfigurableDispatcherTestBase {
 
 	/** Simple test of the life cycle of the servlet configurable dispatcher.
-	 * 
+	 *
 	 */
 	@Test
 	public void testServletPingPong () {
 		// Set the servlet to test
 		contextWS.addServlet(new ServletHolder((Servlet) new SimpleServlet()), "/test/*");
-		
+
 		// Run ping request
 		String sContentTXT = getGetRequestContent("/test/ping.txt");
 		assertEquals("pong\n", sContentTXT);
@@ -57,13 +57,13 @@ extends ServletConfigurableDispatcherTest {
 	}
 
 	/** Simple test of the life cycle of the servlet configurable dispatcher.
-	 * 
+	 *
 	 */
 	@Test
 	public void testServletDemoRepositoryRDF () {
 		// Set the servlet to test
 		contextWS.addServlet(new ServletHolder((Servlet) new SimpleServlet()), "/test/*");
-		
+
 		// Run the demo repository request
 		Model modDemo = DemoRepositoryGenerator.getTestHelloWorldRepository();
 		Model modRDF = getGetModel("/test/get_rdf.rdf", "RDF/XML-ABBREV");
@@ -76,20 +76,20 @@ extends ServletConfigurableDispatcherTest {
 
 
 	/** Simple test of a call that returns an array of the servlet configurable dispatcher.
-	 * 
+	 *
 	 */
 	@Test
 	public void testServletArray () {
 		// Set the servlet to test
 		contextWS.addServlet(new ServletHolder((Servlet) new SimpleServlet()), "/test/*");
-		
+
 		// Get an array in text form
 		String sContentTXT = getGetRequestContent("/test/array.txt");
 		String [] saResponse = sContentTXT.split("\n");
 		assertEquals(10, saResponse.length);
 		for ( int i=0,iMax=saResponse.length ; i<iMax ; i++ )
 			assertEquals("value"+i, saResponse[i]);
-		
+
 		// Get an array in JSON form
 		try {
 			String sContentJSON = getGetRequestContent("/test/array.json");
@@ -102,7 +102,7 @@ extends ServletConfigurableDispatcherTest {
 			e.printStackTrace(new PrintStream(baos));
 			fail("Failed to parse the JSON array content because "+baos.toString());
 		}
-		
+
 		// Get an array in XML format
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -136,17 +136,17 @@ extends ServletConfigurableDispatcherTest {
 			fail("Failed to parse the XML response content because "+baos.toString());
 		}
 	}
-	
+
 
 	/** Simple test of a call that returns a dictionary of the servlet configurable dispatcher.
-	 * 
+	 *
 	 */
 	@Test
 	public void testServletDictionary () {
 		// Set the servlet to test
 		contextWS.addServlet(new ServletHolder((Servlet) new SimpleServlet()), "/test/*");
 
-		// Get a dictionary in text form	
+		// Get a dictionary in text form
 		try {
 			String sContentTXT = getGetRequestContent("/test/dictionary.txt");
 			ByteArrayInputStream baisXML = new ByteArrayInputStream(sContentTXT.getBytes());
@@ -160,7 +160,7 @@ extends ServletConfigurableDispatcherTest {
 			e.printStackTrace(new PrintStream(baos));
 			fail("Failed to load the text dictionary because "+baos.toString());
 		}
-		
+
 
 		// Get a dictionary in json form
 		try {
@@ -175,7 +175,7 @@ extends ServletConfigurableDispatcherTest {
 			e.printStackTrace(new PrintStream(baos));
 			fail("Failed to parse the JSON array content because "+baos.toString());
 		}
-	
+
 		// Get a dictionary in XML format
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -197,7 +197,7 @@ extends ServletConfigurableDispatcherTest {
 			NodeList nlResponseItemsGet  = el.getElementsByTagName("method");
 			assertEquals(1,nlResponseItemsGet.getLength());
 			assertEquals("get_dictionary_info",((Element)nlResponseItemsGet.item(0)).getFirstChild().getNodeValue());
-			
+
 		} catch (ParserConfigurationException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
@@ -211,12 +211,12 @@ extends ServletConfigurableDispatcherTest {
 			e.printStackTrace(new PrintStream(baos));
 			fail("Failed to parse the XML response content because "+baos.toString());
 		}
-		
+
 	}
 
 	/** Simple test of a call that returns a dictionary of the parameters
 	 * passed to the servlet request.
-	 * 
+	 *
 	 */
 	@Test
 	public void testServletParameterEcho () {
@@ -244,7 +244,7 @@ extends ServletConfigurableDispatcherTest {
 			e.printStackTrace(new PrintStream(baos));
 			fail("Failed to parse the JSON array content because "+baos.toString());
 		}
-		
+
 		// Check passing multiple parameters with multiple values
 		try {
 			int iNumberOfParameters = 10;

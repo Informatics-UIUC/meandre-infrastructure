@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://ivyrep.jayasoft.org/ivy-doc.xsl"?>
+<ivy-module version="2.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation=
+    "http://ant.apache.org/ivy/schemas/ivy.xsd">
+    
+    <info organisation="org.seasr.meandre" module="infrastructure"/>
+    
+    <configurations>
+        <conf name="svntask" description="for svn access" visibility="private"/>
+        
+        <conf name="component-api" description="for creating components" extends="meandre-annotation, meandre-kernel"/>
+        
+        <conf name="meandre-annotation" description="annotation api"/>
+        <conf name="meandre-client" description="for interfacing with a meandre server" extends="meandre-kernel"/>
+        <conf name="meandre-coordinator" description="coordinator api" extends="meandre-kernel"/>
+        <conf name="meandre-core" description="core api" extends="meandre-annotation, meandre-client, meandre-demo, meandre-kernel, meandre-plugins, meandre-store, meandre-webservices, meandre-zigzag"/>
+        <conf name="meandre-demo" description="builtin demos" extends="meandre-kernel"/>
+        <conf name="meandre-kernel" description="kernel api"/>
+        <conf name="meandre-mau" description="mau api" extends="meandre-kernel"/>
+        <conf name="meandre-plugins" description="plugins api" extends="meandre-kernel"/>
+        <conf name="meandre-store" description="store api" extends="meandre-kernel"/>
+        <conf name="meandre-webservices" description="webservices api" extends="meandre-kernel, meandre-store, meandre-plugins"/>
+        <conf name="meandre-zigzag" description="zigzag api" extends="meandre-kernel"/>
+        <conf name="meandre-server" description="meandre server" extends="meandre-core"/>
+        <conf name="zz" description="zigzag" extends="meandre-server"/>
+        <conf name="zzc" description="zigzag compiler" extends="meandre-server"/>
+        <conf name="zzre" description="zigzag runtime environment" extends="meandre-server"/>
+        <conf name="test" description="for running unit tests" visibility="private"/>
+    </configurations>
+    
+    <publications>
+        <artifact name="meandre-annotation" type="jar" ext="jar" conf="meandre-annotation"/>
+        <artifact name="meandre-client" type="jar" ext="jar" conf="meandre-client"/>
+        <artifact name="meandre-coordinator" type="jar" ext="jar" conf="meandre-coordinator"/>
+        <artifact name="meandre-core" type="jar" ext="jar" conf="meandre-core"/>
+        <artifact name="meandre-demo" type="jar" ext="jar" conf="meandre-demo"/>
+        <artifact name="meandre-kernel" type="jar" ext="jar" conf="meandre-kernel"/>
+        <artifact name="meandre-mau" type="jar" ext="jar" conf="meandre-mau"/>
+        <artifact name="meandre-plugins" type="jar" ext="jar" conf="meandre-plugins"/>
+        <artifact name="meandre-store" type="jar" ext="jar" conf="meandre-store"/>
+        <artifact name="meandre-webservices" type="jar" ext="jar" conf="meandre-webservices"/>
+        <artifact name="meandre-zigzag" type="jar" ext="jar" conf="meandre-zigzag"/>
+        <artifact name="meandre-server" type="jar" ext="jar" conf="meandre-server"/>
+        <artifact name="zz" type="jar" ext="jar" conf="zz"/>
+        <artifact name="zzc" type="jar" ext="jar" conf="zzc"/>
+        <artifact name="zzre" type="jar" ext="jar" conf="zzre"/>
+    </publications>
+    
+    <dependencies>
+        <dependency name="svnant" rev="1.2.1" org="subclipse.tigris.org" conf="svntask->default"/>
+        <dependency name="svnjavahl" rev="1.2.1" org="subclipse.tigris.org" conf="svntask->default"/>
+        <dependency name="svnClientAdapter" rev="1.2.1" org="subclipse.tigris.org" conf="svntask->default"/>
+        
+        <!-- External dependencies -->
+<!--        <dependency name="ant" rev="1.7.1" org="org.apache.ant" conf=""/>
+        <dependency name="antlr" rev="2.7.5" org="antlr" conf=""/>
+        <dependency name="cglib-nodep" rev="2.1_3" org="cglib" conf=""/>-->
+        <dependency name="clojure" rev="20080329" org="org.clojure" conf="meandre-kernel->default; meandre-core->default"/>
+        
+<!--        <dependency name="commons-codec" rev="1.3" org="commons-codec" conf=""/>-->
+        <dependency name="commons-fileupload" rev="1.2.1" org="commons-fileupload" conf="meandre-webservices->default"/>
+        <dependency name="commons-httpclient" rev="3.1" org="commons-httpclient" conf="meandre-client->default"/>
+<!--        <dependency name="commons-io" rev="1.4" org="commons-io" conf=""/>-->
+<!--        <dependency name="commons-logging" rev="1.1.1" org="commons-logging" conf=""/>-->
+        
+<!--        <dependency name="concurrent" rev="1.3.4" org="concurrent" conf=""/>-->
+<!--        <dependency name="core" rev="3.1.1" org="org.eclipse.jdt" conf=""/>-->
+        
+        <dependency name="derby" rev="10.4.1.3" org="org.apache.derby" conf="meandre-server->default"/>
+        <!--
+        <dependency name="derbyclient" rev="10.4.1.3" org="org.apache.derby" conf=""/>
+        <dependency name="derbynet" rev="10.4.1.3" org="org.apache.derby" conf=""/>
+        <dependency name="derbyrun" rev="10.4.1.3" org="org.apache.derby" conf=""/>
+        <dependency name="derbytools" rev="10.4.1.3" org="org.apache.derby" conf=""/>
+        
+        <dependency name="dom4j" rev="1.6.1" org="dom4j" conf=""/>
+        <dependency name="icu4j" rev="3.4.4" org="com.ibm.icu" conf=""/>
+        <dependency name="jdom" rev="1.1" org="org.jdom" conf=""/>-->
+        
+        <dependency name="jena" rev="2.5.5" org="com.hp.hpl.jena" conf="meandre-client->default; meandre-demo->default; meandre-zigzag->default; meandre-mau->default; meandre-webservices->default; meandre-store->default; meandre-kernel->default"/>
+<!--        <dependency name="jenatest" rev="2.5.5" org="com.hp.hpl.jena" conf=""/>-->
+        <dependency name="arq" rev="2.5.0" org="com.hp.hpl.jena" conf="meandre-store->default"/>
+<!--        <dependency name="arq-extra" rev="2.5.0" org="com.hp.hpl.jena" conf=""/>-->
+<!--        <dependency name="iri" rev="0.5" org="com.hp.hpl.jena" conf=""/>-->
+        <dependency name="json-jena" rev="1.0" org="com.hp.hpl.jena" conf="meandre-client->default; meandre-plugins->default; meandre-mau->default; meandre-webservices->default; meandre-kernel->default"/>
+        
+<!--        <dependency name="jettison" rev="1.0.1" org="org.codehaus.jettison" conf="; test->default"/>-->
+        <dependency name="jline" rev="0.9.94" org="jline" conf="meandre-zigzag->default"/>
+<!--        <dependency name="joda-time" rev="1.5.2" org="joda-time" conf=""/>-->
+        <dependency name="junit" rev="4.5" org="junit" conf="test->default"/>
+        <dependency name="jython" rev="2.2.1" org="org.python" conf="meandre-webservices->default; meandre-kernel->default"/>
+        
+        <dependency name="jetty" rev="6.1.5" org="org.mortbay.jetty" conf="meandre-plugins->default; meandre-webservices->default; meandre-store->default; meandre-kernel->default"/>
+<!--        <dependency name="jetty-management" rev="6.1.5" org="org.mortbay.jetty" conf=""/>-->
+<!--        <dependency name="jetty-naming" rev="6.1.5" org="org.mortbay.jetty" conf=""/>-->
+        <dependency name="jetty-util" rev="6.1.5" org="org.mortbay.jetty" conf="meandre-plugins->default; meandre-webservices->default;"/>
+<!--        <dependency name="jsp-2.1" rev="6.1.5" org="org.mortbay.jetty" conf=""/>-->
+<!--        <dependency name="jsp-api-2.1" rev="6.1.5" org="org.mortbay.jetty" conf=""/>-->
+<!--        <dependency name="servlet-api-2.5" rev="6.1.5" org="org.mortbay.jetty" conf=""/>-->
+        
+<!--        <dependency name="log4j" rev="1.2.15" org="log4j" conf=""/>-->
+<!--        <dependency name="lucene-core" rev="2.3.1" org="org.apache.lucene" conf=""/>-->
+        
+<!--        <dependency name="mx4j" rev="3.0.1" org="mx4j" conf=""/>-->
+<!--        <dependency name="mx4j-tools" rev="3.0.1" org="mx4j" conf=""/>-->
+        
+<!--        <dependency name="mysql-connector-java" rev="5.1.6" org="mysql" conf=""/>-->
+        <dependency name="prefuse" rev="20071021" org="org.prefuse" conf="meandre-zigzag->default"/>
+        
+<!--        <dependency name="stax" rev="1.2.0" org="stax" conf=""/>-->
+<!--        <dependency name="stax-api" rev="1.0.1" org="stax" conf=""/>-->
+        
+        <dependency name="truezip" rev="6.6" org="de.schlichtherle.io" conf="meandre-plugins->default"/>
+        <!--<dependency name="wstx-asl" rev="3.2.0" org="woodstox" conf=""/>
+        <dependency name="xercesImpl" rev="2.9.1" org="xerces" conf=""/>
+        <dependency name="xml-apis" rev="2.0.2" org="xml-apis" conf=""/>
+        <dependency name="xml-writer" rev="0.2" org="com.megginson.sax" conf=""/>
+        <dependency name="xom" rev="1.1" org="xom" conf=""/>
+        <dependency name="xpp3_min" rev="1.1.4c" org="xpp3" conf=""/>-->
+        
+        <dependency name="xstream" rev="1.3" org="com.thoughtworks.xstream" conf="meandre-kernel->default"/>
+<!--        <dependency name="xstream-benchmark" rev="1.3" org="com.thoughtworks.xstream" conf=""/>-->
+    </dependencies>
+</ivy-module>

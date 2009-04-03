@@ -19,29 +19,29 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 
-/** This class provides a set of tests to the unified base servlet dispatcher shared 
+/** This class provides a set of tests to the unified base servlet dispatcher shared
  * by all the servlets. It takes care of proper routing requests to methods and return
  * formats.
- * 
+ *
  * @author Xavier Llor&agrave;
  *
  */
-public abstract class ServletConfigurableDispatcherTest  {
+public abstract class ServletConfigurableDispatcherTestBase  {
 
 	/** The default port for testing */
 	private final static int iTestPort = 6969;
-	
+
 	/** The main Jetty server */
 	private Server server;
-	
+
 	/** The main context for the webservices */
 	protected Context contextWS;
 
 	/** Creates a fixture to run servlet configurations.
-	 * 
+	 *
 	 */
-	@Before 
-	public void setUp() { 
+	@Before
+	public void setUp() {
 		server = new Server(iTestPort);
 		contextWS = new Context(server,"/",Context.NO_SESSIONS);
 		try {
@@ -52,9 +52,9 @@ public abstract class ServletConfigurableDispatcherTest  {
 			fail("Server failed to start because "+baos.toString());
 		}
 	}
-	
+
 	/** Tears the server down.
-	 * 
+	 *
 	 */
 	@After
 	public void tearDown () {
@@ -67,15 +67,15 @@ public abstract class ServletConfigurableDispatcherTest  {
 		}
 	}
 
-	
+
 	/** Pull the content of a get request.
-	 * 
+	 *
 	 * @param sMethod The method to pull
 	 * @return The content pulled
 	 */
 	protected String getGetRequestContent ( String sMethod ) {
 		try {
-			
+
 			URL url = new URL("http://localhost:"+iTestPort+sMethod);
 			InputStream is = url.openStream();
 			int iRead;
@@ -83,7 +83,7 @@ public abstract class ServletConfigurableDispatcherTest  {
 			while ( (iRead=is.read())>=0 )
 				baos.write(iRead);
 			return baos.toString();
-			
+
 		} catch (MalformedURLException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
@@ -96,10 +96,10 @@ public abstract class ServletConfigurableDispatcherTest  {
 			return null;
 		}
 	}
-	
+
 
 	/** Pull the model of a get request.
-	 * 
+	 *
 	 * @param sMethod The method to pull
 	 * @param sFormat The format of the model
 	 * @return The model pulled
@@ -122,5 +122,5 @@ public abstract class ServletConfigurableDispatcherTest  {
 			return null;
 		}
 	}
-	
+
 }
