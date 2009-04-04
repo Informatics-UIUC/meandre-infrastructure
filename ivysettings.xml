@@ -16,10 +16,6 @@
                 <artifact pattern="http://norma.ncsa.uiuc.edu/public-dav/capitanu/repository/internal/[organisation]/[artifact]-[revision].[ext]"/>
             </url>
             
-            <url name="mvnsearch.org" m2compatible="true">
-                <artifact pattern="http://www.mvnsearch.org/maven2/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]"/>
-            </url>
-            
             <ibiblio name="ibiblio" m2compatible="true"/>
         </chain>
     </resolvers>
