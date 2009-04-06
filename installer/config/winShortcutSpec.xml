@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+
+<shortcuts>
+  <skipIfNotSupported/>
+  
+  <programGroup defaultName="SEASR\Meandre Infrastructure"
+                location="applications"/>
+  <shortcut
+    name="Start Meandre Infrastructure"
+    target="$INSTALL_PATH\bin\startInfrastructure.bat"
+    commandLine=""
+    workingDirectory="$INSTALL_PATH"
+    description="Start Meandre Infrastructure"
+    iconFile="$INSTALL_PATH\images\MDR.ico"
+    iconIndex="0"
+    initialState="noShow"
+    programGroup="yes"
+    desktop="yes"
+    applications="yes"
+    startMenu="no"
+    startup="no">
+
+    <createForPack name="Infrastructure Application"/>
+  </shortcut>
+  
+  <shortcut
+    name="Uninstall Meandre Infrastructure"
+    target="$INSTALL_PATH\bin\uninstallInfrastructure.bat"
+    commandLine=""
+    description="Uninstall Meandre Infrastructure"
+    initialState="noShow"
+    programGroup="yes"
+    applications="yes"
+    desktop="no"
+    startMenu="no"
+    startup="no">
+    
+    <createForPack name="Infrastructure Application"/>
+  </shortcut>
+</shortcuts>

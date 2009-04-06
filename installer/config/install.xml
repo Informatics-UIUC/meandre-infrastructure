@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+<!-- 
+    Meandre Infrastructure installation file.
+-->
+
+<installation version="1.0">
+
+    <!-- 
+        The info section.
+        The meaning of the tags should be obvious ...
+    -->
+    <info>
+        <appname>@{ant.project.name}</appname>
+        <appversion>@{version}</appversion>
+        <appsubpath>SEASR/Infrastructure</appsubpath>
+        <authors>
+            <author name="The SEASR Project" email="http://seasr.org"/>
+        </authors>
+        <javaversion>1.5</javaversion>
+        <requiresjdk>no</requiresjdk>
+        <writeinstallationinformation>no</writeinstallationinformation>
+        <!-- <run-privileged condition="izpack.windowsinstall.vista|izpack.macinstall"/> --> 
+    </info>
+    
+    <variables>
+        <variable name="DesktopShortcutCheckboxEnabled" value="true"/>
+        <variable name="APP_JAR" value="@{infrastructure.jar.file}"/>
+    </variables>
+
+    <!-- 
+        The gui preferences indication.
+        Sets the installer window to 700x600. Users will be able to change the size.
+    -->
+    <guiprefs width="700" height="590" resizable="no">
+    	<modifier key="useButtonIcons" value="yes"/>
+  		<modifier key="useLabelIcons" value="yes"/>
+  		<modifier key="labelGap" value="2"/>
+		<modifier key="layoutAnchor" value="CENTER"/>
+		<modifier key="useHeadingPanel" value="yes"/>
+		<modifier key="headingLineCount" value="1"/>
+		<modifier key="headingFontSize" value="1.5"/>
+		<modifier key="headingBackgroundColor" value="0x00ffffff"/>
+		<modifier key="headingPanelCounter" value="text"/>
+		<modifier key="headingPanelCounterPos" value="inHeading"/>
+	</guiprefs>
+
+    <!-- 
+        The locale section.
+        Include the English langpack.
+    -->
+    <locale>
+        <langpack iso3="eng"/>
+    </locale>
+
+    <!-- 
+        The resources section.
+        The ids must be these ones if you want to use the LicencePanel and/or the InfoPanel.
+    -->
+    <resources>
+    	<res id="Heading.image" src="config/images/logo_seasr.gif"/>
+    	<res id="Installer.image.0" src="config/images/border1.png"/>
+    	<res id="Installer.image.1" src="config/images/border2.png"/>
+    	<res id="Installer.image.2" src="config/images/border3.png"/>
+    	<res id="Installer.image.3" src="config/images/border4.png"/>
+    	<res id="Installer.image.4" src="config/images/border5.png"/>
+    	<res id="Installer.image.5" src="config/images/border5.png"/>
+    	<res id="Installer.image.6" src="config/images/border6.png"/>
+    	<res id="Installer.image.7" src="config/images/border7.png"/>
+    	<res id="Installer.image.8" src="config/images/border8.png"/>
+    	<res id="HTMLInfoPanel.info" src="deploy/doc/README.html"/>
+        <res id="HTMLLicencePanel.licence" src="deploy/doc/LICENSE.html"/>
+        <res id="CustomLangpack.xml_eng" src="config/custom.eng.xml"/>
+        <res id="Unix_shortcutSpec.xml" src="config/unixShortcutSpec.xml"/>
+        <res id="shortcutSpec.xml" src="config/winShortcutSpec.xml"/>
+    </resources>
+
+    <!-- 
+        The panels section.
+        We indicate here which panels we want to use. The order will be respected.
+    -->
+    <panels>
+        <panel classname="HelloPanel"/>
+        <panel classname="HTMLInfoPanel"/>
+        <panel classname="HTMLLicencePanel"/>
+        <panel classname="TargetPanel"/>
+        <panel classname="PacksPanel"/>
+        <panel classname="SummaryPanel"/>
+        <panel classname="InstallPanel"/>
+        <panel classname="ShortcutPanel"/>
+        <panel classname="SimpleFinishPanel"/>
+    </panels>
+
+    <!-- 
+        The packs section.
+        Here we specify what is installed and where.
+    -->
+    <packs>
+        <pack name="Infrastructure Application" required="yes">
+            <description>The Jetty-based standalone Meandre Infrastructure server</description>
+            
+            <fileset dir="deploy/doc" targetdir="$INSTALL_PATH/doc"/>
+            <fileset dir="deploy/bin" targetdir="$INSTALL_PATH/bin" includes="*.bat" os="windows"/>
+            <fileset dir="deploy/bin" targetdir="$INSTALL_PATH/bin" includes="*.sh" condition="izpack.linuxinstall"/>
+            <fileset dir="deploy/bin" targetdir="$INSTALL_PATH/bin" includes="*.command" condition="izpack.macinstall"/>
+            
+            <file src="@{dist.dir}/@{infrastructure.jar.file}" targetdir="$INSTALL_PATH/lib"/>
+            <file src="deploy/images/MDR.ico" targetdir="$INSTALL_PATH/images" os="windows"/>
+            <file src="deploy/images/MDR.png" targetdir="$INSTALL_PATH/images" condition="izpack.linuxinstall"/>
+            
+            <parsable targetfile="$INSTALL_PATH/bin/startInfrastructure.bat" os="windows"/>
+            <parsable targetfile="$INSTALL_PATH/bin/uninstallInfrastructure.bat" os="windows"/>
+            <parsable targetfile="$INSTALL_PATH/bin/startInfrastructure.sh" condition="izpack.linuxinstall"/>
+            <parsable targetfile="$INSTALL_PATH/bin/uninstallInfrastructure.sh" condition="izpack.linuxinstall"/>
+            <parsable targetfile="$INSTALL_PATH/bin/startInfrastructure.command" condition="izpack.macinstall"/>
+            <parsable targetfile="$INSTALL_PATH/bin/uninstallInfrastructure.command" condition="izpack.macinstall"/>
+            
+            <executable targetfile="$INSTALL_PATH/bin/startInfrastructure.sh" stage="never" condition="izpack.linuxinstall"/>
+            <executable targetfile="$INSTALL_PATH/bin/uninstallInfrastructure.sh" stage="never" condition="izpack.linuxinstall"/>
+            <executable targetfile="$INSTALL_PATH/bin/startInfrastructure.command" stage="never" condition="izpack.macinstall"/>
+            <executable targetfile="$INSTALL_PATH/bin/uninstallInfrastructure.command" stage="never" condition="izpack.macinstall"/>            
+            
+            <file src="deploy/scripts/postinstall.mac.sh" targetdir="$INSTALL_PATH" condition="izpack.macinstall"/>
+            <parsable targetfile="$INSTALL_PATH/postinstall.mac.sh" condition="izpack.macinstall"/>
+            <executable targetfile="$INSTALL_PATH/postinstall.mac.sh" stage="postinstall" condition="izpack.macinstall"/>
+            
+            <file src="deploy/scripts/postuninstall.mac.sh" targetdir="$INSTALL_PATH/Uninstaller" condition="izpack.macinstall"/>
+            <parsable targetfile="$INSTALL_PATH/Uninstaller/postuninstall.mac.sh" condition="izpack.macinstall"/>
+            <executable targetfile="$INSTALL_PATH/Uninstaller/postuninstall.mac.sh" stage="uninstall" condition="izpack.macinstall"/>
+        </pack>
+    </packs>
+    
+    <!-- The native libraries to add. This is required for creating shortcuts on Windows -->
+    <native type="izpack" name="ShellLink.dll"/>
+
+</installation>

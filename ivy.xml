@@ -9,6 +9,7 @@
     
     <configurations>
         <conf name="svntask" description="for svn access" visibility="private"/>
+        <conf name="izpack" description="for building the graphical installer" visibility="private"/>
         
         <conf name="component-api" description="for creating components" extends="meandre-annotation, meandre-kernel"/>
         
@@ -52,6 +53,8 @@
         <dependency name="svnant" rev="1.2.1" org="subclipse.tigris.org" conf="svntask->default"/>
         <dependency name="svnjavahl" rev="1.2.1" org="subclipse.tigris.org" conf="svntask->default"/>
         <dependency name="svnClientAdapter" rev="1.2.1" org="subclipse.tigris.org" conf="svntask->default"/>
+        
+        <dependency name="izpack-standalone-compiler" rev="4.2.1" org="org.codehaus.izpack" conf="izpack->default"/>
         
         <!-- External dependencies -->
         <dependency name="clojure" rev="20080329" org="org.clojure" conf="meandre-kernel->default"/>

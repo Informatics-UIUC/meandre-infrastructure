@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+
+<shortcuts>
+
+  <programGroup defaultName="SEASR/Meandre Infrastructure"
+  location="applications"/>
+
+  <shortcut
+     name="Meandre Infrastructure"
+     programGroup="yes"
+     desktop="yes"
+     applications="no"
+     startMenu="yes"
+     startup="no"
+     target="$INSTALL_PATH/bin/startInfrastructure.sh"
+     commandLine=""
+     workingDirectory="$INSTALL_PATH"
+     description="Meandre Infrastructure"
+     iconFile="$INSTALL_PATH/images/MDR.png"
+     iconIndex="0"
+     type="Application"
+     encoding="UTF-8"
+     terminal="true"
+     KdeSubstUID="false"
+     initialState="normal">
+     <createForPack name="Infrastructure Application"/>
+   </shortcut>
+   
+</shortcuts>

@@ -12,7 +12,7 @@
         message="This project requires at least Java 5. Please set JAVA_HOME to point to where the JDK is installed."/>
     
     <!-- here is the version of ivy we will use. change this property to try a newer version if you want -->
-    <property name="ivy.install.version" value="2.0.0" />
+    <property name="ivy.install.version" value="2.1.0-rc1" />
     <property name="ivy.jar.dir" value="${basedir}/ivy" />
     <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
     
@@ -29,6 +29,7 @@
     <property name="test.dir" value="${basedir}/test"/>
     <property name="data.dir" value="${basedir}/data"/>
     <property name="doc.dir" value="${basedir}/javadoc"/>
+    <property name="installer.dir" value="${basedir}/installer"/>
  
     <property name="version.template" value="${basedir}/version.tpl"/>
     <property name="version.file" value="${basedir}/src-kernel/code/org/meandre/core/utils/Version.java"/>
@@ -67,6 +68,12 @@
     <target name="install-svnant" depends="install-ivy">
         <ivy:cachepath pathid="svnant.classpath" conf="svntask"/>
         <typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
+    </target>
+    
+    <target name="install-izpack" depends="install-ivy">
+        <ivy:cachepath pathid="izpack.classpath" conf="izpack"/>
+        <!-- Allows us to use the IzPack Ant task to create the graphical installer -->
+        <taskdef name="IzPack" classpathref="izpack.classpath" classname="com.izforge.izpack.ant.IzPackTask"/>
     </target>
     
     <target name="resolve" depends="install-ivy">
@@ -132,6 +139,7 @@
         </tstamp>
         
         <property name="version.full" value="${version}.${svn_revision}"/>
+        <property name="infrastructure.jar.file" value="meandre-server-${version.full}.jar"/>
     </target>
     
     <target name="check.version.upToDate">
@@ -355,7 +363,7 @@
         <delete file="${release.tmp.dir}/LICENSE" quiet="true"/>
         
         <!-- Creating the Meandre server jar distribution -->
-        <jar destfile="${dist.dir}/meandre-server-${version.full}.jar" basedir="${release.tmp.dir}">
+        <jar destfile="${dist.dir}/${infrastructure.jar.file}" basedir="${release.tmp.dir}">
             <manifest>
                 <attribute name="Build-Version" value="${version.full}"/>
                 <attribute name="Build-Date" value="${TIMESTAMP}"/>
@@ -397,7 +405,16 @@
         <delete dir="${release.tmp.dir}"/>
     </target>
     
-    <target name="dist" depends="dist-libs, dist-standalone" description="-> creates distribution suite"/>
+    <target name="dist-installer" depends="dist-standalone, install-izpack" description="-> creates Infrastructure graphical installer">
+        <IzPack 
+            input="${installer.dir}/config/install.xml"
+            output="${dist.dir}/meandre-server-${version.full}-install.jar"
+            installerType="standard"
+            basedir="${installer.dir}"
+            inheritAll="true"/>
+    </target>
+    
+    <target name="dist" depends="dist-libs, dist-standalone, dist-installer" description="-> creates distribution suite"/>
     
     <target name="publish" depends="run-tests, dist" description="-> publishes the build artifacts to the ivy repository">
         <ivy:publish 
