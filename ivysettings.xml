@@ -3,7 +3,7 @@
     <settings defaultResolver="seasrchain"/>
         
     <resolvers>
-        <chain name="seasrchain" returnFirst="true">
+        <chain name="seasrchain">
             <url name="seasr">
                 <ivy pattern="http://candy.ncsa.uiuc.edu/repository/seasr/[organisation]/[module]/ivys/ivy-[revision].xml"/>
                 <artifact pattern="http://candy.ncsa.uiuc.edu/repository/seasr/[organisation]/[module]/[artifact]-[revision].[ext]"/>
@@ -21,21 +21,6 @@
             
             <ibiblio name="ibiblio" m2compatible="true"/>
         </chain>
-        
-        <sftp name="seasr-upload" host="${ivy.repo.host}">
-            <ivy pattern="${ivy.repo.path}/[organisation]/[module]/ivys/ivy-[revision].xml"/>
-            <artifact pattern="${ivy.repo.path}/[organisation]/[module]/[artifact]-[revision].[ext]"/>
-        </sftp>
-        
-        <!--<sftp name="dependencies-upload" host="${ivy.repo.host}">
-            <ivy pattern="${ivy.repo.path}/[organisation]/[module]/ivys/ivy-[revision].xml"/>
-            <artifact pattern="${ivy.repo.path}/[organisation]/[module]/[artifact]-[revision].[ext]"/>
-        </sftp>-->
-        
-       <!-- <vfs name="seasr-upload">
-            <ivy pattern="sftp://${user}:${password}@${ivy.repo.host}${ivy.repo.path}/[organisation]/[module]/ivys/ivy-[revision].xml" />
-            <artifact pattern="sftp://${user}:${password}@${ivy.repo.host}${ivy.repo.path}/[organisation]/[module]/[artifact]-[revision].[ext]" />
-        </vfs> -->
     </resolvers>
     
     <modules>
