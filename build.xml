@@ -352,58 +352,51 @@
     </target>
     
     <target name="dist-standalone" depends="compile" description="-> creates standalone distribution jars">
-        <tempfile property="release.tmp.dir" destdir="${dist.dir}" prefix="release" suffix=".tmp"/>
-        <mkdir dir="${release.tmp.dir}"/>
-        <copy todir="${release.tmp.dir}" includeEmptyDirs="no">
-            <fileset dir="${build.src.dir}"/>
-        </copy>
-        <unjar dest="${release.tmp.dir}">
-            <fileset refid="meandre.server.libs"/>
-        </unjar>
-        <delete file="${release.tmp.dir}/META-INF/MANIFEST.MF" quiet="true"/>
-        <delete file="${release.tmp.dir}/LICENSE" quiet="true"/>
+        <manifest file="MANIFEST.MF">
+            <attribute name="Build-Version" value="${version.full}"/>
+            <attribute name="Build-Date" value="${TIMESTAMP}"/>
+            <attribute name="Built-By" value="${user.name}"/>
+        </manifest>
+        
+        <fileset id="src.build.output" dir="${build.src.dir}"/>
         
         <!-- Creating the Meandre server jar distribution -->
-        <jar destfile="${dist.dir}/${infrastructure.jar.file}" basedir="${release.tmp.dir}">
+        <jar destfile="${dist.dir}/${infrastructure.jar.file}" manifest="MANIFEST.MF">
             <manifest>
-                <attribute name="Build-Version" value="${version.full}"/>
-                <attribute name="Build-Date" value="${TIMESTAMP}"/>
-                <attribute name="Built-By" value="${user.name}"/>
                 <attribute name="Main-Class" value="org.meandre.webservices.WSInfrastructureBootstrapper"/>
             </manifest>
+            <fileset refid="src.build.output"/>
+            <zipgroupfileset refid="meandre.server.libs"/>
         </jar>
         
         <!-- Creating the Meandre ZigZag compiler jar distribution -->
-        <jar destfile="${dist.dir}/zzc-${version.full}.jar" basedir="${release.tmp.dir}">
+        <jar destfile="${dist.dir}/zzc-${version.full}.jar" manifest="MANIFEST.MF">
             <manifest>
-                <attribute name="Build-Version" value="${version.full}"/>
-                <attribute name="Build-Date" value="${TIMESTAMP}"/>
-                <attribute name="Built-By" value="${user.name}"/>
                 <attribute name="Main-Class" value="org.meandre.zigzag.parser.ZigZag"/>
             </manifest>
+            <fileset refid="src.build.output"/>
+            <zipgroupfileset refid="meandre.server.libs"/>
         </jar>
         
         <!-- Creating the Meandre mau executor jar distribution -->
-        <jar destfile="${dist.dir}/zzre-${version.full}.jar" basedir="${release.tmp.dir}">
+        <jar destfile="${dist.dir}/zzre-${version.full}.jar" manifest="MANIFEST.MF">
             <manifest>
-                <attribute name="Build-Version" value="${version.full}"/>
-                <attribute name="Build-Date" value="${TIMESTAMP}"/>
-                <attribute name="Built-By" value="${user.name}"/>
                 <attribute name="Main-Class" value="org.meandre.mau.MAUExecutor"/>
             </manifest>
+            <fileset refid="src.build.output"/>
+            <zipgroupfileset refid="meandre.server.libs"/>
         </jar>
         
         <!-- Creating the Meandre interpreter console jar distribution -->
-        <jar destfile="${dist.dir}/zz-${version.full}.jar" basedir="${release.tmp.dir}">
+        <jar destfile="${dist.dir}/zz-${version.full}.jar" manifest="MANIFEST.MF">
             <manifest>
-                <attribute name="Build-Version" value="${version.full}"/>
-                <attribute name="Build-Date" value="${TIMESTAMP}"/>
-                <attribute name="Built-By" value="${user.name}"/>
                 <attribute name="Main-Class" value="org.meandre.zigzag.console.ZigZagConsole"/>
             </manifest>
+            <fileset refid="src.build.output"/>
+            <zipgroupfileset refid="meandre.server.libs"/>
         </jar>
         
-        <delete dir="${release.tmp.dir}"/>
+        <delete file="MANIFEST.MF" quiet="true"/>
     </target>
     
     <target name="dist-installer" depends="dist-standalone, install-izpack" description="-> creates Infrastructure graphical installer">
