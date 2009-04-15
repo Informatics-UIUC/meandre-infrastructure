@@ -11,6 +11,19 @@ import org.meandre.core.engine.Probe;
 public class NullProbeImpl 
 implements Probe {
 
+	/** Invoked when the probe object get instantiated.
+	 * 
+	 */
+	public void initialize () {
+		
+	}
+	
+	/** Invoked when the probe object has finished its live cycle.
+	 * 
+	 */
+	public void dispose() {
+		
+	}
 	
 	/** The flow started executing.
 	 * 
@@ -19,6 +32,14 @@ implements Probe {
 	 */
 	public void probeFlowStart(String sFlowUniqueID, Date ts, String weburl) {
 		
+	}
+	
+	
+	/** Returns the serialized probe information.
+	 * 
+	 */
+	public String serializeProbeInformation() {
+		return "";
 	}
 	
 	/** The flow stopped executing.

@@ -73,6 +73,12 @@ implements Probe {
 	 * 
 	 */
 	public StatisticsProbeImpl () {
+	}
+	
+	/** Invoked when the probe object get instantiated.
+	 * 
+	 */
+	public void initialize () {
 		this.sFlowID = null;
 		this.flowStatus = null;
 		this.dateFlowStart = null;
@@ -84,6 +90,24 @@ implements Probe {
 		this.htExecutableComponentsExecutionDataIn = new Hashtable<String,Long>();  
 		this.htExecutableComponentsExecutionDataOut = new Hashtable<String,Long>(); 
 		this.htExecutableComponentsExecutionReadProperties = new Hashtable<String,Long>(); 
+	}
+	
+	/** Invoked when the probe object has finished its live cycle.
+	 * 
+	 */
+	public void dispose() {
+		this.sFlowID = null;
+		this.flowStatus = null;
+		this.dateFlowStart = null;
+		this.dateLatestDate = null;
+		this.htExecutableComponentsStates = null;
+		this.htExecutableComponentsTimesFired = null;
+		this.htExecutableComponentsExecutionTime = null;
+		this.htExecutableComponentsFiredTimeStamp = null;
+		this.htExecutableComponentsExecutionDataIn = null;
+		this.htExecutableComponentsExecutionDataOut = null;
+		this.htExecutableComponentsExecutionReadProperties = null;
+
 	}
 	
 	/** The flow started executing.
@@ -270,7 +294,7 @@ implements Probe {
 	 * @return The JSONObject containing the statistics
 	 * @throws ProbeException A problem arised with serialzing the statistics
 	 */
-	public JSONObject getSerializedStatistics () throws ProbeException {
+	protected JSONObject getSerializedStatistics () throws ProbeException {
 		JSONObject joRes = new JSONObject();
 	
 		try {
@@ -310,6 +334,19 @@ implements Probe {
 		
 		
 		return joRes;
+	}
+	
+	
+	/** Returns the serialized probe information.
+	 * 
+	 */
+	public String serializeProbeInformation() {
+		try {
+			return getSerializedStatistics().toString(3);
+		}
+		catch ( Exception e ) {
+			return "{\"error: \"Could not serialize the probe to JSON\"}";
+		}
 	}
 
 	/** Returns a readable version of the executable component state.

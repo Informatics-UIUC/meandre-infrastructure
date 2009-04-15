@@ -206,5 +206,12 @@ public class Executor {
 	public String getThreadGroupName() {
 		return tg.getName();
 	}
+	
+	/** Request the execution abortion.
+	 * 
+	 */
+	public void requestAbort() {
+		thdMrPropper.abort();
+	}
 
 }

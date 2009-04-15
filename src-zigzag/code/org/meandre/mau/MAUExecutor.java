@@ -21,6 +21,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.engine.Conductor;
@@ -145,7 +146,11 @@ public class MAUExecutor {
 	 * @throws ProbeException The statistics could not be retrieved
 	 */
 	public JSONObject getStatistics () throws ProbeException {
-		return spi.getSerializedStatistics();
+		try {
+			return new JSONObject(spi.serializeProbeInformation());
+		} catch (JSONException e) {
+			throw new ProbeException(e);
+		}
 	}
 
 	/** Returns the termination status for the execution
@@ -396,7 +401,7 @@ public class MAUExecutor {
 	 */
 	protected void printStatistics() {
 		try {
-			JSONObject jsonStats = spi.getSerializedStatistics();
+			JSONObject jsonStats = new JSONObject(spi.serializeProbeInformation());
 			ps.println("----------------------------------------------------------------------------");
 			ps.println();
 			ps.println("Flow execution statistics");
@@ -426,6 +431,7 @@ public class MAUExecutor {
 		catch ( Exception e ) {
 			KernelLoggerFactory.getCoreLogger().warning("This exception should have never been thrown\n"+e);
 		}
+		spi.dispose();
 	}
 	
 	

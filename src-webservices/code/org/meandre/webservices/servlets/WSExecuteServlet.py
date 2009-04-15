@@ -51,13 +51,14 @@ def execute_flow ( request, response, format ):
                 tokens = [str(System.currentTimeMillis()) for i in range(len(uris))]
             else :
                 tokens = params['token']
-            if 'statistics' not in params :
-                stats = ['true' in params for i in range(len(uris))]
-            else :
-                stats = params['statistics']
+            keys = params.keys()
+            names = []
+            for k in keys :
+                if k!='uri' and k!='token' and params[k][0] == 'true' :
+                    names.append(k)
+            prob_names = [names for i in range(len(uris))]
             content = []
-            for flow_uri, stat, token in zip(uris,stats,tokens): 
-                stat = stat=='true'
+            for flow_uri, probs, token in zip(uris,prob_names,tokens): 
                 statusOK(response)
                 qr = meandre_store.getRepositoryStore(getMeandreUser(request))
                 job = JobDetail()
@@ -66,7 +67,7 @@ def execute_flow ( request, response, format ):
                 if format == 'txt' :
                     fuid = InteractiveExecution.createUniqueExecutionFlowID(flow_uri,meandre_config.getBasePort())
                     jiba.startJob(fuid,getMeandreUser(request))
-                    res = InteractiveExecution.executeVerboseFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,stat,token,job,fuid,jiba)
+                    res = InteractiveExecution.executeVerboseFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,probs,token,job,fuid,jiba)
                     if res :
                         jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_COMPLETED)
                     else :
@@ -198,9 +199,9 @@ def execute_repository ( request, response, format ):
         if qr is not None :
             uris = [uri.toString() for uri in qr.getAvailableFlows()]
             tokens = [str(System.currentTimeMillis()) for i in range(len(uris))]
-            stats = [True for i in range(len(uris))]
+            prob_names = [['statistics'] for i in range(len(uris))]
             content = []
-            for flow_uri, stat, token in zip(uris,stats,tokens): 
+            for flow_uri, probs, token in zip(uris,prob_names,tokens): 
                 statusOK(response)
                 job = JobDetail()
                 executionTokenMap[token] = job
@@ -208,7 +209,7 @@ def execute_repository ( request, response, format ):
                 if format == 'txt' :
                     fuid = InteractiveExecution.createUniqueExecutionFlowID(flow_uri,meandre_config.getBasePort())
                     jiba.startJob(fuid,getMeandreUser(request))
-                    res = InteractiveExecution.executeVerboseFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,stat,token,job,fuid,jiba)
+                    res = InteractiveExecution.executeVerboseFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,probs,token,job,fuid,jiba)
                     if res :
                         jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_COMPLETED)
                     else :

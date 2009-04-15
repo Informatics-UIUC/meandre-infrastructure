@@ -16,7 +16,6 @@ import org.json.JSONObject;
 import org.json.XML;
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.engine.Probe;
-import org.meandre.core.engine.ProbeException;
 import org.meandre.core.engine.probes.StatisticsProbeImpl;
 import org.mortbay.jetty.HttpConnection;
 import org.mortbay.jetty.Request;
@@ -200,8 +199,8 @@ public class WebUIDispatcher extends AbstractHandler {
 				if ( p instanceof StatisticsProbeImpl ) {
 					JSONObject jsonStats = null;
 					try {
-						jsonStats = ((StatisticsProbeImpl)p).getSerializedStatistics();
-					} catch (ProbeException e) {
+						jsonStats = new JSONObject(p.serializeProbeInformation());
+					} catch (JSONException e) {
 						throw new IOException(e.toString());
 					}
 					
@@ -260,6 +259,7 @@ public class WebUIDispatcher extends AbstractHandler {
 		    			break;
 		    		}
 				}
+				p.dispose();
 			}
     	}
     	else {

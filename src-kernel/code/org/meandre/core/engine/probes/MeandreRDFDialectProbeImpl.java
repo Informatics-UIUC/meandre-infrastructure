@@ -1,5 +1,6 @@
 package org.meandre.core.engine.probes;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
 import org.meandre.core.engine.Probe;
@@ -29,8 +30,33 @@ implements Probe {
 	 * 
 	 */
 	public MeandreRDFDialectProbeImpl () {
+	}
+	
+	/** Invoked when the probe object get instantiated.
+	 * 
+	 */
+	public void initialize () {
 		// Create the model
 		this.modProbe = ModelFactory.createDefaultModel();
+		setNameSpaces();
+	}
+	
+	/** Invoked when the probe object has finished its live cycle.
+	 * 
+	 */
+	public void dispose() {
+		// Create the model
+		this.modProbe = null;
+	}
+	
+	
+	/** Returns the serialized probe information.
+	 * 
+	 */
+	public String serializeProbeInformation() {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		this.modProbe.write(baos,"N-TRIPLE");
+		return  baos.toString();
 	}
 	
 	/** Create a new probe that does record anything to the provided model.
@@ -302,7 +328,7 @@ implements Probe {
 	 * 
 	 * @return The model
 	 */
-	public Model getModel () {
+	protected Model getModel () {
 		return modProbe;
 	}
 

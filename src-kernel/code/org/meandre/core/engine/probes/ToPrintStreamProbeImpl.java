@@ -24,6 +24,27 @@ implements Probe {
 		this.psOut = ps;
 	}
 	
+	/** Invoked when the probe object get instantiated.
+	 * 
+	 */
+	public void initialize (){
+	}
+	
+	/** Invoked when the probe object has finished its live cycle.
+	 * 
+	 */
+	public void dispose() {
+		this.psOut = null;
+	}
+	
+	
+	/** Returns the serialized probe information.
+	 * 
+	 */
+	public String serializeProbeInformation() {
+		return "";
+	}
+	
 	/** The flow started executing.
 	 * 
 	 * @param sFlowUniqueID The unique execution flow ID

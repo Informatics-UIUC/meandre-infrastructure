@@ -28,6 +28,20 @@ public interface Probe {
 		EXECUTABLE_COMPONENT_COOLING_DOWN	// The executable component is cooling down
 	}
 	
+	/** Invoked when the probe object get instantiated.
+	 * 
+	 */
+	public void initialize ();
+	
+	/** Invoked when the probe object has finished its live cycle.
+	 * 
+	 */
+	public void dispose();
+	
+	/** Returns the serialized probe information.
+	 * 
+	 */
+	public String serializeProbeInformation();
 	
 	/** The flow started executing.
 	 * 

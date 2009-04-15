@@ -15,6 +15,10 @@ import org.meandre.core.engine.Conductor;
 import org.meandre.core.engine.ConductorException;
 import org.meandre.core.engine.Executor;
 import org.meandre.core.engine.MrProbe;
+import org.meandre.core.engine.Probe;
+import org.meandre.core.engine.ProbeException;
+import org.meandre.core.engine.probes.NullProbeImpl;
+import org.meandre.core.engine.probes.ProbeFactory;
 import org.meandre.core.engine.probes.StatisticsProbeImpl;
 import org.meandre.core.repository.CorruptedDescriptionException;
 import org.meandre.core.repository.FlowDescription;
@@ -43,7 +47,7 @@ public class InteractiveExecution {
 	 * @param sURI The URI of the flow to execute
 	 * @param outStream The output stream to use to output messages
 	 * @param cnf The core configuration object
-	 * @param bStats Should statistics be collected
+	 * @param saProbes The name of the probes to use
 	 * @param sToken The token to assign to the execution of the flow
 	 * @param job The job detail information bean
 	 * @param sFUID The flow execution unique ID
@@ -55,8 +59,8 @@ public class InteractiveExecution {
 	 */
 	public static boolean executeVerboseFlowURI( QueryableRepository qr, 
 			String sURI, OutputStream outStream, CoreConfiguration cnf, 
-			boolean bStats, String sToken, JobDetail job, String sFUID,
-			JobInformationBackendAdapter jiba )  {
+			String [] saProbes , String sToken, JobDetail job, String sFUID,
+			JobInformationBackendAdapter jiba)  {
 
 		PersistentPrintStream pw = new PersistentPrintStream(
 				new PrintStream(outStream),
@@ -84,17 +88,12 @@ public class InteractiveExecution {
 		Executor exec =null;
 
 		// Redirecting the output
-		StatisticsProbeImpl spi = null;
+		Probe[] pa = null;
 		try {
-			if ( !bStats ){
-				exec = conductor.buildExecutor(qr,resURI,pw,sFUID);
-			}
-			else {
-				spi = new StatisticsProbeImpl();
-				MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),spi,false,false);
-				exec = conductor.buildExecutor(qr, resURI, mrProbe,pw,sFUID);
-				mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
-			}
+			pa = instantiateProbes(saProbes,cnf);
+			MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),pa,false,false);
+			exec = conductor.buildExecutor(qr, resURI, mrProbe,pw,sFUID);
+			mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
 			pw.flush();
 			int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
 			
@@ -162,42 +161,62 @@ public class InteractiveExecution {
 			pw.println(te);
 			pw.flush();
 		}
+		catch ( Throwable t ) {
+			exec.requestAbort();
+			pw.println("----------------------------------------------------------------------------");
+			pw.print("Unknow execption at: ");
+			pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
+			pw.println("----------------------------------------------------------------------------");
+			pw.println();
+			t.printStackTrace(pw);
+			pw.println();
+			pw.flush();
+		}
 
-		if ( bStats ) {
-			try {
-				JSONObject jsonStats = spi.getSerializedStatistics();
+		for (Probe p:pa) {
+			if ( p instanceof StatisticsProbeImpl ) {
+				try {
+					JSONObject jsonStats = new JSONObject(p.serializeProbeInformation());
+					pw.println("----------------------------------------------------------------------------");
+					pw.println();
+					pw.println("Flow execution statistics");
+					pw.println();
+					pw.println("Flow unique execution ID : "+jsonStats.get("flow_unique_id"));
+					pw.println("Flow state               : "+jsonStats.get("flow_state"));
+					pw.println("Started at               : "+jsonStats.get("started_at"));
+					pw.println("Last update              : "+jsonStats.get("latest_probe_at"));
+					pw.println("Total run time (ms)      : "+jsonStats.get("runtime"));
+					pw.println();
+					pw.flush();
+	
+					JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
+					for ( int i=0,iMax=jaEXIS.length() ; i<iMax ; i++ ) {
+						JSONObject joEXIS = (JSONObject) jaEXIS.get(i);
+						pw.println("\tExecutable components instance ID          : "+joEXIS.get("executable_component_instance_id"));
+						pw.println("\tExecutable components state                : "+joEXIS.get("executable_component_state"));
+						pw.println("\tTimes the executable components fired      : "+joEXIS.get("times_fired"));
+						pw.println("\tAccumulated executable components run time : "+joEXIS.get("accumulated_runtime"));
+						pw.println("\tPieces of data pulled                      : "+joEXIS.get("pieces_of_data_in"));
+						pw.println("\tPieces of data pushed                      : "+joEXIS.get("pieces_of_data_out"));
+						pw.println("\tNumber of properties read                  : "+joEXIS.get("number_of_read_properties"));
+						pw.println();
+					}
+					pw.flush();
+				}
+				catch ( Exception e ) {
+					WSLoggerFactory.getWSLogger().warning("This exception should have never been thrown\n"+e);
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					e.printStackTrace(new PrintStream(baos));
+					WSLoggerFactory.getWSLogger().warning(baos.toString());
+				}
+			}
+			else {
 				pw.println("----------------------------------------------------------------------------");
 				pw.println();
-				pw.println("Flow execution statistics");
-				pw.println();
-				pw.println("Flow unique execution ID : "+jsonStats.get("flow_unique_id"));
-				pw.println("Flow state               : "+jsonStats.get("flow_state"));
-				pw.println("Started at               : "+jsonStats.get("started_at"));
-				pw.println("Last update              : "+jsonStats.get("latest_probe_at"));
-				pw.println("Total run time (ms)      : "+jsonStats.get("runtime"));
-				pw.println();
-				pw.flush();
-
-				JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
-				for ( int i=0,iMax=jaEXIS.length() ; i<iMax ; i++ ) {
-					JSONObject joEXIS = (JSONObject) jaEXIS.get(i);
-					pw.println("\tExecutable components instance ID          : "+joEXIS.get("executable_component_instance_id"));
-					pw.println("\tExecutable components state                : "+joEXIS.get("executable_component_state"));
-					pw.println("\tTimes the executable components fired      : "+joEXIS.get("times_fired"));
-					pw.println("\tAccumulated executable components run time : "+joEXIS.get("accumulated_runtime"));
-					pw.println("\tPieces of data pulled                      : "+joEXIS.get("pieces_of_data_in"));
-					pw.println("\tPieces of data pushed                      : "+joEXIS.get("pieces_of_data_out"));
-					pw.println("\tNumber of properties read                  : "+joEXIS.get("number_of_read_properties"));
-					pw.println();
-				}
-				pw.flush();
+				for ( String s:p.serializeProbeInformation().split("\n"))
+					pw.println(s);
 			}
-			catch ( Exception e ) {
-				WSLoggerFactory.getWSLogger().warning("This exception should have never been thrown\n"+e);
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				e.printStackTrace(new PrintStream(baos));
-				WSLoggerFactory.getWSLogger().warning(baos.toString());
-			}
+			p.dispose();
 		}
 		pw.close();
 		
@@ -241,10 +260,10 @@ public class InteractiveExecution {
 		Executor exec =null;
 
 		// Redirecting the output
-		StatisticsProbeImpl spi = null;
+		Probe probe = null;
 		try {
-			spi = new StatisticsProbeImpl();
-			MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),spi,false,false);
+			probe = new NullProbeImpl();
+			MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),probe,false,false);
 			exec = conductor.buildExecutor(qr, resURI, mrProbe,pw,sFUID);
 			mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
 		
@@ -300,6 +319,18 @@ public class InteractiveExecution {
 			pw.println(te);
 			pw.flush();
 		}
+		catch ( Throwable t ) {
+			exec.requestAbort();
+			pw.println("----------------------------------------------------------------------------");
+			pw.print("Unknow execption at: ");
+			pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
+			pw.println("Flow execution abort requested");
+			pw.println("----------------------------------------------------------------------------");
+			pw.println();
+			t.printStackTrace(pw);
+			pw.println();
+			pw.flush();
+		}
 		
 		pw.close();
 		
@@ -320,5 +351,22 @@ public class InteractiveExecution {
 		return resFlow + NetworkTools.getNumericIPValue()
 				+ Integer.toHexString(iPort).toUpperCase() + "/" + System.currentTimeMillis()
 				+ "/" + (Math.abs(new Random().nextInt())) + "/";
+	}
+	
+	/** Instantiates the required probes to use during the flow execution.
+	 * 
+	 * @param saProbeNames The probe names
+	 * @param cnf The core configuration object
+	 * @return The probe objects
+	 * @throws ProbeException A probe could not be instantiated
+	 */
+	protected static Probe[] instantiateProbes ( String [] saProbeNames, CoreConfiguration cnf ) throws ProbeException {
+		Probe [] pa = new Probe[saProbeNames.length];
+		int i=0;
+		ProbeFactory pf = ProbeFactory.getProbeFactory(cnf);
+		for ( String sProbName:saProbeNames ) 
+			pa[i++] = pf.getProbe(sProbName);		
+		
+		return pa;
 	}
 }

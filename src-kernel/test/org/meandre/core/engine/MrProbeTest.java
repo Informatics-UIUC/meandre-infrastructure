@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
@@ -19,9 +20,11 @@ import org.meandre.core.engine.probes.ToPrintStreamProbeImpl;
 import org.meandre.core.engine.test.TestLoggerFactory;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
+import org.meandre.core.utils.ModelIO;
 import org.meandre.demo.repository.DemoRepositoryGenerator;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 /** This class gathers together the tests related to MrProbe.
  * 
@@ -84,12 +87,16 @@ public class MrProbeTest {
 		try {
 			// Create the probe
 			MeandreRDFDialectProbeImpl mmrdpi = new MeandreRDFDialectProbeImpl();
+			mmrdpi.initialize();
 			
 			// Run the probe
 			runMrProbeTestWithProvidedProbe(mmrdpi, false, false);
 			
 			// Dump the results
-			Model modProbe = mmrdpi.getModel();
+			String sSerialized = mmrdpi.serializeProbeInformation();
+			Model modProbe = ModelFactory.createDefaultModel();
+			ModelIO.attemptReadModel(modProbe, sSerialized); 
+			mmrdpi.dispose();
 			assertEquals(581L,modProbe.size());
 		}
 		catch ( Exception e ) {
@@ -116,35 +123,42 @@ public class MrProbeTest {
 			// Basic test running basic provenance to an RDF model
 			ByteArrayOutputStream baosOutProv = new ByteArrayOutputStream();
 			MeandreRDFDialectProbeImpl rdfModProbe = new MeandreRDFDialectProbeImpl();
+			rdfModProbe.initialize();
 			MrProbe mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,false,false);
 			conductor = new Conductor(10,cnf);
 			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProv));
 			runExecutor(exec,baosOutProv);
+			rdfModProbe.dispose();
 
 			// Basic test running basic provenance and data serialization to an RDF model
 			ByteArrayOutputStream baosOutProv2 = new ByteArrayOutputStream();
 			rdfModProbe = new MeandreRDFDialectProbeImpl();
+			rdfModProbe.initialize();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,true,false);
 			conductor = new Conductor(10,cnf);
 			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProv2));
 			runExecutor(exec,baosOutProv2);
-
+			rdfModProbe.dispose();
+			
 			// Basic test running state storage provenance to an RDF model
 			ByteArrayOutputStream baosOutProvSto = new ByteArrayOutputStream();
 			rdfModProbe = new MeandreRDFDialectProbeImpl();
+			rdfModProbe.initialize();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,false,true);
 			conductor = new Conductor(10,cnf);
 			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProvSto));
 			runExecutor(exec,baosOutProvSto);
+			rdfModProbe.dispose();
 
 			// Basic test running state storage provenance to an RDF model
 			ByteArrayOutputStream baosOutProvSto3 = new ByteArrayOutputStream();
 			rdfModProbe = new MeandreRDFDialectProbeImpl();
+			rdfModProbe.initialize();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,true,true);
 			conductor = new Conductor(10,cnf);
 			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProvSto3));
 			runExecutor(exec,baosOutProvSto3);
-			
+			rdfModProbe.initialize();
 		}
 		catch ( Exception e ) {
 			e.printStackTrace();
@@ -164,13 +178,14 @@ public class MrProbeTest {
 			CoreConfiguration cnf = new CoreConfiguration();
 			Conductor conductor = new Conductor(10,cnf);
 			StatisticsProbeImpl spi = new StatisticsProbeImpl();
+			spi.initialize();
 			MrProbe mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),spi,false,false);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baos));
 			runExecutor(exec,baos);
 			
 			// Test the stats are there
-			JSONObject jsonStats = spi.getSerializedStatistics();
+			JSONObject jsonStats = new JSONObject(spi.serializeProbeInformation());
 			assertNotNull(jsonStats.get("flow_unique_id"));
 			assertNotNull(jsonStats.get("flow_state"));
 			assertNotNull(jsonStats.get("started_at"));
@@ -189,6 +204,7 @@ public class MrProbeTest {
 				assertNotNull(joEXIS.get("pieces_of_data_out"));
 				assertNotNull(joEXIS.get("number_of_read_properties"));
 			}
+			spi.dispose();
 		}
 		catch ( Exception e ) {
 			e.printStackTrace();
