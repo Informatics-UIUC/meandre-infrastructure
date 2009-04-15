@@ -785,7 +785,7 @@ public class Store {
 	public boolean addLocation(String sUser, String sLocation, String sDescription, CoreConfiguration cnf) {
 
 		boolean bRes = false;
-
+		
 		// Retrieve system store
 		SystemStore ss = getSystemStore(cnf,sUser);
 
@@ -841,9 +841,11 @@ public class Store {
 						new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator).mkdirs();
 			    		File savedFile = new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator+sFile);
 						FileOutputStream fos = new FileOutputStream(savedFile);
-						int iChar;
 						InputStream is = urlCntx.openStream();
-						while ( (iChar=is.read())>=0 ) fos.write(iChar);
+						byte [] baTmp = new byte[1048576];
+						int iNumBytes = 0;
+						while ( (iNumBytes=is.read(baTmp))>-1 )
+							fos.write(baTmp, 0, iNumBytes);
 						fos.close();
 					} catch (Exception e) {
 						ByteArrayOutputStream  baos = new ByteArrayOutputStream();

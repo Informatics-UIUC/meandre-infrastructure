@@ -16,22 +16,22 @@ import org.meandre.core.utils.Constants;
 public class CoreConfiguration {
 
 	/** The private run directory property*/
-	private static final String MEANDRE_PRIVATE_RUN_DIRECTORY = "MEANDRE_PRIVATE_RUN_DIRECTORY";
+	public static final String MEANDRE_PRIVATE_RUN_DIRECTORY = "MEANDRE_PRIVATE_RUN_DIRECTORY";
 	
 	/** The public resource directory */
-	private static final String MEANDRE_PUBLIC_RESOURCE_DIRECTORY = "MEANDRE_PUBLIC_RESOURCE_DIRECTORY";
+	public static final String MEANDRE_PUBLIC_RESOURCE_DIRECTORY = "MEANDRE_PUBLIC_RESOURCE_DIRECTORY";
 
 	/** The base port */
-	private static final String MEANDRE_BASE_PORT = "MEANDRE_BASE_PORT";
+	public static final String MEANDRE_BASE_PORT = "MEANDRE_BASE_PORT";
 
 	/** The config path */
-	private static final String MEANDRE_CORE_CONFIG_FILE = "MEANDRE_CORE_CONFIG_FILE";
+	public static final String MEANDRE_CORE_CONFIG_FILE = "MEANDRE_CORE_CONFIG_FILE";
 
     /** The config path */
-    private static final String MEANDRE_HOME_DIRECTORY = "MEANDRE_HOME_DIRECTORY";
+	public static final String MEANDRE_HOME_DIRECTORY = "MEANDRE_HOME_DIRECTORY";
     
     /** The Default port*/
-	private static final int DEFAULT_PORT =1714;
+	public static final int DEFAULT_PORT =1714;
 	
 	/** The configuration properties */
 	private Properties propsCore;

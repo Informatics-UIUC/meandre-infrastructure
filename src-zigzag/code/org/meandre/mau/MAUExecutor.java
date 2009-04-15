@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -56,6 +57,9 @@ public class MAUExecutor {
 
 	/** The run temp dir */
 	private static final String MAU_RUN_DIR = "run";
+	
+	/** Public resources */
+	private static final String MAU_PUBLIC_RESOURCES_RUN_DIR = "run_public_resources";
 
 	/** The output print stream to use */
 	protected PrintStream ps;
@@ -169,7 +173,9 @@ public class MAUExecutor {
 
 		ps.println("Executing MAU file " + sFileName);
 		File fTmp = new File(sFileName+"."+MAU_RUN_DIR);
+		File fTmpPR = new File(sFileName+"."+MAU_PUBLIC_RESOURCES_RUN_DIR);
 		ps.println("Creating temp dir " + fTmp.toString());
+		ps.println("Creating temp dir " + fTmpPR.toString());
 		fTmp.mkdir();
 		ps.println();
 
@@ -177,7 +183,14 @@ public class MAUExecutor {
 
 		Resource resURI = qr.getAvailableFlows().iterator().next();
 		ps.println("Preparing flow: "+resURI);
-		CoreConfiguration cnf = new CoreConfiguration(iPort-1,".");
+		Properties props = new Properties();
+		props.setProperty(CoreConfiguration.MEANDRE_BASE_PORT, ""+(iPort-1));
+		props.setProperty(CoreConfiguration.MEANDRE_HOME_DIRECTORY, ".");
+		props.setProperty(CoreConfiguration.MEANDRE_PRIVATE_RUN_DIRECTORY, fTmp.toString());
+		props.setProperty(CoreConfiguration.MEANDRE_PUBLIC_RESOURCE_DIRECTORY, fTmpPR.toString());
+		props.setProperty(CoreConfiguration.MEANDRE_CORE_CONFIG_FILE, "meandre-config-core.xml");
+		CoreConfiguration cnf = new CoreConfiguration(props);
+		
 		Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
 
 		exec =null;
@@ -264,13 +277,39 @@ public class MAUExecutor {
 
 		// Cleaning the tmp run dir
 		ps.println("Cleaning temp dir " + fTmp.toString());
-		for ( String sFileName:fTmp.list() )
-			new File(fTmp.getAbsoluteFile()+File.separator+sFileName).delete();
-		fTmp.delete();
+		deleteDir(fTmp);
+		ps.println("Cleaning temp dir " + fTmpPR.toString());
+		deleteDir(fTmpPR);
 		ps.println();
 
 	}
+	
+	/**  Deletes all files and subdirectories under dir.
+     *   Returns true if all deletions were successful. 
+     *   If a deletion fails, the method stops attempting to delete and returns false.
+     *   
+     * @param dir The directory to delete
+     * @return True if it was properly cleaned, false otherwise
+     */
+	 private boolean deleteDir(File dir) {
+	    if (dir.isDirectory()) {
+	         String[] children = dir.list();
+	         for (int i=0; i<children.length; i++) {
+	             boolean success = deleteDir(new File(dir, children[i]));
+	             if (!success) 
+	                 return false;
+	         }
+	     }
+	    // The directory is now empty so delete it
+        if (dir.exists())
+	        return dir.delete();
+        else
+        	return true;
+	    
+	 }
 
+	private HashSet<String> setProcessedJars = new HashSet<String>();
+	 
 	/** Process the model contained on the MAU file and rearrenge the contexts URIs.
 	 *
 	 * @return The edited model
@@ -288,6 +327,7 @@ public class MAUExecutor {
 			// Edit the contexts URI
 			JarFile jar = new JarFile(sFileName);
 			Enumeration<JarEntry> iterJE = jar.entries();
+			setProcessedJars.clear();
 			while (iterJE.hasMoreElements()) {
 				JarEntry je = iterJE.nextElement();
 				String [] sa = je.getName().split("/");
@@ -309,6 +349,9 @@ public class MAUExecutor {
 	 * @param sNewURI The new URI to set
 	 */
 	private void editContextJarURI(QueryableRepository qr, String sJarName, String sNewURI) {
+		String sPrefix = sFileName+"."+MAU_PUBLIC_RESOURCES_RUN_DIR+File.separator+"public"+File.separator+"resources"+File.separator+"contexts"+File.separator+"java";
+		new File(sPrefix).mkdirs();
+		
 		for ( ExecutableComponentDescription ecd:qr.getAvailableExecutableComponentDescriptions() ) {
 			Set<RDFNode> setNew = new HashSet<RDFNode>();
 			for ( RDFNode rdfNode:ecd.getContext() ) {
@@ -316,13 +359,17 @@ public class MAUExecutor {
 					 rdfNode.toString().endsWith(sJarName) ) {
 					try {
 						InputStream is = new URL(sNewURI).openStream();
-						File fo = new File(sFileName+"."+MAU_RUN_DIR+File.separator+sJarName);
-						FileOutputStream fos = new FileOutputStream(fo);
-						int iRead;
-						while ( (iRead=is.read())>=0 )
-							fos.write(iRead);
-						fos.close();
-						is.close();
+						File fo = new File(sPrefix+File.separator+sJarName);
+						if ( !setProcessedJars.contains(fo.toString()) ) {
+							FileOutputStream fos = new FileOutputStream(fo);
+							byte [] baTmp = new byte[1048576];
+							int iNumBytes = 0;
+							while ( (iNumBytes=is.read(baTmp))>-1 )
+								fos.write(baTmp, 0, iNumBytes);
+							fos.close();
+							is.close();
+							setProcessedJars.add(fo.toString());
+						}
 						setNew.add(qr.getModel().createResource("file:"+fo.getAbsolutePath()));
 					} catch (MalformedURLException e) {
 						// TODO Auto-generated catch block

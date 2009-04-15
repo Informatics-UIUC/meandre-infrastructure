@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -109,6 +110,8 @@ public abstract class Tools {
 	public static void prepareJarsToTheFileSystem(FlowDescription fd, QueryableRepository qr, File fileFolderContexts ) 
 	throws ParseException {
 		
+		// Create a set of distinct
+		Set<URI> setJars = new HashSet<URI>();
 		for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() ) {
 			ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(ecid.getExecutableComponent());
 			Set<RDFNode> setCntxs = ecd.getContext();	
@@ -121,19 +124,8 @@ public abstract class Tools {
 						// Pull the URL and dump it to the local file
 						Resource res = (Resource)node;
 						URI uri = new URI(res.getURI().replaceAll(" ", "%20"));
-						if ( uri.toString().endsWith(".jar")) {
-							String [] sa = uri.getPath().split("/");
-							InputStream is = uri.toURL().openStream();
-							FileOutputStream fos = new FileOutputStream(new File(fileFolderContexts.toString()+File.separator+sa[sa.length-1]));
-							int iTmp;
-							while ( (iTmp=is.read())!=-1 )
-								fos.write(iTmp);
-							fos.close();
-						}
-					} catch (MalformedURLException e) {
-						throw new ParseException(e.toString());
-					} catch (IOException e) {
-						throw new ParseException(e.toString());
+						if ( uri.toString().endsWith(".jar")) 
+							setJars.add(uri);						
 					} catch (URISyntaxException e) {
 						throw new ParseException(e.toString());
 					}
@@ -142,6 +134,25 @@ public abstract class Tools {
 					throw new ParseException("Unknow context type: "+node);
 			}
 					
+		}
+		
+		// Write them to the file output
+		for ( URI uri:setJars ) {
+			try {
+				String [] sa = uri.getPath().split("/");
+				InputStream is = uri.toURL().openStream();
+				FileOutputStream fos = new FileOutputStream(new File(fileFolderContexts.toString()+File.separator+sa[sa.length-1]));
+				byte [] baTmp = new byte[1048576];
+				int iNumBytes = 0;
+				while ( (iNumBytes=is.read(baTmp))>-1 )
+					fos.write(baTmp, 0, iNumBytes);
+				fos.close();
+			}
+			catch (MalformedURLException e) {
+                throw new ParseException(e.toString());
+			} catch (IOException e) {
+				throw new ParseException(e.toString());
+			}
 		}
 		
 	}
