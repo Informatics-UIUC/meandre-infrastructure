@@ -105,13 +105,21 @@ public class ZigZagConsole {
 				if (sLine.length()>0 )
 					parseCommandLine(sLine);
 			}
-			catch ( NullPointerException e ) {
-				System.out.println();
-				parseSystemCommand("quit");
-			} catch (ParseException e) {
+			catch (NullPointerException e) {
+				System.err.println("^D");
+				try {
+					parseCommandLine("quit");
+				} catch (ParseException e1) {
+					System.exit(-1);
+				}
+			}
+			catch (ParseException e) {
 				System.err.println(e.getMessage());
 				//e.printStackTrace();
 			}
+			catch ( Throwable t ) {
+				System.err.println(t.getMessage());
+			} 
 
 		}
 

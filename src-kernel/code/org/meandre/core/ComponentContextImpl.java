@@ -163,8 +163,11 @@ implements ComponentContext {
 		for ( String sOutputName:htOutputMap.keySet() )
 			htReverse.put(htOutputMap.get(sOutputName), sOutputName);
 
-		for ( ActiveBuffer abOutput:setOutputs ) {
-			this.htActiveBufferOuputs.put(htReverse.get(abOutput.getName()),abOutput);
+		for ( String sOut:htOutputMap.keySet() ) {
+			String sIn = htOutputMap.get(sOut);
+			for ( ActiveBuffer ab:setOutputs)
+				if ( ab.getName().equals(sIn))
+					this.htActiveBufferOuputs.put(sOut,ab);
 		}
 
 		try {

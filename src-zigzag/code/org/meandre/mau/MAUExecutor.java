@@ -204,6 +204,7 @@ public class MAUExecutor {
 
 		try {
 			spi = new StatisticsProbeImpl();
+			spi.initialize();
 			MrProbe mrProbe = new MrProbe(KernelLoggerFactory.getCoreLogger(),spi,false,false);
 			conductor.setParentClassloader(this.getParentClassloader());
 			exec = conductor.buildExecutor(qr, resURI, mrProbe, System.out);
@@ -275,6 +276,17 @@ public class MAUExecutor {
 			ps.println("Reason for aborting the execution:");
 			ps.println();
 			ps.println(te);
+			ps.flush();
+		}
+		catch ( Throwable t ) {
+			exec.requestAbort();
+			ps.println("----------------------------------------------------------------------------");
+			ps.print("Unknow execption at: ");
+			ps.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
+			ps.println("----------------------------------------------------------------------------");
+			ps.println();
+			t.printStackTrace(ps);
+			ps.println();
 			ps.flush();
 		}
 
