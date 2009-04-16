@@ -26,6 +26,9 @@ import org.meandre.core.utils.NetworkTools;
  */
 public abstract class JobInformationBackendAdapter {
 
+	/** The maximum console chunk to print at once */
+	static final int MAX_CONSOLE_PRINT_CHUNK = 30000;
+	
 	/** The common query map file */
 	static final String COMMON_MAP_FILE = "job_information_query_map_common.xml";
 
@@ -403,27 +406,38 @@ public abstract class JobInformationBackendAdapter {
 	 * @param oPrint The log text to trace
 	 */
 	public void print ( String sJobID, Object oPrint ) {
-		try {
-			String sQueryIJC = propQueryMapping.getProperty(QUERY_INSERT_JOB_CONSOLE);
-			Object [] oaValuesUpdate = {
-					sServerID,
-					sJobID,
-					oPrint.toString()
-				};
-			executeUpdateQueryWithParams(sQueryIJC, oaValuesUpdate);
-			
-			// Commit the transaction
-			if ( bTransactional ) conn.commit();
-			
-		} catch (JobInformationBackendAdapterException e) {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			e.printStackTrace(new PrintStream(baos));
-			log.warning("Could not print to the job information storage! "+baos);
+		String sObj = oPrint.toString();
+		int iObjSize = sObj.length();
+		if ( iObjSize>MAX_CONSOLE_PRINT_CHUNK) {
+			int iOff = 0;
+			do {
+				print ( sJobID, sObj.substring(iOff, iOff+MAX_CONSOLE_PRINT_CHUNK));
+				iOff += MAX_CONSOLE_PRINT_CHUNK;
+			} while (iOff<iObjSize);
 		}
-		catch (SQLException e) {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			e.printStackTrace(new PrintStream(baos));
-			log.severe("Commit operation failed! "+baos.toString());
+		else {
+			try {
+				String sQueryIJC = propQueryMapping.getProperty(QUERY_INSERT_JOB_CONSOLE);
+				Object [] oaValuesUpdate = {
+						sServerID,
+						sJobID,
+						sObj
+					};
+				executeUpdateQueryWithParams(sQueryIJC, oaValuesUpdate);
+				
+				// Commit the transaction
+				if ( bTransactional ) conn.commit();
+				
+			} catch (JobInformationBackendAdapterException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				log.warning("Could not print to the job information storage! "+baos);
+			}
+			catch (SQLException e) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				e.printStackTrace(new PrintStream(baos));
+				log.severe("Commit operation failed! "+baos.toString());
+			}
 		}
 	}
 
