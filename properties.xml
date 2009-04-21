@@ -28,6 +28,7 @@
     <property name="client.src" value="src-client/code"/>
     <property name="annotation.src" value="src-annotation/code"/>
     <property name="coordinator.src" value="src-coordinator/code"/>
+    <property name="executables.src" value="src-executables/code"/>
 
     <!-- Test code locations -->
     <property name="kernel.test" value="src-kernel/test"/>
@@ -38,6 +39,7 @@
     <property name="store.test" value="src-store/test"/>
     <property name="client.test" value="src-client/test"/>
     <property name="coordinator.test" value="src-coordinator/test"/>
+    <property name="executables.test" value="src-executables/test"/>
 
     <!-- The generic classpath to all the code (includes code and tests) -->
     <path id="meandre.javadoc.src">
@@ -57,6 +59,8 @@
         <fileset dir="${client.test}" includes="*"/>
         <fileset dir="${coordinator.src}" includes="*"/>
         <fileset dir="${coordinator.test}" includes="*"/>
+        <fileset dir="${executables.src}" includes="*"/>
+        <fileset dir="${executables.test}" includes="*"/>
     </path>
 
     <!-- Default options for code-generation, compiling and junit-testing -->

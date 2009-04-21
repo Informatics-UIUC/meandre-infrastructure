@@ -44,6 +44,7 @@
 			<include name="${coordinator.src}/**/*.java"/>
 			<include name="${client.src}/**/*.java"/>
 			<include name="${annotation.src}/**/*.java"/>
+			<include name="${executables.src}/**/*.java"/>
 		</javac>
 
 		<copy todir="${build.dir}" includeEmptyDirs="no">
@@ -144,6 +145,7 @@
 		<javac srcdir="${store.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
 		<javac srcdir="${client.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
 		<javac srcdir="${coordinator.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${executables.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
 	</target>
 
 	<!-- clean -->
@@ -228,6 +230,9 @@
 				<fileset dir="${coordinator.test}">
 					<include name="**/*.java"/>
 				</fileset>
+				<fileset dir="${executables.test}">
+					<include name="**/*.java"/>
+				</fileset>
 			</batchtest>
 		</junit>
 	</target>
@@ -267,6 +272,7 @@
 				<include name="${client.src}/**"/>
 				<include name="${annotation.src}/**"/>
 				<include name="${coordinator.src}/**"/>
+				<include name="${executables.src}/**"/>
 				<exclude name="**/*.properties" />
 				<exclude name="**/*.jj" />
 				<exclude name="**/*.xml" />
@@ -429,6 +435,18 @@
 			</fileset>
 		</jar>
 
+		<!-- Create executables jar -->
+		<jar destfile="${dist.dir}/lib/${app.name}-executables-${build.version}.jar">
+			<manifest>
+				<attribute name="Build-Version" value="${build.version}"/>
+			</manifest>
+			<fileset dir="${build.dir}">
+				<include name="**/executables/**/*.class"/>
+				<include name="**/executables/**/*.properties"/>
+				<include name="**/executables/**/*.xml"/>
+			</fileset>
+		</jar>
+
 		<!-- Preparations to create the release jars -->
 		<copy todir="${dist.dir}/tmp" includeEmptyDirs="no">
 			<fileset dir="${build.dir}">
@@ -541,6 +559,9 @@
 			<fileset dir="${client.src}">
 				<include name="**/*"/>
 			</fileset>
+			<fileset dir="${executables.src}">
+				<include name="**/*"/>
+			</fileset>
 		</jar>
 
 		<!-- Create annotation jar -->
@@ -632,6 +653,16 @@
 				<include name="**/*"/>
 			</fileset>
 		</jar>
+        <!-- Create executables src jar -->
+		<jar destfile="${dist.dir}/src-jars/meandre-executables-${build.version}-src.jar">
+			<manifest>
+				<attribute name="Build-Version" value="${build.version}"/>
+			</manifest>
+			<fileset dir="${executables.src}">
+				<include name="**/*"/>
+			</fileset>
+		</jar>
+
 	</target>
 
 	<target name="clean-all"
