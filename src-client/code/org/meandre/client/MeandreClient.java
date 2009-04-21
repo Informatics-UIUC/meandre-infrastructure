@@ -879,7 +879,7 @@ public class MeandreClient extends MeandreBaseClient{
         String sRestCommand = "services/execute/flow.txt";
         Set<NameValuePair> nvps = new HashSet<NameValuePair>();
         nvps.add(new NameValuePair("uri", sFlowUrl));
-        nvps.add(new NameValuePair("statistic", Boolean.toString(verbose)));
+        nvps.add(new NameValuePair("statistics", Boolean.toString(verbose)));
 
 
         String sResults = executeGetRequestString(sRestCommand, nvps);
@@ -943,7 +943,7 @@ public class MeandreClient extends MeandreBaseClient{
         nvps.add(new NameValuePair("uri", sFlowUrl));
         if (token != null)
             nvps.add(new NameValuePair("token", token));
-        nvps.add(new NameValuePair("statistic", Boolean.toString(verbose)));
+        nvps.add(new NameValuePair("statistics", Boolean.toString(verbose)));
 
         return executeGetRequestStream(sRestCommand, nvps);
     }
