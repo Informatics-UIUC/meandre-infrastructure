@@ -109,7 +109,8 @@
         <pathelement location="${apache-commons-logging.jar}"/>
         <pathelement location="${apache-commons-io.jar}"/>
         <pathelement location="${jython.jar}"/>
-        <pathelement location="${clojure.jar}"/>
+    	<pathelement location="${junit.jar}"/>
+    	<pathelement location="${clojure.jar}"/>
     </path>
 
     <!-- =================================================================== -->
@@ -117,7 +118,6 @@
     <!-- =================================================================== -->
     <path id="meandre.test.classpath">
         <path refid="meandre.core.classpath"/>
-        <pathelement location="${junit.jar}"/>
         <pathelement location="${build.dir}"/>
         <pathelement location="${test.dir}"/>
     </path>
