@@ -389,6 +389,8 @@ public class MeandreBaseClient{
             errBuf.append(reason);
 
             _log.severe(errBuf.toString());
+          
+            method.releaseConnection();
 
 		    throw new TransmissionException(iStat + " " + reason + " " +
                 sFailedUrl);
