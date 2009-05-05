@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.meandre.webservices.logger.WSLoggerFactory;
+import org.python.modules.synchronize;
 import org.python.util.PythonInterpreter;
 
 /** This class provides a unified base servlet dispatcher shared by all the
@@ -27,6 +29,9 @@ public abstract class ServletConfigurableDispatcher extends HttpServlet {
 
 	/** A default serail ID */
 	private static final long serialVersionUID = 1L;
+	
+	/** A random number generator */
+	private static Random rnd;
 
 	/** Initialize the Python home dir properly */
 	static {
@@ -37,6 +42,7 @@ public abstract class ServletConfigurableDispatcher extends HttpServlet {
 		props.setProperty("python.home", fp.toString());
 		PythonInterpreter.initialize(System.getProperties(), props,
 		                             new String[] {""});
+		rnd = new Random();
 	}
 	
 	/** The Jython interpreter that will use this executable component. */
@@ -200,8 +206,8 @@ public abstract class ServletConfigurableDispatcher extends HttpServlet {
 			String sExtension = (saParts.length==2 )?saParts[1]:"";
 	    	
 			// Create the names
-			String sReq = "req"+lctm;
-			String sRes = "resp"+lctm;
+			String sReq = "req"+lctm+Math.abs(rnd.nextInt());
+			String sRes = "resp"+lctm+Math.abs(rnd.nextInt());
 			
 			// Set the objects
 			pi.set(sReq,req);

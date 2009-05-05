@@ -66,7 +66,7 @@ public class PrintObjectComponent implements ExecutableComponent {
 		if ( bPrintCount )
 			ps.print("P"+lObjectsPrinted+"\t");
 		ps.println(sObject);
-		ps.flush();		
+		//ps.flush();		
 	}
 
 	/** This method is called when the Menadre Flow execution is completed.

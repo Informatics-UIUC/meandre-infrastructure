@@ -12,7 +12,7 @@ public class Constants {
     public final static String MEANDRE_RELEASE_TAG ="Sara";
 
     /** The version identifier */
-    public final static String MEANDRE_VERSION = "1.4.4";
+    public final static String MEANDRE_VERSION = "1.4.5";
 
     /** The meandre qualifier based on the date */
 	public static String MEANDRE_QUALIFIER = null;

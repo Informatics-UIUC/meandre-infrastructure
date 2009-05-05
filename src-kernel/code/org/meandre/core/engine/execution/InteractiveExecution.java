@@ -73,7 +73,7 @@ public class InteractiveExecution {
 		pw.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		pw.println();
 
-		pw.flush();
+		//pw.flush();
 
 		// Create the execution
 		FlowDescription fd = qr.getFlowDescription(qr.getModel().createResource(sURI));
@@ -84,6 +84,7 @@ public class InteractiveExecution {
 			
 		Resource resURI = fd.getFlowComponent();
 		pw.println("Preparing flow: "+sURI);
+		pw.println("Unique flow ID: "+sFUID);
 		Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
 		Executor exec =null;
 
@@ -94,7 +95,7 @@ public class InteractiveExecution {
 			MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),pa,false,false);
 			exec = conductor.buildExecutor(qr, resURI, mrProbe,pw,sFUID);
 			mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
-			pw.flush();
+			//pw.flush();
 			int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
 			
 			pw.println("Preparation completed correctly\n");
@@ -102,14 +103,14 @@ public class InteractiveExecution {
 			pw.print("Execution started at: " + nextPort +" on ");
 			pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
 			pw.println("----------------------------------------------------------------------------");
-			pw.flush();
+			//pw.flush();
 			WebUI webui = exec.initWebUI(nextPort,sToken);
 			job.setToken(sToken);
 			job.setFlowInstanceId(sFUID);
 			job.setHostname(NetworkTools.getLocalHostName());
 			job.setPort(nextPort);
 			exec.execute(webui);
-			pw.flush();
+			//pw.flush();
 			pw.println("----------------------------------------------------------------------------");
 			pw.print("Execution finished at: ");
 			pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
@@ -127,7 +128,7 @@ public class InteractiveExecution {
 				for ( String sMsg:exec.getAbortMessage() )
 					pw.println("\t"+sMsg);
 			}
-			pw.flush();
+			//pw.flush();
 
 		}
 		catch ( CorruptedDescriptionException cde ) {
@@ -137,7 +138,7 @@ public class InteractiveExecution {
 			pw.println("Reason for aborting the preparation:");
 			pw.println();
 			pw.println(cde);
-			pw.flush();
+			//pw.flush();
 		}
 		catch ( ConductorException ce ) {
 			pw.println("----------------------------------------------------------------------------");
@@ -148,7 +149,7 @@ public class InteractiveExecution {
 			pw.println("Reason for aborting the execution:");
 			pw.println();
 			pw.println(ce);
-			pw.flush();
+			//pw.flush();
 		}
 		catch ( NoClassDefFoundError te ) {
 			pw.println("----------------------------------------------------------------------------");
@@ -159,7 +160,7 @@ public class InteractiveExecution {
 			pw.println("Reason for aborting the execution:");
 			pw.println();
 			pw.println(te);
-			pw.flush();
+			//pw.flush();
 		}
 		catch ( Throwable t ) {
 			exec.requestAbort();
@@ -170,7 +171,7 @@ public class InteractiveExecution {
 			pw.println();
 			t.printStackTrace(pw);
 			pw.println();
-			pw.flush();
+			//pw.flush();
 		}
 
 		for (Probe p:pa) {
@@ -187,7 +188,7 @@ public class InteractiveExecution {
 					pw.println("Last update              : "+jsonStats.get("latest_probe_at"));
 					pw.println("Total run time (ms)      : "+jsonStats.get("runtime"));
 					pw.println();
-					pw.flush();
+					//pw.flush();
 	
 					JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
 					for ( int i=0,iMax=jaEXIS.length() ; i<iMax ; i++ ) {
@@ -201,7 +202,7 @@ public class InteractiveExecution {
 						pw.println("\tNumber of properties read                  : "+joEXIS.get("number_of_read_properties"));
 						pw.println();
 					}
-					pw.flush();
+					//pw.flush();
 				}
 				catch ( Exception e ) {
 					WSLoggerFactory.getWSLogger().warning("This exception should have never been thrown\n"+e);
@@ -284,7 +285,7 @@ public class InteractiveExecution {
 				for ( String sMsg:exec.getAbortMessage() )
 					pw.println("\t"+sMsg);
 			}
-			pw.flush();
+			//pw.flush();
 
 		}
 		catch ( CorruptedDescriptionException cde ) {
@@ -295,7 +296,7 @@ public class InteractiveExecution {
 			pw.println("Reason for aborting the preparation:");
 			pw.println();
 			pw.println(cde);
-			pw.flush();
+			//pw.flush();
 		}
 		catch ( ConductorException ce ) {
 			pw.println("----------------------------------------------------------------------------");
@@ -306,7 +307,7 @@ public class InteractiveExecution {
 			pw.println("Reason for aborting the execution:");
 			pw.println();
 			pw.println(ce);
-			pw.flush();
+			//pw.flush();
 		}
 		catch ( NoClassDefFoundError te ) {
 			pw.println("----------------------------------------------------------------------------");
@@ -317,7 +318,7 @@ public class InteractiveExecution {
 			pw.println("Reason for aborting the execution:");
 			pw.println();
 			pw.println(te);
-			pw.flush();
+			//pw.flush();
 		}
 		catch ( Throwable t ) {
 			exec.requestAbort();
@@ -329,7 +330,7 @@ public class InteractiveExecution {
 			pw.println();
 			t.printStackTrace(pw);
 			pw.println();
-			pw.flush();
+			//pw.flush();
 		}
 		
 		pw.close();

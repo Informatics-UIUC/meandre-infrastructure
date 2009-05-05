@@ -43,6 +43,7 @@ from org.meandre.jobs.storage.backend import JobInformationBackendAdapter
 
 def execute_flow ( request, response, format ):
     '''Executes a flow interactively on the Server.'''
+    #response.setBufferSize(1)
     if checkUserRole (request,Role.EXECUTION) :
         params = extractRequestParamaters(request)
         if 'uri' in params :
@@ -82,7 +83,9 @@ def execute_flow ( request, response, format ):
                         jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_ABORTED)
                 else :
                     errorNotFound(response)
-                del executionTokenMap[token]
+                executionTokenMap[token].setPort(-1)
+                # TODO: Set to clean up the map after a while
+                #del executionTokenMap[token]
         else :
             errorExpectationFail(response)
     else:

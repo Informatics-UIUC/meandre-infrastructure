@@ -6,10 +6,8 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Set;
-
 import java.util.logging.Logger;
 
-import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
@@ -23,9 +21,9 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
+import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.json.JSONTokener;
-import org.meandre.core.logger.MeandreFormatter;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -143,7 +141,7 @@ public class MeandreBaseClient{
 	    HostConfiguration config = new HostConfiguration();
         config.setHost(_serverHost, _port);
         httpClient.setHostConfiguration(config);
-
+        
         //if credentials are not set, we will assume we don't need authorization
 		if(_credentials != null){
             AuthScope scope = new AuthScope(null, _port, null);

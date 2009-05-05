@@ -345,7 +345,7 @@ implements Probe {
 			return getSerializedStatistics().toString(3);
 		}
 		catch ( Exception e ) {
-			return "{\"error: \"Could not serialize the probe to JSON\"}";
+			return "{\"error\": \"Could not serialize the probe to JSON\"}";
 		}
 	}
 

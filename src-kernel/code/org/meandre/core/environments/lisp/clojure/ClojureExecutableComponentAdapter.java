@@ -187,7 +187,7 @@ implements ExecutableComponent, ScriptingEnvironmentAdapter {
 			cjCCP.invoke(ccp);
 		} catch (Exception e) {
 			e.printStackTrace();
-			untrapOutputAndErrorStreams();
+			//untrapOutputAndErrorStreams();
 		}
 	}
 
@@ -208,7 +208,7 @@ implements ExecutableComponent, ScriptingEnvironmentAdapter {
 			cjCCP.invoke(cc);
 		} catch (Exception e) {
 			e.printStackTrace();
-			untrapOutputAndErrorStreams();
+			//untrapOutputAndErrorStreams();
 		}
 	}
 
@@ -229,7 +229,7 @@ implements ExecutableComponent, ScriptingEnvironmentAdapter {
 			cjCCP.invoke(ccp);
 		} catch (Exception e) {
 			e.printStackTrace();
-			untrapOutputAndErrorStreams();
+			//untrapOutputAndErrorStreams();
 		}
 	}
 

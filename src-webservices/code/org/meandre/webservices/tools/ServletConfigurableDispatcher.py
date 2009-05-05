@@ -253,13 +253,14 @@ def __dictionary_from_get_request__ ( request ):
     
        __dictionary_from_get_request__ ( request )'''
     dictParams = {}
-    parameterNames = request.getParameterNames() 
-    for name in parameterNames :
-        requestValues = request.getParameterValues(name)
-        values = []
-        for value in requestValues:
-            values.append(value)
-        dictParams[name] = values
+    if request is not None:
+        parameterNames = request.getParameterNames() 
+        for name in parameterNames :
+            requestValues = request.getParameterValues(name)
+            values = []
+            for value in requestValues:
+                values.append(value)
+            dictParams[name] = values
     return dictParams
 
 def extractRequestParamaters ( request ):
