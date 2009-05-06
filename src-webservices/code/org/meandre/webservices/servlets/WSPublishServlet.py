@@ -7,8 +7,10 @@ __name__ = 'WSPublishServlet'
 requestMap = {
     'GET': { 
         'publish': 'publish_publish',
+        'publish_all': 'publish_publish_all',
         'list_published': 'publish_list_published',    
-        'unpublish': 'publish_unpublish'
+        'unpublish': 'publish_unpublish',    
+        'unpublish_all': 'publish_unpublish_all'
         }
 }
 
@@ -69,5 +71,34 @@ def publish_list_published ( request, response, format ):
         sendTJXContent(response,content,format)
     else:
         errorForbidden(response)        
-    
+   
+def publish_publish_all ( request, response, format ):
+    '''Publish all the uri of published components/flows in the 
+       user's instance of the Meandre Server.''' 
+    if checkUserRole (request,Role.PUBLISH) :
+        content = []
+        qr = meandre_store.getRepositoryStore(getMeandreUser(request))
+        for uri in qr.getAvailableExecutableComponents() :
+            if meandre_store.publishURI(uri.toString(),getMeandreUser(request)) :
+                content.append({'meandre_uri':uri})
+        for uri in qr.getAvailableFlows() :
+            if meandre_store.publishURI(uri.toString(),getMeandreUser(request)) :
+                content.append({'meandre_uri':uri})
+        statusOK(response)
+        sendTJXContent(response,content,format)
+    else:
+        errorForbidden(response)   
+        
+def publish_unpublish_all ( request, response, format ):
+    '''Unpublish all component/flow available in this 
+       instance of the Meandre Server.''' 
+    if checkUserRole (request,Role.PUBLISH) :
+        content = []
+        for uri in meandre_store.getPublishedComponentsAndFlows():
+            if meandre_store.unpublishURI(uri,getMeandreUser(request)) :
+                content.append({'meandre_uri':uri})
+        statusOK(response)
+        sendTJXContent(response,content,format)
+    else:
+        errorForbidden(response)   
     

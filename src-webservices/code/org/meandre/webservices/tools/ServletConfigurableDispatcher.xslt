@@ -159,6 +159,8 @@
 		 		    	<p>Publish</p>
 			 		    <ul>
 							<li><a href="/services/publish/list_published.html">List published</a></li>
+							<li><a href="/services/publish/unpublish_all.html" onclick="return confirm('Are you sure you want to unpublish all components and flows?');">Unpublish all</a></li>
+		 		    		<li><a href="/services/publish/publish_all.html" onclick="return confirm('Are you sure you want to publish all components and flows?');">Publish all</a></li>
 		 		    	</ul>
 		 		    	<p>Execution</p>
 			 		    <ul>
