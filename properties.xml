@@ -6,7 +6,7 @@
     <!-- when you modify this version make sure to modify the
         org.meandre.core.utils.Constants.java  in the src-kernel/code
     -->
-    <property name="build.version" value="1.4.4"/>
+    <property name="build.version" value="1.4.5"/>
 
     <!-- Directory structure of the project -->
     <property name="build.dir" value="${basedir}/bin"/>
