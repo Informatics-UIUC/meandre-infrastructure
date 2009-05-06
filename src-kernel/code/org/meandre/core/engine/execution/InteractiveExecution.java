@@ -103,7 +103,7 @@ public class InteractiveExecution {
 			pw.print("Execution started at: " + nextPort +" on ");
 			pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
 			pw.println("----------------------------------------------------------------------------");
-			//pw.flush();
+			pw.flush();
 			WebUI webui = exec.initWebUI(nextPort,sToken);
 			job.setToken(sToken);
 			job.setFlowInstanceId(sFUID);
