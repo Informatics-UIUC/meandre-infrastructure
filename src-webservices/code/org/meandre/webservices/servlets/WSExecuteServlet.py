@@ -43,8 +43,7 @@ from org.meandre.jobs.storage.backend import JobInformationBackendAdapter
 #
 
 def execute_flow ( request, response, format ):
-    #'''Executes a flow interactively on the Server.'''
-    response.setBufferSize(0)
+    '''Executes a flow interactively on the Server.'''
     if checkUserRole (request,Role.EXECUTION) :
         params = extractRequestParamaters(request)
         if 'uri' in params :
@@ -62,6 +61,7 @@ def execute_flow ( request, response, format ):
             content = []
             for flow_uri, probs, token in zip(uris,prob_names,tokens): 
                 statusOK(response)
+                response.flushBuffer()
                 qr = meandre_store.getRepositoryStore(getMeandreUser(request))
                 job = JobDetail()
                 executionTokenMap[token] = job
@@ -197,7 +197,6 @@ def execute_uri_flow ( request, response, format ):
  
 def execute_repository ( request, response, format ):
     '''Executes all the flows in the provided repository.'''
-    #response.setBufferSize(1)
     if checkUserRole (request,Role.EXECUTION) :
         qr = WSExecuteServlet.extractRepository(request,meandre_store)
         if qr is not None :
@@ -207,6 +206,7 @@ def execute_repository ( request, response, format ):
             content = []
             for flow_uri, probs, token in zip(uris,prob_names,tokens): 
                 statusOK(response)
+                response.flushBuffer()
                 job = JobDetail()
                 executionTokenMap[token] = job
                 jiba = meandre_store.getJobInformation()
