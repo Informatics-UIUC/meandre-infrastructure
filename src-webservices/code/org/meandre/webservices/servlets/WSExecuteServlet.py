@@ -234,16 +234,18 @@ def execute_repository ( request, response, format ):
 
 
 def execute_clean_uri_flow ( request, response, format ):
-    '''Executes all the flows in the provided repository.'''
+    '''Cleans all the tokens left behind after execution.'''
     
-    content = []
-    for token in executionTokenMap :
-       job = executionTokenMap[token]
-       if job.getPort()==-1 :
-           del executionTokenMap[token]
-           cleaned = { 'token': token }
-           content.append(cleaned)   
-    statusOK(response)
-    sendTJXContent(response,content,format)
-    
+    if checkUserRole (request,Role.ADMIN) :
+        content = []
+        for token in executionTokenMap :
+           job = executionTokenMap[token]
+           if job.getPort()==-1 :
+               del executionTokenMap[token]
+               cleaned = { 'token': token }
+               content.append(cleaned)   
+        statusOK(response)
+        sendTJXContent(response,content,format)
+    else:
+        errorForbidden(response)
     
