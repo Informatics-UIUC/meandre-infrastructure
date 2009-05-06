@@ -73,7 +73,7 @@ public class InteractiveExecution {
 		pw.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		pw.println();
 
-		pw.flush();
+		//pw.flush();
 
 		// Create the execution
 		FlowDescription fd = qr.getFlowDescription(qr.getModel().createResource(sURI));
