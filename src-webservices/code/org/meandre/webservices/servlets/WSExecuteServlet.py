@@ -43,7 +43,7 @@ from org.meandre.jobs.storage.backend import JobInformationBackendAdapter
 #
 
 def execute_flow ( request, response, format ):
-    '''Executes a flow interactively on the Server.'''
+    #'''Executes a flow interactively on the Server.'''
     response.setBufferSize(0)
     if checkUserRole (request,Role.EXECUTION) :
         params = extractRequestParamaters(request)
@@ -197,7 +197,7 @@ def execute_uri_flow ( request, response, format ):
  
 def execute_repository ( request, response, format ):
     '''Executes all the flows in the provided repository.'''
-    response.setBufferSize(1)
+    #response.setBufferSize(1)
     if checkUserRole (request,Role.EXECUTION) :
         qr = WSExecuteServlet.extractRepository(request,meandre_store)
         if qr is not None :

@@ -73,7 +73,7 @@ public class InteractiveExecution {
 		pw.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		pw.println();
 
-		//pw.flush();
+		pw.flush();
 
 		// Create the execution
 		FlowDescription fd = qr.getFlowDescription(qr.getModel().createResource(sURI));
@@ -269,6 +269,8 @@ public class InteractiveExecution {
 			mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
 		
 			int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
+			
+			pw.flush();
 			
 			WebUI webui = exec.initWebUI(nextPort,sToken);
 			job.setToken(sToken);
