@@ -10,7 +10,8 @@ requestMap = {
         'list_running_flows': 'execute_list_running_flows' ,
         'url': 'execute_url',
         'web_component_url': 'execute_web_component_url',
-        'uri_flow': 'execute_uri_flow'
+        'uri_flow': 'execute_uri_flow',
+        'clean_uri_flow': 'execute_clean_uri_flow'
     },
     'POST': {
         'repository': 'execute_repository'
@@ -84,7 +85,6 @@ def execute_flow ( request, response, format ):
                 else :
                     errorNotFound(response)
                 executionTokenMap[token].setPort(-1)
-                # TODO: Set to clean up the map after a while
                 #del executionTokenMap[token]
         else :
             errorExpectationFail(response)
@@ -225,11 +225,25 @@ def execute_repository ( request, response, format ):
                         jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_COMPLETED)
                     else :
                         jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_ABORTED)
-                del executionTokenMap[token]
+                executionTokenMap[token].setPort(-1)
+                #del executionTokenMap[token]
         else :
             errorExpectationFail(response)
     else:
         errorForbidden(response)
 
 
+def execute_clean_uri_flow ( request, response, format ):
+    '''Executes all the flows in the provided repository.'''
+    
+    content = []
+    for token in executionTokenMap :
+       job = executionTokenMap[token]
+       if job.getPort()==-1 :
+           del executionTokenMap[token]
+           cleaned = { 'token': token }
+           content.append(cleaned)   
+    statusOK(response)
+    sendTJXContent(response,content,format)
+    
     

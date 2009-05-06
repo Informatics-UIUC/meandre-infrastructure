@@ -165,6 +165,7 @@
 							<li><a href="/services/execute/list_running_flows.html">Running flows</a></li>
 							<li><a href="/services/auxiliar/execute_repository.html">Execute repository</a></li>
 							<li><a href="/services/jobs/list_jobs_statuses.html">List job statuses</a></li>
+							<li><a href="/services/execute/clean_uri_flow.html">Clean data structures</a></li>
 		 		    	</ul>
 		 		    	<p>Cluster</p>
 			 		    <ul>
@@ -414,6 +415,9 @@
 			          				</xsl:if>	
 			          				<xsl:if test="console">	
 			          					<th>Console output</th>
+			          				</xsl:if>
+			          				<xsl:if test="token">	
+			          					<th>Token cleaned</th>
 			          				</xsl:if>			
 		          				</tr>
 		          			</xsl:if>
@@ -697,6 +701,9 @@
 		          						</pre>
 		          					</td>	
 		          				</xsl:if>	
+		          				<xsl:if test="token">
+		          					<td><xsl:value-of select="token"/></td>
+		          				</xsl:if>
 					     	</tr>
 				     	</xsl:for-each>
 		     		</table>
