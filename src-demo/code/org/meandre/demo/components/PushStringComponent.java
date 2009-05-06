@@ -30,7 +30,8 @@ public class PushStringComponent implements ExecutableComponent {
 	 */
 	public void initialize ( ComponentContextProperties ccp ) 
 	throws ComponentExecutionException, ComponentContextException {
-		sRandom = (""+new Random().nextFloat()).substring(0,7);
+		sRandom = (""+new Random().nextFloat());
+		if (sRandom.length()>8) sRandom = sRandom.substring(0,7);
 	}
 
 	/** This method just pushes a string  to the output.
