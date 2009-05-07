@@ -139,7 +139,7 @@ public class FlowGenerator {
 	/** Import a repository
 	 *
 	 * @param iLine The line where the import happen
-	 * @throws ParseException Problem arised while importing the URI
+	 * @throws ParseException Problem occurred while importing the URI
 	 */
 	public void importRepository ( String sURI, int iLine )
 	throws ParseException {
@@ -177,7 +177,7 @@ public class FlowGenerator {
 	 * @param iLine The line where the request was done
 	 * @throws ParseException The component could not be imported
 	 */
-	public void importRepository(String sURI, String sCompURI, int iLine) 
+	public void importRepository(String sURI, String sCompURI, int iLine)
 	throws ParseException {
 		URI uri = Tools.filterURItoURL(sURI, iLine);
 
@@ -309,8 +309,8 @@ public class FlowGenerator {
 	 * @param qLeftProp The left instance property
 	 * @param qRightIns The right instance
 	 * @param qRightProp The right instance property
-	 * @param iLine The line where the assigment was invoked
-	 * @throws ParseException The assigments could not be conducted
+	 * @param iLine The line where the assignment was invoked
+	 * @throws ParseException The assignments could not be conducted
 	 */
 	public void setProperties(Queue<String> qLeftIns, Queue<String> qLeftProp,
 			Queue<String> qRightIns, Queue<String> qRightProp, int iLine) throws ParseException {
@@ -452,7 +452,7 @@ public class FlowGenerator {
 		return false;
 	}
 
-	/** Retun the available ports.
+	/** Return the available ports.
 	 *
 	 * @param setDataport The set of data ports
 	 * @return The set of available ports
@@ -489,19 +489,52 @@ public class FlowGenerator {
 		generateMAUToFile(sOutputFileName);
 	}
 
-	/** Generates the MAU file for the successfully compiled code.
+	   /** Generates the MAU file for the successfully compiled code.
+    *
+    * @param sOutputFileName The filename
+    * @throws ParseException Something went wrong
+    */
+   public void generateMAUToFile(String sOutputFileName) throws ParseException {
+       ps.println("ZigZag compilation finished successfuly!" );
+       ps.print("Preparing flow descriptor... " );
+
+       sOutputFileName = (sOutputFileName.endsWith(File.pathSeparator))?sOutputFileName.replaceAll(File.separator+"$", ""):sOutputFileName;
+
+       // Get the flow description generated so far (including the parallel processing)
+       FlowDescription fd = getFlowDescription(sOutputFileName,true);
+
+       // Add the component descriptions to the model
+       ps.print("Assembling MAU repository... ");
+       Model mod = fd.getModel();
+       for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() )
+           mod.add(ri.getExecutableComponentDescription(ecid.getExecutableComponent()).getModel());
+
+       ps.println("done");
+
+       // Generate the compressed MAU file
+       try {
+           generateCompressedMau(sOutputFileName, fd, mod);
+       }
+       catch ( Exception e ) {
+           throw new ParseException(e.toString());
+       }
+
+   }
+	/** Generates the MAU blindly without processing parallelization or uri rewriting. Only
+	 * useful to generate MAU out of an existing repository!!!
 	 *
 	 * @param sOutputFileName The filename
+	 * @param sURI The flow URI to use
 	 * @throws ParseException Something went wrong
 	 */
-	public void generateMAUToFile(String sOutputFileName) throws ParseException {
+	public void generateMAUBlindlyToFile(String sOutputFileName, String sURI) throws ParseException {
 		ps.println("ZigZag compilation finished successfuly!" );
 		ps.print("Preparing flow descriptor... " );
 
 		sOutputFileName = (sOutputFileName.endsWith(File.pathSeparator))?sOutputFileName.replaceAll(File.separator+"$", ""):sOutputFileName;
 
-		// Get the flow description generated so far (inlcuding the parallel processing)
-		FlowDescription fd = getFlowDescription(sOutputFileName,true);
+		// Get the flow description generated so far (including the parallel processing)
+		FlowDescription fd = ri.getFlowDescription(ri.getModel().createResource(sURI));
 
 		// Add the component descriptions to the model
 		ps.print("Assembling MAU repository... ");
@@ -541,7 +574,7 @@ public class FlowGenerator {
 
 		FlowDescription fd = new FlowDescription();
 		String sBaseURI = sBaseURL+"flow/"+sOutputFileName.replaceAll("\"", "").replaceAll("'", "").replaceAll("\\"+".", "-")+"/";
-		
+
 		// Set the basic flow properties
 		fd.setFlowComponent(ri.getModel().createResource(sBaseURI));
 		fd.setName(sOutputFileName);
@@ -557,30 +590,30 @@ public class FlowGenerator {
 		// Add the connectors to the flow
 		fd.getConnectorDescriptions().addAll(hsConnectors);
 
-		// Post parellization processing
+		// Post parallelization processing
 		if ( bParallelProcess && htParallelInstances.size()>0 ) {
 			ps.println("Postprocessing flow for parallelization");
 			postProcessingParallelization(fd);
 			ps.println("Postprocessing flow for parallelization finished");
 		}
-		
+
 		return uriRewrite(fd,sBaseURI);
 	}
 
 	/** Rewrites the URLs to make them happy and convention complaining
-	 * 
+	 *
 	 * @param fdOrig The flow description to arranges
 	 * @param baseURI The base URI
 	 * @return The new flow description
 	 */
 	private FlowDescription uriRewrite(FlowDescription fdOrig, String baseURI) {
-		
+
 		RepositoryImpl ri = new RepositoryImpl(fdOrig.getModel());
 		Model mod = ri.getModel();
 		FlowDescription fdn = ri.getAvailableFlowDescriptions().iterator().next();
 		Hashtable<Resource,Resource> htTranslate = new Hashtable<Resource,Resource>();
 		HashSet<ExecutableComponentInstanceDescription> hsSet = new HashSet<ExecutableComponentInstanceDescription>();
-		
+
 		// Replace the uri name in the instances
 		for ( ExecutableComponentInstanceDescription ecid:fdn.getExecutableComponentInstances()) {
 			String sName = ecid.getName().replaceAll(" ", "-").replaceAll("\t", "-");
@@ -592,7 +625,7 @@ public class FlowGenerator {
 		fdn.removeAllExecutableComponentInstances();
 		for ( ExecutableComponentInstanceDescription ecidMod:hsSet )
 			fdn.addExecutableComponentInstance(ecidMod);
-		
+
 		// Replace the uri in the components
 		int iCnt = 0;
 		for( ConnectorDescription cd:fdn.getConnectorDescriptions() ) {
@@ -603,7 +636,7 @@ public class FlowGenerator {
 			// Fix target
 			cd.setTargetInstance(htTranslate.get(cd.getTargetInstance()));
 		}
-		
+
 		return fdn;
 	}
 
