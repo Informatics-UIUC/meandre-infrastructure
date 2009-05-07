@@ -102,7 +102,8 @@ def execute_list_running_flows ( request, response, format ):
                 content.append( {
                         'flow_instance_uri': flow_uri,
                         'flow_instance_webui_uri': 'http://'+getHostName()+':'+str(webui.getPort())+'/',
-                        'flow_instance_proxy_webui_uri': 'http://'+getHostName()+':'+str(meandre_config.getBasePort())+'/webui/'+str(webui.getPort())+'/'
+                        'flow_instance_proxy_webui_uri': 'http://'+getHostName()+':'+str(meandre_config.getBasePort())+'/webui/'+str(webui.getPort())+'/',
+                        'flow_instance_proxy_webui_relative': '/webui/'+str(webui.getPort())+'/'
                     })
         statusOK(response)
         sendTJXContent(response,content,format)
@@ -123,7 +124,8 @@ def execute_url ( request, response, format ):
                     content.append( {
                             'flow_instance_uri': flow_uri,
                             'flow_instance_webui_uri': 'http://'+getHostName()+':'+str(webui.getPort())+'/',
-                            'flow_instance_proxy_webui_uri': 'http://'+getHostName()+':'+str(meandre_config.getBasePort())+'/webui/'+str(webui.getPort())+'/'
+                            'flow_instance_proxy_webui_uri': 'http://'+getHostName()+':'+str(meandre_config.getBasePort())+'/webui/'+str(webui.getPort())+'/',
+                            'flow_instance_proxy_webui_relative': '/webui/'+str(webui.getPort())+'/'
                         })
             statusOK(response)
             sendTJXContent(response,content,format)

@@ -312,6 +312,9 @@
 			          				<xsl:if test="flow_instance_uri">
 			          					<th>Flow instance URI</th>
 			          				</xsl:if>
+     							    <xsl:if test="flow_instance_proxy_webui_relative">
+			          					<th>Proxy UI</th>
+			          				</xsl:if>
 			          				<xsl:if test="flow_instance_webui_uri">
 			          					<th>WebUI URL</th>
 			          				</xsl:if>
@@ -561,6 +564,14 @@
 				     			<xsl:if test="flow_instance_uri">
 		          					<td><xsl:value-of select="flow_instance_uri"/></td>
 		          				</xsl:if>
+		          				<xsl:if test="flow_instance_proxy_webui_relative">
+		          					<td>
+		          						<a>
+						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_proxy_webui_relative"/></xsl:attribute> 
+											<xsl:value-of select="flow_instance_proxy_webui_relative"/>
+						     			</a>
+		          					</td>
+		          				</xsl:if>	
 		          				<xsl:if test="flow_instance_webui_uri">
 		          					<td>
 		          						<a>

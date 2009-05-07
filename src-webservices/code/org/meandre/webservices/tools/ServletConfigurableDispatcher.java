@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.meandre.webservices.logger.WSLoggerFactory;
-import org.python.modules.synchronize;
 import org.python.util.PythonInterpreter;
 
 /** This class provides a unified base servlet dispatcher shared by all the
