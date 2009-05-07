@@ -15,7 +15,7 @@ import org.meandre.core.logger.KernelLoggerFactory;
  */
 public class NetworkTools {
 	
-	/** Returns the best gest for the host name.
+	/** Returns the best guess for the host name.
 	 * 
 	 * @return The host name
 	 */
@@ -28,6 +28,22 @@ public class NetworkTools {
 			KernelLoggerFactory.getCoreLogger().warning(baos.toString());
 		};
 		return "localhost";
+	}
+	
+
+	/** Returns the best guess for the host IP.
+	 * 
+	 * @return The host ip
+	 */
+	public static String getLocalHostIP () {
+		try {
+			return 	InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			KernelLoggerFactory.getCoreLogger().warning(baos.toString());
+		};
+		return "127.0.0.1";
 	}
 	
 	/** Returns the numeric version of the IP of the box where the server 

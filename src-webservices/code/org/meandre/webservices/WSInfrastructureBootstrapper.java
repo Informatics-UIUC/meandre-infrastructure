@@ -55,8 +55,6 @@ public class WSInfrastructureBootstrapper {
 				ms.start();
 			}
 		}
-		log.info("Tearing down the server");
-		System.exit(0);
 	}
 
 }

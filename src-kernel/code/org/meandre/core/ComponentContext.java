@@ -1,5 +1,9 @@
 package org.meandre.core;
 
+import java.net.URL;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.meandre.plugins.MeandrePlugin;
 
 /** The component context contains methods to access the context environment
@@ -44,9 +48,17 @@ extends ComponentContextProperties {
 	 */
 	public boolean isFlowAborting();
 	
-	/**Return the MeandrePlugin for a particular id
+	/** Returns the MeandrePlugin for a particular id.
 	 * 
 	 */
 	public MeandrePlugin getPlugin(String id);
+	
+	/** Given a request it returns the proper base URL to use.
+	 * 
+	 * @param request The request received
+	 * @return The dynamic URL
+	 * @throws ComponentContextException The URL could not be generated
+	 */
+	public URL getDynamicRequestBaseURL ( HttpServletRequest request ) throws ComponentContextException;
 
 }

@@ -3,11 +3,15 @@ package org.meandre.core;
 
 import java.io.PrintStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.engine.ActiveBuffer;
@@ -378,7 +382,8 @@ implements ComponentContext {
 		URL urlRes = null;
 		
 		try {
-			urlRes = new URL("http://"+NetworkTools.getLocalHostName()+":"+webui.getPort()+"/");
+			String sHost = (bName)?NetworkTools.getLocalHostName():NetworkTools.getLocalHostIP();
+			urlRes = new URL("http://"+sHost+":"+webui.getPort()+"/");
 		} catch (MalformedURLException e) {
 			throw new ComponentContextException(e);
 		}
@@ -399,7 +404,8 @@ implements ComponentContext {
 		URL urlRes = null;
 		
 		try {
-			urlRes = new URL("http://"+NetworkTools.getLocalHostName()+":"+ccCnf.getBasePort()+"/webui/"+webui.getPort()+"/");
+			String sHost = (bName)?NetworkTools.getLocalHostName():NetworkTools.getLocalHostIP();
+			urlRes = new URL("http://"+sHost+":"+ccCnf.getBasePort()+"/webui/"+webui.getPort()+"/");
 		} catch (MalformedURLException e) {
 			throw new ComponentContextException(e);
 		}
@@ -407,6 +413,24 @@ implements ComponentContext {
 		return urlRes;
 	}
 
+	/** Given a request it returns the proper base URL to use.
+	 * 
+	 * @param request The request received
+	 * @return The dynamic URL
+	 * @throws ComponentContextException The URL could not be generated
+	 */
+	public URL getDynamicRequestBaseURL ( HttpServletRequest request ) throws ComponentContextException {
+		URI uri;
+		try {
+			uri = new URI(request.getRequestURI());
+		} catch (URISyntaxException e) {
+			throw new ComponentContextException(e);
+		}
+		if ( uri.getPath().startsWith("/webui/") ) 
+			return getProxyWebUIUrl(true);
+		else
+			return getWebUIUrl(true);
+	}
 
 	/** Returns the logging facility.
 	 *
