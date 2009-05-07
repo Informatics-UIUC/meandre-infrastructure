@@ -103,7 +103,7 @@ public class RDF2ZZMain {
                 inputURL = new URL(inputRDFFileURL);
             } catch (Exception e) {
                 File file = new File(inputRDFFileURL);
-                inputURL = file.toURL();
+                inputURL = file.toURI().toURL();
             }
 
             InputStream is = inputURL.openStream();
