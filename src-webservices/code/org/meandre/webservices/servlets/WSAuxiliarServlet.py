@@ -318,9 +318,9 @@ def __render_descriptor_download ( uri ):
         '''Displays the download row for the supported formats'''
         html  = '<tr><th>Download</th><td>'
         html += uri+' ('
-        html += ('<a href="/services/repository/describe.rdf?uri=' % (meandre_config.appContext))+uri+'" target="_blank" title="Get RDF/XML">RDF/XML</a>, '
-        html += ('<a href="/services/repository/describe.ttl?uri=' % (meandre_config.appContext))+uri+'" target="_blank" title="Get TTL">TTL</a>, '
-        html += ('<a href="/services/repository/describe.nt?uri=' % (meandre_config.appContext))+uri+'" target="_blank" title="Get N-TRIPLE">N-TRIPLE</a>)'
+        html += ('<a href="%s/services/repository/describe.rdf?uri=' % (meandre_config.appContext))+uri+'" target="_blank" title="Get RDF/XML">RDF/XML</a>, '
+        html += ('<a href="%s/services/repository/describe.ttl?uri=' % (meandre_config.appContext))+uri+'" target="_blank" title="Get TTL">TTL</a>, '
+        html += ('<a href="%s/services/repository/describe.nt?uri=' % (meandre_config.appContext))+uri+'" target="_blank" title="Get N-TRIPLE">N-TRIPLE</a>)'
         html += '</td></tr>'
         return html
     
