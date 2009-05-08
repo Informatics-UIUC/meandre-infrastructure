@@ -4,6 +4,9 @@
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:fn="http://www.w3.org/2005/xpath-functions">
 
+	<xsl:param name="date"></xsl:param>
+	<xsl:param name="context"></xsl:param>
+	
 	<xsl:template match="/meandre_response">
 		<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 			<head>
@@ -121,9 +124,17 @@
 		 	<body>
 		 		<script language="JAVASCRIPT" type="TEXT/JAVASCRIPT"><![CDATA[
 						checkForFlow = function () {
-							if ( window.location.pathname=='/services/repository/list_flows.html' ||
-							     window.location.pathname=='/services/repository/search_flows.html' ||
-							     window.location.pathname=='/services/repository/flows_by_tag.html' ) {
+						    var pn = window.location.pathname
+						    var pn1 = pn.indexOf('/services/repository/list_flows.html')!=-1
+						    var pn2 = pn.indexOf('/services/repository/search_flows.html')!=-1
+						    var pn3 = pn.indexOf('/services/repository/flows_by_tag.html')!=-1
+							if ( pn1 ) {
+								return confirm('Are you sure you want to run this flow');
+							}
+							else if ( pn2 ) {
+								return confirm('Are you sure you want to run this flow');
+							}
+							else if ( pn3 ) {
 								return confirm('Are you sure you want to run this flow');
 							}
 							else {
@@ -134,56 +145,62 @@
 					]]></script>
 				<table id="separator"><tr><td id="separator" valign="top" style="border:none;" width="200px">
 		 		<div id="menu"> 
-					<img src="/public/resources/system/logo-meandre.gif" />
+					<img>
+						<xsl:attribute name="src"><xsl:value-of select="$context"/>/public/resources/system/logo-meandre.gif</xsl:attribute>
+					</img>
+					<p><xsl:value-of select="$date"/></p>
 					<div id="navigation">
 			 			<p>Repository</p>
 			 		    <ul>
-							<li><a href="/services/auxiliar/add_to_repository.html" >Add</a></li>
-							<li><a href="/services/repository/dump.ttl" target="_blank">Dump</a></li>
-							<li><a href="/services/repository/list_components.html?order=name">Components</a> (<a href="/services/repository/list_components.html?order=date">by date</a>)</li>
-							<li><a href="/services/repository/list_flows.html?order=name">Flows</a> (<a href="/services/repository/list_flows.html?order=date">by date</a>)</li>
-							<li><a href="/services/repository/tags.html">Tags</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/auxiliar/add_to_repository.html</xsl:attribute>Add</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/dump.ttl</xsl:attribute><xsl:attribute name="target">_blank</xsl:attribute>Dump</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/list_components.html?order=name</xsl:attribute>Components</a> (<a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/list_components.html?order=date</xsl:attribute>by date</a>)</li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/list_flows.html?order=name</xsl:attribute>Flows</a> (<a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/list_flows.html?order=date</xsl:attribute>by date</a>)</li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/tags.html</xsl:attribute>Tags</a></li>
 							<li>
-								<form name="sfc" method="get" action="/services/repository/search_components.html">
+								<form name="sfc" method="get">
+								 	<xsl:attribute name="action"><xsl:value-of select="$context"/>/services/repository/search_components.html</xsl:attribute>
 									<input type="text" id="sc" name="q" value="Search components..." onclick="document.sfc.sc.value=''"/><br/>
 								</form> 
 							</li>
 							<li>
-								<form name="sff"  method="get" action="/services/repository/search_flows.html">
+								<form name="sff"  method="get">
+									<xsl:attribute name="action"><xsl:value-of select="$context"/>/services/repository/search_flows.html</xsl:attribute>
 									<input type="text" id="sf" name="q" value="Search flows..." onclick="document.sff.sf.value=''"/><br/>
 								</form> 
 							</li>
-							<li><a href="/services/repository/clear.html" onclick="return confirm('Are you sure you want to remove all the components and flow from the repository?');">Clear</a></li>
-							<li><a href="/services/repository/regenerate.html" onclick="return confirm('Are you sure you want to regenerate the repository?');">Regenerate</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/clear.html</xsl:attribute><xsl:attribute name="onclick">return confirm('Are you sure you want to remove all the components and flow from the repository?');</xsl:attribute>Clear</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/regenerate.html</xsl:attribute><xsl:attribute name="onclick">return confirm('Are you sure you want to to regenerate the repository?');</xsl:attribute>Regenerate</a></li>
 		 		    	</ul>
 		 		    	<p>Publish</p>
 			 		    <ul>
-							<li><a href="/services/publish/list_published.html">List published</a></li>
-							<li><a href="/services/publish/unpublish_all.html" onclick="return confirm('Are you sure you want to unpublish all components and flows?');">Unpublish all</a></li>
-		 		    		<li><a href="/services/publish/publish_all.html" onclick="return confirm('Are you sure you want to publish all components and flows?');">Publish all</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/publish/list_published.html</xsl:attribute>List published</a></li>
+							<li><a onclick="return confirm('Are you sure you want to unpublish all components and flows?');"><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/publish/unpublish_all.html</xsl:attribute>Unpublish all</a></li>
+		 		    		<li><a onclick="return confirm('Are you sure you want to publish all components and flows?');"><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/publish/publish_all.html</xsl:attribute>Publish all</a></li>
 		 		    	</ul>
 		 		    	<p>Execution</p>
 			 		    <ul>
-							<li><a href="/services/execute/list_running_flows.html">Running flows</a></li>
-							<li><a href="/services/auxiliar/execute_repository.html">Execute repository</a></li>
-							<li><a href="/services/jobs/list_jobs_statuses.html">List job statuses</a></li>
-							<li><a href="/services/execute/clean_uri_flow.html">Clean data structures</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/execute/list_running_flows.html</xsl:attribute>Running flows</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/auxiliar/execute_repository.html</xsl:attribute>Execute repository</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/jobs/list_jobs_statuses.html</xsl:attribute>List job statuses</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/execute/clean_uri_flow.html</xsl:attribute>Clean data structures</a></li>
 		 		    	</ul>
 		 		    	<p>Cluster</p>
 			 		    <ul>
-							<li><a href="/services/coordinator/log.html">Cluster log</a></li>
-							<li><a href="/services/coordinator/status.html">Servers' statuses</a></li>
-							<li><a href="/services/coordinator/info.html">Servers' information</a></li>
-		 		    		<li><a href="/services/coordinator/property.html">Servers' properties</a></li>
-		 		    		<li><a href="/services/server/shutdown.html" onclick="return confirm('Are you sure you want to shutdown this server?');">Shutdown this server</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/coordinator/log.html</xsl:attribute>Cluster log</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/coordinator/status.html</xsl:attribute>Servers' statuses</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/coordinator/info.html</xsl:attribute>Servers' information</a></li>
+		 		    		<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/coordinator/property.html</xsl:attribute>Servers' properties</a></li>
+		 		    		<li><a onclick="return confirm('Are you sure you want to shutdown this server?');"><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/server/shutdown.html</xsl:attribute>Shutdown this server</a></li>
 		 		    	</ul>
 		 		    	<p>Locations</p>
 			 		    <ul>
-			 		    	<li><a href="/services/locations/list.html">List</a></li>
+			 		    	<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/locations/list.html</xsl:attribute>List</a></li>
 							<li>
 								Add a location<br/>
 								<ul>
-									<form name="al"  method="get" action="/services/locations/add.html">
+									<form name="al"  method="get">
+								 		<xsl:attribute name="action"><xsl:value-of select="$context"/>/services/locations/add.html</xsl:attribute>
 										<input type="text" id="loc" name="location" value="Location..." onclick="document.al.loc.value=''"/><br/>
 										<input type="text" id="desc" name="description" value="Description..." onclick="document.al.desc.value=''"/><br/>
 										<input type="submit" value="Add" />
@@ -193,38 +210,41 @@
 		 		    	</ul>
 		 		    	<p>Security</p>
 			 		    <ul>
-							<li><a href="/services/auxiliar/create_user.html" >Create user</a></li>
-							<li><a href="/services/security/users.html">Users</a></li>
-							<li><a href="/services/security/valid_roles.html">Valid roles</a></li>
-							<li><a href="/services/security/current_roles.html">Current user roles</a></li>
-							<li><a href="/services/auxiliar/roles_map.html">Role map</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/auxiliar/create_user.html</xsl:attribute>Create user</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/security/users.html</xsl:attribute>Users</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/security/valid_roles.html</xsl:attribute>Valid roles</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/security/current_roles.html</xsl:attribute>Current user roles</a></li>
+							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/auxiliar/roles_map.html</xsl:attribute>Role map</a></li>
 							<li>
-								<form name="rou"  method="get" action="/services/security/roles_of_user.html">
+								<form name="rou"  method="get">
+								 	<xsl:attribute name="action"><xsl:value-of select="$context"/>/services/security/roles_of_user.html</xsl:attribute>
 									<input type="text" id="un" name="user_name" value="User roles..." onclick="document.rou.un.value=''"/><br/>
 								</form> 
 							</li>
 							<li>
-								<form name="u"  method="get" action="/services/security/user.html">
+								<form name="u"  method="get">
+							 		<xsl:attribute name="action"><xsl:value-of select="$context"/>/services/security/user.html</xsl:attribute>
 									<input type="text" id="un" name="user_name" value="User info..." onclick="document.u.un.value=''"/><br/>
 								</form> 
 							</li>
 							<li>
-								<form name="rar"  method="get" action="/services/security/revoke_all_roles.html">
+								<form name="rar"  method="get">
+							 		<xsl:attribute name="action"><xsl:value-of select="$context"/>/services/security/revoke_all_roles.html</xsl:attribute>
 									<input type="text" id="un" name="user_name" value="Revoke all roles..." onclick="document.rar.un.value=''"/><br/>
 								</form> 
 							</li>
 		 		    	</ul>
 		 		    	<p>Public</p>
 			 		    <ul>
-			 		    	<li><a href="/public/services/repository.ttl" target="_blank">Published repository</a></li>
-			 		    	<li><a href="/public/services/demo_repository.ttl" target="_blank">Demo repository</a></li>
-			 		    	<li><a href="/public/services/ping.html" >Ping</a></li>
+			 		    	<li><a target="_blank"><xsl:attribute name="href"><xsl:value-of select="$context"/>/public/services/repository.ttl</xsl:attribute>Published repository</a></li>
+			 		    	<li><a target="_blank"><xsl:attribute name="href"><xsl:value-of select="$context"/>/public/services/demo_repository.ttl</xsl:attribute>Demo repository</a></li>
+			 		    	<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/public/services/ping.html</xsl:attribute>Ping</a></li>
 		 		    	</ul>
 		 		    	<p>About</p>
 			 		    <ul>
-			 		    	<li><a href="/services/about/installation.html">Installation</a></li>
-			 		    	<li><a href="/services/about/version.html">Version</a></li>
-			 		    	<li><a href="/services/about/plugins.html">Plugins</a></li>
+			 		    	<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/about/installation.html</xsl:attribute>Installation</a></li>
+			 		    	<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/about/version.html</xsl:attribute>Version</a></li>
+			 		    	<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/about/plugins.html</xsl:attribute>Plugins</a></li>
 		 		    	</ul>
 		 		    </div>
 		 		    <br/>All rights reserved by<br/>DITA, NCSA, and UofI, 2007-2009.
@@ -437,7 +457,7 @@
 						     		</td>
 						     		<td>
 						     			<a>
-						     				<xsl:attribute name="href">/services/locations/remove.html?location=<xsl:value-of select="location"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/locations/remove.html?location=<xsl:value-of select="location"/></xsl:attribute> 
 											remove
 						     			</a>
 				     				</td>
@@ -510,36 +530,36 @@
 		          				<xsl:if test="meandre_uri">
 				     				<td>
 						     			<a>
-						     				<xsl:attribute name="href">/services/auxiliar/show.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/auxiliar/show.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
 											<xsl:value-of select="meandre_uri"/>
 						     			</a>
 						     		</td>
 						     		<td>
 						     			<a>
-						     				<xsl:attribute name="href">/services/execute/flow.txt?statistics=true&amp;uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/execute/flow.txt?statistics=true&amp;uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
 											<xsl:attribute name="target">_blank</xsl:attribute>
 											<xsl:attribute name="onclick">return checkForFlow()</xsl:attribute>
 											run 
 						     			</a> 
 						     			- 		
 						     			<a>
-						     				<xsl:attribute name="href">/services/auxiliar/tune_flow.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/auxiliar/tune_flow.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
 											<xsl:attribute name="target">_blank</xsl:attribute>
 											tune&amp;run 
 						     			</a> 
 						     			-		     			
 						     			<a>
-						     				<xsl:attribute name="href">/services/publish/publish.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/publish/publish.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
 											publish
 						     			</a>
 						     			-				     			
 						     			<a>
-						     				<xsl:attribute name="href">/services/publish/unpublish.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/publish/unpublish.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
 											unpublish
 						     			</a>	
 						     			-				     			
 						     			<a>
-						     				<xsl:attribute name="href">/services/repository/remove.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/remove.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
 											remove
 						     			</a>
 				     				</td>
@@ -550,13 +570,13 @@
 						     		</td>
 						     		<td>
 						     			<a>
-						     				<xsl:attribute name="href">/services/repository/components_by_tag.html?tag=<xsl:value-of select="meandre_tag"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/components_by_tag.html?tag=<xsl:value-of select="meandre_tag"/></xsl:attribute> 
 											<xsl:value-of select="meandre_uri"/>
 											show components
 						     			</a> 
 						     			-
 						     			<a>
-						     				<xsl:attribute name="href">/services/repository/flows_by_tag.html?tag=<xsl:value-of select="meandre_tag"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/flows_by_tag.html?tag=<xsl:value-of select="meandre_tag"/></xsl:attribute> 
 											show flows
 						     			</a>
 				     				</td>
@@ -603,7 +623,7 @@
 		          					<td><xsl:value-of select="user_name"/></td>
 		          					<td>
 		          						<a>
-						     				<xsl:attribute name="href">/services/security/remove_users.html?user_name=<xsl:value-of select="user_name"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/security/remove_users.html?user_name=<xsl:value-of select="user_name"/></xsl:attribute> 
 											<xsl:attribute name="onclick">return confirm('Are you sure you want to delete this user?');</xsl:attribute>
 											delete user
 						     			</a>
@@ -630,7 +650,7 @@
 		          				<xsl:if test="user_id">
 		          					<td>
 		          						<a>
-						     				<xsl:attribute name="href">/services/security/user.html?user_name=<xsl:value-of select="user_id"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/security/user.html?user_name=<xsl:value-of select="user_id"/></xsl:attribute> 
 											<xsl:value-of select="user_id"/>
 					     				</a>
 				     				</td>
@@ -702,7 +722,7 @@
 		          					<td>
 		          						<xsl:value-of select="job_id"/>
 		          						<a>
-						     				<xsl:attribute name="href">/services/jobs/job_console.html?uri=<xsl:value-of select="job_id"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/jobs/job_console.html?uri=<xsl:value-of select="job_id"/></xsl:attribute> 
 											Console
 						     			</a>
 					     			</td>

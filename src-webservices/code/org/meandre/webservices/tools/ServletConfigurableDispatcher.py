@@ -14,6 +14,7 @@ from com.hp.hpl.jena.vocabulary import DC,RDF,RDFS,XSD
 from javax.xml.transform import Source,Transformer,TransformerFactory
 from javax.xml.transform.stream import StreamResult,StreamSource
 from java.io import StringReader
+from java.util import Date
 
 from org.meandre.webservices.tools import ServletConfigurableDispatcher
 
@@ -222,6 +223,8 @@ def sendTJXContent ( response, content, format ):
         xmlc += '</meandre_response>'
         xmlSource = StreamSource(StringReader(xmlc))
         result = StreamResult(response.getOutputStream())
+        __xslTrans.setParameter("date",Date().toString())
+        __xslTrans.setParameter("context",meandre_config.getAppContext())
         __xslTrans.transform(xmlSource, result);
     else:
         errorNotFound(response)

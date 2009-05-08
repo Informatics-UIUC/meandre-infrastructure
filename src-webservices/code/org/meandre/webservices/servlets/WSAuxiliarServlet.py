@@ -24,6 +24,8 @@ requestMap = {
 
 from java.io import ByteArrayOutputStream
 
+from org.meandre.webservices.tools import ServletConfigurableDispatcher
+
 __header = """
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
             <head>
@@ -59,7 +61,7 @@ __header = """
                         } 
                     
                         #main table {
-                            width: 100%;
+                            width: 100%% ;
                             margin-left:auto;
                             margin-right:auto;
                             border: 1px solid gray;
@@ -84,8 +86,9 @@ __header = """
             </head>
              <body>
              <div id="main">
-             <img src="/public/resources/system/logo-meandre.gif" /><br/>
-    """
+             <img src="%s/public/resources/system/logo-meandre.gif" /><br/>
+    """  
+            
     
 __footer = """
              </div>
@@ -96,7 +99,7 @@ __footer = """
     """
 
 __add_to_repository_form = """
-        <form enctype="multipart/form-data" method="POST" action="/services/repository/add.html" >
+        <form enctype="multipart/form-data" method="POST" action="%s/services/repository/add.html" >
         <fieldset>
                 <table>
                     <tbody>
@@ -178,7 +181,7 @@ __add_to_repository_form = """
     """
     
 __add_user_form = """
-        <form method="get" action="/services/security/create_users.html" >
+        <form method="get" action="%s/services/security/create_users.html" >
             <fieldset>
                 <table>
                     <tr><td>
@@ -197,7 +200,7 @@ __add_user_form = """
     """
 
 __run_repository_form = """
-        <form enctype="multipart/form-data" method="POST" action="/services/execute/repository.txt" >
+        <form enctype="multipart/form-data" method="POST" action="%s/services/execute/repository.txt" >
         <fieldset>
                 <table>
                     <tbody>
@@ -232,8 +235,8 @@ def auxiliar_add_to_repository ( request, response, format ):
         if format=='html' :
             statusOK(response)
             contentAppHTML(response)
-            sendRawContent(response,__header)
-            sendRawContent(response,__add_to_repository_form)
+            sendRawContent(response,__header % (meandre_config.appContext) )
+            sendRawContent(response,__add_to_repository_form % (meandre_config.appContext))
             sendRawContent(response,__footer)
         else :
             errorNotFound(response)
@@ -247,8 +250,8 @@ def auxiliar_create_user ( request, response, format ):
         if format=='html' :
             statusOK(response)
             contentAppHTML(response)
-            sendRawContent(response,__header)
-            sendRawContent(response,__add_user_form)
+            sendRawContent(response,__header % (meandre_config.appContext))
+            sendRawContent(response,__add_user_form % (meandre_config.appContext))
             sendRawContent(response,__footer)
         else :
             errorNotFound(response)
@@ -261,7 +264,7 @@ def auxiliar_roles_map ( request, response, format ):
         if format=='html' :
             statusOK(response)
             contentAppHTML(response)
-            sendRawContent(response,__header)
+            sendRawContent(response,__header % (meandre_config.appContext))
             sendRawContent(response,'<br/><div id="main"><table><tr><th>User</th><th>Full name</th>')
             roles = Role.getStandardRoles()
             for role in roles :
@@ -274,9 +277,9 @@ def auxiliar_roles_map ( request, response, format ):
                 user_roles = meandre_security.getRolesOfUser(user)
                 for role in roles:
                     if role in user_roles :
-                        sendRawContent(response,'<td><a href="/services/security/revoke_roles.html?user_name='+user_nick_name+'&role_name='+role.getUrl()+'">revoke</a></td>')
+                        sendRawContent(response,('<td><a href="%s/services/security/revoke_roles.html?user_name=' % (meandre_config.appContext))+user_nick_name+'&role_name='+role.getUrl()+'">revoke</a></td>')
                     else:
-                        sendRawContent(response,'<td><a href="/services/security/grant_roles.html?user_name='+user_nick_name+'&role_name='+role.getUrl()+'">grant</a></td>')
+                        sendRawContent(response,('<td><a href="%s/services/security/grant_roles.html?user_name=' % (meandre_config.appContext))+user_nick_name+'&role_name='+role.getUrl()+'">grant</a></td>')
                 sendRawContent(response,'</tr>')
             sendRawContent(response,'</table></div>')
             sendRawContent(response,__footer)
@@ -292,8 +295,8 @@ def auxiliar_execute_repository ( request, response, format ):
         if format=='html' :
             statusOK(response)
             contentAppHTML(response)
-            sendRawContent(response,__header)
-            sendRawContent(response,__run_repository_form)
+            sendRawContent(response,__header % (meandre_config.appContext))
+            sendRawContent(response,__run_repository_form % (meandre_config.appContext))
             sendRawContent(response,__footer)
         else :
             errorNotFound(response)
@@ -315,9 +318,9 @@ def __render_descriptor_download ( uri ):
         '''Displays the download row for the supported formats'''
         html  = '<tr><th>Download</th><td>'
         html += uri+' ('
-        html += '<a href="/services/repository/describe.rdf?uri='+uri+'" target="_blank" title="Get RDF/XML">RDF/XML</a>, '
-        html += '<a href="/services/repository/describe.ttl?uri='+uri+'" target="_blank" title="Get TTL">TTL</a>, '
-        html += '<a href="/services/repository/describe.nt?uri='+uri+'" target="_blank" title="Get N-TRIPLE">N-TRIPLE</a>)'
+        html += ('<a href="/services/repository/describe.rdf?uri=' % (meandre_config.appContext))+uri+'" target="_blank" title="Get RDF/XML">RDF/XML</a>, '
+        html += ('<a href="/services/repository/describe.ttl?uri=' % (meandre_config.appContext))+uri+'" target="_blank" title="Get TTL">TTL</a>, '
+        html += ('<a href="/services/repository/describe.nt?uri=' % (meandre_config.appContext))+uri+'" target="_blank" title="Get N-TRIPLE">N-TRIPLE</a>)'
         html += '</td></tr>'
         return html
     
@@ -369,7 +372,7 @@ def __render_flow ( flow_desc, edit, qr ):
         
         html = ''
         if edit is True:
-            html += '<form method="POST" action="/services/auxiliar/run_tuned_flow.txt">'
+            html += '<form method="POST" action="%s/services/auxiliar/run_tuned_flow.txt">' % (meandre_config.appContext)
             html += '<br/><table><tr><td colspan="2" align="center"><input type="submit" value="Run!" /><input type="reset" value="Reset" /></td></tr>'
         else:
             html += '<br/><table>'
@@ -408,7 +411,7 @@ def auxiliar_tune_flow ( request, response, format ):
                     body += '</table>'
                 statusOK(response)
                 contentAppHTML(response)
-                sendRawContent(response,__header)
+                sendRawContent(response,__header % (meandre_config.appContext))
                 sendRawContent(response,body)
                 sendRawContent(response,__footer)
             else :
@@ -435,7 +438,7 @@ def auxiliar_run_tuned_flow ( request, response, format ):
                 ecd = qr.getExecutableComponentDescription(ecid.getExecutableComponent())
                 model.add(ecd.getModel())
             request.setAttribute('repository',model)
-            rd = request.getRequestDispatcher('/services/execute/repository.txt')
+            rd = request.getRequestDispatcher('%s/services/execute/repository.txt' % (meandre_config.appContext))
             rd.forward(request, response)
     else:
         errorForbidden(response)
@@ -494,7 +497,7 @@ def auxiliar_show ( request, response, format ):
             if 'uri' in params :
                 statusOK(response)
                 contentAppHTML(response)
-                sendRawContent(response,__header)
+                sendRawContent(response,__header % (meandre_config.appContext))
                 for uri in params['uri']:
                     content = getEmptyModel()
                     qr = meandre_store.getRepositoryStore(getMeandreUser(request))
@@ -513,6 +516,5 @@ def auxiliar_show ( request, response, format ):
         errorForbidden(response)
 
 
-    
 
     

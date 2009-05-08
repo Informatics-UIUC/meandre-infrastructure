@@ -56,9 +56,9 @@ extends ComponentContextProperties {
 	/** Given a request it returns the proper base URL to use.
 	 * 
 	 * @param request The request received
-	 * @return The dynamic URL
+	 * @return The initial path to use
 	 * @throws ComponentContextException The URL could not be generated
 	 */
-	public URL getDynamicRequestBaseURL ( HttpServletRequest request ) throws ComponentContextException;
+	public String getInitialURLPath ( HttpServletRequest request ) throws ComponentContextException;
 
 }

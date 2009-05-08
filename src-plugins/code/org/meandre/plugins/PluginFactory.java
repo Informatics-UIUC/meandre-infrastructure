@@ -138,7 +138,8 @@ public class PluginFactory {
 		//
 		// Initializing the public file server
 		//
-		Context contextResources = new Context(server,"/public/resources",Context.NO_SESSIONS);
+		String sCntx = cnf.getAppContext();
+		Context contextResources = new Context(server,sCntx+"/public/resources",Context.NO_SESSIONS);
 
 		File file = new File(cnf.getPublicResourcesDirectory());
 
@@ -198,7 +199,8 @@ public class PluginFactory {
 		//
 		// Initializing the public file server
 		//
-
+		String sCntx = cnf.getAppContext();
+		
 		for ( Object oKey:propPluginFactoryConfig.keySet()) {
 			try {
 				String sClassName = propPluginFactoryConfig.getProperty(oKey.toString());
@@ -206,10 +208,10 @@ public class PluginFactory {
 				mpPlugin.setCoreConfiguration(cnf);
 				if ( mpPlugin.isServlet() ) {
 					mpPlugin.setLogger(log);
-					cntxGlobal.addServlet(new ServletHolder((Servlet)mpPlugin), mpPlugin.getAlias());
+					cntxGlobal.addServlet(new ServletHolder((Servlet)mpPlugin), sCntx+mpPlugin.getAlias());
 				}else if(mpPlugin.isFilter()){
 					mpPlugin.setLogger(log);
-					cntxGlobal.addFilter(new FilterHolder((Filter)mpPlugin), mpPlugin.getAlias(), org.mortbay.jetty.Handler.DEFAULT);
+					cntxGlobal.addFilter(new FilterHolder((Filter)mpPlugin), sCntx+mpPlugin.getAlias(), org.mortbay.jetty.Handler.DEFAULT);
 				}
 				mpPlugin.inited(Boolean.TRUE);
 				pluginMap.put(oKey.toString(), mpPlugin);

@@ -35,7 +35,7 @@ def about_version ( request, response, format ):
     
     
 def about_plugins ( request, response, format ):
-    '''Returns the list of intalled global plugins on the Meander server.'''
+    '''Returns the list of installed global plugins on the Meander server.'''
     content = []
     map = meandre_plugins.getPropPluginFactoryConfig()
     for key in map.keySet() :
@@ -45,7 +45,7 @@ def about_plugins ( request, response, format ):
                       'key': key,
                       'className': value,
                      'isServlet': 'false',
-                      'alias': plugin.getAlias()
+                      'alias': meandre_config.getAppContext()+plugin.getAlias()
              }
         if plugin.isServlet() :
             pluginInfo['isServlet'] = 'true'

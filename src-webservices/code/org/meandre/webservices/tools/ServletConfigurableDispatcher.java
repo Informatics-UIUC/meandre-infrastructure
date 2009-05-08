@@ -67,10 +67,10 @@ public abstract class ServletConfigurableDispatcher extends HttpServlet {
 	 * 
 	 * @param config The servlet configuration object to use
 	 */
-	public void init(ServletConfig config) throws ServletException {
-		super.init(config);
-		initPythonInterpreter();
-	}
+//	public void init(ServletConfig config) throws ServletException {
+//		super.init(config);
+//		initPythonInterpreter();
+//	}
 	
 	private void initPythonInterpreter () {
 		// Setup the interpreter

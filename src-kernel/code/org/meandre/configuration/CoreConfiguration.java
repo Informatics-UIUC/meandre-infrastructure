@@ -29,6 +29,9 @@ public class CoreConfiguration {
 
     /** The config path */
 	public static final String MEANDRE_HOME_DIRECTORY = "MEANDRE_HOME_DIRECTORY";
+	
+    /** The web app context */
+	public static final String MEANDRE_APP_CONTEXT = "MEANDRE_APP_CONTEXT";
     
     /** The Default port*/
 	public static final int DEFAULT_PORT =1714;
@@ -55,6 +58,7 @@ public class CoreConfiguration {
         propsCore.setProperty(MEANDRE_PRIVATE_RUN_DIRECTORY,INSTALL_DIR + File.separator + "run");
         propsCore.setProperty(MEANDRE_CORE_CONFIG_FILE, INSTALL_DIR + File.separator + "meandre-config-core.xml");
         propsCore.setProperty(MEANDRE_HOME_DIRECTORY,INSTALL_DIR);   
+        propsCore.setProperty(MEANDRE_APP_CONTEXT,"");   
         
         initializeConfiguration();    	
 	}
@@ -89,6 +93,7 @@ public class CoreConfiguration {
         propsCore.setProperty(MEANDRE_PRIVATE_RUN_DIRECTORY, sInstallDir + File.separator + "run");
         propsCore.setProperty(MEANDRE_CORE_CONFIG_FILE, sInstallDir + File.separator + "meandre-config-core.xml");
         propsCore.setProperty(MEANDRE_HOME_DIRECTORY, sInstallDir);  
+        propsCore.setProperty(MEANDRE_APP_CONTEXT,"");   
         INSTALL_DIR = sInstallDir;
         log = KernelLoggerFactory.getCoreLogger();
 	     
@@ -166,6 +171,15 @@ public class CoreConfiguration {
         return propsCore.getProperty(MEANDRE_HOME_DIRECTORY);
     }
 
+    /** Returns the application context were to express Meandre
+     * 
+     * @return The application context
+     */
+    public String getAppContext () {
+    	String sCntx = propsCore.getProperty(MEANDRE_APP_CONTEXT);
+    	return (sCntx==null)?"":"/"+sCntx;
+    }
+    
 //    /** Returns the current host IP address.
 //     * 
 //     * @return The host IP address

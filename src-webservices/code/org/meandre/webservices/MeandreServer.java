@@ -247,7 +247,7 @@ public class MeandreServer {
 	 * 
 	 */
 	public void join () throws InterruptedException {
-		log.info("Joining Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+")");
+		log.info("Joining Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+") on context <"+cnf.getAppContext()+">");
 		server.join();
 		
 	}
@@ -306,8 +306,11 @@ public class MeandreServer {
 	private Context initializeTheWebServices(Server server)
 			throws IOException {
 		
+		String sCntx = cnf.getAppContext();
+		
 		// Install the WebUI proxy before anyother handler
 		server.addHandler(new WebUIProxy());
+		
 		
 		//
 		// Initializing the web services
@@ -331,7 +334,7 @@ public class MeandreServer {
 
 		ConstraintMapping cm = new ConstraintMapping();
 		cm.setConstraint(constraint);
-		cm.setPathSpec("/services/*");
+		cm.setPathSpec(sCntx+"/services/*");
 
 		String sJettyHome = System.getProperty("jetty.home");
 		sJettyHome = (sJettyHome==null)?MEANDRE_HOME:sJettyHome;
@@ -357,22 +360,22 @@ public class MeandreServer {
 		//
 		// Adding the publicly provided services
 		//
-		contextWS.addServlet(new ServletHolder((Servlet) new WSPublicServlet(this,store,cnf)), "/public/services/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSPublicServlet(this,store,cnf)), sCntx+"/public/services/*");
 		
 		//
 		// Adding restrictedly provided services
 		//
-		contextWS.addServlet(new ServletHolder((Servlet) new WSAboutServlet(this,store,cnf)), 		"/services/about/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSLocationsServlet(this,store,cnf)),	"/services/locations/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSRepositoryServlet(this,store,cnf)),	"/services/repository/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSExecuteServlet(this,store,cnf)),		"/services/execute/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSPublishServlet(this,store,cnf)),		"/services/publish/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurityServlet(this,store,cnf)),		"/services/security/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSCoordinatorServlet(this,store,cnf,baToStore)),		"/services/coordinator/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSJobServlet(this,store,cnf)),		"/services/jobs/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSServerServlet(this,store,cnf)),		"/services/server/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSAboutServlet(this,store,cnf)), 		sCntx+"/services/about/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSLocationsServlet(this,store,cnf)),	sCntx+"/services/locations/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSRepositoryServlet(this,store,cnf)),	sCntx+"/services/repository/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSExecuteServlet(this,store,cnf)),		sCntx+"/services/execute/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSPublishServlet(this,store,cnf)),		sCntx+"/services/publish/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurityServlet(this,store,cnf)),		sCntx+"/services/security/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSCoordinatorServlet(this,store,cnf,baToStore)),		sCntx+"/services/coordinator/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSJobServlet(this,store,cnf)),		sCntx+"/services/jobs/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSServerServlet(this,store,cnf)),		sCntx+"/services/server/*");
 
-		contextWS.addServlet(new ServletHolder((Servlet) new WSAuxiliarServlet(this,store,cnf)),     "/services/auxiliar/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSAuxiliarServlet(this,store,cnf)),     sCntx+"/services/auxiliar/*");
 		
 		
 		return contextWS;

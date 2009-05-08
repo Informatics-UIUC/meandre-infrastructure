@@ -383,7 +383,7 @@ implements ComponentContext {
 		
 		try {
 			String sHost = (bName)?NetworkTools.getLocalHostName():NetworkTools.getLocalHostIP();
-			urlRes = new URL("http://"+sHost+":"+webui.getPort()+"/");
+			urlRes = new URL("http://"+sHost+":"+webui.getPort()+ccCnf.getAppContext()+"/");
 		} catch (MalformedURLException e) {
 			throw new ComponentContextException(e);
 		}
@@ -405,7 +405,7 @@ implements ComponentContext {
 		
 		try {
 			String sHost = (bName)?NetworkTools.getLocalHostName():NetworkTools.getLocalHostIP();
-			urlRes = new URL("http://"+sHost+":"+ccCnf.getBasePort()+"/webui/"+webui.getPort()+"/");
+			urlRes = new URL("http://"+sHost+":"+ccCnf.getBasePort()+ccCnf.getAppContext()+"/webui/"+webui.getPort()+"/");
 		} catch (MalformedURLException e) {
 			throw new ComponentContextException(e);
 		}
@@ -413,23 +413,23 @@ implements ComponentContext {
 		return urlRes;
 	}
 
-	/** Given a request it returns the proper base URL to use.
+	/** Given a request it returns the proper path base to use.
 	 * 
 	 * @param request The request received
 	 * @return The dynamic URL
 	 * @throws ComponentContextException The URL could not be generated
 	 */
-	public URL getDynamicRequestBaseURL ( HttpServletRequest request ) throws ComponentContextException {
+	public String getInitialURLPath ( HttpServletRequest request ) throws ComponentContextException {
 		URI uri;
 		try {
 			uri = new URI(request.getRequestURI());
 		} catch (URISyntaxException e) {
 			throw new ComponentContextException(e);
 		}
-		if ( uri.getPath().startsWith("/webui/") ) 
-			return getProxyWebUIUrl(true);
+		if ( uri.getPath().startsWith(ccCnf.getAppContext()+"/webui/") ) 
+			return ccCnf.getAppContext()+"/webui/"+webui.getPort()+"/";
 		else
-			return getWebUIUrl(true);
+			return ccCnf.getAppContext()+"/";
 	}
 
 	/** Returns the logging facility.

@@ -3,6 +3,8 @@
  */
 package org.meandre.webservices.servlets;
 
+import javax.servlet.ServletException;
+
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.store.Store;
 import org.meandre.webservices.MeandreServer;
@@ -28,6 +30,11 @@ public class WSAuxiliarServlet extends MeandreBaseServlet {
 		super(server, store, cnf);
 	}
 
-	
-
+	/** Initialize the servlet. Creates an instance of the python interpreter.
+	 * 
+	 */
+	public void init() throws ServletException {
+		super.init();
+		pi.set("meandre_config", this.cnf);
+	}
 }

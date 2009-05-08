@@ -12,7 +12,9 @@ import org.meandre.core.services.coordinator.backend.CoordinatorBackendAdapter;
 import org.meandre.core.store.Store;
 import org.meandre.plugins.PluginFactory;
 import org.meandre.webservices.MeandreServer;
+import org.meandre.webservices.logger.WSLoggerFactory;
 import org.meandre.webservices.tools.ServletConfigurableDispatcher;
+import org.python.core.PyDictionary;
 
 
 /** This class is the base class that adds Meandre related information to the
@@ -64,6 +66,7 @@ extends ServletConfigurableDispatcher {
 	/** Initialize the servlet. Adds the store varibles to the Python interpreter.
 	 * 
 	 */
+	@Override
 	public void init() throws ServletException {
 		super.init();
 		configureMeandreEnvironment();
@@ -74,21 +77,18 @@ extends ServletConfigurableDispatcher {
 	 * 
 	 * @param config The servlet configuration object to use
 	 */
-	public void init(ServletConfig config) throws ServletException {
-		super.init(config);
-		configureMeandreEnvironment();
-	}
+//	@Override
+//	public void init(ServletConfig config) throws ServletException {
+//		super.init(config);
+//		configureMeandreEnvironment();
+//	}
 
 	/** Add the configuration objects to the the Python interpreter.
 	 * 
 	 */
 	private void configureMeandreEnvironment() {
-		// Process the script
-		process(
-				MeandreBaseServlet.class.getResourceAsStream(
-						MeandreBaseServlet.class.getSimpleName()+".py"
-					)
-			);
+		
+		WSLoggerFactory.getWSLogger().info("Initializing service "+this.getClass().getSimpleName());
 		// Add the extra global variables
 		pi.set("meandre_server", this.server);
 		pi.set("meandre_store", this.store);
@@ -97,6 +97,16 @@ extends ServletConfigurableDispatcher {
 		pi.set("meandre_plugins", this.plugins);
 		if (this.backendAdaptor!=null )
 			pi.set("meandre_coordinator", this.backendAdaptor);
+		
+		// Process the script
+		process(
+				MeandreBaseServlet.class.getResourceAsStream(
+						MeandreBaseServlet.class.getSimpleName()+".py"
+					)
+			);
+		
+		
+		
 	}
 	
 }
