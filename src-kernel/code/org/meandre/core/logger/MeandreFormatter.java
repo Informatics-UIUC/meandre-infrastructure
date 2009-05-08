@@ -20,7 +20,24 @@ public class MeandreFormatter extends Formatter {
 	/** The new line separator */
 	private final static String NEW_LINE = System.getProperty("line.separator");
 	
+	/** The date formater */
 	private final static SimpleDateFormat FORMATER = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss.SSS");
+	
+	/** Should the class be reported */
+	private boolean bClass = true;
+
+	/** Creates the default formater */
+	public MeandreFormatter () {
+		bClass = true;
+	}
+	
+	/** Creates the default formater allowing to choos is the reporting class should be reported.
+	 * 
+	 * @param bShowClass Should the class be shown?
+	 */
+	public MeandreFormatter ( boolean bShowClass ) {
+		bClass = bShowClass;
+	}
 	
 	/** Formats the record.
 	 * 
@@ -40,8 +57,8 @@ public class MeandreFormatter extends Formatter {
 		  return sTimeStamp+"::"+
 		   		record.getLevel()+":  "+
 		   		record.getMessage()+ "  " + 
-		   		" ["+className+"."+record.getSourceMethodName() + "]"+
-		   		" <"+threadName+":"+record.getThreadID()+">"+
+		   		((bClass)?" ["+className+"."+record.getSourceMethodName() + "]":"")+
+		   		((bClass)?" <"+threadName+":"+record.getThreadID()+">":"")+
 		   		NEW_LINE;
 	  }
 }

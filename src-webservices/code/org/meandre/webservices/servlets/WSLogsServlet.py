@@ -36,17 +36,20 @@ __base_pr_logger = '.'+File.separator+'log'+File.separator+'meandre-probes.log.0
 
 def __read_log ( log_file, offset ):
     '''Returns the read log'''
-    f=open(log_file,'rb')
-    s,i = '',0
-    while 1:
-        line = f.readline()
-        if not line:
-            break
-        if i>=offset :
-            s += line
-        i += 1
-    f.close()
-    return s
+    try :
+        f=open(log_file,'rb')
+        s,i = '',0
+        while 1:
+            line = f.readline()
+            if not line:
+                break
+            if i>=offset :
+                s += line
+            i += 1
+        f.close()
+        return s
+    except IOError:
+        return 'log '+log_file+' currently unavailable';
 
 def __dump_log ( request, response, format, log ):
     '''Dumps the requested log'''
