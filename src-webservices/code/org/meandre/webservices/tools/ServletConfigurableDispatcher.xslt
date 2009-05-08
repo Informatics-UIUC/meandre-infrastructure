@@ -330,7 +330,7 @@
 			          					<th>Actions</th>
 			          				</xsl:if>
 			          				<xsl:if test="flow_instance_uri">
-			          					<th>Flow instance URI</th>
+			          					<th>Job ID</th>
 			          				</xsl:if>
      							    <xsl:if test="flow_instance_proxy_webui_relative">
 			          					<th>Proxy UI</th>
