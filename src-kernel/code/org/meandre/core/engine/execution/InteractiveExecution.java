@@ -137,7 +137,7 @@ public class InteractiveExecution {
 			pw.println();
 			pw.println("Reason for aborting the preparation:");
 			pw.println();
-			pw.println(cde);
+			cde.printStackTrace(pw);
 			//pw.flush();
 		}
 		catch ( ConductorException ce ) {
@@ -148,7 +148,7 @@ public class InteractiveExecution {
 			pw.println();
 			pw.println("Reason for aborting the execution:");
 			pw.println();
-			pw.println(ce);
+			ce.printStackTrace(pw);
 			//pw.flush();
 		}
 		catch ( NoClassDefFoundError te ) {
@@ -159,7 +159,7 @@ public class InteractiveExecution {
 			pw.println();
 			pw.println("Reason for aborting the execution:");
 			pw.println();
-			pw.println(te);
+			te.printStackTrace(pw);
 			//pw.flush();
 		}
 		catch ( Throwable t ) {
@@ -209,6 +209,7 @@ public class InteractiveExecution {
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
 					e.printStackTrace(new PrintStream(baos));
 					WSLoggerFactory.getWSLogger().warning(baos.toString());
+					e.printStackTrace(pw);
 				}
 			}
 			else {
@@ -297,7 +298,7 @@ public class InteractiveExecution {
 			pw.println();
 			pw.println("Reason for aborting the preparation:");
 			pw.println();
-			pw.println(cde);
+			cde.printStackTrace(pw);
 			//pw.flush();
 		}
 		catch ( ConductorException ce ) {
@@ -308,7 +309,7 @@ public class InteractiveExecution {
 			pw.println();
 			pw.println("Reason for aborting the execution:");
 			pw.println();
-			pw.println(ce);
+			ce.printStackTrace(pw);
 			//pw.flush();
 		}
 		catch ( NoClassDefFoundError te ) {
@@ -319,7 +320,7 @@ public class InteractiveExecution {
 			pw.println();
 			pw.println("Reason for aborting the execution:");
 			pw.println();
-			pw.println(te);
+			te.printStackTrace(pw);
 			//pw.flush();
 		}
 		catch ( Throwable t ) {
