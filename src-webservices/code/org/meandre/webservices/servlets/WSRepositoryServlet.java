@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.meandre.webservices.servlets;
 
@@ -37,7 +37,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /** Provides the servlet that serves Repository requests.
- * 
+ *
  * @author Xavier Llor&agrave;
  *
  */
@@ -45,12 +45,12 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 
 	/** A default serial ID */
 	private static final long serialVersionUID = 1L;
-	
+
 	/** The web service loger */
 	private static final Logger log = WSLoggerFactory.getWSLogger();
-	
+
 	/** Creates the servlet to provide Repository information.
-	 * 
+	 *
 	 * @param server The Meandre server
 	 * @param store The Meandre store to use
 	 * @param cnf The Meandre configuration to use
@@ -69,7 +69,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 	 * @throws FileUploadException An exception araised while uploading the model
 	 */
 	@SuppressWarnings("unchecked")
-	public static final Set<String> addToRepository(HttpServletRequest request, Store store, CoreConfiguration cnf, String sExtension)
+	public static final synchronized Set<String> addToRepository(HttpServletRequest request, Store store, CoreConfiguration cnf, String sExtension)
 	throws IOException, FileUploadException {
 
 		boolean bEmbed = false;
@@ -83,7 +83,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 
 		// The user repository
 		QueryableRepository qr = store.getRepositoryStore(request.getRemoteUser());
-		
+
 		while(itr.hasNext()) {
 			FileItem item = itr.next();
 		    // Get the name of the field
@@ -94,7 +94,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 
 				String sRDFContent = new String(item.get());
 				if (sRDFContent.length()==0 ) continue;
-				
+
 				Model modelTmp = ModelFactory.createDefaultModel();
 
 				modelTmp.setNsPrefix("", "http://www.meandre.org/ontology/");
@@ -124,7 +124,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 						modelAcc.add(fd.getModel());
 					else
 						log.warning("Discarding flow "+fd.getFlowComponent()+". It already exist in th repository");
-				
+
 			}
 			// Check if we need to upload jar files
 			else if(fieldName.equals("context")) {
@@ -154,7 +154,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 		// The resulting set
 		//
 		Set<String> setAddedURIs = new HashSet<String>();
-		
+
 		//
 		// Add to the user repository
 		//
@@ -171,7 +171,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 				log.warning("Component "+resComp+" already exist in "+request.getRemoteUser()+" repository. Discarding it.");
 			}
 		}
-		
+
 		// Adding flows
 		Model modUser = qr.getModel();
 		modUser.begin();
@@ -181,7 +181,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 				modUser.add(qrNew.getFlowDescription(resFlow).getModel());
 				setAddedURIs.add(resFlow.toString());
 				log.info("Added flow "+resFlow+" to "+request.getRemoteUser()+"'s repository");
-				
+
 			}
 			else {
 				if ( bOverwrite ) {
@@ -236,7 +236,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 					for ( String sFile:setFiles) {
 						// Failsafe check
 						if ( sFile.length()==0 ) continue;
-							
+
 						// Dump the files to disk
 						new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator).mkdirs();
 			    		File savedFile = new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator+sFile);
