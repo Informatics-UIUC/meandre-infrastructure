@@ -143,7 +143,7 @@ public class PluginFactory {
 
 		File file = new File(cnf.getPublicResourcesDirectory());
 
-		if ( file.mkdir() ) {
+		if ( file.mkdirs() ) {
 			try {
 				PrintStream ps = new PrintStream(new FileOutputStream(file.getAbsolutePath()+File.separator+"readme.txt"));
 				ps.println("Meandre Execution Engine version "+Constants.MEANDRE_VERSION);
@@ -153,6 +153,7 @@ public class PluginFactory {
 				ps.println("This directory contains all the publicly available implementations for the Meandre components.");
 				ps.println();
 				ps.println("Created on "+new Date());
+				ps.close();
 
 				log.warning("The resource directory does not exist - creating a new one...");
 
@@ -162,7 +163,7 @@ public class PluginFactory {
 		}
 
 		File fileResDir = new File(file.getAbsolutePath()+File.separator+sRescoureDestination);
-		if  ( fileResDir.mkdir() )  {
+		if  ( fileResDir.mkdirs() )  {
 			try {
 				for ( String sFile:saResources ) {
 					InputStream fis = PluginFactory.class.getResourceAsStream(sFile);
