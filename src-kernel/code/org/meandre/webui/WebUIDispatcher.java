@@ -43,6 +43,7 @@ public class WebUIDispatcher extends AbstractHandler {
 	private ResourceHandler resource_handler;
 
 	/** The core configuration object */
+	@SuppressWarnings("unused")
 	private CoreConfiguration cnf;
 
 	/**

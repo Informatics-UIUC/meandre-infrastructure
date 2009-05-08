@@ -35,6 +35,7 @@ import org.meandre.webservices.servlets.WSCoordinatorServlet;
 import org.meandre.webservices.servlets.WSExecuteServlet;
 import org.meandre.webservices.servlets.WSJobServlet;
 import org.meandre.webservices.servlets.WSLocationsServlet;
+import org.meandre.webservices.servlets.WSLogsServlet;
 import org.meandre.webservices.servlets.WSPublicServlet;
 import org.meandre.webservices.servlets.WSPublishServlet;
 import org.meandre.webservices.servlets.WSRepositoryServlet;
@@ -60,7 +61,7 @@ import org.mortbay.thread.BoundedThreadPool;
 public class MeandreServer {
 
 	/** Maximum jetty thread idle time */
-	private static final int MAXIMUM_JETTY_THREAD_IDLE_TIME = 3000000;
+	private static final int MAXIMUM_JETTY_THREAD_IDLE_TIME = 300000;
 
 	/** Maximum number of jetty theads */
 	private static final int MAXIMUM_NUMBER_OF_JETTY_THREADS = 256;
@@ -373,6 +374,7 @@ public class MeandreServer {
 		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurityServlet(this,store,cnf)),		sCntx+"/services/security/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSCoordinatorServlet(this,store,cnf,baToStore)),		sCntx+"/services/coordinator/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSJobServlet(this,store,cnf)),		sCntx+"/services/jobs/*");
+		contextWS.addServlet(new ServletHolder((Servlet) new WSLogsServlet(this,store,cnf)),		sCntx+"/services/logs/*");
 		contextWS.addServlet(new ServletHolder((Servlet) new WSServerServlet(this,store,cnf)),		sCntx+"/services/server/*");
 
 		contextWS.addServlet(new ServletHolder((Servlet) new WSAuxiliarServlet(this,store,cnf)),     sCntx+"/services/auxiliar/*");

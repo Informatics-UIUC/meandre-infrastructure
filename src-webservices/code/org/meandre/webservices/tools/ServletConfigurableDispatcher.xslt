@@ -234,6 +234,14 @@
 								</form> 
 							</li>
 		 		    	</ul>
+		 		    	<p>Server Logs</p>
+			 		    <ul>
+			 		    	<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/logs/webservices.html</xsl:attribute>Webservices</a></li>
+			 		    	<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/logs/kernel.html</xsl:attribute>Kernel</a></li>
+			 		    	<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/logs/coordinator.html</xsl:attribute>Coordinator</a></li>
+			 		    	<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/logs/plugins.html</xsl:attribute>Plugins</a></li>
+			 		    	<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/logs/probes.html</xsl:attribute>Probes</a></li>
+		 		    	</ul>
 		 		    	<p>Public</p>
 			 		    <ul>
 			 		    	<li><a target="_blank"><xsl:attribute name="href"><xsl:value-of select="$context"/>/public/services/repository.ttl</xsl:attribute>Published repository</a></li>
@@ -443,6 +451,9 @@
 			          				</xsl:if>
 			          				<xsl:if test="token">	
 			          					<th>Token cleaned</th>
+			          				</xsl:if>	
+			          				<xsl:if test="log">	
+			          					<th>Log</th>
 			          				</xsl:if>			
 		          				</tr>
 		          			</xsl:if>
@@ -736,6 +747,13 @@
 		          				</xsl:if>	
 		          				<xsl:if test="token">
 		          					<td><xsl:value-of select="token"/></td>
+		          				</xsl:if>
+		          				<xsl:if test="log">	
+		          					<td>
+		          						<pre>
+		          							<xsl:value-of select="log"/>
+		          						</pre>
+		          					</td>	
 		          				</xsl:if>
 					     	</tr>
 				     	</xsl:for-each>

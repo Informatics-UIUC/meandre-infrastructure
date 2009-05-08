@@ -1,7 +1,5 @@
 package org.meandre.core;
 
-import java.net.URL;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.meandre.plugins.MeandrePlugin;

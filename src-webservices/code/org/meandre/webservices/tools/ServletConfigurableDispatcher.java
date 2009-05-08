@@ -8,7 +8,6 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;

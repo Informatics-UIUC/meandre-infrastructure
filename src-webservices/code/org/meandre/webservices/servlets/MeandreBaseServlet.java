@@ -3,7 +3,6 @@
  */
 package org.meandre.webservices.servlets;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
 import org.meandre.configuration.CoreConfiguration;
@@ -14,7 +13,6 @@ import org.meandre.plugins.PluginFactory;
 import org.meandre.webservices.MeandreServer;
 import org.meandre.webservices.logger.WSLoggerFactory;
 import org.meandre.webservices.tools.ServletConfigurableDispatcher;
-import org.python.core.PyDictionary;
 
 
 /** This class is the base class that adds Meandre related information to the
