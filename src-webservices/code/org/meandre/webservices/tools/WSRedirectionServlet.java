@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.meandre.configuration.CoreConfiguration;
+
 /** This class provides a simple redirection
  * 
  * @author Xavier Llor&agrave;
@@ -20,6 +22,10 @@ public class WSRedirectionServlet extends HttpServlet {
 
 	/** Initialize the Python home dir properly */
 	private String sURLPath = "/public/services/ping.html";
+
+	/** The core configuration object */
+	private CoreConfiguration cnf;
+	
 	/** Initialize the base dispatcher
 	 *
 	 */
@@ -30,8 +36,9 @@ public class WSRedirectionServlet extends HttpServlet {
 	 *
 	 * @param sURL The URL to redirect
 	 */
-	public WSRedirectionServlet ( String sURL) {
-		sURLPath = sURL;
+	public WSRedirectionServlet ( String sURL, CoreConfiguration cnf ) {
+		this.sURLPath = sURL;
+		this.cnf = cnf;
 	}
 		
 	/** Response to a get request.
@@ -135,7 +142,7 @@ public class WSRedirectionServlet extends HttpServlet {
 					"</head>\n"+
 					"<body>\n" +
 					"<div id=\"menu\"> \n" +
-					"<img src=\"/public/resources/system/logo-meandre.gif\" />\n" +
+					"<img src=\""+cnf.getAppContext()+"/public/resources/system/logo-meandre.gif\" />\n" +
 					"<div id=\"main\">\n"+
 					"<p>You will be redirected to the Meandre Server page. Otherwise just click <a href=\""+sURLPath+"\">here</a>.</br>"+
 					new Date()+"</p>"+

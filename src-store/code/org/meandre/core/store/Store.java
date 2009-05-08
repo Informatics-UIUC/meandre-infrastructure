@@ -912,7 +912,7 @@ public class Store {
 					String sJar = rdfNode.toString();
 					URL url = new URL(sJar);
 					String [] sFileName = url.getFile().split("/");
-					String sNewJarLocation = url.getProtocol()+"://"+NetworkTools.getLocalHostName()+":"+cnf.getBasePort()+"/public/resources/contexts/java/"+sFileName[sFileName.length-1];
+					String sNewJarLocation = url.getProtocol()+"://"+NetworkTools.getLocalHostName()+":"+cnf.getBasePort()+cnf.getAppContext()+"/public/resources/contexts/java/"+sFileName[sFileName.length-1];
 					hsNewCtx.add(mod.createResource(sNewJarLocation));
 				}
 				catch ( Exception e ) {

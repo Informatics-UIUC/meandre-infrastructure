@@ -249,7 +249,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 							throw new IOException(e.toString());
 						}
 						// Add the proper context resources
-						Resource res = modUser.createResource(urlRequest.getProtocol()+"://"+urlRequest.getHost()+":"+urlRequest.getPort()+"/public/resources/contexts/java/"+sFile);
+						Resource res = modUser.createResource(urlRequest.getProtocol()+"://"+urlRequest.getHost()+":"+urlRequest.getPort()+cnf.getAppContext()+"/public/resources/contexts/java/"+sFile);
 						ecd.getContext().add(res);
 					}
 					// Avoid dumping them multiple times

@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.meandre.configuration.CoreConfiguration;
 import org.meandre.webservices.logger.WSLoggerFactory;
 import org.meandre.webui.WebUI;
 import org.meandre.webui.WebUIFactory;
@@ -28,6 +29,9 @@ public class WebUIProxy implements Handler {
 
 	/** The parent server */
 	private Server server;
+
+	/** The core configuration object */
+	private CoreConfiguration cnf;
 	
 	/** The logger to use */
 	private final static Logger log = WSLoggerFactory.getWSLogger();
@@ -35,8 +39,9 @@ public class WebUIProxy implements Handler {
 	/** Create a new webui proxy instance.
 	 * 
 	 */
-	public WebUIProxy ( ) {
+	public WebUIProxy ( CoreConfiguration cnf ) {
 		this.server = null;
+		this.cnf = cnf;
 	}
 	
 	/** Destroys the proxy */
@@ -67,10 +72,11 @@ public class WebUIProxy implements Handler {
 				               (Request)request :
 				               HttpConnection.getCurrentConnection().getRequest();
 
-        if ( sRequestedURL.startsWith("/webui/") ) {
+        if ( sRequestedURL.startsWith(cnf.getAppContext()+"/webui/") ) {
         	String sUser = request.getRemoteUser();
         	sUser = (sUser==null) ? "anonymous" : sUser;
         	log.info(request.getRemoteAddr()+":"+request.getRemotePort()+"/"+sUser+" --> WebUI proxy --> "+sRequestedURL);
+        	sRequestedURL = sRequestedURL.substring(cnf.getAppContext().length());
             String [] sArgs = sRequestedURL.split("/");
    	   		if ( sArgs.length<3 )  {
 				// Missing port

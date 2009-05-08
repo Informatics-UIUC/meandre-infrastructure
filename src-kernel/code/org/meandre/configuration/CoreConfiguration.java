@@ -177,7 +177,7 @@ public class CoreConfiguration {
      */
     public String getAppContext () {
     	String sCntx = propsCore.getProperty(MEANDRE_APP_CONTEXT);
-    	return (sCntx==null)?"":"/"+sCntx;
+    	return (sCntx==null || sCntx.length()==0 )?"":"/"+sCntx;
     }
     
 //    /** Returns the current host IP address.

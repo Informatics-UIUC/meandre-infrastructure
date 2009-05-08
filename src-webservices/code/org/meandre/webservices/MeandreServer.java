@@ -247,7 +247,8 @@ public class MeandreServer {
 	 * 
 	 */
 	public void join () throws InterruptedException {
-		log.info("Joining Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+") on context <"+cnf.getAppContext()+">");
+		String sCntx = cnf.getAppContext();
+		log.info("Joining Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+") on context <"+((sCntx.length()==0)?"/":sCntx)+">");
 		server.join();
 		
 	}
@@ -309,9 +310,8 @@ public class MeandreServer {
 		String sCntx = cnf.getAppContext();
 		
 		// Install the WebUI proxy before anyother handler
-		server.addHandler(new WebUIProxy());
-		
-		
+		server.addHandler(new WebUIProxy(cnf));
+				
 		//
 		// Initializing the web services
 		//
@@ -377,6 +377,7 @@ public class MeandreServer {
 
 		contextWS.addServlet(new ServletHolder((Servlet) new WSAuxiliarServlet(this,store,cnf)),     sCntx+"/services/auxiliar/*");
 		
+		//contextWS.setErrorHandler(errorHandler)
 		
 		return contextWS;
 	}

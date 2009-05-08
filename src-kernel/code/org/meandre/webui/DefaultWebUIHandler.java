@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.meandre.configuration.CoreConfiguration;
 import org.mortbay.jetty.HttpConnection;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
@@ -21,12 +22,18 @@ public class DefaultWebUIHandler extends AbstractHandler {
 	
 	/** The parent of this handler */
 	private WebUI webUIParent = null;
+	
+	/** The core configuration */
+	private CoreConfiguration cnf;
 
 	/** Creates the default WebUI handler.
 	 * 
+	 * @param webUIParent The parent webUI
+	 * @param cnf The core configuration
 	 */
-	public DefaultWebUIHandler ( WebUI webUIParent ) {
+	public DefaultWebUIHandler ( WebUI webUIParent, CoreConfiguration cnf ) {
 		this.webUIParent = webUIParent;
+		this.cnf = cnf;
 	}
 	
 	/** Implements the default, no web ui available, response.
@@ -78,7 +85,7 @@ public class DefaultWebUIHandler extends AbstractHandler {
 				"</head>\n"+
 				"<body>\n" +
 				"<div id=\"menu\"> \n" +
-				"<img src=\"/public/resources/system/logo-meandre.gif\" />\n" +
+				"<img src=\""+cnf.getAppContext()+"/public/resources/system/logo-meandre.gif\" />\n" +
 				"<div id=\"main\">\n"+
 				"<p>No WebUI available at this point of execution.</br>"+
 				new Date()+"</p>"+

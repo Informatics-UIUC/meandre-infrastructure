@@ -42,6 +42,9 @@ public class WebUIDispatcher extends AbstractHandler {
 	/** The default resource handler */
 	private ResourceHandler resource_handler;
 
+	/** The core configuration object */
+	private CoreConfiguration cnf;
+
 	/**
 	 * Creates the default WebUI handler.
 	 * @param cnf The core configuration object
@@ -52,14 +55,15 @@ public class WebUIDispatcher extends AbstractHandler {
 		this.webUIParent = webUIParent;
 		this.lstHandlers = new LinkedList<WebUIFragment>();
 		// Create the default handler
-		this.hdlDefault = new DefaultWebUIHandler(webUIParent);
+		this.hdlDefault = new DefaultWebUIHandler(webUIParent,cnf);
+		this.cnf = cnf;
 		
 		// The resouce file server
 		File file = new File(cnf.getPublicResourcesDirectory());
 		resource_handler = new ResourceHandler();
 		resource_handler.setCacheControl("no-cache");
 		resource_handler.setResourceBase(file.getAbsolutePath());
-		Context contextResources = new Context(webUIParent.server,"/public/resources",Context.NO_SESSIONS);
+		Context contextResources = new Context(webUIParent.server,cnf.getAppContext()+"/public/resources",Context.NO_SESSIONS);
 		contextResources.setHandler(resource_handler);
 	}
 
