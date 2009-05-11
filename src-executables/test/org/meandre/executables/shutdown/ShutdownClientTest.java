@@ -45,7 +45,14 @@ public class ShutdownClientTest extends TestCase {
         assertFalse("not shutdown before call", target.hasBeenShutdown());
         client.shutdown();
         //give the other thread a few milliseconds to finish
-        Thread.sleep(100L);
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + 100L;
+        System.out.println("StartTime:" + startTime + "  EndTime:" + endTime );
+        while(System.currentTimeMillis() < endTime){
+            //System.out.println(System.currentTimeMillis());
+        }
+
+        System.out.println("Done Waiting");
         assertTrue("is shutdown after call", target.hasBeenShutdown());
         
         //make sure the security token file is cleaned up

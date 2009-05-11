@@ -166,7 +166,7 @@ public class ShutdownControlThread extends Thread{
 				
                 if ("stop".equals(cmd)) {
                     this.shutdown();
-                    System.exit(0);
+                    //System.exit(0);
                 } else if ("status".equals(cmd)) {
 
                     socket.getOutputStream().write("OK\r\n".getBytes());
