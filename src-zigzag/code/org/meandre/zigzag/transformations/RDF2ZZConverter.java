@@ -158,9 +158,10 @@ public class RDF2ZZConverter {
         sb.append("# Specify component imports").append(NEWLINE);
         sb.append("#").append(NEWLINE);
 
-        if (_importSource == null)
+        if (_importSource == null) {
             sb.append("# TODO: Add component import statement(s) here").append(NEWLINE);
-        else
+            sb.append("# Example: import <URL>   (replace 'URL' with the correct location)").append(NEWLINE);
+        } else
             sb.append(String.format("import <%s>", _importSource)).append(NEWLINE);
 
         return sb.toString();
@@ -221,11 +222,19 @@ public class RDF2ZZConverter {
         sb.append("#").append(NEWLINE);
 
         for (Entry<ExecutableComponentInstanceDescription, String> instance : instantiationMap.entrySet()) {
-            String compInstanceName = instance.getValue();
+            String compInstanceVarName = instance.getValue();
 
-            for (Entry<String, String> property : instance.getKey().getProperties().getValueMap().entrySet())
-                if (!property.getKey().startsWith("wb_"))
-                    sb.append(String.format("%s.%s = \"%s\"", compInstanceName, property.getKey(), property.getValue())).append(NEWLINE);
+            ExecutableComponentInstanceDescription compInstance = instance.getKey();
+            Map<String, String> compInstanceProps = compInstance.getProperties().getValueMap();
+
+            ExecutableComponentDescription compDesc =
+                _repository.getExecutableComponentDescription(compInstance.getExecutableComponent());
+            Map<String, String> compDefaultProps = compDesc.getProperties().getValueMap();
+
+            for (Entry<String, String> property : compInstanceProps.entrySet())
+                if (compDefaultProps.containsKey(property.getKey()))
+                    sb.append(String.format("%s.%s = \"%s\"", compInstanceVarName,
+                        property.getKey(), property.getValue())).append(NEWLINE);
 
             sb.append(NEWLINE);
         }
