@@ -196,7 +196,11 @@ public class Conductor {
 				} catch (IllegalAccessException e) {
 					thdMrProbe.done();
 					throw new ConductorException("Condcuctor could not instantiate class "+htMapResourceToName.get(ecomp)+"\n"+e);
+				} catch (ClassCastException e ) {
+					thdMrProbe.done();
+					throw new ConductorException("Class is not an executable components: "+e.getMessage());
 				}
+				
 			}
 			else if ( ecd.getRunnable().equals("python") && ecd.getFormat().equals("jython") ){
 				// Creates a jython wrapper and sources all the scripts
