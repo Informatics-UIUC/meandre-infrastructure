@@ -136,6 +136,7 @@ public class InteractiveExecution {
 
 		}
 		catch ( CorruptedDescriptionException cde ) {
+			bFailSafe  = false;
 			pw.println("Preparation could not be completed correctly!\n");
 			pw.println("----------------------------------------------------------------------------");
 			pw.println();
@@ -145,6 +146,7 @@ public class InteractiveExecution {
 			//pw.flush();
 		}
 		catch ( ConductorException ce ) {
+			bFailSafe  = false;
 			pw.println("----------------------------------------------------------------------------");
 			pw.print("Execution aborted at: ");
 			pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
@@ -156,6 +158,7 @@ public class InteractiveExecution {
 			//pw.flush();
 		}
 		catch ( NoClassDefFoundError te ) {
+			bFailSafe  = false;
 			pw.println("----------------------------------------------------------------------------");
 			pw.print("Missing class definition: ");
 			pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
