@@ -20,6 +20,7 @@ import org.meandre.core.engine.ProbeException;
 import org.meandre.core.engine.probes.NullProbeImpl;
 import org.meandre.core.engine.probes.ProbeFactory;
 import org.meandre.core.engine.probes.StatisticsProbeImpl;
+import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.repository.CorruptedDescriptionException;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
@@ -33,6 +34,7 @@ import org.meandre.webui.PortScroller;
 import org.meandre.webui.WebUI;
 
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.thoughtworks.xstream.converters.extended.ThrowableConverter;
 
 /** This class provide simple execution of a flow on demand.
  * 
@@ -62,6 +64,8 @@ public class InteractiveExecution {
 			String [] saProbes , String sToken, JobDetail job, String sFUID,
 			JobInformationBackendAdapter jiba)  {
 
+		boolean bFailSafe = true;
+		
 		PersistentPrintStream pw = new PersistentPrintStream(
 				new PrintStream(outStream),
 				jiba,
@@ -163,7 +167,12 @@ public class InteractiveExecution {
 			//pw.flush();
 		}
 		catch ( Throwable t ) {
-			exec.requestAbort();
+			bFailSafe = false;
+			try{
+				exec.requestAbort();
+			}
+			catch ( Throwable t2 ) {
+			}
 			pw.println("----------------------------------------------------------------------------");
 			pw.print("Unknow execption at: ");
 			pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
@@ -174,51 +183,53 @@ public class InteractiveExecution {
 			//pw.flush();
 		}
 
-		for (Probe p:pa) {
-			if ( p instanceof StatisticsProbeImpl ) {
-				try {
-					JSONObject jsonStats = new JSONObject(p.serializeProbeInformation());
+		if ( bFailSafe ) {
+				for (Probe p:pa) {
+				if ( p instanceof StatisticsProbeImpl ) {
+					try {
+						JSONObject jsonStats = new JSONObject(p.serializeProbeInformation());
+						pw.println("----------------------------------------------------------------------------");
+						pw.println();
+						pw.println("Flow execution statistics");
+						pw.println();
+						pw.println("Flow unique execution ID : "+jsonStats.get("flow_unique_id"));
+						pw.println("Flow state               : "+jsonStats.get("flow_state"));
+						pw.println("Started at               : "+jsonStats.get("started_at"));
+						pw.println("Last update              : "+jsonStats.get("latest_probe_at"));
+						pw.println("Total run time (ms)      : "+jsonStats.get("runtime"));
+						pw.println();
+						//pw.flush();
+		
+						JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
+						for ( int i=0,iMax=jaEXIS.length() ; i<iMax ; i++ ) {
+							JSONObject joEXIS = (JSONObject) jaEXIS.get(i);
+							pw.println("\tExecutable components instance ID          : "+joEXIS.get("executable_component_instance_id"));
+							pw.println("\tExecutable components state                : "+joEXIS.get("executable_component_state"));
+							pw.println("\tTimes the executable components fired      : "+joEXIS.get("times_fired"));
+							pw.println("\tAccumulated executable components run time : "+joEXIS.get("accumulated_runtime"));
+							pw.println("\tPieces of data pulled                      : "+joEXIS.get("pieces_of_data_in"));
+							pw.println("\tPieces of data pushed                      : "+joEXIS.get("pieces_of_data_out"));
+							pw.println("\tNumber of properties read                  : "+joEXIS.get("number_of_read_properties"));
+							pw.println();
+						}
+						//pw.flush();
+					}
+					catch ( Exception e ) {
+						KernelLoggerFactory.getCoreLogger().warning("This exception should have never been thrown\n"+e);
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						e.printStackTrace(new PrintStream(baos));
+						WSLoggerFactory.getWSLogger().warning(baos.toString());
+						e.printStackTrace(pw);
+					}
+				}
+				else {
 					pw.println("----------------------------------------------------------------------------");
 					pw.println();
-					pw.println("Flow execution statistics");
-					pw.println();
-					pw.println("Flow unique execution ID : "+jsonStats.get("flow_unique_id"));
-					pw.println("Flow state               : "+jsonStats.get("flow_state"));
-					pw.println("Started at               : "+jsonStats.get("started_at"));
-					pw.println("Last update              : "+jsonStats.get("latest_probe_at"));
-					pw.println("Total run time (ms)      : "+jsonStats.get("runtime"));
-					pw.println();
-					//pw.flush();
-	
-					JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
-					for ( int i=0,iMax=jaEXIS.length() ; i<iMax ; i++ ) {
-						JSONObject joEXIS = (JSONObject) jaEXIS.get(i);
-						pw.println("\tExecutable components instance ID          : "+joEXIS.get("executable_component_instance_id"));
-						pw.println("\tExecutable components state                : "+joEXIS.get("executable_component_state"));
-						pw.println("\tTimes the executable components fired      : "+joEXIS.get("times_fired"));
-						pw.println("\tAccumulated executable components run time : "+joEXIS.get("accumulated_runtime"));
-						pw.println("\tPieces of data pulled                      : "+joEXIS.get("pieces_of_data_in"));
-						pw.println("\tPieces of data pushed                      : "+joEXIS.get("pieces_of_data_out"));
-						pw.println("\tNumber of properties read                  : "+joEXIS.get("number_of_read_properties"));
-						pw.println();
-					}
-					//pw.flush();
+					for ( String s:p.serializeProbeInformation().split("\n"))
+						pw.println(s);
 				}
-				catch ( Exception e ) {
-					WSLoggerFactory.getWSLogger().warning("This exception should have never been thrown\n"+e);
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					e.printStackTrace(new PrintStream(baos));
-					WSLoggerFactory.getWSLogger().warning(baos.toString());
-					e.printStackTrace(pw);
-				}
+				p.dispose();
 			}
-			else {
-				pw.println("----------------------------------------------------------------------------");
-				pw.println();
-				for ( String s:p.serializeProbeInformation().split("\n"))
-					pw.println(s);
-			}
-			p.dispose();
 		}
 		pw.close();
 		
@@ -324,7 +335,11 @@ public class InteractiveExecution {
 			//pw.flush();
 		}
 		catch ( Throwable t ) {
-			exec.requestAbort();
+			try{
+				exec.requestAbort();
+			}
+			catch ( Throwable t2 ) {
+			}
 			pw.println("----------------------------------------------------------------------------");
 			pw.print("Unknow execption at: ");
 			pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
