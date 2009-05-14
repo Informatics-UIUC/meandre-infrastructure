@@ -69,7 +69,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 	 * @throws FileUploadException An exception araised while uploading the model
 	 */
 	@SuppressWarnings("unchecked")
-	public static final synchronized Set<String> addToRepository(HttpServletRequest request, Store store, CoreConfiguration cnf, String sExtension)
+	public static final Set<String> addToRepository(HttpServletRequest request, Store store, CoreConfiguration cnf, String sExtension)
 	throws IOException, FileUploadException {
 
 		boolean bEmbed = false;
@@ -155,128 +155,130 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 		//
 		Set<String> setAddedURIs = new HashSet<String>();
 
-		//
-		// Add to the user repository
-		//
-		// Adding components
-		for ( Resource resComp:qrNew.getAvailableExecutableComponents() ) {
-			if ( qr.getExecutableComponentDescription(resComp)==null || bOverwrite) {
-				// Component does not exist
-				// Add to the set to modify before adding to the repository repository
-				setComponentsToAdd.add(qrNew.getExecutableComponentDescription(resComp));
-				setAddedURIs.add(resComp.toString());
+		synchronized ( qr ) {
+			//
+			// Add to the user repository
+			//
+			// Adding components
+			for ( Resource resComp:qrNew.getAvailableExecutableComponents() ) {
+				if ( qr.getExecutableComponentDescription(resComp)==null || bOverwrite) {
+					// Component does not exist
+					// Add to the set to modify before adding to the repository repository
+					setComponentsToAdd.add(qrNew.getExecutableComponentDescription(resComp));
+					setAddedURIs.add(resComp.toString());
+				}
+				else {
+					// Component does exist
+					log.warning("Component "+resComp+" already exist in "+request.getRemoteUser()+" repository. Discarding it.");
+				}
 			}
-			else {
-				// Component does exist
-				log.warning("Component "+resComp+" already exist in "+request.getRemoteUser()+" repository. Discarding it.");
-			}
-		}
-
-		// Adding flows
-		Model modUser = qr.getModel();
-		modUser.begin();
-		for ( Resource resFlow:qrNew.getAvailableFlows() ) {
-			if ( qr.getFlowDescription(resFlow)==null ) {
-				// Component does not exist
-				modUser.add(qrNew.getFlowDescription(resFlow).getModel());
-				setAddedURIs.add(resFlow.toString());
-				log.info("Added flow "+resFlow+" to "+request.getRemoteUser()+"'s repository");
-
-			}
-			else {
-				if ( bOverwrite ) {
-					log.info("Overwriting flow "+resFlow);
-					modUser.remove(qr.getFlowDescription(resFlow).getModel());
+	
+			// Adding flows
+			Model modUser = qr.getModel();
+			modUser.begin();
+			for ( Resource resFlow:qrNew.getAvailableFlows() ) {
+				if ( qr.getFlowDescription(resFlow)==null ) {
+					// Component does not exist
 					modUser.add(qrNew.getFlowDescription(resFlow).getModel());
 					setAddedURIs.add(resFlow.toString());
 					log.info("Added flow "+resFlow+" to "+request.getRemoteUser()+"'s repository");
+	
 				}
-				else
-					// Component does exist
-					log.warning("Flow "+resFlow+" already exist in "+request.getRemoteUser()+" repository. Discarding it. No overwrite flag provided.");
-			}
-		}
-
-		// Adding the components after adding the contexts
-		URL urlRequest = new URL(request.getRequestURL().toString());
-		Set<String> setFiles = htContextBytes.keySet();
-		boolean bWriteOnce = true;
-		for ( ExecutableComponentDescription ecd:setComponentsToAdd) {
-			if ( htContextBytes.keySet().isEmpty() ) {
-				if ( qr.getExecutableComponentDescription(ecd.getExecutableComponent())!=null ) {
+				else {
 					if ( bOverwrite ) {
-						modUser.remove(qr.getExecutableComponentDescription(ecd.getExecutableComponent()).getModel());
-						modUser.add(ecd.getExecutableComponent().getModel());
+						log.info("Overwriting flow "+resFlow);
+						modUser.remove(qr.getFlowDescription(resFlow).getModel());
+						modUser.add(qrNew.getFlowDescription(resFlow).getModel());
+						setAddedURIs.add(resFlow.toString());
+						log.info("Added flow "+resFlow+" to "+request.getRemoteUser()+"'s repository");
+					}
+					else
+						// Component does exist
+						log.warning("Flow "+resFlow+" already exist in "+request.getRemoteUser()+" repository. Discarding it. No overwrite flag provided.");
+				}
+			}
+	
+			// Adding the components after adding the contexts
+			URL urlRequest = new URL(request.getRequestURL().toString());
+			Set<String> setFiles = htContextBytes.keySet();
+			boolean bWriteOnce = true;
+			for ( ExecutableComponentDescription ecd:setComponentsToAdd) {
+				if ( htContextBytes.keySet().isEmpty() ) {
+					if ( qr.getExecutableComponentDescription(ecd.getExecutableComponent())!=null ) {
+						if ( bOverwrite ) {
+							modUser.remove(qr.getExecutableComponentDescription(ecd.getExecutableComponent()).getModel());
+							modUser.add(ecd.getExecutableComponent().getModel());
+							log.info("Added component "+ecd.getExecutableComponent()+" to "+request.getRemoteUser()+"'s repository");
+						}
+						else
+							log.warning("Discarding upload of the existem component "+ecd.getExecutableComponent()+". No overwrite flag provided.");
+					}
+					else {
+						modUser.add(ecd.getModel());
 						log.info("Added component "+ecd.getExecutableComponent()+" to "+request.getRemoteUser()+"'s repository");
 					}
-					else
-						log.warning("Discarding upload of the existem component "+ecd.getExecutableComponent()+". No overwrite flag provided.");
 				}
 				else {
-					modUser.add(ecd.getModel());
-					log.info("Added component "+ecd.getExecutableComponent()+" to "+request.getRemoteUser()+"'s repository");
-				}
-			}
-			else {
-				if ( (bEmbed && ecd.getRunnable().equals("java") && ecd.getFormat().equals("java/class") ) ||
-						 (ecd.getRunnable().equals("python") && ecd.getFormat().equals("jython"))||
-						 (ecd.getRunnable().equals("lisp") && ecd.getFormat().equals("clojure")) ) {
-					//
-					// Embed all the context per descriptor
-					//
-					for ( String sFile:setFiles) {
-						Literal lit = modUser.createTypedLiteral(htContextBytes.get(sFile),XSDDatatype.XSDbase64Binary);
-						ecd.getContext().add(lit);
-					}
-				}
-				else if ( bWriteOnce ) {
-					//
-					// Dump the context file to the disc only once
-					//
-					for ( String sFile:setFiles) {
-						// Failsafe check
-						if ( sFile.length()==0 ) continue;
-
-						// Dump the files to disk
-						new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator).mkdirs();
-			    		File savedFile = new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator+sFile);
-						try {
-							FileOutputStream fos = new FileOutputStream(savedFile);
-							fos.write(htContextBytes.get(sFile));
-							fos.close();
-						} catch (Exception e) {
-							log.warning("Problems writing context "+sFile+" to "+savedFile.getAbsolutePath());
-							throw new IOException(e.toString());
+					if ( (bEmbed && ecd.getRunnable().equals("java") && ecd.getFormat().equals("java/class") ) ||
+							 (ecd.getRunnable().equals("python") && ecd.getFormat().equals("jython"))||
+							 (ecd.getRunnable().equals("lisp") && ecd.getFormat().equals("clojure")) ) {
+						//
+						// Embed all the context per descriptor
+						//
+						for ( String sFile:setFiles) {
+							Literal lit = modUser.createTypedLiteral(htContextBytes.get(sFile),XSDDatatype.XSDbase64Binary);
+							ecd.getContext().add(lit);
 						}
-						// Add the proper context resources
-						Resource res = modUser.createResource(urlRequest.getProtocol()+"://"+urlRequest.getHost()+":"+urlRequest.getPort()+cnf.getAppContext()+"/public/resources/contexts/java/"+sFile);
-						ecd.getContext().add(res);
 					}
-					// Avoid dumping them multiple times
-					bWriteOnce = false;
-				}
-
-				if ( qr.getExecutableComponentDescription(ecd.getExecutableComponent())!=null ) {
-					if ( bOverwrite ) {
-						modUser.remove(qr.getExecutableComponentDescription(ecd.getExecutableComponent()).getModel());
+					else if ( bWriteOnce ) {
+						//
+						// Dump the context file to the disc only once
+						//
+						for ( String sFile:setFiles) {
+							// Failsafe check
+							if ( sFile.length()==0 ) continue;
+	
+							// Dump the files to disk
+							new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator).mkdirs();
+				    		File savedFile = new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator+sFile);
+							try {
+								FileOutputStream fos = new FileOutputStream(savedFile);
+								fos.write(htContextBytes.get(sFile));
+								fos.close();
+							} catch (Exception e) {
+								log.warning("Problems writing context "+sFile+" to "+savedFile.getAbsolutePath());
+								throw new IOException(e.toString());
+							}
+							// Add the proper context resources
+							Resource res = modUser.createResource(urlRequest.getProtocol()+"://"+urlRequest.getHost()+":"+urlRequest.getPort()+cnf.getAppContext()+"/public/resources/contexts/java/"+sFile);
+							ecd.getContext().add(res);
+						}
+						// Avoid dumping them multiple times
+						bWriteOnce = false;
+					}
+	
+					if ( qr.getExecutableComponentDescription(ecd.getExecutableComponent())!=null ) {
+						if ( bOverwrite ) {
+							modUser.remove(qr.getExecutableComponentDescription(ecd.getExecutableComponent()).getModel());
+							modUser.add(ecd.getModel());
+							log.info("Adding component "+ecd.getExecutableComponent()+" to "+request.getRemoteUser()+"'s repository");
+						}
+						else
+							log.warning("Discarding upload of the existem component "+ecd.getExecutableComponent()+". No overwrite flag provided.");
+					}
+					else {
 						modUser.add(ecd.getModel());
-						log.info("Adding component "+ecd.getExecutableComponent()+" to "+request.getRemoteUser()+"'s repository");
 					}
-					else
-						log.warning("Discarding upload of the existem component "+ecd.getExecutableComponent()+". No overwrite flag provided.");
 				}
-				else {
-					modUser.add(ecd.getModel());
-				}
+	
 			}
+			//Commiting changes
+			modUser.commit();
 
+			// Regenerate the cache after adding
+			qr.refreshCache();
 		}
-		//Commiting changes
-		modUser.commit();
-
-		// Regenerate the cache after adding
-		qr.refreshCache();
-
+		
 		return setAddedURIs;
 	}
 

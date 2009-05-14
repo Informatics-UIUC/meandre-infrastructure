@@ -310,26 +310,11 @@ def repository_remove ( request, response, format ):
     if checkUserRole (request,Role.REPOSITORY) :
         params = extractRequestParamaters(request)
         if 'uri' in params :
-            qr = meandre_store.getRepositoryStore(getMeandreUser(request))
-            user_model = qr.getModel()
             content = []
             for uri in params['uri']:
-                resource_uri = user_model.createResource(uri)
-                component_desc = qr.getExecutableComponentDescription(resource_uri)
-                flow_desc = qr.getFlowDescription(resource_uri)
-                model_to_remove = None
-                if component_desc is not None :
-                    model_to_remove = component_desc.getModel()
+                res = meandre_store.removeFromRepository(getMeandreUser(request),uri)
+                if res is not None :
                     content.append({'meandre_uri':uri})
-                elif flow_desc is not None :
-                    model_to_remove = flow_desc.getModel()
-                    content.append({'meandre_uri':uri})
-                else :
-                    model_to_remove = getEmptyModel()
-                user_model.begin()
-                user_model.remove(model_to_remove)
-                user_model.commit()
-            qr.refreshCache()
             statusOK(response)
             sendTJXContent(response,content,format)
         else:
@@ -342,11 +327,7 @@ def repository_clear ( request, response, format ):
     '''Remove all the components and flows for the aggregated repository
        for the requesting user in the current Meandre server.'''
     if checkUserRole (request,Role.REPOSITORY) :
-       qr = meandre_store.getRepositoryStore(getMeandreUser(request))
-       qr.getModel().begin()
-       qr.getModel().removeAll()
-       qr.getModel().commit()
-       qr.refreshCache()
+       meandre_store.clearUserRepository(getMeandreUser(request))
        content = {'message':'Repository successfully emptied'}
        statusOK(response)
        sendTJXContent(response,content,format)

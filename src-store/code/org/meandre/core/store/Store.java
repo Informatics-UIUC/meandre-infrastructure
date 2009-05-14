@@ -34,6 +34,7 @@ import org.meandre.core.utils.Constants;
 import org.meandre.core.utils.ModelIO;
 import org.meandre.core.utils.NetworkTools;
 import org.meandre.jobs.storage.backend.JobInformationBackendAdapter;
+import org.python.modules.synchronize;
 
 import com.hp.hpl.jena.db.DBConnection;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -588,25 +589,30 @@ public class Store {
 		Resource resURI = qr.getModel().createResource(sURI);
 		Model modToPublish = null;
 		Model modPublic = getPublicRepositoryStore();
-		QueryableRepository qrPublic = new RepositoryImpl(modPublic);
-
-		if ( qrPublic.getExecutableComponentDescription(resURI)==null &&
-			 qrPublic.getFlowDescription(resURI)==null ) {
-			// The URI does not exist
-			ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(resURI);
-			FlowDescription fd = qr.getFlowDescription(resURI);
-			if ( ecd!=null ) {
-				modToPublish = ecd.getModel();
-			}
-			else if ( fd!=null ) {
-				modToPublish = fd.getModel();
-			}
-
-			if ( modToPublish!=null ) {
-				bPublished = true;
-				modPublic.begin();
-				modPublic.add(modToPublish);
-				modPublic.commit();
+		
+		synchronized ( modPublic ) {
+			synchronized ( qr ) {
+				QueryableRepository qrPublic = new RepositoryImpl(modPublic);
+		
+				if ( qrPublic.getExecutableComponentDescription(resURI)==null &&
+					 qrPublic.getFlowDescription(resURI)==null ) {
+					// The URI does not exist
+					ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(resURI);
+					FlowDescription fd = qr.getFlowDescription(resURI);
+					if ( ecd!=null ) {
+						modToPublish = ecd.getModel();
+					}
+					else if ( fd!=null ) {
+						modToPublish = fd.getModel();
+					}
+		
+					if ( modToPublish!=null ) {
+						bPublished = true;
+						modPublic.begin();
+						modPublic.add(modToPublish);
+						modPublic.commit();
+					}
+				}
 			}
 		}
 
@@ -629,25 +635,30 @@ public class Store {
 		Resource resURI = qr.getModel().createResource(sURI);
 		Model modToUnpublish = null;
 		Model modPublic = getPublicRepositoryStore();
-		QueryableRepository qrPublic = new RepositoryImpl(modPublic);
-
-		if ( qrPublic.getExecutableComponentDescription(resURI)!=null ||
-			 qrPublic.getFlowDescription(resURI)!=null ) {
-			// The URI does not exist
-			ExecutableComponentDescription ecd = qrPublic.getExecutableComponentDescription(resURI);
-			FlowDescription fd = qrPublic.getFlowDescription(resURI);
-			if ( ecd!=null ) {
-				modToUnpublish = ecd.getModel();
-			}
-			else if ( fd!=null ) {
-				modToUnpublish = fd.getModel();
-			}
-
-			if ( modToUnpublish!=null ) {
-				bUnpublished = true;
-				modPublic.begin();
-				modPublic.remove(modToUnpublish);
-				modPublic.commit();
+		
+		synchronized ( modPublic ) {
+			synchronized ( qr ) {
+				QueryableRepository qrPublic = new RepositoryImpl(modPublic);
+		
+				if ( qrPublic.getExecutableComponentDescription(resURI)!=null ||
+					 qrPublic.getFlowDescription(resURI)!=null ) {
+					// The URI does not exist
+					ExecutableComponentDescription ecd = qrPublic.getExecutableComponentDescription(resURI);
+					FlowDescription fd = qrPublic.getFlowDescription(resURI);
+					if ( ecd!=null ) {
+						modToUnpublish = ecd.getModel();
+					}
+					else if ( fd!=null ) {
+						modToUnpublish = fd.getModel();
+					}
+		
+					if ( modToUnpublish!=null ) {
+						bUnpublished = true;
+						modPublic.begin();
+						modPublic.remove(modToUnpublish);
+						modPublic.commit();
+					}
+				}
 			}
 		}
 
@@ -728,32 +739,34 @@ public class Store {
 
                 }
 
-                // Check the pulled repository consistency
-                QueryableRepository qrTmp = new RepositoryImpl(modelTmp);
-
-				//
-				// Remove the components provided by the location
-				//
-				// Remove the executable components
-				for ( Resource recd:qrTmp.getAvailableExecutableComponents() ) {
-					ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(recd);
-					if ( ecd!=null ) {
-						mod.begin();
-						mod.remove(ecd.getModel());
-						mod.commit();
+				synchronized ( qr ) {
+	                // Check the pulled repository consistency
+	                QueryableRepository qrTmp = new RepositoryImpl(modelTmp);
+	
+					//
+					// Remove the components provided by the location
+					//
+					// Remove the executable components
+					for ( Resource recd:qrTmp.getAvailableExecutableComponents() ) {
+						ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(recd);
+						if ( ecd!=null ) {
+							mod.begin();
+							mod.remove(ecd.getModel());
+							mod.commit();
+						}
 					}
-				}
-
-				for ( Resource rfd:qrTmp.getAvailableFlows() ) {
-					FlowDescription fd = qr.getFlowDescription(rfd);
-					if ( fd!=null ) {
-						mod.begin();
-						mod.remove(fd.getModel());
-						mod.commit();
+	
+					for ( Resource rfd:qrTmp.getAvailableFlows() ) {
+						FlowDescription fd = qr.getFlowDescription(rfd);
+						if ( fd!=null ) {
+							mod.begin();
+							mod.remove(fd.getModel());
+							mod.commit();
+						}
 					}
+	
+					qr.refreshCache();
 				}
-
-				qr.refreshCache();
 				bRes = true;
 			}
 			catch ( Exception e ) {
@@ -819,11 +832,10 @@ public class Store {
 				//
 				ss.setProperty(SystemStore.REPOSITORY_LOCATION, sLocation, sDescription);
 				QueryableRepository qr = getRepositoryStore(sUser);
-
+				
 				// Modifying the repository
 				Model model = qr.getModel();
-				model.begin();
-
+				
 				// Pull all the jars
 				HashSet<String> hsCtxs = new HashSet<String>();
 				for ( ExecutableComponentDescription ecd:qrNew.getAvailableExecutableComponentDescriptions())
@@ -833,6 +845,7 @@ public class Store {
 							if ( rdfNode.isResource() && bFile )
 								hsCtxs.add(rdfNode.toString());
 					}
+	
 				for ( String sCtx:hsCtxs ) {
 					try {
 						URL urlCntx = new URL(sCtx);
@@ -856,24 +869,28 @@ public class Store {
 					}
 				}
 
-				// Adding components
-				for ( ExecutableComponentDescription ecd:qrNew.getAvailableExecutableComponentDescriptions())
-					if ( !qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent())) {
-						// Localize the context URL
-						localizeContexes(ecd);
-						model.add(ecd.getModel());
-					}
-					else
-						log.warning("Component "+ecd.getExecutableComponent()+" already exist in the current repository. Discarding it.");
+				synchronized  ( qr ) {
+					model.begin();
 
-				// Adding flows
-				for ( FlowDescription fd:qrNew.getAvailableFlowDescriptions())
-					if ( !qr.getAvailableFlows().contains(fd.getFlowComponent()))
-						model.add(fd.getModel());
-					else
-						log.warning("Flow "+fd.getFlowComponent()+" already exist in the current repository. Discarding it.");
-
-				model.commit();
+					// Adding components
+					for ( ExecutableComponentDescription ecd:qrNew.getAvailableExecutableComponentDescriptions())
+						if ( !qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent())) {
+							// Localize the context URL
+							localizeContexes(ecd);
+							model.add(ecd.getModel());
+						}
+						else
+							log.warning("Component "+ecd.getExecutableComponent()+" already exist in the current repository. Discarding it.");
+	
+					// Adding flows
+					for ( FlowDescription fd:qrNew.getAvailableFlowDescriptions())
+						if ( !qr.getAvailableFlows().contains(fd.getFlowComponent()))
+							model.add(fd.getModel());
+						else
+							log.warning("Flow "+fd.getFlowComponent()+" already exist in the current repository. Discarding it.");
+	
+					model.commit();
+				}
 				getRepositoryStore(sUser).refreshCache(model);
 				bRes = true;
 			}
@@ -956,6 +973,7 @@ public class Store {
 	 */
 	public Set<String> addFlowsToRepository(String sUser, String sRDF, boolean bOverwrite) {
 		QueryableRepository qr = getRepositoryStore(sUser);
+		Set<String> setURIs = new HashSet<String>();
 		Model modNew = ModelFactory.createDefaultModel();
 
 		modNew.setNsPrefix("", "http://www.meandre.org/ontology/");
@@ -986,42 +1004,91 @@ public class Store {
 			}
 		}
 
-		Set<String> setURIs = new HashSet<String>();
 		if ( bValidModel ) {
-			QueryableRepository qrNew = new RepositoryImpl(modNew);
-			Model modUser = qr.getModel();
-			for ( FlowDescription fd:qrNew.getAvailableFlowDescriptions()) {
-				if ( !qr.getAvailableFlows().contains(fd.getFlowComponent())) {
-					// The model for the flow to add
-					Model fdModel = fd.getModel();
-					// Add to the user repository
-					modUser.begin();
-					modUser.add(fdModel);
-					modUser.commit();
-					// Add the URI to modified
-					setURIs.add(fd.getFlowComponent().toString());
+			synchronized ( qr ) {
+				QueryableRepository qrNew = new RepositoryImpl(modNew);
+				Model modUser = qr.getModel();
+				for ( FlowDescription fd:qrNew.getAvailableFlowDescriptions()) {
+					if ( !qr.getAvailableFlows().contains(fd.getFlowComponent())) {
+						// The model for the flow to add
+						Model fdModel = fd.getModel();
+						// Add to the user repository
+						modUser.begin();
+						modUser.add(fdModel);
+						modUser.commit();
+						// Add the URI to modified
+						setURIs.add(fd.getFlowComponent().toString());
+					}
+					else if ( bOverwrite ) {
+						// Flow is there by needs to be overwritten
+						Model modOld = qr.getFlowDescription(fd.getFlowComponent()).getModel();
+						Model modRep = qr.getModel();
+						modRep.begin();
+						modRep.remove(modOld);
+						modRep.add(fd.getModel());
+						modRep.commit();
+						// Add the URI to modified
+						setURIs.add(fd.getFlowComponent().toString());
+					}
+					else {
+						log.info("Flow already exist and the overwrite flag has not been provided. Discading flow update "+fd.getFlowComponent());
+					}
 				}
-				else if ( bOverwrite ) {
-					// Flow is there by needs to be overwritten
-					Model modOld = qr.getFlowDescription(fd.getFlowComponent()).getModel();
-					Model modRep = qr.getModel();
-					modRep.begin();
-					modRep.remove(modOld);
-					modRep.add(fd.getModel());
-					modRep.commit();
-					// Add the URI to modified
-					setURIs.add(fd.getFlowComponent().toString());
-				}
-				else {
-					log.info("Flow already exist and the overwrite flag has not been provided. Discading flow update "+fd.getFlowComponent());
-				}
+				qr.refreshCache();
 			}
-			qr.refreshCache();
 		}
-
+		
 		return setURIs;
 	}
+	
 
+	/** Remove the given URI from the user model.
+	 *
+	 * @param sUser The system store user
+	 * @param sURI The repository to add
+	 * @return The URI if it could be removed
+	 */
+	public String removeFromRepository(String sUser, String sURI ) {
+		QueryableRepository qr = getRepositoryStore(sUser);
+		Resource res = ModelFactory.createDefaultModel().createResource(sURI);
+		boolean bOK = false;
+		
+		synchronized ( qr ) {
+			FlowDescription fd = qr.getFlowDescription(res);
+			ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(res);
+			
+			Model mod = null;
+			if ( fd!=null )        mod = fd.getModel();
+			else if ( ecd !=null ) mod = ecd.getModel();
+			
+			if ( mod!=null ) {
+				Model modUser = qr.getModel();
+				modUser.begin();
+				modUser.remove(mod);
+				modUser.commit();
+				qr.refreshCache();
+				bOK = true;
+			}	
+		}
+		
+		return (bOK)?sURI:null;
+	}
+	
+	/** Clears the user repository dropping all the flows and components.
+	 * 
+	 * @param sUser The user which user needs to be flushed
+	 */
+	public void clearUserRepository ( String sUser ) {
+		QueryableRepository qr = getRepositoryStore(sUser);
+		synchronized ( qr ) {
+			Model mod = qr.getModel();
+			mod.begin();
+			mod.removeAll();
+			mod.commit();
+			qr.refreshCache();
+		}
+	}
+ 
 	/** Returns the list of published components and flows in the current server.
 	 *
 	 * @return The set of published components' URI
