@@ -411,7 +411,9 @@ public abstract class JobInformationBackendAdapter {
 		if ( iObjSize>MAX_CONSOLE_PRINT_CHUNK) {
 			int iOff = 0;
 			do {
-				print ( sJobID, sObj.substring(iOff, iOff+MAX_CONSOLE_PRINT_CHUNK));
+				int iEnd = iOff+MAX_CONSOLE_PRINT_CHUNK;
+				iEnd = (iEnd>iObjSize)?iObjSize:iEnd;
+				print ( sJobID, sObj.substring(iOff, iEnd));
 				iOff += MAX_CONSOLE_PRINT_CHUNK;
 			} while (iOff<iObjSize);
 		}
