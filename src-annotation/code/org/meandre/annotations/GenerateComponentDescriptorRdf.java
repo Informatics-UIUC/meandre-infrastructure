@@ -19,7 +19,11 @@ import com.hp.hpl.jena.rdf.model.Resource;
  *
  */
 public class GenerateComponentDescriptorRdf {
-	
+    
+    private java.util.Hashtable<String,Object> componentKeyValues = null;
+    private java.util.Hashtable<String,Object> componentPropertyKeyValues = null;
+    private java.util.Hashtable<String,Object> componentInputKeyValues = null;
+    private java.util.Hashtable<String,Object> componentOutputKeyValues = null;
 	/**
 	 * 
 	 */
@@ -31,7 +35,7 @@ public class GenerateComponentDescriptorRdf {
 	 */
 	public void setComponentKeyValues(
 			java.util.Hashtable<String, Object> componentKeyValues) {
-		GenerateComponentDescriptorRdf.componentKeyValues = componentKeyValues;
+		this.componentKeyValues = componentKeyValues;
 	}
 
 	/**
@@ -39,7 +43,7 @@ public class GenerateComponentDescriptorRdf {
 	 */
 	public void setComponentPropertyKeyValues(
 			java.util.Hashtable<String, Object> componentPropertyKeyValues) {
-		GenerateComponentDescriptorRdf.componentPropertyKeyValues = componentPropertyKeyValues;
+		this.componentPropertyKeyValues = componentPropertyKeyValues;
 	}
 
 	/**
@@ -47,7 +51,7 @@ public class GenerateComponentDescriptorRdf {
 	 */
 	public void setComponentInputKeyValues(
 			java.util.Hashtable<String, Object> componentInputKeyValues) {
-		GenerateComponentDescriptorRdf.componentInputKeyValues = componentInputKeyValues;
+		this.componentInputKeyValues = componentInputKeyValues;
 	}
 
 	/**
@@ -55,107 +59,116 @@ public class GenerateComponentDescriptorRdf {
 	 */
 	public void setComponentOutputKeyValues(
 			java.util.Hashtable<String, Object> componentOutputKeyValues) {
-		GenerateComponentDescriptorRdf.componentOutputKeyValues = componentOutputKeyValues;
+		this.componentOutputKeyValues = componentOutputKeyValues;
 	}
 
-	private static java.util.Hashtable<String,Object> componentKeyValues = null;
-	private static java.util.Hashtable<String,Object> componentPropertyKeyValues = null;
-	private static java.util.Hashtable<String,Object> componentInputKeyValues = null;
-	private static java.util.Hashtable<String,Object> componentOutputKeyValues = null;
 
+	
+	public ExecutableComponentDescription getExecutableComponentDescription() 
+	throws CorruptedDescriptionException {
+	    String sName = (String)componentKeyValues.get("name");
+	    String sBaseURL = (String)componentKeyValues.get("baseURL");
+	    String sDescription = (String)componentKeyValues.get("description");
+	    // String sRights = getRights((String)componentKeyValues.get("rights"));
+	    String sRights = (componentKeyValues.containsKey("rights"))?(String)componentKeyValues.get("rights").toString():"";
+	    String sRightsOther = (componentKeyValues.containsKey("rightsOther"))?(String)componentKeyValues.get("rightsOther"):"";
+	    String sCreator = (componentKeyValues.containsKey("creator"))?(String)componentKeyValues.get("creator"):"";
+	    java.util.Date dateCreation = new java.util.Date();
+	    String sTags = (componentKeyValues.containsKey("tags"))?(String)componentKeyValues.get("tags"):"";
+	    String sFormat = (componentKeyValues.containsKey("format"))?(String)componentKeyValues.get("format"):"";
+	    //String type= getType((String)componentKeyValues.get("mode"));
+	    String type= (componentKeyValues.containsKey("mode"))?(String)componentKeyValues.get("mode").toString():"";
+
+	    // Runnable runnable = (Runnable)componentKeyValues.get("runnable");
+	    String sRunnable = (componentKeyValues.containsKey("runnable"))?(String)componentKeyValues.get("runnable").toString():"";
+	    //String sFiringPolicy = getFiringPolicy((String)componentKeyValues.get("firingPolicy"));
+	    String sFiringPolicy = (componentKeyValues.containsKey("firingPolicy"))?(String)componentKeyValues.get("firingPolicy").toString():"";
+
+	    String sLocation = (componentKeyValues.containsKey("location"))?(String)componentKeyValues.get("location"):"";
+
+	    if (sBaseURL.charAt(sBaseURL.length() - 1) != '/') {
+	        sBaseURL += '/';
+	    }
+	    sRights = (sRights.equals("Other")) ? sRightsOther : sRights;
+	    String sComponentName = sName.toLowerCase().replaceAll("[ ]+", " ").
+	    replaceAll(" ", "-");
+
+	    String sClassName = "";
+	    String[] saTmp = sName.replaceAll("[ ]+", " ").split(" ");
+	    for (String s : saTmp) {
+	        char chars[] = s.trim().toCharArray();
+	        chars[0] = Character.toUpperCase(chars[0]);
+	        sClassName += new String(chars);
+	    }
+
+	    Model model = ModelFactory.createDefaultModel();
+	    Resource resExecutableComponent = model.createResource(sBaseURL +
+	            sComponentName);
+	    Resource resLocation = model.createResource(sBaseURL + sComponentName +
+	            "/implementation/" + sLocation);
+
+	    sTags = (sTags == null) ? "" : sTags;
+
+	    if(!sTags.equals("")){
+	        if (sTags.indexOf(',') < 0) {
+	            saTmp = sTags.toLowerCase().replaceAll("[ ]+", " ").split(" ");
+	        } else {
+	            saTmp = sTags.toLowerCase().replaceAll("[ ]+", " ").split(",");
+	        }
+	    }else{
+	        saTmp = new String[0];
+	    }
+	    java.util.Set<String> setTmp = new java.util.HashSet<String>();
+	    for (String s : saTmp) {
+	        setTmp.add(s.trim());
+	    }
+	    TagsDescription tagDesc = new TagsDescription(setTmp);
+
+	    saTmp = new String[] {sBaseURL + sComponentName + "/implementation/"};
+	    java.util.Set<RDFNode> setContext = new java.util.HashSet<RDFNode>();
+	    for (String s : saTmp) {
+	        setContext.add(model.createResource(s.trim()));
+	    }
+
+	    java.util.Set<DataPortDescription> setInputs = getDataPortDescription(
+	            componentInputKeyValues, model, sBaseURL, sComponentName, "input"
+	    );
+
+	    java.util.Set<DataPortDescription> setOutputs = getDataPortDescription(
+	            componentOutputKeyValues, model, sBaseURL, sComponentName, "output"
+	    );
+
+	    PropertiesDescriptionDefinition pddProperties = getPropertiesDescriptionDefinition(componentPropertyKeyValues);
+	    // Generating the description
+	    Resource resMode = ExecutableComponentDescription.COMPUTE_COMPONENT;
+	    if(type.equals("webui")){
+	        resMode = ExecutableComponentDescription.WEBUI_COMPONENT;
+	    }else{
+	        resMode = ExecutableComponentDescription.COMPUTE_COMPONENT;
+	    }
+	    ExecutableComponentDescription ecd = new ExecutableComponentDescription(
+	            resExecutableComponent,
+	            sName,
+	            sDescription,
+	            sRights,
+	            sCreator,
+	            dateCreation,
+	            sRunnable,
+	            sFiringPolicy,
+	            sFormat,
+	            setContext,
+	            resLocation,
+	            setInputs,
+	            setOutputs,
+	            pddProperties,
+	            tagDesc,resMode
+	    );
+	    return ecd;
+
+	}
 	public String  getRdfDescriptor() throws CorruptedDescriptionException {
-        String sName = (String)componentKeyValues.get("name");
-        String sBaseURL = (String)componentKeyValues.get("baseURL");
-        String sDescription = (String)componentKeyValues.get("description");
-        // String sRights = getRights((String)componentKeyValues.get("rights"));
-        String sRights = (componentKeyValues.containsKey("rights"))?(String)componentKeyValues.get("rights").toString():"";
-        String sRightsOther = (componentKeyValues.containsKey("rightsOther"))?(String)componentKeyValues.get("rightsOther"):"";
-        String sCreator = (componentKeyValues.containsKey("creator"))?(String)componentKeyValues.get("creator"):"";
-        java.util.Date dateCreation = new java.util.Date();
-        String sTags = (componentKeyValues.containsKey("tags"))?(String)componentKeyValues.get("tags"):"";
-        String sFormat = (componentKeyValues.containsKey("format"))?(String)componentKeyValues.get("format"):"";
-        //String type= getType((String)componentKeyValues.get("mode"));
-        String type= (componentKeyValues.containsKey("mode"))?(String)componentKeyValues.get("mode").toString():"";
-       
-        // Runnable runnable = (Runnable)componentKeyValues.get("runnable");
-        String sRunnable = (componentKeyValues.containsKey("runnable"))?(String)componentKeyValues.get("runnable").toString():"";
-        //String sFiringPolicy = getFiringPolicy((String)componentKeyValues.get("firingPolicy"));
-        String sFiringPolicy = (componentKeyValues.containsKey("firingPolicy"))?(String)componentKeyValues.get("firingPolicy").toString():"";
-
-        String sLocation = (componentKeyValues.containsKey("location"))?(String)componentKeyValues.get("location"):"";
-        
-        if (sBaseURL.charAt(sBaseURL.length() - 1) != '/') {
-            sBaseURL += '/';
-        }
-        sRights = (sRights.equals("Other")) ? sRightsOther : sRights;
-        String sComponentName = sName.toLowerCase().replaceAll("[ ]+", " ").
-        replaceAll(" ", "-");
-        
-		String sClassName = "";
-		String[] saTmp = sName.replaceAll("[ ]+", " ").split(" ");
-		for (String s : saTmp) {
-			char chars[] = s.trim().toCharArray();
-			chars[0] = Character.toUpperCase(chars[0]);
-			sClassName += new String(chars);
-		}
-
-        Model model = ModelFactory.createDefaultModel();
-        Resource resExecutableComponent = model.createResource(sBaseURL +
-                sComponentName);
-        Resource resLocation = model.createResource(sBaseURL + sComponentName +
-                "/implementation/" + sLocation);
-
-        sTags = (sTags == null) ? "" : sTags;
-        if (sTags.indexOf(',') < 0) {
-            saTmp = sTags.toLowerCase().replaceAll("[ ]+", " ").split(" ");
-        } else {
-            saTmp = sTags.toLowerCase().replaceAll("[ ]+", " ").split(",");
-        }
-        java.util.Set<String> setTmp = new java.util.HashSet<String>();
-        for (String s : saTmp) {
-            setTmp.add(s.trim());
-        }
-        TagsDescription tagDesc = new TagsDescription(setTmp);
-
-        saTmp = new String[] {sBaseURL + sComponentName + "/implementation/"};
-        java.util.Set<RDFNode> setContext = new java.util.HashSet<RDFNode>();
-        for (String s : saTmp) {
-            setContext.add(model.createResource(s.trim()));
-        }
-
-        java.util.Set<DataPortDescription> setInputs = getDataPortDescription(
-        		componentInputKeyValues, model, sBaseURL, sComponentName, "input"
-    	);
-        
-        java.util.Set<DataPortDescription> setOutputs = getDataPortDescription(
-        		componentOutputKeyValues, model, sBaseURL, sComponentName, "output"
-    	);
-        
-        PropertiesDescriptionDefinition pddProperties = getPropertiesDescriptionDefinition(componentPropertyKeyValues);
-        // Generating the description
-        Resource resMode = ExecutableComponentDescription.COMPUTE_COMPONENT;
-        if(type.equals("webui")){
-        	resMode = ExecutableComponentDescription.WEBUI_COMPONENT;
-        }else{
-        	resMode = ExecutableComponentDescription.COMPUTE_COMPONENT;
-        }
-        ExecutableComponentDescription ecd = new ExecutableComponentDescription(
-                resExecutableComponent,
-                sName,
-                sDescription,
-                sRights,
-                sCreator,
-                dateCreation,
-                sRunnable,
-                sFiringPolicy,
-                sFormat,
-                setContext,
-                resLocation,
-                setInputs,
-                setOutputs,
-                pddProperties,
-                tagDesc,resMode
-                                );
+   
+        ExecutableComponentDescription ecd = getExecutableComponentDescription();
         // Generate the descriptors
         java.io.ByteArrayOutputStream bosRDF = new java.io.ByteArrayOutputStream();
         ecd.getModel().write(bosRDF);
