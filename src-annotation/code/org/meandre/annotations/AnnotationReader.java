@@ -34,7 +34,7 @@ public class AnnotationReader {
 
 	}
 
-	void findAnnotations(String className) throws ClassNotFoundException, CorruptedDescriptionException {
+	public void findAnnotations(String className) throws ClassNotFoundException, CorruptedDescriptionException {
 	    java.util.Hashtable<Integer,String> theClassList = new java.util.Hashtable<Integer,String>();
 
 	    theClassName = className;
