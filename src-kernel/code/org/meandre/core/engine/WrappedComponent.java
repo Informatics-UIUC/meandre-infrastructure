@@ -13,6 +13,7 @@ import org.meandre.core.ComponentContextImpl;
 import org.meandre.core.ComponentExecutionException;
 import org.meandre.core.ExecutableComponent;
 import org.meandre.core.logger.KernelLoggerFactory;
+import org.meandre.core.utils.ExceptionFormatter;
 
 /** This class is the Meandre implementation wrapper of an
  * ExecutableComponent. This class implements the basic execution
@@ -32,7 +33,7 @@ extends Thread {
 
 	/** The termination flag index */
 	protected static final int SLEEPING    = 2;
-	
+
 	/** The termination flag index */
 	protected static final int TERMINATION = 3;
 
@@ -96,7 +97,7 @@ extends Thread {
 			Hashtable<String, String> htOutputMap,
 			Hashtable<String, String> htInputLogicNameMap,
 			Hashtable<String, String> htOutputLogicNameMap, ThreadGroup tg,
-			String sThreadName, Hashtable<String, String> htProperties, MrProbe thdMrProbe, 
+			String sThreadName, Hashtable<String, String> htProperties, MrProbe thdMrProbe,
 			CoreConfiguration cnf,
 			PrintStream console )
 			throws InterruptedException {
@@ -134,7 +135,7 @@ extends Thread {
 
 		this.htOutputMap = htOutputMap;
 
-		
+
 		// Waste the only ticket to the blocking semaphore
 		this.semBlocking.acquire();
 
@@ -147,31 +148,31 @@ extends Thread {
 	 */
 	public void run () {
 		log.fine("Initializing a the wrapping component "+ec.toString());
-		
+
 		// Initialize the executable component
 		try {
 			this.ec.initialize(cc);
 		} catch (ComponentExecutionException e) {
 			synchronized (baStatusFlags) {
 				baStatusFlags[TERMINATION] = true;
-				sAbortMessage = e.toString();
+				sAbortMessage = ExceptionFormatter.formatException(e);
 				this.thdMrProbe.probeWrappedComponentAbort(this);
 			}
 			log.severe("Component initialize failed "+e.toString());
 		} catch (ComponentContextException e) {
 			synchronized (baStatusFlags) {
 				baStatusFlags[TERMINATION] = true;
-				sAbortMessage = e.toString();
+				sAbortMessage = ExceptionFormatter.formatException(e);
 				this.thdMrProbe.probeWrappedComponentAbort(this);
 			}
 			log.severe("Component initialize failed "+e.toString());
 		}
-		
+
 		// Main loop
 		while ( baStatusFlags[RUNNING] && !baStatusFlags[TERMINATION]) {
-			
+
 			if ( isExecutable() ) {
-				
+
 				// The executable component is ready for execution
 				//log.finest("Component "+ec.toString()+" ready for execution");
 				try {
@@ -193,23 +194,23 @@ extends Thread {
 					synchronized (baStatusFlags) {
 						baStatusFlags[EXECUTING] = false;
 					}
-					
+
 					//log.finest("Component "+ec.toString()+" executed");
-					
+
 					// Clean the data proxy
 					resetAndUpdateComponentContext();
 					//log.finest("Component "+ec.toString()+" context updated");
 				} catch (ComponentExecutionException e) {
 					synchronized (baStatusFlags) {
 						baStatusFlags[TERMINATION] = true;
-						sAbortMessage = e.toString();
+						sAbortMessage = ExceptionFormatter.formatException(e);
 						this.thdMrProbe.probeWrappedComponentAbort(this);
 					}
 					log.warning(e.getMessage());
 				} catch (ComponentContextException e) {
 					synchronized (baStatusFlags) {
 						baStatusFlags[TERMINATION] = true;
-						sAbortMessage = e.toString();
+						sAbortMessage = ExceptionFormatter.formatException(e);
 						this.thdMrProbe.probeWrappedComponentAbort(this);
 					}
 					log.warning(e.getMessage());
@@ -217,14 +218,14 @@ extends Thread {
 				catch (Exception e) {
 					synchronized (baStatusFlags) {
 						baStatusFlags[TERMINATION] = true;
-						sAbortMessage = e.toString();
+						sAbortMessage = ExceptionFormatter.formatException(e);
 						this.thdMrProbe.probeWrappedComponentAbort(this);
 					}
 					log.warning(e.toString());
 				}
 			}
 			else {
-				
+
 				// The executable component is not ready for execution
 				//log.finest("Component "+ec.toString()+" not ready for execution");
 				try {
@@ -242,23 +243,23 @@ extends Thread {
 					if ( baStatusFlags[TERMINATION] || !baStatusFlags[RUNNING] )
 						continue;
 					//log.finest("Component "+ec.toString()+" awakened by data push");
-					
+
 					//String sLastUpdated = partialUpdateComponentContext();
 					partialUpdateComponentContext();
-					
+
 					//log.finest("Component "+ec.toString()+" populated input "+qUpdatedActiveBuffer);
 				} catch (InterruptedException e) {
 					synchronized (baStatusFlags) {
 						baStatusFlags[TERMINATION] = true;
-						sAbortMessage = e.toString();
+						sAbortMessage = ExceptionFormatter.formatException(e);
 						this.thdMrProbe.probeWrappedComponentAbort(this);
 					}
 					log.warning("The blocking sempahore for "+ec.toString()+" was interrupted!");
-				} 
+				}
 				catch (ComponentContextException e) {
 					synchronized (baStatusFlags) {
 						baStatusFlags[TERMINATION] = true;
-						sAbortMessage = e.toString();
+						sAbortMessage = ExceptionFormatter.formatException(e);
 						this.thdMrProbe.probeWrappedComponentAbort(this);
 					}
 					log.severe("The requested input does not exist "+e.toString());
@@ -275,14 +276,14 @@ extends Thread {
 		} catch (ComponentExecutionException e) {
 			synchronized (baStatusFlags) {
 				baStatusFlags[TERMINATION] = true;
-				sAbortMessage = e.toString();
+				sAbortMessage = ExceptionFormatter.formatException(e);
 				this.thdMrProbe.probeWrappedComponentAbort(this);
 			}
 			log.severe("Component disposed failed "+e.toString());
 		} catch (ComponentContextException e) {
 			synchronized (baStatusFlags) {
 				baStatusFlags[TERMINATION] = true;
-				sAbortMessage = e.toString();
+				sAbortMessage = ExceptionFormatter.formatException(e);
 				this.thdMrProbe.probeWrappedComponentAbort(this);
 			}
 			log.severe("Component disposed failed "+e.toString());
@@ -318,7 +319,7 @@ extends Thread {
 	}
 
 	/** Keeps updating a partially populated component context.
-	 * 
+	 *
 	 * @throws ComponentContextException Something went really wrong
 	 */
 	private void partialUpdateComponentContext()
@@ -331,7 +332,7 @@ extends Thread {
 			Hashtable<String, String> htInputLogicNameMapReverse = cc.getInputLogicNameMapReverse();
 			for ( int i=0,iMax=saIN.length ; bNotDone && i<iMax ; i++ ) {
 				String sIN = saIN[i];
-				if ( cc.getDataComponentFromInput(htInputLogicNameMapReverse.get(sIN))==null ) 
+				if ( cc.getDataComponentFromInput(htInputLogicNameMapReverse.get(sIN))==null )
 					if ( !this.htInputs.get(sIN).isEmpty() ) {
 						cc.setDataComponentToInput(
 								sIN,
@@ -346,17 +347,17 @@ extends Thread {
 			e.printStackTrace(new PrintStream(baos));
 			log.warning("Something went really wrong in "+this.ec.getClass().getName()+"\n" +baos.toString());
 		}
-		
+
 
 //		String sLastUpdated = qUpdatedActiveBuffer.poll().toString();
-//		
+//
 //		cc.setDataComponentToInput(
 //				sLastUpdated,
 //				htInputs.get(sLastUpdated).popDataComponent()
 //			);
-		
+
 	}
-	
+
 	/** Awakes the modules to the arrival of a new data.
 	 *
 	 * @param sInput The updated input active buffer
@@ -415,16 +416,16 @@ extends Thread {
 	}
 
 	/** Sets MrProper.
-	 * 
+	 *
 	 * @param thdMrPropper MrPropper thread
 	 */
 	public void setMrPropper(MrProper thdMrPropper) {
 		this.thdMrProper = thdMrPropper;
 		this.cc.setMrPropper(thdMrPropper);
 	}
-	
+
 	/** Returns the unique ID of this executable instance.
-	 * 
+	 *
 	 * @return The unique ID
 	 */
 	public String getExecutableComponentInstanceID () {
@@ -432,24 +433,24 @@ extends Thread {
 	}
 
 	/** Returns the executable component wrapped.
-	 * 
+	 *
 	 * @return The executable component
 	 */
 	public ExecutableComponent getExecutableComponentImplementation() {
 		return ec;
 	}
-	
-	
+
+
 	/** Returns the MrProper for this wraped component.
-	 * 
+	 *
 	 * @return MrProbe
 	 */
 	public MrProper getMrProper() {
 		return thdMrProper;
 	}
-	
+
 	/** Returns the MrProbe for this wraped component.
-	 * 
+	 *
 	 * @return MrProbe
 	 */
 	public MrProbe getMrProbe() {
@@ -457,7 +458,7 @@ extends Thread {
 	}
 
 	/** Returns true if termination flag is on.
-	 * 
+	 *
 	 * @return The value of the termination flag
 	 */
 	public boolean isTerminating() {
