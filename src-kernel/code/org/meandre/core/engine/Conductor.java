@@ -31,10 +31,10 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
 
-/** This class is devoted to the arrengement required to execute a given
- * flow description. The basic input the conductor is in charge of generate
- * the proper structures and connections to create the Executor object that
- * which will eventually execute the flow.
+/** This class performs the setup required to execute a given
+ * flow description. The conductor generates the proper structures and
+ * connections needed to create the Executor object that will eventually
+ * be used to execute the flow.
  *
  * @author Xavier Llor&agrave;
  */
@@ -50,7 +50,7 @@ public class Conductor {
 	static private final String [] saExecutableComponentTypes = { "java/class", "jython", "clojure" };
 
 	/** A simple separator character for URLs */
-	static private final String URL_SEAPARTOR = "##--##--##";
+	static private final String URL_SEPARATOR = "##--##--##";
 
 	/** The default queue size for the active buffers */
 	public static final int DEFAULT_QUEUE_SIZE = 10000;
@@ -64,23 +64,23 @@ public class Conductor {
 	/** The core root logger */
 	protected static Logger log = KernelLoggerFactory.getCoreLogger();
 
-	/** Embeded context to file URI mapper */
+	/** Embedded context to file URI mapper */
 	private static Hashtable<Literal,String> htMapLiteralToFile = new Hashtable<Literal,String>();
 
-	/** Embeded context to hash code mapper */
+	/** Embedded context to hash code mapper */
 	private static Hashtable<Literal,Integer> htMapLiteralToHashcode = new Hashtable<Literal,Integer>();
 
 	/** The core configuration object */
 	private CoreConfiguration cnf;
-	
+
 	private ClassLoader parentClassloader;
-	
+
 	/** Initialize a conductor with a set of valid URLs.
 	 *
 	 */
 	public Conductor( int iActiveBufferSize, CoreConfiguration cnf ) {
 		this.cnf = cnf;
-		
+
 		log.fine("Creating a conductor object");
 		this.iActiveBufferSize = iActiveBufferSize;
 		setLoadableLanguages = new HashSet<String>();
@@ -99,7 +99,7 @@ public class Conductor {
 	 * @param console The output console
 	 * @return The executor object
 	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
-	 * @throws ConductorException The counductor could not create an executable flow
+	 * @throws ConductorException The conductor could not create an executable flow
 	 */
 	public Executor buildExecutor(QueryableRepository qr, Resource res, PrintStream console )
 	throws CorruptedDescriptionException, ConductorException {
@@ -125,7 +125,7 @@ public class Conductor {
 		exec.initWebUI(PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID()), "XStreamTest");
 		return exec;
 	}
-	
+
 	/** Creates an execution object for the given flow description.
 	 *
 	 * @param qr The queryable repository containing component descriptions
@@ -165,12 +165,12 @@ public class Conductor {
 
 		// Start MrProbe
 		thdMrProbe.start();
-		
+
 		// Get the description
 		FlowDescription fd = qr.getFlowDescription(res);
 
 		log.info("Preparing flow "+sFlowUniqueExecutionID);
-		
+
 		// STEP 0: Gather all the required contexts and load them
 		log.fine("STEP 0: Plugging the required contexts");
 		URLClassLoader urlFlowCL = plugRequiredContexts(qr, htMapNameToClass, htMapResourceToName,fd);
@@ -200,7 +200,7 @@ public class Conductor {
 					thdMrProbe.done();
 					throw new ConductorException("Class is not an executable components: "+e.getMessage());
 				}
-				
+
 			}
 			else if ( ecd.getRunnable().equals("python") && ecd.getFormat().equals("jython") ){
 				// Creates a jython wrapper and sources all the scripts
@@ -258,7 +258,7 @@ public class Conductor {
 			Resource resCSInsDP = cd.getTargetInstanceDataPort();
 			//Resource resECID = fd.getExecutableComponentResourceForInstance(resCSIns);
 			//ExecutableComponentDescription compDesc = qr.getExecutableComponentDescription(resECID);
-			String sID = resCSIns.toString()+URL_SEAPARTOR+resCSInsDP.toString();
+			String sID = resCSIns.toString()+URL_SEPARATOR+resCSInsDP.toString();
 			if ( htMapInAB.get(sID)==null ) {
 				//htMapInAB.put(sID,new ActiveBuffer(compDesc.getInput(resCSInsDP).getIdentifier(),iActiveBufferSize));
 				htMapInAB.put(sID,new ActiveBuffer(sID,iActiveBufferSize));
@@ -289,14 +289,14 @@ public class Conductor {
 			Hashtable<String, String> htMapInLog = new Hashtable<String,String>();
 			htMapInputLogicNameTranslation.put(ecid.getExecutableComponentInstance(),htMapInLog);
 			for ( DataPortDescription dpd:ecd.getInputs() ) {
-				String  sIDIn = ecid.getExecutableComponentInstance()+URL_SEAPARTOR+dpd.getResource();
+				String  sIDIn = ecid.getExecutableComponentInstance()+URL_SEPARATOR+dpd.getResource();
 				htMapInLog.put(dpd.getName(), sIDIn);
 			}
 
 			Hashtable<String, String> htMapOutLog = new Hashtable<String,String>();
 			htMapOutputLogicNameTranslation.put(ecid.getExecutableComponentInstance(),htMapOutLog);
 			for ( DataPortDescription dpd:ecd.getOutputs() ) {
-				String  sIDOut = ecid.getExecutableComponentInstance()+URL_SEAPARTOR+dpd.getResource();
+				String  sIDOut = ecid.getExecutableComponentInstance()+URL_SEPARATOR+dpd.getResource();
 				htMapOutLog.put(dpd.getName(), sIDOut);
 			}
 
@@ -307,7 +307,7 @@ public class Conductor {
 		for ( ConnectorDescription cd:fd.getConnectorDescriptions() ) {
 			String sIDOutSet = cd.getSourceInstance().toString();
 			String  sIDInSet = cd.getTargetInstance().toString();
-			String  sIDIn = cd.getTargetInstance().toString()+URL_SEAPARTOR+cd.getTargetInstanceDataPort().toString();
+			String  sIDIn = cd.getTargetInstance().toString()+URL_SEPARATOR+cd.getTargetInstanceDataPort().toString();
 
 			ActiveBuffer ab = htMapInAB.get(sIDIn);
 
@@ -316,7 +316,7 @@ public class Conductor {
 			ExecutableComponentDescription compDesc = qr.getExecutableComponentDescription(fd.getExecutableComponentResourceForInstance(cd.getSourceInstance()));
 			DataPortDescription dpdOut = compDesc.getOutput(cd.getSourceInstanceDataPort());
 			Hashtable<String,String> htMapOut = htMapOutputTranslation.get(cd.getSourceInstance());
-			htMapOut.put(sIDOutSet+URL_SEAPARTOR+dpdOut.getIdentifier(), ab.getName());
+			htMapOut.put(sIDOutSet+URL_SEPARATOR+dpdOut.getIdentifier(), ab.getName());
 
 			// Update the input and output sets
 			htInsOutputSet.get(sIDOutSet).add(ab);
@@ -493,8 +493,8 @@ public class Conductor {
 		// Load the component classes
 		return loadExecutableComponentImplementation(setContexts, setURLLocations, htMapNameToClass, htMapNameToResource, htMapResourceToRunnable, htMapResourceToFormat);
 	}
-	
-	
+
+
 
 	/** This methods dump the Literal to the file system and creates a URI for the class loader.
 	 *
@@ -562,19 +562,19 @@ public class Conductor {
 				else if (sURL.endsWith(".jar")) {
 					ua[iCnt++] = new URL("jar:"+sURL+"!/");
 				}
-					
+
 			} catch (MalformedURLException e) {
 				throw new CorruptedDescriptionException("Context URL "+sURL+" is not a valid URL");
 			}
 			// Initializing the java class loader
 			URLClassLoader urlCL=null;
 			if(this.getParentClassloader()==null){
-				urlCL=  URLClassLoader.newInstance(ua);	
+				urlCL=  URLClassLoader.newInstance(ua);
 			}else{
 				urlCL = URLClassLoader.newInstance(ua, this.getParentClassloader());
 			}
-		 
-	
+
+
 		for ( String sClassName:setURLLocations ) {
 			try {
 				if ( htMapResourceToRunnable.get(htMapNameToResource.get(sClassName)).equals("java") ) {
@@ -582,7 +582,7 @@ public class Conductor {
 					Class clazz = Class.forName(sClassName, true, urlCL);
 					htMapNameToClass.put(sClassName,clazz);
 				}
-			}  
+			}
 			catch (java.lang.LinkageError e){
 				log.warning("Class "+sClassName+" appearing multiple times. Discarding the copies.");
 				log.warning("Having multiple copies of class"+sClassName+" can cause erratic behavior if they do not align!");
@@ -611,5 +611,5 @@ public class Conductor {
 	public void setParentClassloader(ClassLoader parentClassloader) {
 		this.parentClassloader = parentClassloader;
 	}
-	
+
 }

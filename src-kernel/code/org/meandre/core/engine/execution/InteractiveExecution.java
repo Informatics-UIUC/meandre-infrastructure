@@ -34,17 +34,16 @@ import org.meandre.webui.PortScroller;
 import org.meandre.webui.WebUI;
 
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.thoughtworks.xstream.converters.extended.ThrowableConverter;
 
 /** This class provide simple execution of a flow on demand.
- * 
+ *
  * @author Xavier Llor&agrave;
  *
  */
 public class InteractiveExecution {
 
 	/** Executes the requested flow in verbose mode.
-	 * 
+	 *
 	 * @param qr The query repository to use
 	 * @param sURI The URI of the flow to execute
 	 * @param outStream The output stream to use to output messages
@@ -59,19 +58,19 @@ public class InteractiveExecution {
 	 * @throws CorruptedDescriptionException The flow could not be properly recovered
 	 * @throws ConductorException An execution was thrown during the execution process
 	 */
-	public static boolean executeVerboseFlowURI( QueryableRepository qr, 
-			String sURI, OutputStream outStream, CoreConfiguration cnf, 
+	public static boolean executeVerboseFlowURI( QueryableRepository qr,
+			String sURI, OutputStream outStream, CoreConfiguration cnf,
 			String [] saProbes , String sToken, JobDetail job, String sFUID,
 			JobInformationBackendAdapter jiba)  {
 
 		boolean bFailSafe = true;
-		
+
 		PersistentPrintStream pw = new PersistentPrintStream(
 				new PrintStream(outStream),
 				jiba,
 				sFUID
 			);
-		
+
 		pw.println("Meandre Execution Engine version "+Constants.MEANDRE_VERSION);
 		pw.println("All rights reserved by DITA, NCSA, UofI (2007-2009)");
 		pw.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
@@ -85,7 +84,7 @@ public class InteractiveExecution {
 			pw.println("Requested flow "+sURI+" does not exist in the users repository");
 			return false;
 		}
-			
+
 		Resource resURI = fd.getFlowComponent();
 		pw.println("Preparing flow: "+sURI);
 		pw.println("Unique flow ID: "+sFUID);
@@ -101,7 +100,7 @@ public class InteractiveExecution {
 			mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
 			//pw.flush();
 			int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
-			
+
 			pw.println("Preparation completed correctly\n");
 
 			pw.print("Execution started at: " + nextPort +" on ");
@@ -128,7 +127,7 @@ public class InteractiveExecution {
 				//
 				// Aborted execution.
 				//
-				pw.println("Execution aborted!!!\nReason:\n");
+				pw.println("Execution aborted!!!\nReason:");
 				for ( String sMsg:exec.getAbortMessage() )
 					pw.println("\t"+sMsg);
 			}
@@ -177,7 +176,7 @@ public class InteractiveExecution {
 			catch ( Throwable t2 ) {
 			}
 			pw.println("----------------------------------------------------------------------------");
-			pw.print("Unknow execption at: ");
+			pw.print("Unknow exception at: ");
 			pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
 			pw.println("----------------------------------------------------------------------------");
 			pw.println();
@@ -202,7 +201,7 @@ public class InteractiveExecution {
 						pw.println("Total run time (ms)      : "+jsonStats.get("runtime"));
 						pw.println();
 						//pw.flush();
-		
+
 						JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
 						for ( int i=0,iMax=jaEXIS.length() ; i<iMax ; i++ ) {
 							JSONObject joEXIS = (JSONObject) jaEXIS.get(i);
@@ -235,16 +234,16 @@ public class InteractiveExecution {
 			}
 		}
 		pw.close();
-		
+
 		if ( exec!=null )
 			return exec.hadGracefullTermination();
 		else
 			return false;
-	
+
 	}
-	
+
 	/** Executes the requested flow in silent mode.
-	 * 
+	 *
 	 * @param qr The query repository to use
 	 * @param sURI The URI of the flow to execute
 	 * @param outStream The output stream to use to output messages
@@ -258,9 +257,9 @@ public class InteractiveExecution {
 	 * @throws CorruptedDescriptionException The flow could not be properly recovered
 	 * @throws ConductorException An execution was thrown during the execution process
 	 */
-	public static boolean executeSilentFlowURI( QueryableRepository qr, 
-			String sURI, OutputStream outStream, CoreConfiguration cnf, 
-			String sToken, JobDetail job, String sFUID, 
+	public static boolean executeSilentFlowURI( QueryableRepository qr,
+			String sURI, OutputStream outStream, CoreConfiguration cnf,
+			String sToken, JobDetail job, String sFUID,
 			JobInformationBackendAdapter jiba ) {
 
 		PersistentPrintStream pw = new PersistentPrintStream(
@@ -268,7 +267,7 @@ public class InteractiveExecution {
 				jiba,
 				sFUID
 			);
-		
+
 		// Create the execution
 		FlowDescription fd = qr.getFlowDescription(qr.getModel().createResource(sURI));
 		Resource resURI = fd.getFlowComponent();
@@ -282,11 +281,11 @@ public class InteractiveExecution {
 			MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),probe,false,false);
 			exec = conductor.buildExecutor(qr, resURI, mrProbe,pw,sFUID);
 			mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
-		
+
 			int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
-			
+
 			pw.flush();
-			
+
 			WebUI webui = exec.initWebUI(nextPort,sToken);
 			job.setToken(sToken);
 			job.setFlowInstanceId(sFUID);
@@ -353,18 +352,18 @@ public class InteractiveExecution {
 			pw.println();
 			//pw.flush();
 		}
-		
+
 		pw.close();
-		
+
 		if ( exec!=null )
 			return exec.hadGracefullTermination();
 		else
 			return false;
 	}
-	
+
 
 	/** Create a new unique execution flow ID
-	 * 
+	 *
 	 * @param resFlow The flow resource URI
 	 * @param iPort The port number the server is running on
 	 * @return The unique execution ID
@@ -374,9 +373,9 @@ public class InteractiveExecution {
 				+ Integer.toHexString(iPort).toUpperCase() + "/" + System.currentTimeMillis()
 				+ "/" + (Math.abs(new Random().nextInt())) + "/";
 	}
-	
+
 	/** Instantiates the required probes to use during the flow execution.
-	 * 
+	 *
 	 * @param saProbeNames The probe names
 	 * @param cnf The core configuration object
 	 * @return The probe objects
@@ -386,9 +385,9 @@ public class InteractiveExecution {
 		Probe [] pa = new Probe[saProbeNames.length];
 		int i=0;
 		ProbeFactory pf = ProbeFactory.getProbeFactory(cnf);
-		for ( String sProbName:saProbeNames ) 
-			pa[i++] = pf.getProbe(sProbName);		
-		
+		for ( String sProbName:saProbeNames )
+			pa[i++] = pf.getProbe(sProbName);
+
 		return pa;
 	}
 }
