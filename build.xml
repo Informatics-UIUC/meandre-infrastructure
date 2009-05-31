@@ -420,6 +420,7 @@
 				<include name="**/annotations/**/*.class"/>
 				<include name="**/annotations/**/*.properties"/>
 				<include name="**/annotations/**/*.xml"/>
+                                <include name="org/meandre/components/test/framework/**/*.class"/>
 			</fileset>
 		</jar>
 
