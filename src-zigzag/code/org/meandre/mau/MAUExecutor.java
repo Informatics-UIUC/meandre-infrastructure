@@ -58,9 +58,9 @@ public class MAUExecutor {
 
 	/** The run temp dir */
 	private static final String MAU_RUN_DIR = "run";
-	
+
 	/** Public resources */
-	private static final String MAU_PUBLIC_RESOURCES_RUN_DIR = "run_public_resources";
+	private static final String MAU_PUBLIC_RESOURCES_RUN_DIR = "public_resources";
 
 	/** The output print stream to use */
 	protected PrintStream ps;
@@ -79,7 +79,7 @@ public class MAUExecutor {
 
 	/** The port number to use */
 	private int iPort;
-	
+
 	/** The main method that runs the the MAU file.
 	 *
 	 * @param sArgs The command line arguments
@@ -112,9 +112,9 @@ public class MAUExecutor {
 		this.sFileName = sFileName;
 		this.iPort = 1715;
 	}
-	
+
 	/** Set the WebUI port number to use.
-	 * 
+	 *
 	 * @param iPort The port number
 	 */
 	public void setWebUIPortNumber(int iPort) {
@@ -195,7 +195,7 @@ public class MAUExecutor {
 		props.setProperty(CoreConfiguration.MEANDRE_PUBLIC_RESOURCE_DIRECTORY, fTmpPR.toString());
 		props.setProperty(CoreConfiguration.MEANDRE_CORE_CONFIG_FILE, "meandre-config-core.xml");
 		CoreConfiguration cnf = new CoreConfiguration(props);
-		
+
 		Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
 
 		exec =null;
@@ -209,7 +209,7 @@ public class MAUExecutor {
 			conductor.setParentClassloader(this.getParentClassloader());
 			exec = conductor.buildExecutor(qr, resURI, mrProbe, System.out);
 			mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
-			
+
 			ps.flush();
 
 			// Redirecting the streamers
@@ -300,11 +300,11 @@ public class MAUExecutor {
 		ps.println();
 
 	}
-	
+
 	/**  Deletes all files and subdirectories under dir.
-     *   Returns true if all deletions were successful. 
+     *   Returns true if all deletions were successful.
      *   If a deletion fails, the method stops attempting to delete and returns false.
-     *   
+     *
      * @param dir The directory to delete
      * @return True if it was properly cleaned, false otherwise
      */
@@ -313,7 +313,7 @@ public class MAUExecutor {
 	         String[] children = dir.list();
 	         for (int i=0; i<children.length; i++) {
 	             boolean success = deleteDir(new File(dir, children[i]));
-	             if (!success) 
+	             if (!success)
 	                 return false;
 	         }
 	     }
@@ -322,11 +322,11 @@ public class MAUExecutor {
 	        return dir.delete();
         else
         	return true;
-	    
+
 	 }
 
 	private HashSet<String> setProcessedJars = new HashSet<String>();
-	 
+
 	/** Process the model contained on the MAU file and rearrenge the contexts URIs.
 	 *
 	 * @return The edited model
@@ -366,9 +366,9 @@ public class MAUExecutor {
 	 * @param sNewURI The new URI to set
 	 */
 	private void editContextJarURI(QueryableRepository qr, String sJarName, String sNewURI) {
-		String sPrefix = sFileName+"."+MAU_PUBLIC_RESOURCES_RUN_DIR+File.separator+"public"+File.separator+"resources"+File.separator+"contexts"+File.separator+"java";
+		String sPrefix = sFileName+"."+MAU_PUBLIC_RESOURCES_RUN_DIR+File.separator+"contexts"+File.separator+"java";
 		new File(sPrefix).mkdirs();
-		
+
 		for ( ExecutableComponentDescription ecd:qr.getAvailableExecutableComponentDescriptions() ) {
 			Set<RDFNode> setNew = new HashSet<RDFNode>();
 			for ( RDFNode rdfNode:ecd.getContext() ) {
@@ -445,8 +445,8 @@ public class MAUExecutor {
 		}
 		spi.dispose();
 	}
-	
-	
+
+
 
 	/**
 	 * @return the parentClassloader
