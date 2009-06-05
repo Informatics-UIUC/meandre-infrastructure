@@ -192,10 +192,10 @@ public class Conductor {
 					htECInstances.put(ins,(ExecutableComponent) htMapNameToClass.get(htMapResourceToName.get(ecomp)).newInstance());
 				} catch (InstantiationException e) {
 					thdMrProbe.done();
-					throw new ConductorException("Condcuctor could not instantiate class "+htMapResourceToName.get(ecomp)+"\n"+e);
+					throw new ConductorException("Conductor could not instantiate class "+htMapResourceToName.get(ecomp)+"\n"+e);
 				} catch (IllegalAccessException e) {
 					thdMrProbe.done();
-					throw new ConductorException("Condcuctor could not instantiate class "+htMapResourceToName.get(ecomp)+"\n"+e);
+					throw new ConductorException("Conductor could not instantiate class "+htMapResourceToName.get(ecomp)+"\n"+e);
 				} catch (ClassCastException e ) {
 					thdMrProbe.done();
 					throw new ConductorException("Class is not an executable components: "+e.getMessage());
