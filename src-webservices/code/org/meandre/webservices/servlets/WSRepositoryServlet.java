@@ -5,6 +5,7 @@ package org.meandre.webservices.servlets;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
@@ -12,6 +13,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +29,8 @@ import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.store.Store;
 import org.meandre.core.utils.ModelIO;
+import org.meandre.support.io.FileUtils;
+import org.meandre.support.text.StringUtils;
 import org.meandre.webservices.MeandreServer;
 import org.meandre.webservices.logger.WSLoggerFactory;
 
@@ -88,11 +92,12 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 			FileItem item = itr.next();
 		    // Get the name of the field
 			String fieldName = item.getFieldName();
+			byte[] data = item.get();
 
 			// check if the current item is a form field or an uploaded file
-			if(fieldName.equals("repository")) {
+            if(fieldName.equals("repository")) {
 
-				String sRDFContent = new String(item.get());
+				String sRDFContent = new String(data);
 				if (sRDFContent.length()==0 ) continue;
 
 				Model modelTmp = ModelFactory.createDefaultModel();
@@ -129,8 +134,8 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 			// Check if we need to upload jar files
 			else if(fieldName.equals("context")) {
 				String sFile = item.getName();
-				if ( sFile.length()==0 ) continue;
-				htContextBytes.put(sFile, item.get());
+				if ( sFile.length()==0) continue;
+				htContextBytes.put(sFile, data);
 			}
 			else if ( fieldName.equals("embed") ) {
 				String sValue = item.getString();
@@ -169,10 +174,10 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 				}
 				else {
 					// Component does exist
-					log.warning("Component "+resComp+" already exist in "+request.getRemoteUser()+" repository. Discarding it.");
+					log.warning("Component "+resComp+" already exist in "+request.getRemoteUser()+" repository. Ignoring it.");
 				}
 			}
-	
+
 			// Adding flows
 			Model modUser = qr.getModel();
 			modUser.begin();
@@ -182,7 +187,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 					modUser.add(qrNew.getFlowDescription(resFlow).getModel());
 					setAddedURIs.add(resFlow.toString());
 					log.info("Added flow "+resFlow+" to "+request.getRemoteUser()+"'s repository");
-	
+
 				}
 				else {
 					if ( bOverwrite ) {
@@ -194,10 +199,10 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 					}
 					else
 						// Component does exist
-						log.warning("Flow "+resFlow+" already exist in "+request.getRemoteUser()+" repository. Discarding it. No overwrite flag provided.");
+						log.warning("Flow "+resFlow+" already exist in "+request.getRemoteUser()+" repository. Ignoring it. No overwrite flag provided.");
 				}
 			}
-	
+
 			// Adding the components after adding the contexts
 			URL urlRequest = new URL(request.getRequestURL().toString());
 			Set<String> setFiles = htContextBytes.keySet();
@@ -231,24 +236,45 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 						}
 					}
 					else if ( bWriteOnce ) {
-						//
+                        String javaContextDir = cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator;
+                        String md5Dir = javaContextDir + "md5/";
+                        new File(javaContextDir).mkdirs();
+                        new File(md5Dir).mkdirs();
+
+					    //
 						// Dump the context file to the disc only once
 						//
 						for ( String sFile:setFiles) {
 							// Failsafe check
 							if ( sFile.length()==0 ) continue;
-	
+
 							// Dump the files to disk
-							new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator).mkdirs();
-				    		File savedFile = new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator+sFile);
-							try {
-								FileOutputStream fos = new FileOutputStream(savedFile);
-								fos.write(htContextBytes.get(sFile));
-								fos.close();
-							} catch (Exception e) {
-								log.warning("Problems writing context "+sFile+" to "+savedFile.getAbsolutePath());
-								throw new IOException(e.toString());
+							byte[] fileData = htContextBytes.get(sFile);
+							if (fileData.length > 0) {     // MDR-160: ignore uploading context files of 0 size
+    				    		File savedFile = new File(javaContextDir + sFile);
+    							try {
+    								FileOutputStream fos = new FileOutputStream(savedFile);
+                                    fos.write(fileData);
+    								fos.close();
+    							} catch (Exception e) {
+    								log.warning("Problems writing context "+sFile+" to "+savedFile.getAbsolutePath());
+    								throw new IOException(e.toString());
+    							}
+
+    							// Create the MD5 checksum for the uploaded file (MDR-160)
+    							try {
+    							    byte[] md5sum = FileUtils.createMD5Checksum(savedFile);
+    							    String sMD5 = StringUtils.getHexString(md5sum).toLowerCase();
+    							    String md5File = md5Dir + sMD5 +".md5";
+
+    							    FileWriter writer = new FileWriter(md5File);
+                                    writer.write(savedFile.getName());
+    							    writer.close();
+    							} catch (Exception e) {
+    							    log.log(Level.WARNING, "Could not create MD5 checksum for: " + savedFile, e);
+    							}
 							}
+
 							// Add the proper context resources
 							Resource res = modUser.createResource(urlRequest.getProtocol()+"://"+urlRequest.getHost()+":"+urlRequest.getPort()+cnf.getAppContext()+"/public/resources/contexts/java/"+sFile);
 							ecd.getContext().add(res);
@@ -256,7 +282,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 						// Avoid dumping them multiple times
 						bWriteOnce = false;
 					}
-	
+
 					if ( qr.getExecutableComponentDescription(ecd.getExecutableComponent())!=null ) {
 						if ( bOverwrite ) {
 							modUser.remove(qr.getExecutableComponentDescription(ecd.getExecutableComponent()).getModel());
@@ -270,7 +296,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 						modUser.add(ecd.getModel());
 					}
 				}
-	
+
 			}
 			//Commiting changes
 			modUser.commit();
@@ -278,7 +304,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 			// Regenerate the cache after adding
 			qr.refreshCache();
 		}
-		
+
 		return setAddedURIs;
 	}
 

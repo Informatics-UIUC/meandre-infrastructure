@@ -6,7 +6,7 @@
     <!-- when you modify this version make sure to modify the
         org.meandre.core.utils.Constants.java  in the src-kernel/code
     -->
-    <property name="build.version" value="1.4.6"/>
+    <property name="build.version" value="1.4.7"/>
 
     <!-- Directory structure of the project -->
     <property name="build.dir" value="${basedir}/bin"/>
@@ -29,6 +29,7 @@
     <property name="annotation.src" value="src-annotation/code"/>
     <property name="coordinator.src" value="src-coordinator/code"/>
     <property name="executables.src" value="src-executables/code"/>
+	<property name="support.src" value="src-support/code"/>
 
     <!-- Test code locations -->
     <property name="kernel.test" value="src-kernel/test"/>
@@ -40,6 +41,7 @@
     <property name="client.test" value="src-client/test"/>
     <property name="coordinator.test" value="src-coordinator/test"/>
     <property name="executables.test" value="src-executables/test"/>
+	<property name="support.test" value="src-support/test"/>
 
     <!-- The generic classpath to all the code (includes code and tests) -->
     <path id="meandre.javadoc.src">
@@ -61,6 +63,8 @@
         <fileset dir="${coordinator.test}" includes="*"/>
         <fileset dir="${executables.src}" includes="*"/>
         <fileset dir="${executables.test}" includes="*"/>
+    	<fileset dir="${support.src}" includes="*"/>
+    	<fileset dir="${support.test}" includes="*"/>
     </path>
 
     <!-- Default options for code-generation, compiling and junit-testing -->
