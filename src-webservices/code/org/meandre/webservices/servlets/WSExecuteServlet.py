@@ -96,15 +96,19 @@ def execute_list_running_flows ( request, response, format ):
     '''Returns the list of interactive flow currently being run on the Server.'''
     if checkUserRole (request,Role.EXECUTION) :
         content = []
+        remote_user = request.getRemoteUser()
+        jiba = meandre_store.getJobInformation()
         for flow_uri in WebUIFactory.getFlows() :
             webui = WebUIFactory.getExistingWebUI(flow_uri)
             if ( webui is not None ) :
-                content.append( {
-                        'flow_instance_uri': flow_uri,
-                        'flow_instance_webui_uri': 'http://'+getHostName()+':'+str(webui.getPort())+'/',
-                        'flow_instance_proxy_webui_uri': 'http://'+getHostName()+':'+str(meandre_config.getBasePort())+'/webui/'+str(webui.getPort())+'/',
-                        'flow_instance_proxy_webui_relative': meandre_config.appContext+'/webui/'+str(webui.getPort())+'/'
-                    })
+                job_user_id = jiba.getJobOwner(flow_uri)
+                if checkUserRole (request,Role.ADMIN) or job_user_id==remote_user :
+                    content.append( {
+                            'flow_instance_uri': flow_uri,
+                            'flow_instance_webui_uri': 'http://'+getHostName()+':'+str(webui.getPort())+'/',
+                            'flow_instance_proxy_webui_uri': 'http://'+getHostName()+':'+str(meandre_config.getBasePort())+'/webui/'+str(webui.getPort())+'/',
+                            'flow_instance_proxy_webui_relative': meandre_config.appContext+'/webui/'+str(webui.getPort())+'/'
+                        })
         statusOK(response)
         sendTJXContent(response,content,format)
     else:

@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import org.apache.commons.codec.binary.Base64;
 import org.meandre.core.repository.LocationBean;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
@@ -38,7 +39,6 @@ public class MeandreProxy{
 	private String sPassword;
 
 	/** The base url of the remote server */
-	@SuppressWarnings("unused")
 	private String sBaseURL;
 
 	/** The credentials */
@@ -103,7 +103,7 @@ public class MeandreProxy{
         client.setCredentials(sUser, sPasswd);
 		
 		String sUserPassword = sUserName + ":" + sPassword;
-		this.sUPEncoding = new sun.misc.BASE64Encoder().encode (sUserPassword.getBytes());
+		this.sUPEncoding = new String(Base64.encodeBase64(sUserPassword.getBytes()));
 		
 		// Force a first authetication for role caching
 		this.bIsReady = null!=getRoles();

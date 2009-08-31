@@ -34,7 +34,6 @@ import org.meandre.core.utils.Constants;
 import org.meandre.core.utils.ModelIO;
 import org.meandre.core.utils.NetworkTools;
 import org.meandre.jobs.storage.backend.JobInformationBackendAdapter;
-import org.python.modules.synchronize;
 
 import com.hp.hpl.jena.db.DBConnection;
 import com.hp.hpl.jena.rdf.model.Model;

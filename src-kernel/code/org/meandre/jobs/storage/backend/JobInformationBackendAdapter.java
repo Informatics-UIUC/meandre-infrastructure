@@ -650,6 +650,38 @@ public abstract class JobInformationBackendAdapter {
 		
 		return null;
 	}
+	
+	/** Returns the job owner.
+	 * 
+	 * @param sJobID The job ID
+	 * @return The job owner
+	 */
+	public String getJobOwner ( String sJobID ) {
+		try {
+			String sQueryIJC = propQueryMapping.getProperty(QUERY_SELECT_JOB_STATUS);
+			Object [] oaValuesUpdate = { sJobID };
+			List<Map<String, String>> ls = selectTextColumnsWithNameAndParams(sQueryIJC,oaValuesUpdate,0);
+			
+			// Commit the transaction
+			if ( bTransactional ) conn.commit();
+			
+			if ( ls.size()!=1 )
+				return null;
+			else
+				return ls.get(0).get("user_id");
+		} catch (JobInformationBackendAdapterException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.warning("Could not retrieve job status at the backend information storage! "+baos);
+		}
+		catch (SQLException e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			log.severe("Commit operation failed! "+baos.toString());
+		}
+		
+		return null;
+	}
 
 
 	/** Returns the current job status.
