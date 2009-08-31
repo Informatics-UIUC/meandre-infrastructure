@@ -852,13 +852,18 @@ public class Store {
 						String sFile = saSplit[saSplit.length-1];
 						new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator).mkdirs();
 			    		File savedFile = new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator+sFile);
-						FileOutputStream fos = new FileOutputStream(savedFile);
 						InputStream is = urlCntx.openStream();
 						byte [] baTmp = new byte[1048576];
-						int iNumBytes = 0;
-						while ( (iNumBytes=is.read(baTmp))>-1 )
-							fos.write(baTmp, 0, iNumBytes);
-						fos.close();
+						int iNumBytes = is.read(baTmp);
+						if ( iNumBytes>0 ) {
+							savedFile.delete();
+							FileOutputStream fos = new FileOutputStream(savedFile);
+							do {
+								fos.write(baTmp, 0, iNumBytes);
+							}
+							while ( (iNumBytes=is.read(baTmp))>-1 );
+							fos.close();
+						}
 					} catch (Exception e) {
 						ByteArrayOutputStream  baos = new ByteArrayOutputStream();
 						PrintStream ps = new PrintStream(baos);
