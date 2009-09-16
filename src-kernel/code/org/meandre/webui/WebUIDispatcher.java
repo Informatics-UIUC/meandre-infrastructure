@@ -24,7 +24,7 @@ import org.mortbay.jetty.handler.ResourceHandler;
 import org.mortbay.jetty.servlet.Context;
 
 /** This class dispatches the webui calls.
- * 
+ *
  * @author Xavier Llor&agrave;
  *
  */
@@ -40,16 +40,16 @@ public class WebUIDispatcher extends AbstractHandler {
 	private DefaultWebUIHandler hdlDefault = null;
 
 	/** The default resource handler */
-	private ResourceHandler resource_handler;
+	private final ResourceHandler resource_handler;
 
 	/** The core configuration object */
 	@SuppressWarnings("unused")
-	private CoreConfiguration cnf;
+	private final CoreConfiguration cnf;
 
 	/**
 	 * Creates the default WebUI handler.
 	 * @param cnf The core configuration object
-	 * 
+	 *
 	 */
 	public WebUIDispatcher(WebUI webUIParent, CoreConfiguration cnf) {
 		// Initialize
@@ -58,7 +58,7 @@ public class WebUIDispatcher extends AbstractHandler {
 		// Create the default handler
 		this.hdlDefault = new DefaultWebUIHandler(webUIParent,cnf);
 		this.cnf = cnf;
-		
+
 		// The resouce file server
 		File file = new File(cnf.getPublicResourcesDirectory());
 		resource_handler = new ResourceHandler();
@@ -73,7 +73,7 @@ public class WebUIDispatcher extends AbstractHandler {
 	 * important to keep in mind that fragments are identified by their instance
 	 * URI. This means that, for instance, allows data from form to be properly
 	 * routed
-	 * 
+	 *
 	 * @param target
 	 *            The target path
 	 * @param request
@@ -90,7 +90,7 @@ public class WebUIDispatcher extends AbstractHandler {
 	public void handle(String target, HttpServletRequest request,
 			HttpServletResponse response, int dispatch) throws IOException,
 			ServletException {
-		
+
 		target = target.replaceAll("^(/)+", "/");
 		if ( target.startsWith("/admin/") ) {
 			processAdminRequest(target,request,response,dispatch);
@@ -100,8 +100,8 @@ public class WebUIDispatcher extends AbstractHandler {
 		}
 		else {
 			if (lstHandlers.size() > 0) {
-				Request base_request = (request instanceof Request) ? 
-		                (Request) request : 
+				Request base_request = (request instanceof Request) ?
+		                (Request) request :
 		                HttpConnection.getCurrentConnection().getRequest();
 
 				if (response.isCommitted() || base_request.isHandled())
@@ -110,14 +110,14 @@ public class WebUIDispatcher extends AbstractHandler {
 
 				response.setStatus(HttpServletResponse.SC_OK);
 				response.setContentType("text/html");
-				
+
 				//response.getWriter().println(getHeader());
-				
+
 				boolean bHasParams = !request.getParameterMap().isEmpty();
 				String contentType = request.getContentType();
 				boolean isMultiPart = Boolean.FALSE;
-				if ( (contentType!=null && contentType.startsWith("multipart/form-data")) || 
-					  request.getMethod().equalsIgnoreCase("post") || 
+				if ( (contentType!=null && contentType.startsWith("multipart/form-data")) ||
+					  request.getMethod().equalsIgnoreCase("post") ||
 					  request.getMethod().equalsIgnoreCase("put")  ){
 					isMultiPart = Boolean.TRUE;
 				}
@@ -127,18 +127,19 @@ public class WebUIDispatcher extends AbstractHandler {
 					WebUIFragment wuif = lstHandlers.get(iCnt);
 					try {
 						if ( wuif.isConfigurable() ) {
-							if (wuif.canHandleRequest(target)) 
+							if (wuif.canHandleRequest(target))
 								wuif.handle(request, response);
 						}
 						else {
 							// Not configurable WebUIs
-							// Check if any paramater has been passed
+							// Check if any parameter has been passed
 							if (bHasParams || isMultiPart) {
 								// Only pass them them to the target
 								if (wuif.canHandleRequest(target))
 									wuif.handle(request, response);
-								else
-									wuif.emptyRequest(response);
+// TODO: MDR-181: changed so that multiple webui components play nice together (a component should only respond to / and /<instance_id>)
+//								else
+//									wuif.emptyRequest(response);
 							} else {
 								// Empty call updated all fragments
 								wuif.emptyRequest(response);
@@ -150,13 +151,13 @@ public class WebUIDispatcher extends AbstractHandler {
 								iCnt--;
 							}
 						}
-							
+
 					} catch (WebUIException e) {
 						throw new ServletException(e);
 					}
 				}
 				//response.getWriter().println(getFooter());
-				
+
 			} else {
 				hdlDefault.handle(target, request, response, dispatch);
 			}
@@ -164,7 +165,7 @@ public class WebUIDispatcher extends AbstractHandler {
 	}
 
 	/** Process an admin requrest.
-	 * 
+	 *
 	 * @param target The target
 	 * @param request The requrest
 	 * @param response The response
@@ -177,22 +178,22 @@ public class WebUIDispatcher extends AbstractHandler {
 		Request base_request = (request instanceof Request) ? (Request) request
 				: HttpConnection.getCurrentConnection().getRequest();
 		base_request.setHandled(true);
-		
+
 		String [] saParts = target.split("\\.");
    		String sTarget = saParts[0];
 		String sExtension = "";
-		PrintWriter pw = response.getWriter();	
+		PrintWriter pw = response.getWriter();
 
     	if ( saParts.length==2 ) {
     		sExtension = saParts[1];
     	}
-    	
+
     	if ( sTarget.startsWith("/admin/abort") ) {
     		if ( sExtension.equals("txt") ) {
     			this.webUIParent.getMrProper().abort();
     			response.setStatus(HttpServletResponse.SC_OK);
     			response.setContentType("text/plain");
-    			response.getWriter().print("Abort request dispatched...");	
+    			response.getWriter().print("Abort request dispatched...");
     		}
     		else {
     			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -208,7 +209,7 @@ public class WebUIDispatcher extends AbstractHandler {
 					} catch (JSONException e) {
 						throw new IOException(e.toString());
 					}
-					
+
 		    		if ( sExtension.equals("txt")) {
 		    			response.setStatus(HttpServletResponse.SC_OK);
 		    			response.setContentType("text/plain");
@@ -224,7 +225,7 @@ public class WebUIDispatcher extends AbstractHandler {
 							pw.println("Total run time (ms)      :"+jsonStats.get("runtime"));
 							pw.println();
 							pw.flush();
-							
+
 							JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
 							for ( int i=0,iMax=jaEXIS.length() ; i<iMax ; i++ ) {
 								JSONObject joEXIS = (JSONObject) jaEXIS.get(i);
@@ -260,7 +261,7 @@ public class WebUIDispatcher extends AbstractHandler {
 		    			}break;
 		    		}
 		    		else {
-		    			response.setStatus(HttpServletResponse.SC_NOT_FOUND);	
+		    			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		    			break;
 		    		}
 				}
@@ -268,15 +269,15 @@ public class WebUIDispatcher extends AbstractHandler {
 			}
     	}
     	else {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);	
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		}
-        	
+
 
 	}
 
 	/**
 	 * Returns the header of the webui page.
-	 * 
+	 *
 	 * @return The header
 	 */
 	protected String getHeader() {
@@ -291,15 +292,15 @@ public class WebUIDispatcher extends AbstractHandler {
 	}
 
 	/** Returns the footer of the webui page.
-	 * 
+	 *
 	 * @return The footer
-	 */ 
+	 */
 	protected String getFooter () {
 		return "</body></html>\n";
 	}
 	/**
 	 * Add a fragment to the list of dispatcheable fragments.
-	 * 
+	 *
 	 * @param wuif
 	 *            The fragment to add
 	 */
@@ -309,7 +310,7 @@ public class WebUIDispatcher extends AbstractHandler {
 
 	/**
 	 * Remove a fragment from the list of dispatcheable fragments.
-	 * 
+	 *
 	 * @param wuif
 	 *            The fragment to remove
 	 */
