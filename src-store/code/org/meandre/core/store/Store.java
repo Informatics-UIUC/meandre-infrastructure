@@ -3,6 +3,7 @@ package org.meandre.core.store;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -10,14 +11,18 @@ import java.io.InputStream;
 import java.io.LineNumberReader;
 import java.io.PrintStream;
 import java.io.StringReader;
+import java.net.URI;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.meandre.configuration.CoreConfiguration;
@@ -33,7 +38,11 @@ import org.meandre.core.store.system.SystemStoreImpl;
 import org.meandre.core.utils.Constants;
 import org.meandre.core.utils.ModelIO;
 import org.meandre.core.utils.NetworkTools;
+import org.meandre.core.utils.vocabulary.RepositoryVocabulary;
 import org.meandre.jobs.storage.backend.JobInformationBackendAdapter;
+import org.meandre.plugins.tools.ResourceManager;
+import org.meandre.support.crypto.Crypto;
+import org.meandre.support.io.IOUtils;
 
 import com.hp.hpl.jena.db.DBConnection;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -41,6 +50,8 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 /**
  * This class provides the basic configuration for the Meandre store.
@@ -106,12 +117,12 @@ public class Store {
     /**
      * The default configuration file name
      */
-    private String sConfigFile = "meandre-config-store.xml";
+    private final String sConfigFile = "meandre-config-store.xml";
 
     /**
      * The default configuration file name
      */
-    private String sLocationFile = "meandre-default-locations.txt";
+    private final String sLocationFile = "meandre-default-locations.txt";
 
     /**
      * Contains the basic properties of storage mechanism
@@ -166,12 +177,12 @@ public class Store {
     /**
      * The default set of location to create per user
      */
-    private Set<String> setDefaultLocations = new HashSet<String>();
+    private final Set<String> setDefaultLocations = new HashSet<String>();
 
     /**
      * The repository cache entry
      */
-    private Hashtable<String, RepositoryImpl> htMapRepImpl = new Hashtable<String, RepositoryImpl>();
+    private final Hashtable<String, RepositoryImpl> htMapRepImpl = new Hashtable<String, RepositoryImpl>();
 
     /**
      * The Jena database connection object
@@ -179,10 +190,12 @@ public class Store {
 	private DBConnection dbConn = null;
 
 	/** The core configuration object */
-	private CoreConfiguration cnf;
+	private final CoreConfiguration cnf;
 
 	/** The job backend adapter information */
 	private JobInformationBackendAdapter baJobInfo;
+
+	private final ResourceManager resManager;
 
     /** Initialize a default store.
      *
@@ -193,6 +206,8 @@ public class Store {
     	propStoreConfig = new Properties();
     	initializeDefaultProperties();
         initializeStore();
+
+        resManager = new ResourceManager(cnf);
     }
 
     /** Initialize a default store to install its file resources in a
@@ -209,6 +224,8 @@ public class Store {
         propStoreConfig = new Properties();
         initializeDefaultProperties();
         initializeStore();
+
+        resManager = new ResourceManager(cnf);
     }
     /** Initialize a store with the provided properties
      *
@@ -219,6 +236,8 @@ public class Store {
     	this.cnf = cnf;
     	propStoreConfig = props;
     	initializeStore();
+
+    	resManager = new ResourceManager(cnf);
     }
 
     /** Initialize a Store with the given properties.
@@ -588,11 +607,11 @@ public class Store {
 		Resource resURI = qr.getModel().createResource(sURI);
 		Model modToPublish = null;
 		Model modPublic = getPublicRepositoryStore();
-		
+
 		synchronized ( modPublic ) {
 			synchronized ( qr ) {
 				QueryableRepository qrPublic = new RepositoryImpl(modPublic);
-		
+
 				if ( qrPublic.getExecutableComponentDescription(resURI)==null &&
 					 qrPublic.getFlowDescription(resURI)==null ) {
 					// The URI does not exist
@@ -604,7 +623,7 @@ public class Store {
 					else if ( fd!=null ) {
 						modToPublish = fd.getModel();
 					}
-		
+
 					if ( modToPublish!=null ) {
 						bPublished = true;
 						modPublic.begin();
@@ -634,11 +653,11 @@ public class Store {
 		Resource resURI = qr.getModel().createResource(sURI);
 		Model modToUnpublish = null;
 		Model modPublic = getPublicRepositoryStore();
-		
+
 		synchronized ( modPublic ) {
 			synchronized ( qr ) {
 				QueryableRepository qrPublic = new RepositoryImpl(modPublic);
-		
+
 				if ( qrPublic.getExecutableComponentDescription(resURI)!=null ||
 					 qrPublic.getFlowDescription(resURI)!=null ) {
 					// The URI does not exist
@@ -650,7 +669,7 @@ public class Store {
 					else if ( fd!=null ) {
 						modToUnpublish = fd.getModel();
 					}
-		
+
 					if ( modToUnpublish!=null ) {
 						bUnpublished = true;
 						modPublic.begin();
@@ -741,7 +760,7 @@ public class Store {
 				synchronized ( qr ) {
 	                // Check the pulled repository consistency
 	                QueryableRepository qrTmp = new RepositoryImpl(modelTmp);
-	
+
 					//
 					// Remove the components provided by the location
 					//
@@ -754,7 +773,7 @@ public class Store {
 							mod.commit();
 						}
 					}
-	
+
 					for ( Resource rfd:qrTmp.getAvailableFlows() ) {
 						FlowDescription fd = qr.getFlowDescription(rfd);
 						if ( fd!=null ) {
@@ -763,7 +782,7 @@ public class Store {
 							mod.commit();
 						}
 					}
-	
+
 					qr.refreshCache();
 				}
 				bRes = true;
@@ -792,12 +811,12 @@ public class Store {
 	 * @param sLocation The location to add
 	 * @param sDescription The description of the location to add
 	 * @param cnf The core configuration object
-	 * @return True if the location could be successfully added
+	 * @return True if the location was successfully added
 	 */
 	public boolean addLocation(String sUser, String sLocation, String sDescription, CoreConfiguration cnf) {
 
 		boolean bRes = false;
-		
+
 		// Retrieve system store
 		SystemStore ss = getSystemStore(cnf,sUser);
 
@@ -812,7 +831,7 @@ public class Store {
 
 				modelTmp.setNsPrefix("", "http://www.meandre.org/ontology/");
 				modelTmp.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
-					modelTmp.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
+				modelTmp.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
 				modelTmp.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
 
 				//
@@ -826,15 +845,15 @@ public class Store {
 				QueryableRepository qrNew = new RepositoryImpl(modelTmp);
 
 				//
-				// If now exception was thrown, add the location to the list
+				// If no exception was thrown, add the location to the list
 				// and update the user repository
 				//
 				ss.setProperty(SystemStore.REPOSITORY_LOCATION, sLocation, sDescription);
 				QueryableRepository qr = getRepositoryStore(sUser);
-				
+
 				// Modifying the repository
 				Model model = qr.getModel();
-				
+
 				// Pull all the jars
 				HashSet<String> hsCtxs = new HashSet<String>();
 				for ( ExecutableComponentDescription ecd:qrNew.getAvailableExecutableComponentDescriptions())
@@ -844,26 +863,65 @@ public class Store {
 							if ( rdfNode.isResource() && bFile )
 								hsCtxs.add(rdfNode.toString());
 					}
-	
+
+				Map<String, String> rewriteMap = new HashMap<String, String>();
+
 				for ( String sCtx:hsCtxs ) {
 					try {
-						URL urlCntx = new URL(sCtx);
-						String [] saSplit = urlCntx.getFile().split("/");
-						String sFile = saSplit[saSplit.length-1];
-						new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator).mkdirs();
-			    		File savedFile = new File(cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator+sFile);
-						InputStream is = urlCntx.openStream();
-						byte [] baTmp = new byte[1048576];
-						int iNumBytes = is.read(baTmp);
-						if ( iNumBytes>0 ) {
-							savedFile.delete();
-							FileOutputStream fos = new FileOutputStream(savedFile);
-							do {
-								fos.write(baTmp, 0, iNumBytes);
-							}
-							while ( (iNumBytes=is.read(baTmp))>-1 );
-							fos.close();
-						}
+					    // adjust the relative pathname to a full reachable URL
+					    String baseURL = url.toString();
+					    baseURL = baseURL.substring(0, baseURL.lastIndexOf("/"));
+
+					    URI uriCntx = new URI(sCtx);
+					    if (uriCntx.getScheme().equals("context")) {
+					        uriCntx = new URI(baseURL + uriCntx.getPath());
+					    }
+
+					    URI uriMD5 = new URI(uriCntx.toString() + ".md5");
+					    String sReloFile = null;
+
+					    try {
+					        String sMD5 = IOUtils.getTextFromReader(IOUtils.getReaderForResource(uriMD5)).replaceAll("\\r|\\n", "");
+					        sReloFile = resManager.getResourceForMD5(sMD5);
+					    }
+					    catch (FileNotFoundException e) {
+					    }
+
+					    URL urlCntx = uriCntx.toURL();
+					    String [] saSplit = urlCntx.getFile().split("/");
+					    String sFile = saSplit[saSplit.length-1];
+
+					    // sFile -> the name of the resource file (ex: foo.jar) specified in the RDF
+					    // sReloFile -> the name of the resource file (ex: foo-v2.jar) that the server has with a matching MD5 checksum
+
+					    if (sReloFile == null) {
+    						String sJarContextDir = cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator;
+                            new File(sJarContextDir).mkdirs();
+    			    		File savedFile = new File(sJarContextDir, sFile);
+
+    			    		// check if we're overwriting anything
+    			    		if (savedFile.exists())
+    			    		    log.warning("Overwriting context file: " + savedFile.toString());
+
+    						InputStream is = urlCntx.openStream();
+    						byte [] baTmp = new byte[1048576];
+    						int iNumBytes = is.read(baTmp);
+    						if ( iNumBytes>0 ) {
+    							savedFile.delete();
+    							FileOutputStream fos = new FileOutputStream(savedFile);
+    							do {
+    								fos.write(baTmp, 0, iNumBytes);
+    							}
+    							while ( (iNumBytes=is.read(baTmp))>-1 );
+    							fos.close();
+    						}
+
+    						resManager.addResource(sFile, Crypto.getHexString(Crypto.createMD5Checksum(savedFile)));
+					    } else {
+					        log.finer("Skipping download of '" + sFile + "'. Reason: Found as '" + sReloFile + "'");
+					        if (!sReloFile.equals(sFile))
+					            rewriteMap.put(sFile, sReloFile);
+					    }
 					} catch (Exception e) {
 						ByteArrayOutputStream  baos = new ByteArrayOutputStream();
 						PrintStream ps = new PrintStream(baos);
@@ -880,19 +938,19 @@ public class Store {
 					for ( ExecutableComponentDescription ecd:qrNew.getAvailableExecutableComponentDescriptions())
 						if ( !qr.getAvailableExecutableComponents().contains(ecd.getExecutableComponent())) {
 							// Localize the context URL
-							localizeContexes(ecd);
+							localizeContexts(ecd, rewriteMap);
 							model.add(ecd.getModel());
 						}
 						else
 							log.warning("Component "+ecd.getExecutableComponent()+" already exist in the current repository. Discarding it.");
-	
+
 					// Adding flows
 					for ( FlowDescription fd:qrNew.getAvailableFlowDescriptions())
 						if ( !qr.getAvailableFlows().contains(fd.getFlowComponent()))
 							model.add(fd.getModel());
 						else
 							log.warning("Flow "+fd.getFlowComponent()+" already exist in the current repository. Discarding it.");
-	
+
 					model.commit();
 				}
 				getRepositoryStore(sUser).refreshCache(model);
@@ -920,7 +978,7 @@ public class Store {
 	 *
 	 * @param ecd The executable component to description to localize
 	 */
-	private void localizeContexes(ExecutableComponentDescription ecd) {
+	private void localizeContexts(ExecutableComponentDescription ecd, Map<String, String> rewriteMap) {
 		Model mod = ModelFactory.createDefaultModel();
 		Set<RDFNode> setCntxs = ecd.getContext();
 		HashSet<RDFNode> hsOldCtx = new HashSet<RDFNode>();
@@ -931,9 +989,17 @@ public class Store {
 				hsOldCtx.add(rdfNode);
 				try {
 					String sJar = rdfNode.toString();
-					URL url = new URL(sJar);
-					String [] sFileName = url.getFile().split("/");
-					String sNewJarLocation = url.getProtocol()+"://"+NetworkTools.getLocalHostName()+":"+cnf.getBasePort()+cnf.getAppContext()+"/public/resources/contexts/java/"+sFileName[sFileName.length-1];
+					URI url = new URI(sJar);
+					String [] sFileName = url.getPath().split("/");
+					String sFile = sFileName[sFileName.length-1];
+
+					if (rewriteMap != null && rewriteMap.containsKey(sFile)) {
+					    String sNewFile = rewriteMap.get(sFile);
+					    log.fine("Applying rewrite rule: " + sFile + " --> " + sNewFile);
+					    sFile = sNewFile;
+					}
+
+                    String sNewJarLocation = "context://localhost/java/"+sFile;
 					hsNewCtx.add(mod.createResource(sNewJarLocation));
 				}
 				catch ( Exception e ) {
@@ -1041,10 +1107,10 @@ public class Store {
 				qr.refreshCache();
 			}
 		}
-		
+
 		return setURIs;
 	}
-	
+
 
 	/** Remove the given URI from the user model.
 	 *
@@ -1056,15 +1122,15 @@ public class Store {
 		QueryableRepository qr = getRepositoryStore(sUser);
 		Resource res = ModelFactory.createDefaultModel().createResource(sURI);
 		boolean bOK = false;
-		
+
 		synchronized ( qr ) {
 			FlowDescription fd = qr.getFlowDescription(res);
 			ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(res);
-			
+
 			Model mod = null;
 			if ( fd!=null )        mod = fd.getModel();
 			else if ( ecd !=null ) mod = ecd.getModel();
-			
+
 			if ( mod!=null ) {
 				Model modUser = qr.getModel();
 				modUser.begin();
@@ -1072,14 +1138,14 @@ public class Store {
 				modUser.commit();
 				qr.refreshCache();
 				bOK = true;
-			}	
+			}
 		}
-		
+
 		return (bOK)?sURI:null;
 	}
-	
+
 	/** Clears the user repository dropping all the flows and components.
-	 * 
+	 *
 	 * @param sUser The user which user needs to be flushed
 	 */
 	public void clearUserRepository ( String sUser ) {
@@ -1092,7 +1158,7 @@ public class Store {
 			qr.refreshCache();
 		}
 	}
- 
+
 	/** Returns the list of published components and flows in the current server.
 	 *
 	 * @return The set of published components' URI
@@ -1118,5 +1184,33 @@ public class Store {
 	 */
 	public JobInformationBackendAdapter getJobInformation () {
 		return this.baJobInfo;
+	}
+
+	public Model rewriteContexts(Model model) {
+	    // TODO: what's the proper synchronization mechanism?  we don't want the model to be modified while this method is executed
+	    synchronized (model) {
+	        Model copy = ModelFactory.createDefaultModel();
+	        copy.add(model);
+
+	        StmtIterator iter = model.listStatements(null, RepositoryVocabulary.execution_context, (RDFNode)null);
+	        while (iter.hasNext()) {
+	            Statement ctxStmt = iter.nextStatement();
+	            String ctx = ctxStmt.getObject().toString();
+
+	            try {
+	                URI ctxUri = new URI(ctx);
+	                if (ctxUri.getScheme().equals("context")) {
+	                    URL ctxUrl = new URL("http", NetworkTools.getLocalHostName(), cnf.getBasePort(), "/public/resources/contexts" + ctxUri.getPath());
+	                    copy.remove(ctxStmt);
+	                    copy.add(ctxStmt.getSubject(), RepositoryVocabulary.execution_context, copy.createResource(ctxUrl.toString()));
+	                }
+	            }
+	            catch (Exception e) {
+	                log.log(Level.WARNING, "Problem rewriting jar context for: " + ctx, e);
+	            }
+	        }
+
+	        return copy;
+        }
 	}
 }

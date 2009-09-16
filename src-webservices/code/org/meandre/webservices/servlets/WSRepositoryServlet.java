@@ -5,15 +5,12 @@ package org.meandre.webservices.servlets;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,8 +26,8 @@ import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.store.Store;
 import org.meandre.core.utils.ModelIO;
-import org.meandre.support.io.FileUtils;
-import org.meandre.support.text.StringUtils;
+import org.meandre.plugins.tools.ResourceManager;
+import org.meandre.support.crypto.Crypto;
 import org.meandre.webservices.MeandreServer;
 import org.meandre.webservices.logger.WSLoggerFactory;
 
@@ -50,8 +47,11 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 	/** A default serial ID */
 	private static final long serialVersionUID = 1L;
 
-	/** The web service loger */
+	/** The web service logger */
 	private static final Logger log = WSLoggerFactory.getWSLogger();
+
+	/** The resource manager that interrogates the JarTool plugin for the existence of JARs based on MD5 checksums */
+	private static ResourceManager resManager;
 
 	/** Creates the servlet to provide Repository information.
 	 *
@@ -61,6 +61,8 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 	 */
 	public WSRepositoryServlet(MeandreServer server, Store store, CoreConfiguration cnf) {
 		super(server, store, cnf);
+
+		resManager = new ResourceManager(cnf);
 	}
 
 	/** Adds components and flows to the user repository.
@@ -70,7 +72,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 	 * @param cnf The Meandre core configuration object
 	 * @param sExtension The extension format
 	 * @return The set of added URIs
-	 * @throws FileUploadException An exception araised while uploading the model
+	 * @throws FileUploadException An exception was encountered while uploading the model
 	 */
 	@SuppressWarnings("unchecked")
 	public static final Set<String> addToRepository(HttpServletRequest request, Store store, CoreConfiguration cnf, String sExtension)
@@ -122,13 +124,13 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 					if ( !qrAcc.getAvailableExecutableComponents().contains(ecd.getExecutableComponent()) )
 						modelAcc.add(ecd.getModel());
 					else
-						log.warning("Discarding component "+ecd.getExecutableComponent()+". It already exist in th repository");
+						log.warning("Discarding component "+ecd.getExecutableComponent()+". It already exists in the repository");
 
 				for ( FlowDescription fd:qrTmp.getAvailableFlowDescriptions() )
 					if ( !qrAcc.getAvailableFlows().contains(fd.getFlowComponent()) )
 						modelAcc.add(fd.getModel());
 					else
-						log.warning("Discarding flow "+fd.getFlowComponent()+". It already exist in th repository");
+						log.warning("Discarding flow "+fd.getFlowComponent()+". It already exists in the repository");
 
 			}
 			// Check if we need to upload jar files
@@ -140,12 +142,12 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 			else if ( fieldName.equals("embed") ) {
 				String sValue = item.getString();
 				if ( sValue.length()==0 ) continue;
-				bEmbed = sValue.equals("true");
+				bEmbed = Boolean.parseBoolean(sValue);
 			}
 			else if ( fieldName.equals("overwrite") ) {
 				String sValue = item.getString();
 				if ( sValue.length()==0 ) continue;
-				bOverwrite = sValue.equals("true");
+				bOverwrite = Boolean.parseBoolean(sValue);
 			}
 		}
 
@@ -174,7 +176,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 				}
 				else {
 					// Component does exist
-					log.warning("Component "+resComp+" already exist in "+request.getRemoteUser()+" repository. Ignoring it.");
+					log.warning("Component "+resComp+" already exists in "+request.getRemoteUser()+"'s repository. Ignoring it.");
 				}
 			}
 
@@ -199,12 +201,11 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 					}
 					else
 						// Component does exist
-						log.warning("Flow "+resFlow+" already exist in "+request.getRemoteUser()+" repository. Ignoring it. No overwrite flag provided.");
+						log.warning("Flow "+resFlow+" already exists in "+request.getRemoteUser()+"'s repository. Ignoring it. No overwrite flag provided.");
 				}
 			}
 
 			// Adding the components after adding the contexts
-			URL urlRequest = new URL(request.getRequestURL().toString());
 			Set<String> setFiles = htContextBytes.keySet();
 			boolean bWriteOnce = true;
 			for ( ExecutableComponentDescription ecd:setComponentsToAdd) {
@@ -216,7 +217,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 							log.info("Added component "+ecd.getExecutableComponent()+" to "+request.getRemoteUser()+"'s repository");
 						}
 						else
-							log.warning("Discarding upload of the existem component "+ecd.getExecutableComponent()+". No overwrite flag provided.");
+							log.warning("Discarding upload of the existing component "+ecd.getExecutableComponent()+". No overwrite flag provided.");
 					}
 					else {
 						modUser.add(ecd.getModel());
@@ -237,47 +238,42 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 					}
 					else if ( bWriteOnce ) {
                         String javaContextDir = cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator;
-                        String md5Dir = javaContextDir + "md5/";
                         new File(javaContextDir).mkdirs();
-                        new File(md5Dir).mkdirs();
 
 					    //
 						// Dump the context file to the disc only once
 						//
 						for ( String sFile:setFiles) {
-							// Failsafe check
+							// Fail-safe check
 							if ( sFile.length()==0 ) continue;
 
 							// Dump the files to disk
 							byte[] fileData = htContextBytes.get(sFile);
 							if (fileData.length > 0) {     // MDR-160: ignore uploading context files of 0 size
-    				    		File savedFile = new File(javaContextDir + sFile);
-    							try {
-    								FileOutputStream fos = new FileOutputStream(savedFile);
-                                    fos.write(fileData);
-    								fos.close();
-    							} catch (Exception e) {
-    								log.warning("Problems writing context "+sFile+" to "+savedFile.getAbsolutePath());
-    								throw new IOException(e.toString());
-    							}
+							    // Create the MD5 checksum for the uploaded file (MDR-160)
+							    String sMD5 = Crypto.getHexString(Crypto.createMD5Checksum(fileData)).toLowerCase();
+							    String sJarFile = resManager.getResourceForMD5(sMD5);
 
-    							// Create the MD5 checksum for the uploaded file (MDR-160)
-    							try {
-    							    byte[] md5sum = FileUtils.createMD5Checksum(savedFile);
-    							    String sMD5 = StringUtils.getHexString(md5sum).toLowerCase();
-    							    String md5File = md5Dir + sMD5 +".md5";
+							    if (sJarFile == null) {
+							        File savedFile = new File(javaContextDir, sFile);
+							        try {
+							            FileOutputStream fos = new FileOutputStream(savedFile);
+							            fos.write(fileData);
+							            fos.close();
+							        } catch (Exception e) {
+							            log.warning("Problems writing context "+sFile+" to "+savedFile.getAbsolutePath());
+							            throw new IOException(e.toString());
+							        }
 
-    							    FileWriter writer = new FileWriter(md5File);
-                                    writer.write(savedFile.getName());
-    							    writer.close();
-    							} catch (Exception e) {
-    							    log.log(Level.WARNING, "Could not create MD5 checksum for: " + savedFile, e);
-    							}
-							}
+							        resManager.addResource(sFile, sMD5);
+							    } else {
+							        log.finer("Skipping upload of '" + sFile + "'. Reason: Found as '" + sJarFile + "'");
+							        sFile = sJarFile;
+                                }
+							} else
+							    log.finer("Skipping upload of '" + sFile + "'. Reason: File size is 0");
 
-							// Add the proper context resources
-							Resource res = modUser.createResource(urlRequest.getProtocol()+"://"+urlRequest.getHost()+":"+urlRequest.getPort()+cnf.getAppContext()+"/public/resources/contexts/java/"+sFile);
-							ecd.getContext().add(res);
+							ecd.getContext().add(modUser.createResource("context://localhost/java/"+sFile));
 						}
 						// Avoid dumping them multiple times
 						bWriteOnce = false;
@@ -298,7 +294,8 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 				}
 
 			}
-			//Commiting changes
+
+			// Commit changes
 			modUser.commit();
 
 			// Regenerate the cache after adding

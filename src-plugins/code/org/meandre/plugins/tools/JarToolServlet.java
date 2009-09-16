@@ -1,10 +1,14 @@
 package org.meandre.plugins.tools;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.Writer;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -19,9 +23,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.meandre.configuration.CoreConfiguration;
+import org.meandre.core.logger.PluginsLoggerFactory;
 import org.meandre.plugins.MeandrePlugin;
-import org.meandre.support.io.FileUtils;
-import org.meandre.support.text.StringUtils;
+import org.meandre.support.io.IOUtils;
 
 /**
  * This plugin checks whether a particular JAR file is present in the context of the server
@@ -44,13 +48,14 @@ public class JarToolServlet extends HttpServlet implements MeandrePlugin {
 
 	// the directory where java jars are stored
 	private static String PLUGIN_JAR_DIR = null;
-	private static String MD5_DIR = null;
 
 	//alias path
-	private String aliasPath = "/plugins/jar/*";
+	public static final String SERVLET_PATH = "/plugins/jar/";
 
-	/** Get the plugin logger */
-	protected Logger log;
+	/**
+     * The core root logger
+     */
+    protected Logger log = PluginsLoggerFactory.getPluginsLogger();
 
 	private boolean bInited = Boolean.FALSE;
 
@@ -58,6 +63,8 @@ public class JarToolServlet extends HttpServlet implements MeandrePlugin {
 	/** Core configuration object */
 	@SuppressWarnings("unused")
 	private CoreConfiguration cnf = new CoreConfiguration();
+
+    private final Map<String, String> _md5map = Collections.synchronizedMap(new HashMap<String, String>());
 
 
 	/** Sets the core configuration object to use.
@@ -67,22 +74,58 @@ public class JarToolServlet extends HttpServlet implements MeandrePlugin {
 	public void setCoreConfiguration ( CoreConfiguration cnf ) {
 		this.cnf = cnf;
 		PLUGIN_JAR_DIR = cnf.getPublicResourcesDirectory() + File.separator + "contexts" + File.separator + "java";
-		MD5_DIR = PLUGIN_JAR_DIR + File.separator + "md5/";
 	}
 
-	public void init() throws ServletException{
-		log.fine("Initializing the JarToolServlet...");
+	@Override
+	public void init() throws ServletException {
+	    synchronized (_md5map) {
+    	    log.fine("Initializing the JarToolServlet...");
+
+    	    try {
+    	        File fResPath = new File(PLUGIN_JAR_DIR);
+    			fResPath.mkdirs();
+
+    	        _md5map.clear();
+
+    	        File[] md5Files = fResPath.listFiles(new FilenameFilter() {
+    	            public boolean accept(File dir, String name) {
+    	                return name.toLowerCase().endsWith(".md5");
+    	            }
+    	        });
+
+    	        for (File f : md5Files) {
+    	            String md5Value = IOUtils.getTextFromReader(IOUtils.getReaderForResource(f.toURI()));
+    	            String resName = f.getName();                              // ex: context.jar.md5
+    	            resName = resName.substring(0, resName.lastIndexOf("."));  // ex: context.jar
+
+    	            // sanity check
+    	            if (!new File(f.getParent(), resName).exists()) {
+    	                f.delete(); // delete orphaned .md5 file
+    	                continue;
+    	            }
+
+    	            _md5map.put(md5Value.toLowerCase(), resName);
+    	        }
+    	    } catch (IOException e) {
+    	        throw new ServletException(e);
+    	    }
+	    }
+	}
+
+	public String getResourceForMD5(String sMD5) {
+	    return _md5map.get(sMD5.toLowerCase());
 	}
 
 	public void setLogger ( Logger log ) {
 		this.log = log;
 	}
 
-	public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+	@Override
+    public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 	    log.entering(getClass().getName(), "doGet");
 
 		String path = req.getPathInfo();
-		log.fine("Request path: " + path);
+		log.finer("Request path: " + path);
 
 		String[] locations;
 
@@ -94,13 +137,12 @@ public class JarToolServlet extends HttpServlet implements MeandrePlugin {
 		String fileName = locations[1];
 
 		if (fileName.trim().toLowerCase().endsWith(".md5")) {
-		    // check if the MD5 signature exists
-		    File md5File;
-
-		    if ((md5File = new File(MD5_DIR, fileName.toLowerCase())).exists()) {
-		        BufferedReader reader = new BufferedReader(new FileReader(md5File));
-		        fileName = reader.readLine();
-		        reader.close();
+		    String resName = getResourceForMD5(fileName.split("\\.")[0]);
+		    if (resName != null)
+		        fileName = resName;
+		    else {
+		        res.sendError(HttpServletResponse.SC_NOT_FOUND);
+		        return;
 		    }
 		}
 
@@ -133,6 +175,77 @@ public class JarToolServlet extends HttpServlet implements MeandrePlugin {
 		}
 	}
 
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	    log.entering(getClass().getName(), "doPost");
+
+	    String reqPath = req.getPathInfo();
+	    String[] parts;
+
+	    if (reqPath == null || (parts = reqPath.split(URL_SEP)).length > 2) {
+	       resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+	       return;
+	    }
+
+	    //TODO: do we need to synchronize access here? can doPost be invoked in a multi-threaded fashion by multiple user requests?
+
+	    String cmd = parts[1];
+
+	    if (cmd.equals("add")) {
+	        String sFile = req.getParameter("name");
+	        String sMD5 = req.getParameter("md5");
+
+	        if (sFile == null || sMD5 == null) {
+	            resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED);
+	            return;
+	        }
+
+	        String sResName = getResourceForMD5(sMD5);
+	        if (sResName != null) {
+	            if (sResName.equals(sFile)) {
+	                resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+	                return;
+	            } else {
+	                resp.sendError(HttpServletResponse.SC_CONFLICT);
+	                return;
+	            }
+	        }
+
+	        File resFile = new File(PLUGIN_JAR_DIR, sFile);
+	        // make sure the resource file actually exists
+	        if (!resFile.exists()) {
+	            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+	            return;
+	        }
+
+	        File md5File = new File(PLUGIN_JAR_DIR, sFile + ".md5");
+	        Writer writer = IOUtils.getWriterForResource(md5File.toURI());
+	        writer.write(sMD5);
+	        writer.close();
+
+	        _md5map.put(sMD5.toLowerCase(), sFile);
+
+	        resp.setStatus(HttpServletResponse.SC_CREATED);
+
+	        try {
+                processRequest("info", resFile, resp);
+            }
+            catch (JSONException e) {
+                throw new ServletException(e);
+            }
+	    }
+
+	    else
+
+	    if (cmd.equals("initialize")) {
+	        init();
+	        resp.setStatus(HttpServletResponse.SC_OK);
+	    }
+
+	    else
+	        resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+	}
+
 	@SuppressWarnings("unchecked")
 	private void processRequest(String command, File file, HttpServletResponse res) throws IOException, JSONException {
 		log.finest("the command is " + command);
@@ -162,7 +275,7 @@ public class JarToolServlet extends HttpServlet implements MeandrePlugin {
 
 		// md5
 		if (command.equalsIgnoreCase("md5"))
-		    joRes.put("md5", StringUtils.getHexString(FileUtils.createMD5Checksum(file)));
+		    joRes.put("md5", IOUtils.getTextFromReader(new FileReader(file.toString() + ".md5")).replaceAll("\\r|\\n", ""));
 
 		else
 
@@ -175,6 +288,11 @@ public class JarToolServlet extends HttpServlet implements MeandrePlugin {
 		// date
 		if (command.equalsIgnoreCase("date"))
 		    joRes.put("lastModified", file.lastModified());
+
+		else
+
+		if (command.equalsIgnoreCase("name"))
+		    joRes.put("name", file.getName());
 
 		else
 
@@ -215,7 +333,7 @@ public class JarToolServlet extends HttpServlet implements MeandrePlugin {
 	}
 
 	public String getAlias() {
-		return aliasPath;
+		return SERVLET_PATH + "*";
 	}
 
 	public String getName() {

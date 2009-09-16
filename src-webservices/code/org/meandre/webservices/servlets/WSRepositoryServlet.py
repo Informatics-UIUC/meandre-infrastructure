@@ -5,29 +5,29 @@
 __name__ = 'WSRepositoryServlet'
 
 requestMap = {
-    'GET': { 
-        'dump': 'repository_dump',    
-        'regenerate': 'repository_regenerate',    
-        'list_components': 'repository_list_components',    
-        'list_flows': 'repository_list_flows',    
-        'tags': 'repository_tags',    
-        'tags_components': 'repository_tags_components',    
-        'tags_flows': 'repository_tags_flows',    
-        'components_by_tag': 'repository_components_by_tag',    
-        'flows_by_tag': 'repository_flows_by_tag',    
-        'describe': 'repository_describe',    
-        'describe_component': 'repository_describe_component',    
-        'describe_all_components': 'repository_describe_all_components',    
-        'describe_flow': 'repository_describe_flow',    
-        'describe_all_flows': 'repository_describe_all_flows',    
-        'search_components': 'repository_search_components',    
-        'search_flows': 'repository_search_flows',    
-        'remove': 'repository_remove',    
+    'GET': {
+        'dump': 'repository_dump',
+        'regenerate': 'repository_regenerate',
+        'list_components': 'repository_list_components',
+        'list_flows': 'repository_list_flows',
+        'tags': 'repository_tags',
+        'tags_components': 'repository_tags_components',
+        'tags_flows': 'repository_tags_flows',
+        'components_by_tag': 'repository_components_by_tag',
+        'flows_by_tag': 'repository_flows_by_tag',
+        'describe': 'repository_describe',
+        'describe_component': 'repository_describe_component',
+        'describe_all_components': 'repository_describe_all_components',
+        'describe_flow': 'repository_describe_flow',
+        'describe_all_flows': 'repository_describe_all_flows',
+        'search_components': 'repository_search_components',
+        'search_flows': 'repository_search_flows',
+        'remove': 'repository_remove',
         'clear': 'repository_clear'
     },
-    'POST': { 
-        'add': 'repository_add',    
-        'add_flow_description': 'repository_add_flow_descriptions' 
+    'POST': {
+        'add': 'repository_add',
+        'add_flow_description': 'repository_add_flow_descriptions'
     }
 }
 
@@ -48,12 +48,12 @@ from org.meandre.webservices.servlets import WSRepositoryServlet
 def repository_dump ( request, response, format ):
     '''Returns the user repository stored in the current Meandre server.'''
     if checkUserRole (request,Role.REPOSITORY) :
-        content = meandre_store.getRepositoryStore(getMeandreUser(request)).getModel()
+        content = meandre_store.rewriteContexts(meandre_store.getRepositoryStore(getMeandreUser(request)).getModel())
         statusOK(response)
         sendRDFModel(response,content,format)
     else:
         errorForbidden(response)
-        
+
 
 def repository_regenerate ( request, response, format ):
     '''Regenerates the user repository stored in the current Meandre server.'''
@@ -64,8 +64,8 @@ def repository_regenerate ( request, response, format ):
         sendTJXContent(response,[content],format)
     else:
         errorForbidden(response)
-    
-    
+
+
 def repository_list_components ( request, response, format ):
     '''List the components aggregated in the user repository stored in the current Meandre server.'''
     if checkUserRole (request,Role.REPOSITORY) :
@@ -83,7 +83,7 @@ def repository_list_components ( request, response, format ):
                 log.warning('Wrong limit format '+str(params['limit'][0])+'. Defaulting to unlimited')
         qr, resources = meandre_store.getRepositoryStore(getMeandreUser(request)), None
         if ordered :
-            resources = qr.getAvailableExecutableComponentsOrderedBy(order,limit)            
+            resources = qr.getAvailableExecutableComponentsOrderedBy(order,limit)
         else:
             resources = qr.getAvailableExecutableComponents()
         for resource in resources:
@@ -96,8 +96,8 @@ def repository_list_components ( request, response, format ):
         sendTJXContent(response,content,format)
     else:
         errorForbidden(response)
-    
-     
+
+
 def repository_list_flows ( request, response, format ):
     '''List the flows aggregated in the user repository stored in the current Meandre server.'''
     if checkUserRole (request,Role.REPOSITORY) :
@@ -115,7 +115,7 @@ def repository_list_flows ( request, response, format ):
                 log.warning('Wrong limit format '+str(params['limit'][0])+'. Defaulting to unlimited')
         qr, resources = meandre_store.getRepositoryStore(getMeandreUser(request)), None
         if ordered :
-            resources = qr.getAvailableFlowsOrderedBy(order,limit)            
+            resources = qr.getAvailableFlowsOrderedBy(order,limit)
         else:
             resources = qr.getAvailableFlows()
         for resource in resources:
@@ -128,8 +128,8 @@ def repository_list_flows ( request, response, format ):
         sendTJXContent(response,content,format)
     else:
         errorForbidden(response)
-    
-    
+
+
 def repository_tags ( request, response, format ):
     '''Returns the tags stored in the current Meandre server.'''
     if checkUserRole (request,Role.REPOSITORY) :
@@ -141,8 +141,8 @@ def repository_tags ( request, response, format ):
         sendTJXContent(response,content,format)
     else:
         errorForbidden(response)
-   
-   
+
+
 def repository_tags_components ( request, response, format ):
     '''Returns the component tags stored in the current Meandre server.'''
     if checkUserRole (request,Role.REPOSITORY) :
@@ -154,8 +154,8 @@ def repository_tags_components ( request, response, format ):
         sendTJXContent(response,content,format)
     else:
         errorForbidden(response)
-  
-  
+
+
 def repository_tags_flows ( request, response, format ):
     '''Returns the component tags stored in the current Meandre server.'''
     if checkUserRole (request,Role.REPOSITORY) :
@@ -167,7 +167,7 @@ def repository_tags_flows ( request, response, format ):
         sendTJXContent(response,content,format)
     else:
         errorForbidden(response)
-  
+
 def repository_components_by_tag ( request, response, format ):
     '''List the components aggregated in the user repository that match
        the provided tags stored in the current Meandre server.'''
@@ -177,7 +177,7 @@ def repository_components_by_tag ( request, response, format ):
             content = []
             qr = meandre_store.getRepositoryStore(getMeandreUser(request))
             for tag in params['tag'] :
-                components = qr.getComponentsByTag(tag) 
+                components = qr.getComponentsByTag(tag)
                 if components is not None :
                     for component in components :
                          content.append({'meandre_uri':component.getExecutableComponent().toString(),
@@ -189,8 +189,8 @@ def repository_components_by_tag ( request, response, format ):
             errorExpectationFail(response)
     else:
         errorForbidden(response)
-        
-  
+
+
 def repository_flows_by_tag ( request, response, format ):
     '''List the flows aggregated in the user repository that match
        the provided tags stored in the current Meandre server.'''
@@ -201,7 +201,7 @@ def repository_flows_by_tag ( request, response, format ):
             qr = meandre_store.getRepositoryStore(getMeandreUser(request))
             for tag in params['tag'] :
                 flows = qr.getFlowsByTag(tag)
-                if flows is not None : 
+                if flows is not None :
                     for flow in flows :
                         content.append({'meandre_uri':flow.getFlowComponent().toString(),
                                         'meandre_uri_name':flow.getName(),
@@ -212,24 +212,25 @@ def repository_flows_by_tag ( request, response, format ):
             errorExpectationFail(response)
     else:
         errorForbidden(response)
-        
-    
+
+
 def repository_describe_all_components ( request, response, format ):
-    '''Returns all the component descriptions  aggregated for the requesting user in the 
+    '''Returns all the component descriptions  aggregated for the requesting user in the
        current Meandre server.'''
     if checkUserRole (request,Role.REPOSITORY) :
         qr = meandre_store.getRepositoryStore(getMeandreUser(request))
         content = getEmptyModel()
         for component_desc in qr.getAvailableExecutableComponentDescriptions():
             content.add(component_desc.getModel())
+        content = meandre_store.rewriteContexts(content)
         statusOK(response)
         sendRDFModel(response,content,format)
     else:
         errorForbidden(response)
 
-   
+
 def repository_describe_all_flows ( request, response, format ):
-    '''Returns all the flow descriptions aggregated for the requesting user in the 
+    '''Returns all the flow descriptions aggregated for the requesting user in the
        current Meandre server.'''
     if checkUserRole (request,Role.REPOSITORY) :
         qr = meandre_store.getRepositoryStore(getMeandreUser(request))
@@ -240,10 +241,10 @@ def repository_describe_all_flows ( request, response, format ):
         sendRDFModel(response,content,format)
     else:
         errorForbidden(response)
-   
-  
+
+
 def repository_describe_component ( request, response, format ):
-    '''Returns all the components aggregated for the requesting user in the 
+    '''Returns all the components aggregated for the requesting user in the
        current Meandre server.'''
     if checkUserRole (request,Role.REPOSITORY) :
         params = extractRequestParamaters(request)
@@ -254,6 +255,7 @@ def repository_describe_component ( request, response, format ):
                 component_desc = qr.getExecutableComponentDescription(content.createResource(component_uri))
                 if component_desc is not None:
                     content.add(component_desc.getModel())
+            content = meandre_store.rewriteContexts(content)
             statusOK(response)
             sendRDFModel(response,content,format)
         else:
@@ -261,9 +263,9 @@ def repository_describe_component ( request, response, format ):
     else:
         errorForbidden(response)
 
-  
+
 def repository_describe_flow ( request, response, format ):
-    '''Returns all the flows aggregated for the requesting user in the 
+    '''Returns all the flows aggregated for the requesting user in the
        current Meandre server.'''
     if checkUserRole (request,Role.REPOSITORY) :
         params = extractRequestParamaters(request)
@@ -280,9 +282,9 @@ def repository_describe_flow ( request, response, format ):
             errorExpectationFail(response)
     else:
         errorForbidden(response)
-          
+
 def repository_describe ( request, response, format ):
-    '''Returns all the uris aggregated for the requesting user in the 
+    '''Returns all the uris aggregated for the requesting user in the
        current Meandre server.'''
     if checkUserRole (request,Role.REPOSITORY) :
         params = extractRequestParamaters(request)
@@ -297,6 +299,7 @@ def repository_describe ( request, response, format ):
                 flow_desc = qr.getFlowDescription(content.createResource(flow_uri))
                 if flow_desc is not None:
                     content.add(flow_desc.getModel())
+            content = meandre_store.rewriteContexts(content)
             statusOK(response)
             sendRDFModel(response,content,format)
         else:
@@ -320,7 +323,7 @@ def repository_remove ( request, response, format ):
         else:
             errorExpectationFail(response)
     else:
-        errorForbidden(response)  
+        errorForbidden(response)
 
 
 def repository_clear ( request, response, format ):
@@ -332,11 +335,11 @@ def repository_clear ( request, response, format ):
        statusOK(response)
        sendTJXContent(response,content,format)
     else:
-        errorForbidden(response)  
-        
-    
+        errorForbidden(response)
+
+
 def repository_search_components ( request, response, format ):
-    '''Search the components aggregated in the user repository stored in the 
+    '''Search the components aggregated in the user repository stored in the
        current Meandre server.'''
     if checkUserRole (request,Role.REPOSITORY) :
         params = extractRequestParamaters(request)
@@ -359,8 +362,8 @@ def repository_search_components ( request, response, format ):
                 for resource in resources:
                     model.add(qr.getExecutableComponentDescription(resource).getModel())
                 qrNew = RepositoryImpl(model)
-                resources = qrNew.getAvailableExecutableComponentsOrderedBy(order,limit)            
-            
+                resources = qrNew.getAvailableExecutableComponentsOrderedBy(order,limit)
+
             for resource in resources:
                 ecd = qr.getExecutableComponentDescription(resource)
                 if ecd is not None:
@@ -368,15 +371,15 @@ def repository_search_components ( request, response, format ):
                                     'meandre_uri_name':ecd.getName(),
                                     'description':ecd.getDescription()})
             statusOK(response)
-            sendTJXContent(response,content,format) 
+            sendTJXContent(response,content,format)
         else:
             errorExpectationFail(response)
     else:
         errorForbidden(response)
 
-    
+
 def repository_search_flows ( request, response, format ):
-    '''Search the components aggregated in the user repository stored in the 
+    '''Search the components aggregated in the user repository stored in the
        current Meandre server.'''
     if checkUserRole (request,Role.REPOSITORY) :
         params = extractRequestParamaters(request)
@@ -399,8 +402,8 @@ def repository_search_flows ( request, response, format ):
                 for resource in resources:
                     model.add(qr.getFlowDescription(resource).getModel())
                 qrNew = RepositoryImpl(model)
-                resources = qrNew.getAvailableFlowsOrderedBy(order,limit)            
-            
+                resources = qrNew.getAvailableFlowsOrderedBy(order,limit)
+
             for resource in resources:
                 fd = qr.getFlowDescription(resource)
                 if fd is not None:
@@ -408,15 +411,15 @@ def repository_search_flows ( request, response, format ):
                                     'meandre_uri_name':fd.getName(),
                                     'description':fd.getDescription()})
             statusOK(response)
-            sendTJXContent(response,content,format) 
+            sendTJXContent(response,content,format)
         else:
             errorExpectationFail(response)
     else:
         errorForbidden(response)
-   
-        
+
+
 def repository_add_flow_descriptions ( request, response, format ):
-    '''Add a flow descriptor the user repository stored in the 
+    '''Add a flow descriptor the user repository stored in the
        current Meandre server.'''
     if checkUserRole (request,Role.REPOSITORY) :
         params = extractRequestParamaters(request)
@@ -433,14 +436,14 @@ def repository_add_flow_descriptions ( request, response, format ):
                 for uri in uris :
                     content.append({'meandre_uri':uri})
             statusOK(response)
-            sendTJXContent(response,content,format) 
+            sendTJXContent(response,content,format)
         else:
             errorExpectationFail(response)
     else:
         errorForbidden(response)
-  
+
 def repository_add ( request, response, format ):
-    '''Add components and flows to  the user repository stored in the 
+    '''Add components and flows to  the user repository stored in the
        current Meandre server.'''
     if checkUserRole (request,Role.REPOSITORY) :
         uris = WSRepositoryServlet.addToRepository(request,meandre_store,meandre_config,format)
@@ -448,8 +451,7 @@ def repository_add ( request, response, format ):
         for uri in uris :
             content.append({'meandre_uri':uri})
         statusOK(response)
-        sendTJXContent(response,content,format) 
+        sendTJXContent(response,content,format)
     else:
-        errorForbidden(response) 
-    
-    
+        errorForbidden(response)
+

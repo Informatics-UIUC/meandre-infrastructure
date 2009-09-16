@@ -1,8 +1,18 @@
 package org.meandre.core.engine;
 
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Random;
+import java.util.Set;
+import java.util.logging.Logger;
 
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.ExecutableComponent;
@@ -12,24 +22,22 @@ import org.meandre.core.engine.probes.NullProbeImpl;
 import org.meandre.core.environments.lisp.clojure.ClojureExecutableComponentAdapter;
 import org.meandre.core.environments.python.jython.JythonExecutableComponentAdapter;
 import org.meandre.core.logger.KernelLoggerFactory;
-import org.meandre.core.repository.*;
+import org.meandre.core.repository.ConnectorDescription;
+import org.meandre.core.repository.CorruptedDescriptionException;
+import org.meandre.core.repository.DataPortDescription;
+import org.meandre.core.repository.ExecutableComponentDescription;
+import org.meandre.core.repository.ExecutableComponentInstanceDescription;
+import org.meandre.core.repository.FlowDescription;
+import org.meandre.core.repository.PropertiesDescription;
+import org.meandre.core.repository.PropertiesDescriptionDefinition;
+import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.utils.HexConverter;
 import org.meandre.core.utils.NetworkTools;
 import org.meandre.webui.PortScroller;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Random;
-import java.util.Set;
-import java.util.logging.Logger;
+import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
 
 /** This class performs the setup required to execute a given
  * flow description. The conductor generates the proper structures and
@@ -59,7 +67,7 @@ public class Conductor {
 	private Set<String> setLoadableComponents = null;
 
 	/** The default active buffer size */
-	private int iActiveBufferSize;
+	private final int iActiveBufferSize;
 
 	/** The core root logger */
 	protected static Logger log = KernelLoggerFactory.getCoreLogger();
@@ -71,7 +79,7 @@ public class Conductor {
 	private static Hashtable<Literal,Integer> htMapLiteralToHashcode = new Hashtable<Literal,Integer>();
 
 	/** The core configuration object */
-	private CoreConfiguration cnf;
+	private final CoreConfiguration cnf;
 
 	private ClassLoader parentClassloader;
 
@@ -160,7 +168,7 @@ public class Conductor {
 		String flowID = res.toString();
 		// Map class names to classes
 		Hashtable<String,Class> htMapNameToClass = new Hashtable<String,Class>();
-		// Map reource names to classes
+		// Map resource names to classes
 		Hashtable<Resource,String> htMapResourceToName = new Hashtable<Resource,String>();
 
 		// Start MrProbe
@@ -357,7 +365,7 @@ public class Conductor {
 									sFlowUniqueExecutionID,
 									flowID,
 									ecid.getExecutableComponentInstance().toString(),
-									(ExecutableComponent) htECInstances.get(resECI),
+									htECInstances.get(resECI),
 									htInsInputSet.get(sResECI),
 									htInsOutputSet.get(sResECI),
 									htMapOutputTranslation.get(resECI),
@@ -377,7 +385,7 @@ public class Conductor {
 									sFlowUniqueExecutionID,
 									flowID,
 									ecid.getExecutableComponentInstance().toString(),
-									(ExecutableComponent) htECInstances.get(resECI),
+									htECInstances.get(resECI),
 									htInsInputSet.get(sResECI),
 									htInsOutputSet.get(sResECI),
 									htMapOutputTranslation.get(resECI),
@@ -412,7 +420,7 @@ public class Conductor {
 
 	/** Loads and plugs the required contexts to the flow being prepared.
 	 *
-	 * @param qr The queriable repository
+	 * @param qr The queryable repository
 	 * @param htMapNameToClass The map from the name to the class
 	 * @param htMapResourceToName The map from the resource to a name
 	 * @param fd The flow descriptor
@@ -429,11 +437,11 @@ public class Conductor {
 		Set<String> setContexts = new HashSet<String>();
 		// Set of loadable locations
 		Set<String> setURLLocations = new HashSet<String>();
-		// Map reource names to classes
+		// Map resource names to classes
 		Hashtable<String,Resource> htMapNameToResource = new Hashtable<String,Resource>();
 		// Map resource names to runnable
 		Hashtable<Resource,String> htMapResourceToRunnable = new Hashtable<Resource,String>();
-		// Map resource names to runnable
+		// Map resource names to format
 		Hashtable<Resource,String> htMapResourceToFormat = new Hashtable<Resource,String>();
 
 
@@ -442,7 +450,7 @@ public class Conductor {
 		Set<ExecutableComponentInstanceDescription> setIns = fd.getExecutableComponentInstances();
 		for ( ExecutableComponentInstanceDescription ins:setIns ) {
 			ExecutableComponentDescription comp = qr.getExecutableComponentDescription(ins.getExecutableComponent());
-            // If the resource does not exist throw an exeception
+            // If the resource does not exist throw an exception
 			if (comp == null)
 				throw new CorruptedDescriptionException("The required executable component " + ins.getExecutableComponent() + " does not exist in the current repository");
 
@@ -458,7 +466,7 @@ public class Conductor {
 			else
 				throw new CorruptedDescriptionException("Component of type "+comp.getFormat()+" could not be loaded by the conductor");
 
-			// Retrieve the contextes
+			// Retrieve the contexts
 			for ( RDFNode rdfnodeContext:comp.getContext() )
 				if ( rdfnodeContext.isResource() )
 					// Just a usual URI pointing to the resource
@@ -508,14 +516,12 @@ public class Conductor {
 		if ( sURI==null || htMapLiteralToHashcode.get(lit)!=lit.hashCode() ) {
 			// The Literal has not been mapped to a file before
 			byte [] ba = (byte[]) lit.getValue();
-			String sURIPath = new File(".").toURI().toString();
-			String sFilePath = cnf.getRunResourcesDirectory()+File.separator+"java"+File.separator;
-			new File(sFilePath).mkdirs();
-			sFilePath += HexConverter.stringToHex("lit-hash-"+lit.hashCode())+".jar";
-			sURIPath += sFilePath;
-			sURIPath = sURIPath.replaceAll("(\\./)+", "/").replaceAll("/+", "/");
+			File fPath = new File(cnf.getRunResourcesDirectory()+File.separator+"java"+File.separator);
+			fPath.mkdirs();
+			fPath = new File(fPath, HexConverter.stringToHex("lit-hash-"+lit.hashCode())+".jar");
+			String sURIPath = fPath.toURI().toString();
 			try {
-				FileOutputStream fos = new FileOutputStream(new File(sFilePath));
+				FileOutputStream fos = new FileOutputStream(fPath);
 				fos.write(ba);
 				fos.close();
 				htMapLiteralToFile.put(lit, sURIPath);
@@ -554,18 +560,26 @@ public class Conductor {
 	throws CorruptedDescriptionException {
 		log.fine("Preparing the class loader");
 		int iCnt = 0;
+
+        String sPublishedResourcesDir = new File(cnf.getPublicResourcesDirectory()).toURI().toString();
+        if (!sPublishedResourcesDir.endsWith("/")) sPublishedResourcesDir += "/";
+
 		URL [] ua = new URL[setURLContext.size()];
 		for ( String sURL:setURLContext )
 			try {
 				if (sURL.endsWith("/") )
 					ua[iCnt++] = new URL(sURL);
 				else if (sURL.endsWith(".jar")) {
+				    URI ctxUri = new URI(sURL);
+				    if (ctxUri.getScheme().equals("context"))
+				        sURL = sPublishedResourcesDir + "contexts" + ctxUri.getPath();
 					ua[iCnt++] = new URL("jar:"+sURL+"!/");
 				}
 
-			} catch (MalformedURLException e) {
+			} catch (Exception e) {
 				throw new CorruptedDescriptionException("Context URL "+sURL+" is not a valid URL");
 			}
+
 			// Initializing the java class loader
 			URLClassLoader urlCL=null;
 			if(this.getParentClassloader()==null){
