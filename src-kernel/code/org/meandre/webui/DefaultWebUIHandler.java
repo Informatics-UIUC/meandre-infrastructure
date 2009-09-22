@@ -21,10 +21,14 @@ import org.mortbay.jetty.handler.AbstractHandler;
 public class DefaultWebUIHandler extends AbstractHandler {
 	
 	/** The parent of this handler */
-	private WebUI webUIParent = null;
+	private WebUI webUIParent;
 	
 	/** The core configuration */
 	private CoreConfiguration cnf;
+
+	/** The date the webUI was started */
+	private Date startedAt;
+	private long startedAtMS;
 
 	/** Creates the default WebUI handler.
 	 * 
@@ -34,6 +38,8 @@ public class DefaultWebUIHandler extends AbstractHandler {
 	public DefaultWebUIHandler ( WebUI webUIParent, CoreConfiguration cnf ) {
 		this.webUIParent = webUIParent;
 		this.cnf = cnf;
+		this.startedAt = new Date();
+		this.startedAtMS = this.startedAt.getTime();
 	}
 	
 	/** Implements the default, no web ui available, response.
@@ -87,8 +93,9 @@ public class DefaultWebUIHandler extends AbstractHandler {
 				"<div id=\"menu\"> \n" +
 				"<img src=\""+cnf.getAppContext()+"/public/resources/system/logo-meandre.gif\" />\n" +
 				"<div id=\"main\">\n"+
-				"<p>No WebUI available at this point of execution.</br>"+
-				new Date()+"</p>"+
+				"<p>The flow is currently running. Please wait for your results to be displayed here.<br/>No WebUI available at this point of execution.<br/>"+
+				"Started: "+this.startedAt+". <br/>"+
+				"Time elapsed: "+((this.startedAtMS-new Date().getTime())/1000)+" seconds </p>"+
 				"</div>\n"+
 				"</div>\n"+
 				"</body>\n"+
