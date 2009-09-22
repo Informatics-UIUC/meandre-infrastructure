@@ -1,6 +1,7 @@
 package org.meandre.plugins.tools;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -175,75 +176,32 @@ public class JarToolServlet extends HttpServlet implements MeandrePlugin {
 		}
 	}
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	public void addResource(String sFile, String sMD5) throws ResourceConflictException, IOException {
 	    log.entering(getClass().getName(), "doPost");
 
-	    String reqPath = req.getPathInfo();
-	    String[] parts;
+	    if (sFile == null || sMD5 == null)
+	        throw new NullPointerException("need to supply valid values for the 'sFile' and 'sMD5' parameters");
 
-	    if (reqPath == null || (parts = reqPath.split(URL_SEP)).length > 2) {
-	       resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
-	       return;
-	    }
-
-	    //TODO: do we need to synchronize access here? can doPost be invoked in a multi-threaded fashion by multiple user requests?
-
-	    String cmd = parts[1];
-
-	    if (cmd.equals("add")) {
-	        String sFile = req.getParameter("name");
-	        String sMD5 = req.getParameter("md5");
-
-	        if (sFile == null || sMD5 == null) {
-	            resp.sendError(HttpServletResponse.SC_EXPECTATION_FAILED);
+	    String sResName = getResourceForMD5(sMD5);
+	    if (sResName != null) {
+	        if (!sResName.equals(sFile))
+	            throw new ResourceConflictException(sResName + " already exists - trying to add it again as " + sFile);
+	        else
 	            return;
-	        }
-
-	        String sResName = getResourceForMD5(sMD5);
-	        if (sResName != null) {
-	            if (sResName.equals(sFile)) {
-	                resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-	                return;
-	            } else {
-	                resp.sendError(HttpServletResponse.SC_CONFLICT);
-	                return;
-	            }
-	        }
-
-	        File resFile = new File(PLUGIN_JAR_DIR, sFile);
-	        // make sure the resource file actually exists
-	        if (!resFile.exists()) {
-	            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-	            return;
-	        }
-
-	        File md5File = new File(PLUGIN_JAR_DIR, sFile + ".md5");
-	        Writer writer = IOUtils.getWriterForResource(md5File.toURI());
-	        writer.write(sMD5);
-	        writer.close();
-
-	        _md5map.put(sMD5.toLowerCase(), sFile);
-
-	        resp.setStatus(HttpServletResponse.SC_CREATED);
-
-	        try {
-                processRequest("info", resFile, resp);
-            }
-            catch (JSONException e) {
-                throw new ServletException(e);
-            }
 	    }
 
-	    else
+	    File resFile = new File(PLUGIN_JAR_DIR, sFile);
+	    // make sure the resource file actually exists
+	    if (!resFile.exists())
+	        throw new FileNotFoundException(sFile);
 
-	    if (cmd.equals("initialize")) {
-	        init();
-	        resp.setStatus(HttpServletResponse.SC_OK);
-	    }
+	    File md5File = new File(PLUGIN_JAR_DIR, sFile + ".md5");
+	    Writer writer = IOUtils.getWriterForResource(md5File.toURI());
+	    writer.write(sMD5);
+	    writer.close();
 
-	    else
-	        resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+	    _md5map.put(sMD5.toLowerCase(), sFile);
+
 	}
 
 	@SuppressWarnings("unchecked")

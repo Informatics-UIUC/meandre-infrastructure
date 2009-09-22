@@ -19,6 +19,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -40,7 +42,9 @@ import org.meandre.core.utils.ModelIO;
 import org.meandre.core.utils.NetworkTools;
 import org.meandre.core.utils.vocabulary.RepositoryVocabulary;
 import org.meandre.jobs.storage.backend.JobInformationBackendAdapter;
-import org.meandre.plugins.tools.ResourceManager;
+import org.meandre.plugins.PluginFactory;
+import org.meandre.plugins.tools.JarToolServlet;
+import org.meandre.plugins.tools.ResourceConflictException;
 import org.meandre.support.crypto.Crypto;
 import org.meandre.support.io.IOUtils;
 
@@ -195,7 +199,7 @@ public class Store {
 	/** The job backend adapter information */
 	private JobInformationBackendAdapter baJobInfo;
 
-	private final ResourceManager resManager;
+	private JarToolServlet resManager;
 
     /** Initialize a default store.
      *
@@ -206,8 +210,6 @@ public class Store {
     	propStoreConfig = new Properties();
     	initializeDefaultProperties();
         initializeStore();
-
-        resManager = new ResourceManager(cnf);
     }
 
     /** Initialize a default store to install its file resources in a
@@ -224,8 +226,6 @@ public class Store {
         propStoreConfig = new Properties();
         initializeDefaultProperties();
         initializeStore();
-
-        resManager = new ResourceManager(cnf);
     }
     /** Initialize a store with the provided properties
      *
@@ -236,8 +236,6 @@ public class Store {
     	this.cnf = cnf;
     	propStoreConfig = props;
     	initializeStore();
-
-    	resManager = new ResourceManager(cnf);
     }
 
     /** Initialize a Store with the given properties.
@@ -866,6 +864,9 @@ public class Store {
 
 				Map<String, String> rewriteMap = new HashMap<String, String>();
 
+				if (resManager == null)
+			        resManager = (JarToolServlet)PluginFactory.getPluginFactory(cnf).getPlugin("JARTOOL");
+
 				for ( String sCtx:hsCtxs ) {
 					try {
 					    // adjust the relative pathname to a full reachable URL
@@ -916,7 +917,12 @@ public class Store {
     							fos.close();
     						}
 
-    						resManager.addResource(sFile, Crypto.getHexString(Crypto.createMD5Checksum(savedFile)));
+    						try {
+                                resManager.addResource(sFile, Crypto.getHexString(Crypto.createMD5Checksum(savedFile)));
+                            }
+                            catch (ResourceConflictException e) {
+                                log.log(Level.WARNING, "JAR naming conflict!", e);
+                            }
 					    } else {
 					        log.finer("Skipping download of '" + sFile + "'. Reason: Found as '" + sReloFile + "'");
 					        if (!sReloFile.equals(sFile))
@@ -1188,29 +1194,36 @@ public class Store {
 
 	public Model rewriteContexts(Model model) {
 	    // TODO: what's the proper synchronization mechanism?  we don't want the model to be modified while this method is executed
+	    Model copy;
+	    List<Statement> lstStatements = new LinkedList<Statement>();
+
 	    synchronized (model) {
-	        Model copy = ModelFactory.createDefaultModel();
+	        copy = ModelFactory.createDefaultModel();
 	        copy.add(model);
 
 	        StmtIterator iter = model.listStatements(null, RepositoryVocabulary.execution_context, (RDFNode)null);
 	        while (iter.hasNext()) {
 	            Statement ctxStmt = iter.nextStatement();
-	            String ctx = ctxStmt.getObject().toString();
+	            lstStatements.add(ctxStmt);
+	        }
+	    }
 
-	            try {
-	                URI ctxUri = new URI(ctx);
-	                if (ctxUri.getScheme().equals("context")) {
-	                    URL ctxUrl = new URL("http", NetworkTools.getLocalHostName(), cnf.getBasePort(), "/public/resources/contexts" + ctxUri.getPath());
-	                    copy.remove(ctxStmt);
-	                    copy.add(ctxStmt.getSubject(), RepositoryVocabulary.execution_context, copy.createResource(ctxUrl.toString()));
-	                }
-	            }
-	            catch (Exception e) {
-	                log.log(Level.WARNING, "Problem rewriting jar context for: " + ctx, e);
+	    for (Statement ctxStmt : lstStatements) {
+	        String ctx = ctxStmt.getObject().toString();
+
+	        try {
+	            URI ctxUri = new URI(ctx);
+	            if (ctxUri.getScheme().equals("context")) {
+	                URL ctxUrl = new URL("http", NetworkTools.getLocalHostName(), cnf.getBasePort(), "/public/resources/contexts" + ctxUri.getPath());
+	                copy.remove(ctxStmt);
+	                copy.add(ctxStmt.getSubject(), RepositoryVocabulary.execution_context, copy.createResource(ctxUrl.toString()));
 	            }
 	        }
+	        catch (Exception e) {
+	            log.log(Level.WARNING, "Problem rewriting jar context for: " + ctx, e);
+	        }
+	    }
 
-	        return copy;
-        }
+	    return copy;
 	}
 }

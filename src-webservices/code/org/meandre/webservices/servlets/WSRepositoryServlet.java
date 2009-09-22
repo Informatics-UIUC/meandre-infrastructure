@@ -11,6 +11,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +27,9 @@ import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.store.Store;
 import org.meandre.core.utils.ModelIO;
-import org.meandre.plugins.tools.ResourceManager;
+import org.meandre.plugins.PluginFactory;
+import org.meandre.plugins.tools.JarToolServlet;
+import org.meandre.plugins.tools.ResourceConflictException;
 import org.meandre.support.crypto.Crypto;
 import org.meandre.webservices.MeandreServer;
 import org.meandre.webservices.logger.WSLoggerFactory;
@@ -51,7 +54,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 	private static final Logger log = WSLoggerFactory.getWSLogger();
 
 	/** The resource manager that interrogates the JarTool plugin for the existence of JARs based on MD5 checksums */
-	private static ResourceManager resManager;
+	private static JarToolServlet resManager;
 
 	/** Creates the servlet to provide Repository information.
 	 *
@@ -61,8 +64,6 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 	 */
 	public WSRepositoryServlet(MeandreServer server, Store store, CoreConfiguration cnf) {
 		super(server, store, cnf);
-
-		resManager = new ResourceManager(cnf);
 	}
 
 	/** Adds components and flows to the user repository.
@@ -240,6 +241,9 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
                         String javaContextDir = cnf.getPublicResourcesDirectory()+File.separator+"contexts"+File.separator+"java"+File.separator;
                         new File(javaContextDir).mkdirs();
 
+                        if (resManager == null)
+                            resManager = (JarToolServlet)PluginFactory.getPluginFactory(cnf).getPlugin("JARTOOL");
+
 					    //
 						// Dump the context file to the disc only once
 						//
@@ -265,7 +269,12 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 							            throw new IOException(e.toString());
 							        }
 
-							        resManager.addResource(sFile, sMD5);
+							        try {
+                                        resManager.addResource(sFile, sMD5);
+                                    }
+                                    catch (ResourceConflictException e) {
+                                        log.log(Level.WARNING, "JAR naming conflict!", e);
+                                    }
 							    } else {
 							        log.finer("Skipping upload of '" + sFile + "'. Reason: Found as '" + sJarFile + "'");
 							        sFile = sJarFile;
