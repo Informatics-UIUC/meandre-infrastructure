@@ -25,7 +25,7 @@ def server_shutdown ( request, response, format ):
     if checkUserRole (request,Role.ADMIN) :
         content = [{'message':'Server shutting down now!!!'}]    
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
         meandre_server.delayedStop(1000)
     else:
         errorForbidden(response)

@@ -37,7 +37,7 @@ def locations_list ( request, response, format ):
                 }
             content.append(location_info)
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)       
     
@@ -60,7 +60,7 @@ def locations_add ( request, response, format ):
                 else:
                     content.append({'message':'ERROR: Could not add location '+uri})
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else:
             errorExpectationFail(response)
     else:
@@ -79,7 +79,7 @@ def locations_remove ( request, response, format ):
                 if ( meandre_store.removeLocation(getMeandreUser(request), uri, meandre_config) ) :
                     content.append({'location': uri})
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else:
             errorExpectationFail(response)
     else:

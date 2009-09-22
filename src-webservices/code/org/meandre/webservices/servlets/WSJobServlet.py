@@ -24,8 +24,7 @@ from org.meandre.core.security import Role
 def job_list_jobs_statuses ( request, response, format ):
     '''List the current job statuses in the Meandre Server.''' 
     content = []
-    remote_user = request.getRemoteUser()
-    print remote_user
+    remote_user = getMeandreUser(request)
     jiba = meandre_store.getJobInformation()
     for job in jiba.getJobStatuses():
         job_user_id = job.get('user_id')
@@ -36,7 +35,7 @@ def job_list_jobs_statuses ( request, response, format ):
                 map[key] = job.get(key)
             content.append(map)
     statusOK(response)
-    sendTJXContent(response,content,format)
+    sendTJXContent(response,content,format,remote_user)
         
 def job_job_console ( request, response, format ):
     '''List the current job statuses in the Meandre Server.''' 
@@ -55,7 +54,7 @@ def job_job_console ( request, response, format ):
                     errorForbidden(response)
                     return
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else :
             errorExpectationFail(response)
     else:

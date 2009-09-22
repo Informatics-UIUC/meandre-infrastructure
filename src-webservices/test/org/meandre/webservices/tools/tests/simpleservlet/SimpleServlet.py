@@ -21,7 +21,7 @@ def ping_pong ( request, response, format ):
     '''Given a request, just response "pong".'''
     content = [ 'pong' ]
     statusOK(response)
-    sendTJXContent(response,content,format)
+    sendTJXContent(response,content,format,getMeandreUser(request))
 
 #
 # Returns an array of information 
@@ -31,7 +31,7 @@ def get_array_info ( request, response, format ):
        where X is a number in the range from 0 to 9 (inclusive).'''
     content = [ 'value'+str(i) for i in range(10) ]
     statusOK(response)
-    sendTJXContent(response,content,format)
+    sendTJXContent(response,content,format,getMeandreUser(request))
 
 #
 # Returns a dictionary of information
@@ -43,7 +43,7 @@ def get_dictionary_info ( request, response, format ):
             "method": "get_dictionary_info"
         }
     statusOK(response)
-    sendTJXContent(response,[content],format)
+    sendTJXContent(response,[content],format,getMeandreUser(request))
     
 #
 # The demo rdf repository
@@ -64,4 +64,4 @@ def reposonse_request_parameters ( request, response, format ):
        values provided as parameters to the request call.'''
     content = extractRequestParamaters(request)
     statusOK(response)
-    sendTJXContent(response,[content],format)
+    sendTJXContent(response,[content],format,getMeandreUser(request))

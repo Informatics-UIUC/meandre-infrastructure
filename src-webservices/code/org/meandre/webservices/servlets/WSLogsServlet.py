@@ -61,7 +61,7 @@ def __dump_log ( request, response, format, log ):
         content = []
         statusOK(response)
         content.append({'log':__read_log(log,offset)})
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
     

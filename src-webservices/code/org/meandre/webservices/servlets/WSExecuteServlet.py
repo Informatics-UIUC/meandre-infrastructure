@@ -110,7 +110,7 @@ def execute_list_running_flows ( request, response, format ):
                             'flow_instance_proxy_webui_relative': meandre_config.appContext+'/webui/'+str(webui.getPort())+'/'
                         })
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
  
@@ -132,7 +132,7 @@ def execute_url ( request, response, format ):
                             'flow_instance_proxy_webui_relative': meandre_config.appContext+'/webui/'+str(webui.getPort())+'/'
                         })
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else :
             errorExpectationFail(response)
     else:
@@ -158,7 +158,7 @@ def execute_web_component_url ( request, response, format ):
                             'flow_instance_fragment_url': host_url+wfrag.getFragmentID()
                         })
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else :
             errorExpectationFail(response)
     else:
@@ -190,7 +190,7 @@ def execute_uri_flow ( request, response, format ):
                             }
                         content.append(job_info)
                         statusOK(response)
-                        sendTJXContent(response,content,format)
+                        sendTJXContent(response,content,format,getMeandreUser(request))
                     else :
                         errorExpectationFail(response)    
                 else :
@@ -252,7 +252,7 @@ def execute_clean_uri_flow ( request, response, format ):
                cleaned = { 'token': token }
                content.append(cleaned)   
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
     

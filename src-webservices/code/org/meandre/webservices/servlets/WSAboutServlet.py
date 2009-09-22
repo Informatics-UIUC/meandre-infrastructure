@@ -31,7 +31,7 @@ def about_version ( request, response, format ):
     
     content = { 'version': Constants.MEANDRE_VERSION }
     statusOK(response)
-    sendTJXContent(response,content,format)
+    sendTJXContent(response,content,format,getMeandreUser(request))
     
     
 def about_plugins ( request, response, format ):
@@ -51,7 +51,7 @@ def about_plugins ( request, response, format ):
             pluginInfo['isServlet'] = 'true'
         content.append(pluginInfo)
     statusOK(response)
-    sendTJXContent(response,content,format)
+    sendTJXContent(response,content,format,getMeandreUser(request))
 
 
 def __get_installation_information__(request):
@@ -74,7 +74,7 @@ def about_installation ( request, response, format ):
     if checkUserRole(request,Role.ADMIN) :
         content = __get_installation_information__(request)
         statusOK(response)
-        sendTJXContent(response,[content],format)
+        sendTJXContent(response,[content],format,getMeandreUser(request))
     else:
         errorUnauthorized(response)
  
@@ -89,7 +89,7 @@ def about_valid_roles ( request, response, format ):
             }
         content.append(role)
     statusOK(response)
-    sendTJXContent(response,content,format)
+    sendTJXContent(response,content,format,getMeandreUser(request))
    
    
 def about_user_roles ( request, response, format ):
@@ -103,6 +103,6 @@ def about_user_roles ( request, response, format ):
             }
         content.append(role)
     statusOK(response)
-    sendTJXContent(response,content,format)
+    sendTJXContent(response,content,format,getMeandreUser(request))
     
  

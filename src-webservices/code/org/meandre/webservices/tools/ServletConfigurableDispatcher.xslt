@@ -6,6 +6,9 @@
 
 	<xsl:param name="date"></xsl:param>
 	<xsl:param name="context"></xsl:param>
+	<xsl:param name="host"></xsl:param>
+	<xsl:param name="port"></xsl:param>
+	<xsl:param name="user"></xsl:param>
 	
 	<xsl:template match="/meandre_response">
 		<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
@@ -148,7 +151,6 @@
 					<img>
 						<xsl:attribute name="src"><xsl:value-of select="$context"/>/public/resources/system/logo-meandre.gif</xsl:attribute>
 					</img>
-					<p><xsl:value-of select="$date"/></p>
 					<div id="navigation">
 			 			<p>Repository</p>
 			 		    <ul>
@@ -259,6 +261,8 @@
 				</div>	
 				</td><td id="separator" valign="top" width="100%">
 				<div id="main">
+					<p style="text-align:right;width: 98%;"><strong><xsl:value-of select="$date"/></strong>. User <strong><xsl:value-of select="$user"/></strong> on host <strong><xsl:value-of select="$host"/></strong> at port <strong><xsl:value-of select="$port"/></strong>.</p>
+					
 					<table>
 						<xsl:for-each select="meandre_item">
 							<xsl:if test="position() = 1">

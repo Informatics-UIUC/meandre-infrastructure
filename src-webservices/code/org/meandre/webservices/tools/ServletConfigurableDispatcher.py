@@ -17,7 +17,7 @@ from java.io import StringReader
 from java.util import Date
 
 from org.meandre.webservices.tools import ServletConfigurableDispatcher
-
+from org.meandre.core.utils import NetworkTools
 #
 # The basic dispatching dictionary
 #
@@ -25,6 +25,7 @@ requestMap = {
 }
 
 log = WSLoggerFactory.getWSLogger()
+__host = NetworkTools.getLocalHostName()
 
 #
 # Prepare the XSLT information
@@ -180,7 +181,7 @@ def __content_to_TXT__(content,tab):
 
 
 
-def sendTJXContent ( response, content, format ):
+def sendTJXContent ( response, content, format, user ):
     '''Response the content with the proper format. It supports three response
        content format: txt, json, and xml. XML responses follow the following 
        syntax:
@@ -200,7 +201,7 @@ def sendTJXContent ( response, content, format ):
         allows the html format, which is only an style sheet transformation of
         the XML response
         
-        sendTJXContent ( response, content, format )'''
+        sendTJXContent ( response, content, format, user )'''
     if format=='txt':
         contentTextPlain(response)
         txt = __content_to_TXT__(content,'')
@@ -217,6 +218,7 @@ def sendTJXContent ( response, content, format ):
         sendRawContent(response, xmlc)
         sendRawContent(response, '</meandre_response>')
     elif format=='html' :
+        if user is None : user = 'anonymous' 
         contentAppHTML(response)
         xmlc = '<?xml version="1.0" encoding="UTF-8"?><meandre_response>'
         xmlc += XML.toString(__content_to_JSON__(content),"meandre_item")
@@ -225,6 +227,9 @@ def sendTJXContent ( response, content, format ):
         result = StreamResult(response.getOutputStream())
         __xslTrans.setParameter("date",Date().toString())
         __xslTrans.setParameter("context",meandre_config.getAppContext())
+        __xslTrans.setParameter("host",__host)
+        __xslTrans.setParameter("port",str(meandre_config.getBasePort()))
+        __xslTrans.setParameter("user",user)
         __xslTrans.transform(xmlSource, result);
     else:
         errorNotFound(response)

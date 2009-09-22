@@ -41,6 +41,6 @@ def public_ping ( request, response, format ):
     '''Returns a simple pong for the given ping.'''
     content = {'message':'pong'}
     statusOK(response)
-    sendTJXContent(response,[content],format)
+    sendTJXContent(response,[content],format,getMeandreUser(request))
 
 

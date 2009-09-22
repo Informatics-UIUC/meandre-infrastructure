@@ -43,7 +43,7 @@ def security_current_roles ( request, response, format ):
                     'meandre_role_name': role.getShortName() 
                 })
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
 
@@ -66,7 +66,7 @@ def security_roles_of_user ( request, response, format ):
                 else:
                     content.append({'message': 'ERROR: User '+user_name+' not found'} )
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else:
             errorExpectationFail(response)
     else:
@@ -85,7 +85,7 @@ def security_users ( request, response, format ):
                     'full_name': user.getName()
                 })
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
  
@@ -107,7 +107,7 @@ def security_user ( request, response, format ):
                 else:
                    content.append({'message': 'ERROR: User '+user_name+' not found'} ) 
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else:
             errorExpectationFail(response)
     else:
@@ -125,7 +125,7 @@ def security_valid_roles ( request, response, format ):
                     'meandre_role_name': role.getShortName() 
                 })
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
 
@@ -149,7 +149,7 @@ def security_revoke_all_roles ( request, response, format ):
                 else:
                    content.append({'message': 'ERROR: User '+user_name+' not found'} ) 
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else:
             errorExpectationFail(response)
     else:
@@ -174,7 +174,7 @@ def security_revoke_roles ( request, response, format ):
                         'revoked': role_url
                     })
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else:
             errorExpectationFail(response)
     else:
@@ -199,7 +199,7 @@ def security_grant_roles ( request, response, format ):
                         'granted': role_url
                     })
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else:
             errorExpectationFail(response)
     else:
@@ -220,7 +220,7 @@ def security_create_users ( request, response, format ):
                     'full_name': user_full_name
                 })
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else:
             errorExpectationFail(response)
     else:
@@ -245,7 +245,7 @@ def security_remove_users ( request, response, format ):
                 else:
                     content.append({'message':'User '+user_name+' cannot be removed'})
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else:
             errorExpectationFail(response)
     else:
@@ -268,7 +268,7 @@ def security_update_users ( request, response, format ):
                     'full_name': user_full_name
                 })
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else:
             errorExpectationFail(response)
     else:

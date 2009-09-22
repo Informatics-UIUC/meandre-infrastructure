@@ -37,7 +37,7 @@ def publish_publish ( request, response, format ):
                 if meandre_store.publishURI(uri,getMeandreUser(request)) :
                     content.append({'meandre_uri':uri})
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
     
@@ -55,7 +55,7 @@ def publish_unpublish ( request, response, format ):
                 if meandre_store.unpublishURI(uri,getMeandreUser(request)) :
                     content.append({'meandre_uri':uri})
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)        
     
@@ -68,7 +68,7 @@ def publish_list_published ( request, response, format ):
         for uri in meandre_store.getPublishedComponentsAndFlows() :
             content.append({'meandre_uri':uri})
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)        
    
@@ -85,7 +85,7 @@ def publish_publish_all ( request, response, format ):
             if meandre_store.publishURI(uri.toString(),getMeandreUser(request)) :
                 content.append({'meandre_uri':uri})
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)   
         
@@ -98,7 +98,7 @@ def publish_unpublish_all ( request, response, format ):
             if meandre_store.unpublishURI(uri,getMeandreUser(request)) :
                 content.append({'meandre_uri':uri})
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)   
     

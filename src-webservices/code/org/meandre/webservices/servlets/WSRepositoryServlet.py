@@ -61,7 +61,7 @@ def repository_regenerate ( request, response, format ):
         meandre_store.regenerateRepository(getMeandreUser(request))
         content = {'message':'Repository successfully regenerated'}
         statusOK(response)
-        sendTJXContent(response,[content],format)
+        sendTJXContent(response,[content],format,getMeandreUser(request))
     else:
         errorForbidden(response)
 
@@ -93,7 +93,7 @@ def repository_list_components ( request, response, format ):
                                 'meandre_uri_name':ecd.getName(),
                                 'description':ecd.getDescription()})
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
 
@@ -125,7 +125,7 @@ def repository_list_flows ( request, response, format ):
                                 'meandre_uri_name':fd.getName(),
                                 'description':fd.getDescription()})
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
 
@@ -138,7 +138,7 @@ def repository_tags ( request, response, format ):
         for tag in qr.getTags():
             content.append({'meandre_tag':tag})
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
 
@@ -151,7 +151,7 @@ def repository_tags_components ( request, response, format ):
         for tag in qr.getComponentTags():
             content.append({'meandre_tag':tag})
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
 
@@ -164,7 +164,7 @@ def repository_tags_flows ( request, response, format ):
         for tag in qr.getFlowTags():
             content.append({'meandre_tag':tag})
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
 
@@ -184,7 +184,7 @@ def repository_components_by_tag ( request, response, format ):
                                          'meandre_uri_name':component.getName(),
                                          'description':component.getDescription()})
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else:
             errorExpectationFail(response)
     else:
@@ -207,7 +207,7 @@ def repository_flows_by_tag ( request, response, format ):
                                         'meandre_uri_name':flow.getName(),
                                         'description':flow.getDescription()})
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else:
             errorExpectationFail(response)
     else:
@@ -319,7 +319,7 @@ def repository_remove ( request, response, format ):
                 if res is not None :
                     content.append({'meandre_uri':uri})
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else:
             errorExpectationFail(response)
     else:
@@ -333,7 +333,7 @@ def repository_clear ( request, response, format ):
        meandre_store.clearUserRepository(getMeandreUser(request))
        content = {'message':'Repository successfully emptied'}
        statusOK(response)
-       sendTJXContent(response,content,format)
+       sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
 
@@ -371,7 +371,7 @@ def repository_search_components ( request, response, format ):
                                     'meandre_uri_name':ecd.getName(),
                                     'description':ecd.getDescription()})
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else:
             errorExpectationFail(response)
     else:
@@ -411,7 +411,7 @@ def repository_search_flows ( request, response, format ):
                                     'meandre_uri_name':fd.getName(),
                                     'description':fd.getDescription()})
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else:
             errorExpectationFail(response)
     else:
@@ -436,7 +436,7 @@ def repository_add_flow_descriptions ( request, response, format ):
                 for uri in uris :
                     content.append({'meandre_uri':uri})
             statusOK(response)
-            sendTJXContent(response,content,format)
+            sendTJXContent(response,content,format,getMeandreUser(request))
         else:
             errorExpectationFail(response)
     else:
@@ -451,7 +451,7 @@ def repository_add ( request, response, format ):
         for uri in uris :
             content.append({'meandre_uri':uri})
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
 

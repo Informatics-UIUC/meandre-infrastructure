@@ -35,7 +35,7 @@ def coordinator_log ( request, response, format ):
                 map[k] = log_entry.get(k)
             content.append(map)
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
  
@@ -50,7 +50,7 @@ def coordinator_status ( request, response, format ):
                 map[k] = status_entry.get(k)
             content.append(map)
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
  
@@ -65,7 +65,7 @@ def coordinator_info ( request, response, format ):
                 map[k] = info_entry.get(k)
             content.append(map)
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
 
@@ -78,7 +78,7 @@ def coordinator_property ( request, response, format ):
             map = {'property_key':prop_key, 'property_value':properties.get(prop_key)}
             content.append(map)
         statusOK(response)
-        sendTJXContent(response,content,format)
+        sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
  
