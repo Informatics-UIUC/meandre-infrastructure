@@ -87,10 +87,10 @@ public class SystemStoreImpl implements SystemStore {
         this.model.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
         this.model.setNsPrefix("dc", "http://purl.org/dc/elements/1.1/");
 
-        if ( model.size()==0 ) {
-        	log.info("Empty model. Initializing a clean one.");
-            setProperty(REPOSITORY_LOCATION,"http://"+sHost+":"+iPort+"/public/services/repository.nt","The locally published components");
-        }
+//        if ( model.size()==0 ) {
+//        	log.info("Empty model. Initializing a clean one.");
+//            setProperty(REPOSITORY_LOCATION,"http://"+sHost+":"+iPort+"/public/services/repository.nt","The locally published components");
+//        }
 
         flush();
     }

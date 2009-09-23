@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.LineNumberReader;
 import java.io.PrintStream;
 import java.io.StringReader;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.URL;
 import java.sql.Connection;
@@ -737,7 +738,7 @@ public class Store {
 
 				modelTmp.setNsPrefix("", "http://www.meandre.org/ontology/");
 				modelTmp.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
-					modelTmp.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
+				modelTmp.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
 				modelTmp.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
 
 				//
@@ -746,13 +747,21 @@ public class Store {
 				try{
 					ModelIO.readModelInDialect(modelTmp, url);
 				}
+				catch ( ConnectException e ) {
+					log.warning("The location " + url.toString() + " is unreachable. The location is drop but components and flows may have been left behind\n");
+					//
+					// Remove the location form the system properties
+					//
+					ss.removeProperty(SystemStore.REPOSITORY_LOCATION, sLocation);       
+                    bRes = true;
+                    return bRes;
+				}
 				catch(Exception e){
                     log.warning("Store failed removing Location: " +
                             url.toString() + "\n"+
                             e.toString());
                     bRes = false;
                     return bRes;
-
                 }
 
 				synchronized ( qr ) {
