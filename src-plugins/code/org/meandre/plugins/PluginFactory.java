@@ -39,19 +39,19 @@ public class PluginFactory {
 	private final String sConfigFile = "meandre-config-plugins.xml";
 
 	/** The plugins logger */
-	private Logger log = PluginsLoggerFactory.getPluginsLogger();
+	private final Logger log = PluginsLoggerFactory.getPluginsLogger();
 
 	/** The plugin factory store */
 	private static Properties propPluginFactoryConfig;
 
 	/** The core configuration object */
-	private CoreConfiguration cnf;
+	private final CoreConfiguration cnf;
 
 	/** Files to transfer to the public directory */
-	private final static String [] saResources = { "logo-meandre.gif" };
+	private final static String [] saResources = { "logo-meandre.gif", "wait.gif" };
 
 	/** The target directory inside the public resources dir */
-	private final static String sRescoureDestination = "system/";
+	private final static String sResourceDestination = "system/";
 
 	/** Creates an uninitialized plugin factory and avoids other to instantiate it.
 	 *
@@ -162,7 +162,7 @@ public class PluginFactory {
 			}
 		}
 
-		File fileResDir = new File(file.getAbsolutePath()+File.separator+sRescoureDestination);
+		File fileResDir = new File(file.getAbsolutePath()+File.separator+sResourceDestination);
 		if  ( fileResDir.mkdirs() )  {
 			try {
 				for ( String sFile:saResources ) {
@@ -201,7 +201,7 @@ public class PluginFactory {
 		// Initializing the public file server
 		//
 		String sCntx = cnf.getAppContext();
-		
+
 		for ( Object oKey:propPluginFactoryConfig.keySet()) {
 			try {
 				String sClassName = propPluginFactoryConfig.getProperty(oKey.toString());
