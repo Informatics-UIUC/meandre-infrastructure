@@ -1,6 +1,9 @@
 package org.meandre.webui;
 
+import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -101,14 +104,21 @@ public class WebUIFactory {
 		}		
 	}
 	
-	/** Returns the set of running flows.
+	/** Returns the list of running flows.
 	 * 
-	 * @return The set of running flow ids
+	 * @return The list of running flow ids
 	 */
-	static public Set<String> getFlows () {
-		return htActiveWebUI.keySet();
+	static public List<String> getRunningFlowsWithWebUI () {
+		WebUI [] wa = new WebUI[htActivePortWebUI.size()];
+		LinkedList<String> lst = new LinkedList<String>();
+		htActiveWebUI.values().toArray(wa);
+		Arrays.sort(wa);
+		for ( WebUI webui:wa )
+			lst.add(webui.getFlowExecutionUniqueID());
+
+		return lst;
 	}
-	
+
 	/** Returns the set of ports running flows.
 	 * 
 	 * @return The set of currently in use ports

@@ -98,7 +98,7 @@ def execute_list_running_flows ( request, response, format ):
         content = []
         remote_user = request.getRemoteUser()
         jiba = meandre_store.getJobInformation()
-        for flow_uri in WebUIFactory.getFlows() :
+        for flow_uri in WebUIFactory.getRunningFlowsWithWebUI() :
             webui = WebUIFactory.getExistingWebUI(flow_uri)
             if ( webui is not None ) :
                 job_user_id = jiba.getJobOwner(flow_uri)

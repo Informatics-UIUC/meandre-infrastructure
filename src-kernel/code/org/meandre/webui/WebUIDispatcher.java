@@ -3,6 +3,7 @@ package org.meandre.webui;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -49,14 +50,15 @@ public class WebUIDispatcher extends AbstractHandler {
 	/**
 	 * Creates the default WebUI handler.
 	 * @param cnf The core configuration object
+	 * @param date The date when the flow started
 	 *
 	 */
-	public WebUIDispatcher(WebUI webUIParent, CoreConfiguration cnf) {
+	public WebUIDispatcher(WebUI webUIParent, CoreConfiguration cnf, Date date) {
 		// Initialize
 		this.webUIParent = webUIParent;
 		this.lstHandlers = new LinkedList<WebUIFragment>();
 		// Create the default handler
-		this.hdlDefault = new DefaultWebUIHandler(webUIParent,cnf);
+		this.hdlDefault = new DefaultWebUIHandler(webUIParent,cnf,date);
 		this.cnf = cnf;
 
 		// The resouce file server

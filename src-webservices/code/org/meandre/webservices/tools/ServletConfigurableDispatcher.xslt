@@ -343,6 +343,7 @@
 			          				</xsl:if>
 			          				<xsl:if test="flow_instance_uri">
 			          					<th>Job ID</th>
+			          					<th>Console</th>
 			          				</xsl:if>
      							    <xsl:if test="flow_instance_proxy_webui_relative">
 			          					<th>Proxy UI</th>
@@ -598,6 +599,12 @@
 				     			</xsl:if>
 				     			<xsl:if test="flow_instance_uri">
 		          					<td><xsl:value-of select="flow_instance_uri"/></td>
+		          					<td>
+		          						<a>
+		          							<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/jobs/job_console.html?uri=<xsl:value-of select="flow_instance_uri"/></xsl:attribute> 
+											view output
+		          						</a>
+		          					</td>
 		          				</xsl:if>
 		          				<xsl:if test="flow_instance_proxy_webui_relative">
 		          					<td>

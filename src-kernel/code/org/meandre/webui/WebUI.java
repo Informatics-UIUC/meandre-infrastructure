@@ -1,5 +1,6 @@
 package org.meandre.webui;
 
+import java.util.Date;
 import java.util.logging.Logger;
 
 import org.meandre.configuration.CoreConfiguration;
@@ -15,7 +16,7 @@ import org.mortbay.jetty.bio.SocketConnector;
  * @author Xavier Llor&agrave;
  *
  */
-public class WebUI {
+public class WebUI implements Comparable<WebUI> {
 
 	/** The flow execution unique ID */
 	private String sFlowUniqueID = null;
@@ -38,6 +39,9 @@ public class WebUI {
 	/** The core configuration object*/
 	private CoreConfiguration cnf = null;
 
+	/** The date when the flow was started */
+	private Date startedAt;
+
 	/** Creates a WebUI for the given flow on the specified port.
 	 *
 	 * @param flowUniqueID Unique flow execution ID
@@ -57,6 +61,7 @@ public class WebUI {
 		this.mrProbe = mrProbe;
 		this.iPort = iPort;
 		this.cnf = cnf;
+		this.startedAt = new Date();
 		// Creating the server and the connector
 		this.server = new Server();
 		Connector connector = new SocketConnector();
@@ -68,7 +73,7 @@ public class WebUI {
 		//PluginFactory.initializeGlobalCorePlugins(server, log);
 
 		// Add the default WebUI dispatcher handler
-		webUIDispatcher = new WebUIDispatcher(this, cnf);
+		webUIDispatcher = new WebUIDispatcher(this, cnf, this.startedAt);
 		this.server.addHandler(webUIDispatcher);
 		try {
 			this.server.start();
@@ -148,11 +153,30 @@ public class WebUI {
 		this.mrProper = thdMrPropper;
 	}
 
-	/**
+	/** Returns the webUIDispatcher
+	 * 
 	 * @return the webUIDispatcher
 	 */
 	public WebUIDispatcher getWebUIDispatcher() {
 		return webUIDispatcher;
 	}
+	
+	/** Return the date when the webui was started.
+	 * 
+	 * @return The starting date
+	 */
+	public Date getStatingDate () {
+		return this.startedAt;
+	}
+	
+	/** Compare the WebUI to help sort webUI by starting date.
+	 * 
+	 * @param o1 The first webui to compare
+	 * @return The comparison outcome
+	 */
+	public int compareTo(WebUI o) {
+		return this.startedAt.compareTo(o.getStatingDate());
+	}
+	
 
 }

@@ -34,11 +34,12 @@ public class DefaultWebUIHandler extends AbstractHandler {
 	 *
 	 * @param webUIParent The parent webUI
 	 * @param cnf The core configuration
+	 * @param date The date when the flow was started
 	 */
-	public DefaultWebUIHandler ( WebUI webUIParent, CoreConfiguration cnf ) {
+	public DefaultWebUIHandler ( WebUI webUIParent, CoreConfiguration cnf, Date date ) {
 		this.webUIParent = webUIParent;
 		this.cnf = cnf;
-		this.startedAt = new Date();
+		this.startedAt = date;
 		this.startedAtMS = this.startedAt.getTime();
 	}
 
