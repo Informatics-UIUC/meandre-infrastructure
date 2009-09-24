@@ -1,4 +1,4 @@
-package org.seasr.meandre.components.test;
+package org.meandre.components.test.framework;
 
 import static org.junit.Assert.fail;
 
@@ -24,7 +24,6 @@ import org.meandre.core.engine.Executor;
 import org.meandre.core.engine.MrProbe;
 import org.meandre.core.engine.probes.NullProbeImpl;
 import org.meandre.core.logger.KernelLoggerFactory;
-import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.webui.PortScroller;
@@ -44,7 +43,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /** The base class for performing component testing.
- * 
+ *
  * @author Xavier Llor&agrave;
  *
  */
@@ -69,20 +68,20 @@ public class ComponentTesterBase {
 	private int BASE_TEST_PORT = 60000;
 
 	/** Creates a new component tester with defaults.
-	 * 
+	 *
 	 */
 	public ComponentTesterBase () {
 
 	}
 
 	/** Creates a new component tester with defaults.
-	 * 
+	 *
 	 * @param fd The ZigZag flow's directory
 	 * @param td The temporary folder
 	 * @param tdd The temporary description folder
 	 * @param src The array of source directories to explore
 	 * @param port The base port for the tests
-	 * 
+	 *
 	 */
 	public ComponentTesterBase (String fd, String td, String tdd, String[] src, int port) {
 		FLOWS_DIR = fd;
@@ -107,7 +106,7 @@ public class ComponentTesterBase {
 	}
 
 	/** Process the Java files and generate the descriptors
-	 * 
+	 *
 	 * @param lst The list of files to process
 	 */
 	private void processJavaFiles(List<File> lst) {
@@ -117,7 +116,7 @@ public class ComponentTesterBase {
 		for ( File file:lst ) {
 			String sFile = file.toString();
 			String sClassName = processFileName(sFile);
-			System.out.print("\t\t"+sClassName+"..."); 
+			System.out.print("\t\t"+sClassName+"...");
 			try {
 				CreateComponentDescriptor ccd = new CreateComponentDescriptor();
 				ccd.setComponentClassName(sClassName);
@@ -128,13 +127,13 @@ public class ComponentTesterBase {
 			}
 			catch ( Exception e ) {
 				System.out.println("\t\t not a component!");
-			}      
+			}
 		}
 		System.out.println("\t... done");
 	}
 
 	/** Given a path file name return the name of the class.
-	 * 
+	 *
 	 * @param sFile File name to process
 	 * @return The class file name
 	 */
@@ -150,7 +149,7 @@ public class ComponentTesterBase {
 	}
 
 	/** Returns the list of java files contained in the source folders.
-	 * 
+	 *
 	 * @return The list with the files
 	 */
 	private List<File> getJavaFilesToProcess() {
@@ -166,7 +165,7 @@ public class ComponentTesterBase {
 	}
 
 	/** Populates the list with the Java files.
-	 * 
+	 *
 	 * @param lst The list to populate
 	 * @param file The current file being explored
 	 * @return True if succeeded, false otherwise
@@ -181,19 +180,19 @@ public class ComponentTesterBase {
 				}
 			}
 		}
-		else 
+		else
 			if ( file.toString().endsWith(".java"))
 				lst.add(file);
-		return true;         
+		return true;
 	}
 
 	/** Clean the temporary folder by deleting it
-	 * 
+	 *
 	 */
 	private void cleanTempFolder() {
 		System.out.print("\tDeleting temp directory "+getTempFolder()+"... ");
 		File fileTemp = new File(getTempFolder());
-		if ( fileTemp.exists() ) 
+		if ( fileTemp.exists() )
 			if ( !deleteDir(fileTemp) )
 				fail("Failed to delete temporaty directory "+getTempFolder());
 		fileTemp.mkdirs();
@@ -201,9 +200,9 @@ public class ComponentTesterBase {
 	}
 
 	/**  Deletes all files and subdirectories under dir.
-	 *   Returns true if all deletions were successful. 
+	 *   Returns true if all deletions were successful.
 	 *   If a deletion fails, the method stops attempting to delete and returns false.
-	 *   
+	 *
 	 * @param dir The directory to delete
 	 * @return True if it was properly cleaned, false otherwise
 	 */
@@ -224,7 +223,7 @@ public class ComponentTesterBase {
 
 
 	/** Create the list of descriptors available from the temp folder.
-	 * 
+	 *
 	 * @return The string containing the imports
 	 */
 	private List<String> getDescriptorFiles () {
@@ -244,7 +243,7 @@ public class ComponentTesterBase {
 	}
 
 	/** Create the list of imports available from the temp folder.
-	 * 
+	 *
 	 * @return The string containing the imports
 	 */
 	private String getImports () {
@@ -256,7 +255,7 @@ public class ComponentTesterBase {
 	}
 
 	/** Given a ZigZag name it returns the script with the proper imports added.
-	 * 
+	 *
 	 * @param sFileName The ZigZag script name
 	 * @return The ZgZag script
 	 */
@@ -281,7 +280,7 @@ public class ComponentTesterBase {
 	}
 
 	/** Runs a ZigZag script trapping the output and error streams.
-	 * 
+	 *
 	 * @param sZigZag The ZigZag script
 	 * @param out The output stream
 	 * @param err The error stream
@@ -297,22 +296,22 @@ public class ComponentTesterBase {
 		try {
 			fg = generateFlowDescriptor(sZigZag);
 			flow = fg.getFlowDescription(""+System.currentTimeMillis(),true);
-			ri = new RepositoryImpl(flow.getModel()); 
+			ri = new RepositoryImpl(flow.getModel());
 		} catch (Throwable t) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			t.printStackTrace(new PrintStream(baos));
 			fail(baos.toString());
-		} 
+		}
 
 		// Add all the descriptor files
 		Model modRep = ri.getModel();
 		addComponentDescriptorsToModel(modRep);
 		modRep.add(fg.getRepository().getModel());
 		ri.refreshCache(modRep);
-		
+
 		// Set the streams
 		PrintStream origOUT = System.out; PrintStream origERR = System.err;
-		System.setOut(psOut); System.setErr(psErr); 
+		System.setOut(psOut); System.setErr(psErr);
 
 		CoreConfiguration cnf = new CoreConfiguration(BASE_TEST_PORT,".");
 		Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
@@ -327,14 +326,14 @@ public class ComponentTesterBase {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			t.printStackTrace(new PrintStream(baos));
 			fail(baos.toString());
-		} 
+		}
 
 		// Reset the streams
-		System.setOut(origOUT); System.setErr(origERR);        
+		System.setOut(origOUT); System.setErr(origERR);
 	}
 
 	/** Add all the generated component descriptors to the model
-	 * 
+	 *
 	 * @param modRep The model to populate
 	 */
 	private void addComponentDescriptorsToModel(Model modRep) {
@@ -347,7 +346,7 @@ public class ComponentTesterBase {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				t.printStackTrace(new PrintStream(baos));
 				fail(baos.toString());
-			} 
+			}
 		}
 	}
 
@@ -384,7 +383,7 @@ public class ComponentTesterBase {
 	}
 
 	/** Returns a list of the basic ZigZag files.
-	 * 
+	 *
 	 * @return The list of ZigZag
 	 */
 	private List<File> getZigZagFiles () {
@@ -393,14 +392,14 @@ public class ComponentTesterBase {
 		String[] children = dir.list();
 		for (int i=0; i<children.length; i++) {
 			if ( children[i].toString().endsWith(".zz") )
-				lst.add(new File(children[i]));               
+				lst.add(new File(children[i]));
 		}
 
 		return lst;
 	}
 
 	/** Computes basic component coverage by the test flows
-	 * 
+	 *
 	 */
 	private void runCoverageOfFlows() {
 		System.out.println("Analysing component coverage...");
@@ -468,9 +467,9 @@ public class ComponentTesterBase {
 
 	/** Creates a repository containing all the components and flows to allow
 	 * coverage analysis
-	 * 
+	 *
 	 * @return The generated model
-	 * 
+	 *
 	 */
 	private Model createRepositoryForCoverageAnalays() {
 		Model model = ModelFactory.createDefaultModel();
@@ -487,7 +486,7 @@ public class ComponentTesterBase {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				t.printStackTrace(new PrintStream(baos));
 				fail(baos.toString());
-			}            
+			}
 		}
 
 		// Add the components
@@ -497,7 +496,7 @@ public class ComponentTesterBase {
 	}
 
 	/** Set the flows folder
-	 * 
+	 *
 	 * @param fLOWS_DIR the fLOWS_DIR to set
 	 */
 	public void setFlowsFolder(String fLOWS_DIR) {
@@ -505,7 +504,7 @@ public class ComponentTesterBase {
 	}
 
 	/** Gets the flows folder.
-	 * 
+	 *
 	 * @return the fLOWS_DIR
 	 */
 	public String getFlowsFolder() {
@@ -513,7 +512,7 @@ public class ComponentTesterBase {
 	}
 
 	/** Set the temporary folder
-	 * 
+	 *
 	 * @param tEMP_DIR the tEMP_DIR to set
 	 */
 	public void setTempFolder(String tEMP_DIR) {
@@ -521,7 +520,7 @@ public class ComponentTesterBase {
 	}
 
 	/** Get the temporary folder
-	 * 
+	 *
 	 * @return the tEMP_DIR
 	 */
 	public String getTempFolder() {
@@ -529,7 +528,7 @@ public class ComponentTesterBase {
 	}
 
 	/** Set the temp descriptors folder
-	 * 
+	 *
 	 * @param tEMP_DESC_DIR the tEMP_DESC_DIR to set
 	 */
 	public void setTempDescriptorFolder(String tEMP_DESC_DIR) {
@@ -537,7 +536,7 @@ public class ComponentTesterBase {
 	}
 
 	/** Get the temp descriptors folder
-	 * 
+	 *
 	 * @return the tEMP_DESC_DIR
 	 */
 	public String getTempDescriptorFolder() {
@@ -545,7 +544,7 @@ public class ComponentTesterBase {
 	}
 
 	/** Set source folder.
-	 * 
+	 *
 	 * @param sRC_FOLDERS the sRC_FOLDERS to set
 	 */
 	public void setSourceFolders(String [] sRC_FOLDERS) {
@@ -553,7 +552,7 @@ public class ComponentTesterBase {
 	}
 
 	/** Get source folder.
-	 * 
+	 *
 	 * @return the sRC_FOLDERS
 	 */
 	public String [] getSourceFolders() {
@@ -561,7 +560,7 @@ public class ComponentTesterBase {
 	}
 
 	/** Set the base port for the execution
-	 * 
+	 *
 	 * @param bASE_TEST_PORT the bASE_TEST_PORT to set
 	 */
 	public void setBaseTestPort(int bASE_TEST_PORT) {
@@ -569,7 +568,7 @@ public class ComponentTesterBase {
 	}
 
 	/** Get the base port for the execution
-	 * 
+	 *
 	 * @return the bASE_TEST_PORT
 	 */
 	public int getBaseTestPort() {
