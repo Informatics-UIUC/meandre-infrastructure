@@ -1,4 +1,4 @@
-package org.meandre.components.test.framework;
+package org.seasr.meandre.components.test;
 
 import static org.junit.Assert.fail;
 
@@ -24,6 +24,7 @@ import org.meandre.core.engine.Executor;
 import org.meandre.core.engine.MrProbe;
 import org.meandre.core.engine.probes.NullProbeImpl;
 import org.meandre.core.logger.KernelLoggerFactory;
+import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.webui.PortScroller;
@@ -48,32 +49,32 @@ import com.hp.hpl.jena.rdf.model.Resource;
  *
  */
 public class ComponentTesterBase {
-	
+
 	/** The new line character */
 	public final static String NEW_LINE = System.getProperty("line.separator");
-	
+
 	/** The test flows dir location */
 	private String FLOWS_DIR = "."+File.separator+"test"+File.separator+"flows";
-	
+
 	/** The temporary folder location */
 	private String TEMP_DIR = "."+File.separator+"tmp";
-	
+
 	/** The temporary folder for descriptors location */
 	private String TEMP_DESC_DIR = "."+File.separator+"tmp"+File.separator+"desc";
-	
+
 	/** Source packages to process */
 	private  String [] SRC_FOLDERS = { "src-tools" };
-	
+
 	/** The base test port */
 	private int BASE_TEST_PORT = 60000;
-	
+
 	/** Creates a new component tester with defaults.
 	 * 
 	 */
 	public ComponentTesterBase () {
-		
+
 	}
-	
+
 	/** Creates a new component tester with defaults.
 	 * 
 	 * @param fd The ZigZag flow's directory
@@ -90,7 +91,7 @@ public class ComponentTesterBase {
 		SRC_FOLDERS = src;
 		BASE_TEST_PORT = port;
 	}
-	
+
 	/** Generates the descriptors for the specified folders */
 	public void initialize () {
 		System.out.println("-------------------------------------------------------------------------------");
@@ -113,21 +114,21 @@ public class ComponentTesterBase {
 		System.out.println("\tProcessing "+lst.size()+" files...");
 		CreateComponentDescriptor.setMakeSubs(true);
 		new File(getTempDescriptorFolder()).mkdirs();
-        for ( File file:lst ) {
+		for ( File file:lst ) {
 			String sFile = file.toString();
 			String sClassName = processFileName(sFile);
 			System.out.print("\t\t"+sClassName+"..."); 
 			try {
 				CreateComponentDescriptor ccd = new CreateComponentDescriptor();
-		        ccd.setComponentClassName(sClassName);
-		        ccd.setComponentDescriptorFolderName(getTempDescriptorFolder());
-		        ccd.setComponentDescriptorFile(new File(getTempDescriptorFolder()));
-		        ccd.processComponentDescriptor();
-		        System.out.println("\t\t done");
+				ccd.setComponentClassName(sClassName);
+				ccd.setComponentDescriptorFolderName(getTempDescriptorFolder());
+				ccd.setComponentDescriptorFile(new File(getTempDescriptorFolder()));
+				ccd.processComponentDescriptor();
+				System.out.println("\t\t done");
 			}
 			catch ( Exception e ) {
 				System.out.println("\t\t not a component!");
-			}			
+			}      
 		}
 		System.out.println("\t... done");
 	}
@@ -172,18 +173,18 @@ public class ComponentTesterBase {
 	 */
 	private boolean populateListWithJavaFiles(List<File> lst, File file) {
 		if (file.isDirectory()) {
-            String[] children = file.list();
-            for (int i=0; i<children.length; i++) {
-                boolean success = populateListWithJavaFiles(lst, new File(file, children[i]));
-                if (!success) {
-                    return false;
-                }
-            }
-        }
+			String[] children = file.list();
+			for (int i=0; i<children.length; i++) {
+				boolean success = populateListWithJavaFiles(lst, new File(file, children[i]));
+				if (!success) {
+					return false;
+				}
+			}
+		}
 		else 
 			if ( file.toString().endsWith(".java"))
 				lst.add(file);
-		return true;		
+		return true;         
 	}
 
 	/** Clean the temporary folder by deleting it
@@ -198,7 +199,7 @@ public class ComponentTesterBase {
 		fileTemp.mkdirs();
 		System.out.println("done");
 	}
-	
+
 	/**  Deletes all files and subdirectories under dir.
 	 *   Returns true if all deletions were successful. 
 	 *   If a deletion fails, the method stops attempting to delete and returns false.
@@ -206,66 +207,66 @@ public class ComponentTesterBase {
 	 * @param dir The directory to delete
 	 * @return True if it was properly cleaned, false otherwise
 	 */
-    private boolean deleteDir(File dir) {
-        if (dir.isDirectory()) {
-            String[] children = dir.list();
-            for (int i=0; i<children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
-                if (!success) {
-                    return false;
-                }
-            }
-        }
-    
-        // The directory is now empty so delete it
-        return dir.delete();
-    }
+	private boolean deleteDir(File dir) {
+		if (dir.isDirectory()) {
+			String[] children = dir.list();
+			for (int i=0; i<children.length; i++) {
+				boolean success = deleteDir(new File(dir, children[i]));
+				if (!success) {
+					return false;
+				}
+			}
+		}
+
+		// The directory is now empty so delete it
+		return dir.delete();
+	}
 
 
-    /** Create the list of descriptors available from the temp folder.
-     * 
-     * @return The string containing the imports
-     */
-    private List<String> getDescriptorFiles () {
-    	List<String> lst = new LinkedList<String>();
-    	File dir = new File(getTempDescriptorFolder());
-    	for ( String sFile:dir.list() ) {
-    		File here = new File("");
-    		String sRDFFile = here.getAbsolutePath()+getTempDescriptorFolder().substring(1)+File.separator+sFile;
-    		try {
+	/** Create the list of descriptors available from the temp folder.
+	 * 
+	 * @return The string containing the imports
+	 */
+	private List<String> getDescriptorFiles () {
+		List<String> lst = new LinkedList<String>();
+		File dir = new File(getTempDescriptorFolder());
+		for ( String sFile:dir.list() ) {
+			File here = new File("");
+			String sRDFFile = here.getAbsolutePath()+getTempDescriptorFolder().substring(1)+File.separator+sFile;
+			try {
 				URL fileURL = new URL("file:////"+sRDFFile);
 				lst.add(fileURL.toString().replaceAll(" ","%20"));
 			} catch (MalformedURLException e) {
 				fail(e.toString());
 			}
-    	}
-    	return lst;
-    }
-    
-    /** Create the list of imports available from the temp folder.
-     * 
-     * @return The string containing the imports
-     */
-    private String getImports () {
-    	StringBuffer sb = new StringBuffer();
-    	for ( String sURL:getDescriptorFiles() )
-    		sb.append("import <"+sURL+">"+NEW_LINE);
-    	sb.append(NEW_LINE);
-    	return sb.toString();
-    }
+		}
+		return lst;
+	}
 
-    /** Given a ZigZag name it returns the script with the proper imports added.
-     * 
-     * @param sFileName The ZigZag script name
-     * @return The ZgZag script
-     */
-    public String getZigZag ( String sFileName ) {
-    	String sImports = getImports();
-    	
-    	StringBuffer sb = new StringBuffer(sImports);
-    	
-    	String sFile = getFlowsFolder()+File.separator+sFileName;
-    	try {
+	/** Create the list of imports available from the temp folder.
+	 * 
+	 * @return The string containing the imports
+	 */
+	private String getImports () {
+		StringBuffer sb = new StringBuffer();
+		for ( String sURL:getDescriptorFiles() )
+			sb.append("import <"+sURL+">"+NEW_LINE);
+		sb.append(NEW_LINE);
+		return sb.toString();
+	}
+
+	/** Given a ZigZag name it returns the script with the proper imports added.
+	 * 
+	 * @param sFileName The ZigZag script name
+	 * @return The ZgZag script
+	 */
+	public String getZigZag ( String sFileName ) {
+		String sImports = getImports();
+
+		StringBuffer sb = new StringBuffer(sImports);
+
+		String sFile = getFlowsFolder()+File.separator+sFileName;
+		try {
 			LineNumberReader lnr = new LineNumberReader(new FileReader(sFile));
 			String sLine = null;
 			while ( (sLine=lnr.readLine())!=null )
@@ -275,59 +276,62 @@ public class ComponentTesterBase {
 		} catch (IOException e) {
 			fail(e.toString());
 		}
-    	
-    	return sb.toString();
-    }
-    
-    /** Runs a ZigZag script trapping the output and error streams.
-     * 
-     * @param sZigZag The ZigZag script
-     * @param out The output stream
-     * @param err The error stream
-     */
-    public void runZigZag ( String sZigZag, ByteArrayOutputStream out, ByteArrayOutputStream err ) {
-    	PrintStream psOut = new PrintStream(out);
-    	PrintStream psErr = new PrintStream(err);
-    	
-    	// Parse the ZigZag
-    	FlowDescription flow = null;
-    	RepositoryImpl ri = null;
-    	try {
-    		flow = generateFlowDescriptor(sZigZag);
-            ri = new RepositoryImpl(flow.getModel()); 
+
+		return sb.toString();
+	}
+
+	/** Runs a ZigZag script trapping the output and error streams.
+	 * 
+	 * @param sZigZag The ZigZag script
+	 * @param out The output stream
+	 * @param err The error stream
+	 */
+	public void runZigZag ( String sZigZag, ByteArrayOutputStream out, ByteArrayOutputStream err ) {
+		PrintStream psOut = new PrintStream(out);
+		PrintStream psErr = new PrintStream(err);
+
+		// Parse the ZigZag
+		FlowGenerator fg = null;
+		FlowDescription flow = null;
+		RepositoryImpl ri = null;
+		try {
+			fg = generateFlowDescriptor(sZigZag);
+			flow = fg.getFlowDescription(""+System.currentTimeMillis(),true);
+			ri = new RepositoryImpl(flow.getModel()); 
 		} catch (Throwable t) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        	t.printStackTrace(new PrintStream(baos));
+			t.printStackTrace(new PrintStream(baos));
 			fail(baos.toString());
 		} 
-		
+
 		// Add all the descriptor files
 		Model modRep = ri.getModel();
 		addComponentDescriptorsToModel(modRep);
+		modRep.add(fg.getRepository().getModel());
 		ri.refreshCache(modRep);
 		
-    	// Set the streams
-    	PrintStream origOUT = System.out; PrintStream origERR = System.err;
-    	System.setOut(psOut); System.setErr(psErr); 
-    	
-    	CoreConfiguration cnf = new CoreConfiguration(BASE_TEST_PORT,".");
-    	Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
-    	MrProbe mrProbe = new MrProbe(KernelLoggerFactory.getCoreLogger(),new NullProbeImpl(),false,false);
-        try {
+		// Set the streams
+		PrintStream origOUT = System.out; PrintStream origERR = System.err;
+		System.setOut(psOut); System.setErr(psErr); 
+
+		CoreConfiguration cnf = new CoreConfiguration(BASE_TEST_PORT,".");
+		Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
+		MrProbe mrProbe = new MrProbe(KernelLoggerFactory.getCoreLogger(),new NullProbeImpl(),false,false);
+		try {
 			String sFUID = flow.getFlowComponent().toString()+"/"+System.currentTimeMillis();
 			Executor exec = conductor.buildExecutor(ri, flow.getFlowComponent(), mrProbe,System.out,sFUID);
 			int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
-            WebUI webui = exec.initWebUI(nextPort,sFUID);
+			WebUI webui = exec.initWebUI(nextPort,sFUID);
 			exec.execute(webui);
-        } catch (Throwable t) {
-        	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        	t.printStackTrace(new PrintStream(baos));
+		} catch (Throwable t) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			t.printStackTrace(new PrintStream(baos));
 			fail(baos.toString());
 		} 
-    	
-    	// Reset the streams
-    	System.setOut(origOUT); System.setErr(origERR);    	
-    }
+
+		// Reset the streams
+		System.setOut(origOUT); System.setErr(origERR);        
+	}
 
 	/** Add all the generated component descriptors to the model
 	 * 
@@ -341,7 +345,7 @@ public class ComponentTesterBase {
 				modRep.add(model);
 			} catch (Throwable t) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	        	t.printStackTrace(new PrintStream(baos));
+				t.printStackTrace(new PrintStream(baos));
 				fail(baos.toString());
 			} 
 		}
@@ -352,19 +356,17 @@ public class ComponentTesterBase {
 	 * @return
 	 * @throws ParseException
 	 */
-	private FlowDescription generateFlowDescriptor(String sZigZag)
-			throws ParseException {
-		FlowDescription flow;
+	private FlowGenerator generateFlowDescriptor(String sZigZag)
+	throws ParseException {
 		FlowGenerator fg = new FlowGenerator();
 		fg.setPrintStream(new PrintStream(new NullOuputStream()));
 		fg.init(null);
 		ZigZag parser = new ZigZag(new StringReader(sZigZag));
 		parser.setFlowGenerator(fg);
 		parser.start();
-		flow = fg.getFlowDescription(""+System.currentTimeMillis(),true);
-		return flow;
+		return fg;
 	}
-    
+
 	/** Print the coverage reports */
 	public void printCoverageReport () {
 		// Clean the temp folder
@@ -372,8 +374,8 @@ public class ComponentTesterBase {
 		runCoverageOfFlows();
 		System.out.println("-------------------------------------------------------------------------------");
 	}
-	
-    /** Generates the descriptors for the specified folders */
+
+	/** Generates the descriptors for the specified folders */
 	public void destroy () {
 		System.out.println("-------------------------------------------------------------------------------");
 		System.out.println("Tearing down the resources used in tests");
@@ -389,62 +391,63 @@ public class ComponentTesterBase {
 		List<File> lst = new LinkedList<File>();
 		File dir = new File(FLOWS_DIR);
 		String[] children = dir.list();
-        for (int i=0; i<children.length; i++) {
-            if ( children[i].toString().endsWith(".zz") )
-            	lst.add(new File(children[i]));            	
-        }
-		
+		for (int i=0; i<children.length; i++) {
+			if ( children[i].toString().endsWith(".zz") )
+				lst.add(new File(children[i]));               
+		}
+
 		return lst;
 	}
-	
+
 	/** Computes basic component coverage by the test flows
 	 * 
 	 */
 	private void runCoverageOfFlows() {
 		System.out.println("Analysing component coverage...");
 		Model model = createRepositoryForCoverageAnalays();
-		
+
 		// Get the components available
 		String QUERY_COMPONENTS =
-	             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
-	             "PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
-	             "SELECT ?component  " +
-	             "WHERE { " +
-	             "     ?component rdf:type meandre:executable_component " +
-	             "}" ;
+			"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
+			"PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
+			"SELECT ?component  " +
+			"WHERE { " +
+			"     ?component rdf:type meandre:executable_component " +
+			"}" ;
 
-         Map<Resource,Integer> hsRes = new Hashtable<Resource,Integer>();
-         Query query = QueryFactory.create(QUERY_COMPONENTS) ;
-         QueryExecution exec = QueryExecutionFactory.create(query, model, null);
-         ResultSet results = exec.execSelect();
+		Map<Resource,Integer> hsRes = new Hashtable<Resource,Integer>();
+		Query query = QueryFactory.create(QUERY_COMPONENTS) ;
+		QueryExecution exec = QueryExecutionFactory.create(query, model, null);
+		ResultSet results = exec.execSelect();
 
-         while ( results.hasNext() )
-              hsRes.put(results.nextSolution().getResource("component"),0);
-         
-         // Get components used in flows
- 		String QUERY_COMPONENT_INSTANCES =
- 	             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
- 	             "PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
- 	             "SELECT ?component  " +
- 	             "WHERE { " +
- 	             "     ?eci meandre:instance_resource ?component " +
- 	             "}" ;
+		while ( results.hasNext() )
+			hsRes.put(results.nextSolution().getResource("component"),0);
 
- 		Query queryIns = QueryFactory.create(QUERY_COMPONENT_INSTANCES) ;
-	    QueryExecution execIns = QueryExecutionFactory.create(queryIns, model, null);
-	    ResultSet resultsIns = execIns.execSelect();
-	
-	    int iTotal = 0;
-	    while ( resultsIns.hasNext() ) {
-	    	  Resource res = resultsIns.nextSolution().getResource("component");
-	          hsRes.put(res,hsRes.get(res)+1);
-	          iTotal++;
-	    }
+		// Get components used in flows
+		String QUERY_COMPONENT_INSTANCES =
+			"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
+			"PREFIX meandre: <http://www.meandre.org/ontology/>\n"+
+			"SELECT ?component  " +
+			"WHERE { " +
+			"     ?eci meandre:instance_resource ?component " +
+			"}" ;
 
-        int iUsed = 0;
-        int iComps = 0;
-        System.out.println("\tComponent usage");
-        for ( Resource res:hsRes.keySet() ) {
+		Query queryIns = QueryFactory.create(QUERY_COMPONENT_INSTANCES) ;
+		QueryExecution execIns = QueryExecutionFactory.create(queryIns, model, null);
+		ResultSet resultsIns = execIns.execSelect();
+
+		int iTotal = 0;
+		while ( resultsIns.hasNext() ) {
+			Resource res = resultsIns.nextSolution().getResource("component");
+			if ( hsRes.containsKey(res) )
+				hsRes.put(res,hsRes.get(res)+1);
+			iTotal++;
+		}
+
+		int iUsed = 0;
+		int iComps = 0;
+		System.out.println("\tComponent usage");
+		for ( Resource res:hsRes.keySet() ) {
 			int iCount = hsRes.get(res);
 			float fPercent = (iTotal>0) ? 100*((float)iCount)/iTotal : 0 ;
 			String sMsg = (iCount==0) ? "(!!)" : "OK  ";
@@ -452,15 +455,15 @@ public class ComponentTesterBase {
 			System.out.println("\t\t"+sMsg+" "+res+"\t\tused "+iCount+" times ("+fPercent+"%)");
 			iComps++;
 		}
-		
-        System.out.println("\tComponent coverage");
-        if ( iUsed!=iComps )
+
+		System.out.println("\tComponent coverage");
+		if ( iUsed!=iComps )
 			System.out.println("\t\t(!!) Only "+iUsed+"/"+iComps+" ("+(((float)iUsed)/iComps)+"%) components used on the provided test flows");
 		else
 			System.out.println("\t\tAll components used on the provided test flows");
-		
-        System.out.println("...done");
-	     		
+
+		System.out.println("...done");
+
 	}
 
 	/** Creates a repository containing all the components and flows to allow
@@ -477,18 +480,19 @@ public class ComponentTesterBase {
 			String[] saFile = f.toString().split(File.separator);
 			String sZigZag = getZigZag(saFile[saFile.length-1]);
 			try {
-				FlowDescription fd = generateFlowDescriptor(sZigZag);
-				model.add(fd.getModel());
+				FlowGenerator fd = generateFlowDescriptor(sZigZag);
+				FlowDescription flow = fd.getFlowDescription(""+System.currentTimeMillis(),true);
+				model.add(flow.getModel());
 			} catch (Throwable t) {
-	        	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	        	t.printStackTrace(new PrintStream(baos));
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				t.printStackTrace(new PrintStream(baos));
 				fail(baos.toString());
-			} 			
+			}            
 		}
-		
+
 		// Add the components
 		addComponentDescriptorsToModel(model);
-		
+
 		return model;
 	}
 
@@ -571,5 +575,5 @@ public class ComponentTesterBase {
 	public int getBaseTestPort() {
 		return BASE_TEST_PORT;
 	}
-	
+
 }
