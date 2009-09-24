@@ -12,7 +12,7 @@
         message="This project requires at least Java 5. Please set JAVA_HOME to point to where the JDK is installed."/>
     
     <!-- here is the version of ivy we will use. change this property to try a newer version if you want -->
-    <property name="ivy.install.version" value="2.1.0-rc1" />
+    <property name="ivy.install.version" value="2.1.0-rc2" />
     <property name="ivy.jar.dir" value="${basedir}/ivy" />
     <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
     
