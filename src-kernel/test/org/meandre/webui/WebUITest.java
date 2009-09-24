@@ -128,7 +128,7 @@ public class WebUITest {
 			WebUI webui = WebUIFactory.getWebUI(this.sFlowUniqueID, this.mrProper, this.mrProbe, this.cnf, this.port);
 			assertNotNull(webui);
 			String sString = getGetRequestContent("/");
-			assertTrue(sString.indexOf("No WebUI available at this point of execution")>0);
+			assertTrue(sString.indexOf("The flow is currently running. Please wait.")>0);
 			WebUIFactory.disposeWebUI(this.sFlowUniqueID);
 			
 		 } catch (WebUIException e) {

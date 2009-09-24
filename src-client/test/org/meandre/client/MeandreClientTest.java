@@ -208,10 +208,10 @@ public class MeandreClientTest {
         Set<LocationBean> locs = null;
         
         String sUrlExpected = "http://" + _serverUrl + ":" + _serverPort;
-        sUrlExpected += "/public/services/repository.nt";
+        sUrlExpected += "/public/services/demo_repository.nt";
         
         //String sDescriptionExpected = "not the right description";
-        String sDescriptionExpected = "The locally published components";
+        String sDescriptionExpected = "Hello Demo";
         LocationBean lbExpected = new LocationBean(sUrlExpected, sDescriptionExpected);
         System.out.println("ExpectedLoc:");
         System.out.println(lbExpected.toString());
@@ -226,8 +226,9 @@ public class MeandreClientTest {
             System.out.println("isExpected? = " + lbExpected.equals(lb));
             
         }
-        assertTrue("! .../services/repository.nt", locs.contains(lbExpected));
-
+        // assertTrue("! .../services/repository.nt", locs.contains(lbExpected));
+        // This location has been permanently remove to avoid confusion on the users.
+        assertTrue("! .../services/demo_repository.nt", locs.contains(lbExpected));
     }
 
     /**
