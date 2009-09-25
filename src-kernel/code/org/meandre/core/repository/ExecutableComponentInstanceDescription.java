@@ -7,7 +7,8 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * @author Xavier Llor&agrave;
  *
  */
-public class ExecutableComponentInstanceDescription {
+public class ExecutableComponentInstanceDescription
+implements Comparable<ExecutableComponentInstanceDescription>{
 
 
 	/** The resource for the executable component */
@@ -138,6 +139,15 @@ public class ExecutableComponentInstanceDescription {
 	 */
 	public PropertiesDescription getProperties () {
 		return pdProperties;
+	}
+	
+	/** Just compares by name, to help produce an alphabetical sort.
+	 * 
+	 * @param ecid The other flow descriptor to test
+	 * @return The result of the comparison
+	 */
+	public int compareTo(ExecutableComponentInstanceDescription ecid) {
+		return this.sName.compareTo(ecid.sName);
 	}
 
 }

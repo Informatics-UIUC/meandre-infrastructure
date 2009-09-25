@@ -379,7 +379,7 @@ def __render_flow ( flow_desc, edit, qr ):
         html += __render_basic_metadata(flow_desc)
         html += __render_descriptor_download(flow_desc.getFlowComponentAsString())
         html += '<tr><th valign="top"><strong>Instances:</strong></th><td>'
-        for ecid in flow_desc.getExecutableComponentInstances() :
+        for ecid in flow_desc.getExecutableComponentInstancesOrderedByName() :
             html += '<table>'+render_component_instance(ecid)+'</table><br/>'
         html += '</td></tr>'
         if edit is False :
