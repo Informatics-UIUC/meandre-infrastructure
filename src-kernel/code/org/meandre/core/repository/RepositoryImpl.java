@@ -1252,7 +1252,7 @@ public class RepositoryImpl implements QueryableRepository {
 
 	/** Returns the set of available flows descriptions in the repository.
 	 *
-	 * @return The set of resources describing the available flows
+	 * @return The set of flow descriptors describing the available flows
 	 */
 	public Set<FlowDescription> getAvailableFlowDescriptions() {
 		Set<FlowDescription> setFD = new HashSet<FlowDescription>();
