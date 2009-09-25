@@ -1,9 +1,11 @@
 package org.meandre.core.repository;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Set;
 
 import org.meandre.core.utils.vocabulary.RepositoryVocabulary;
@@ -23,7 +25,7 @@ import com.hp.hpl.jena.vocabulary.XSD;
  * @author Xavier Llor&agrave;
  *
  */
-public class FlowDescription {
+public class FlowDescription  {
 
 	/** The resource for the flow component */
 	private Resource resFlowComponent = null;
@@ -296,7 +298,19 @@ public class FlowDescription {
 	public Set<ExecutableComponentInstanceDescription> getExecutableComponentInstances () {
 		return setExecutableComponentInstances;
 	}
+	
 
+	/** Returns the list of executable component instances ordered by name.
+	 *
+	 * @return The set of executable component instances descriptions
+	 */
+	public List<ExecutableComponentInstanceDescription> getExecutableComponentInstancesOrderedByName() {
+		ExecutableComponentInstanceDescription [] ecida = new ExecutableComponentInstanceDescription[setExecutableComponentInstances.size()];
+		setExecutableComponentInstances.toArray(ecida);
+		Arrays.sort(ecida);
+		return Arrays.asList(ecida);
+	}
+	
 	/** Returns the set of connector descriptions.
 	 *
 	 * @return The connector description set
@@ -407,4 +421,5 @@ public class FlowDescription {
 	public String toString() {
 		return sName+" ("+resFlowComponent+")";
 	}
+
 }

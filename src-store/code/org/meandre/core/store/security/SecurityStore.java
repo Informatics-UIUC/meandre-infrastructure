@@ -154,9 +154,11 @@ public class SecurityStore implements SecurityManager {
         StoredUser stUser = new StoredUser(sNickName, sName, PasswordEncryptor.encrypt(sPassword));
 
         //add the model of the storedUser to the rdf store
-        _model.add(stUser.getModel());
-        log(".createUser: added model of new user:" + sNickName);
-        flush();
+        synchronized ( _model ) {
+        	_model.add(stUser.getModel());
+        	log(".createUser: added model of new user:" + sNickName);
+        	flush();
+        }
 
         //return the storedUser
         return stUser;
@@ -168,7 +170,7 @@ public class SecurityStore implements SecurityManager {
     	if (user.getNickName().equals(_store.getAdminUserNickName()) )
     		throw new SecurityStoreException(
                     "Admin user cannot be deleted from the system.");
-    	else {
+    	else synchronized ( _model ) {
     		Model modUser = stUser.getModel();
     		_model.remove(modUser);
     		flush();    	
@@ -176,17 +178,19 @@ public class SecurityStore implements SecurityManager {
     }
 
     /** see SecurityManager interface. */
-    public Set<String> getUsersNickNames(){
-   
-    	Query query = QueryFactory.create(QUERY_ALL_NICKNAMES) ;
-		QueryExecution exec = QueryExecutionFactory.create(query, _model, null);
-		ResultSet results =  exec.execSelect();
-		Set<String> setNickNames = new HashSet<String>();
-		while ( results.hasNext() ) {
-			QuerySolution sol = results.nextSolution();
-			// ?nickname
-			setNickNames.add(sol.getLiteral("nickname").getLexicalForm());
-		}
+    public Set<String> getUsersNickNames() {
+    	Set<String> setNickNames;
+    	synchronized ( _model ) {
+    		Query query = QueryFactory.create(QUERY_ALL_NICKNAMES) ;
+    		QueryExecution exec = QueryExecutionFactory.create(query, _model, null);
+    		ResultSet results =  exec.execSelect();
+    		setNickNames = new HashSet<String>();
+    		while ( results.hasNext() ) {
+    			QuerySolution sol = results.nextSolution();
+    			// ?nickname
+    			setNickNames.add(sol.getLiteral("nickname").getLexicalForm());
+    		}
+    	}
     	return setNickNames;
     }
     
@@ -244,13 +248,16 @@ public class SecurityStore implements SecurityManager {
         StoredUser stUser = userToStoredUser(usr);
         //log("got storedUser instance");
 		if (roleToGrant.isStandard()) {
-			Resource resUser = _model.createResource(stUser.getUrl());	
-            Property propRole = ResourceFactory.createProperty(
-                    Role.ROLE_GRANT_PROPERTY_URL);
-            String sRoleUrl = roleToGrant.getUrl();
-            Resource resRole = ResourceFactory.createResource(sRoleUrl);
-			resUser.addProperty(propRole, resRole);
-            flush();
+			synchronized ( _model ) {
+				Resource resUser = _model.createResource(stUser.getUrl());	
+
+				Property propRole = ResourceFactory.createProperty(
+						Role.ROLE_GRANT_PROPERTY_URL);
+				String sRoleUrl = roleToGrant.getUrl();
+				Resource resRole = ResourceFactory.createResource(sRoleUrl);
+				resUser.addProperty(propRole, resRole);
+				flush();
+			}
 		}
 		else { 
 			throw new SecurityStoreException("Role \'" + 
@@ -281,8 +288,10 @@ public class SecurityStore implements SecurityManager {
             String sRoleUrl = roleToRevoke.getUrl();
             Resource resRole = ResourceFactory.createResource(sRoleUrl);
 			resUser.addProperty(propGrantRole, resRole);
-			_model.remove(modTmp);
-            flush();
+			synchronized ( _model ) {
+				_model.remove(modTmp);
+				flush();
+			}
 		}
 		else { 
 			throw new SecurityStoreException("Role \'" + 
@@ -338,34 +347,37 @@ public class SecurityStore implements SecurityManager {
             throws SecurityStoreException{
         //log("getUsers begin");
         Query query = QueryFactory.create(QUERY_ALL_USERS) ;
-        QueryExecution exec = QueryExecutionFactory.create(query, _model, null);
-        ResultSet results =  exec.execSelect();
-        
-        Set<StoredUser> setUsers = new HashSet<StoredUser>();
-        String sLastNickName = null;
-        StoredUser usr = null;
-        
-        while ( results.hasNext() ) {
-            QuerySolution sol = results.nextSolution();
-            //log("Query record:" + sol.toString());
-            // ?nickname ?name ?password ?date ?action
-            String sNickName = sol.getLiteral("nickname").getString();
-            String sName = sol.getLiteral("name").getString();
-            String sPassword = sol.getLiteral("password").getString();
-            String sDate = sol.getLiteral("date").getString();
-            
-            Resource resAction = sol.getResource("role");
-            
-            if ((sLastNickName == null) || (!sNickName.equals(sLastNickName))){
-                //log("new last nickname");
-                usr = new StoredUser(sNickName, sName, sPassword, sDate);
-                setUsers.add(usr);
-            } 
-            if(resAction != null){
-                //log("resAction was not null, adding role");
-                usr.addRole(Role.fromResource(resAction));
-            }
-            sLastNickName = sNickName;
+        Set<StoredUser> setUsers;
+        synchronized ( _model ) {
+        	QueryExecution exec = QueryExecutionFactory.create(query, _model, null);
+        	ResultSet results =  exec.execSelect();
+
+        	setUsers = new HashSet<StoredUser>();
+        	String sLastNickName = null;
+        	StoredUser usr = null;
+
+        	while ( results.hasNext() ) {
+        		QuerySolution sol = results.nextSolution();
+        		//log("Query record:" + sol.toString());
+        		// ?nickname ?name ?password ?date ?action
+        		String sNickName = sol.getLiteral("nickname").getString();
+        		String sName = sol.getLiteral("name").getString();
+        		String sPassword = sol.getLiteral("password").getString();
+        		String sDate = sol.getLiteral("date").getString();
+
+        		Resource resAction = sol.getResource("role");
+
+        		if ((sLastNickName == null) || (!sNickName.equals(sLastNickName))){
+        			//log("new last nickname");
+        			usr = new StoredUser(sNickName, sName, sPassword, sDate);
+        			setUsers.add(usr);
+        		} 
+        		if(resAction != null){
+        			//log("resAction was not null, adding role");
+        			usr.addRole(Role.fromResource(resAction));
+        		}
+        		sLastNickName = sNickName;
+        	}
         }
         //log("getUsers end");
         return setUsers;
@@ -414,7 +426,7 @@ public class SecurityStore implements SecurityManager {
     /** Flushes the current system model to disk.
     *
     */
-    private void flush() {
+    private synchronized void flush() {
        // Dump the realm file
        // 
        // The realm file is dump to the place were the engine was started
@@ -441,16 +453,18 @@ public class SecurityStore implements SecurityManager {
            _log.severe("Could not update realm because security exception " +
                    "was thrown");
        }
-       // Read and index all literal strings.
-       _larqBuilder = new IndexBuilderString();
-       // Create an index based on existing statements
-       _larqBuilder.indexStatements(_model.listStatements());
-       // Finish indexing
-       _larqBuilder.closeForWriting();
-       // Create the access index  
-       _index = _larqBuilder.getIndex() ;
-       // Make globally available
-       LARQ.setDefaultIndex(_index);
+       synchronized ( _model ) {
+    	   // Read and index all literal strings.
+    	   _larqBuilder = new IndexBuilderString();
+    	   // Create an index based on existing statements
+    	   _larqBuilder.indexStatements(_model.listStatements());
+    	   // Finish indexing
+    	   _larqBuilder.closeForWriting();
+    	   // Create the access index  
+    	   _index = _larqBuilder.getIndex() ;
+    	   // Make globally available
+    	   LARQ.setDefaultIndex(_index);
+       }
    }
     
     /**
@@ -511,13 +525,17 @@ public class SecurityStore implements SecurityManager {
         }
 
         public void addRole(Role role){
-            _actionRoles.add(role);
+        	synchronized (_actionRoles) {
+                _actionRoles.add(role);
+			}
         }
         
         /** gives this user all of the default roles */
-        public void assignDefaultRoles(){
-            _actionRoles.addAll(getDefaultRoles());
-            
+        @SuppressWarnings("unused")
+		public void assignDefaultRoles(){
+        	synchronized (_actionRoles) {
+        		_actionRoles.addAll(getDefaultRoles());
+        	}
         }
 
         private String getUrl(){
@@ -528,50 +546,52 @@ public class SecurityStore implements SecurityManager {
          * generates a jena model of a user including it's assigned roles.        
          */
         public Model getModel(){
-            Model model = ModelFactory.createDefaultModel();
-    		model.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
-            model.setNsPrefix("meandreSec", 
-                    SecurityManager.BASE_SECURITY_URL);
-            model.setNsPrefix("meandreSecProp",
-                    SecurityManager.BASE_SECURITY_URL_PROPERTY);
-            model.setNsPrefix("meandreSecRole", Role.BASE_ROLE_URL);
-            model.setNsPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-            model.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-            model.setNsPrefix("dc", "http://purl.org/dc/elements/1.1/");
+        	Model model = ModelFactory.createDefaultModel();
+        	model.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
+        	model.setNsPrefix("meandreSec", 
+        			SecurityManager.BASE_SECURITY_URL);
+        	model.setNsPrefix("meandreSecProp",
+        			SecurityManager.BASE_SECURITY_URL_PROPERTY);
+        	model.setNsPrefix("meandreSecRole", Role.BASE_ROLE_URL);
+        	model.setNsPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+        	model.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+        	model.setNsPrefix("dc", "http://purl.org/dc/elements/1.1/");
 
-            Resource resRoot = model.createResource(
-                    SecurityManager.BASE_SECURITY_URL);
-       	    Resource resUser = model.createResource(this.getUrl());
-		
-    		resUser.addProperty(ResourceFactory.createProperty(
-                    SecurityStore.BASE_SECURITY_URL_PROPERTY+"name"), 
-                    ResourceFactory.createTypedLiteral(this.getName()));
+        	Resource resRoot = model.createResource(
+        			SecurityManager.BASE_SECURITY_URL);
+        	Resource resUser = model.createResource(this.getUrl());
 
-			resUser.addProperty(ResourceFactory.createProperty(
-			        SecurityStore.BASE_SECURITY_URL_PROPERTY+"nickname"), 
-                    ResourceFactory.createTypedLiteral(this.getNickName()));
+        	resUser.addProperty(ResourceFactory.createProperty(
+        			SecurityStore.BASE_SECURITY_URL_PROPERTY+"name"), 
+        			ResourceFactory.createTypedLiteral(this.getName()));
 
-			resUser.addProperty(ResourceFactory.createProperty(
-                    SecurityStore.BASE_SECURITY_URL_PROPERTY+"password"), 
-                    ResourceFactory.createTypedLiteral(this.getPassword()));
+        	resUser.addProperty(ResourceFactory.createProperty(
+        			SecurityStore.BASE_SECURITY_URL_PROPERTY+"nickname"), 
+        			ResourceFactory.createTypedLiteral(this.getNickName()));
 
-			resUser.addProperty(DC.date, 
-                    ResourceFactory.createTypedLiteral(this.getDate(), 
-                        XSDDatatype.XSDdateTime));
+        	resUser.addProperty(ResourceFactory.createProperty(
+        			SecurityStore.BASE_SECURITY_URL_PROPERTY+"password"), 
+        			ResourceFactory.createTypedLiteral(this.getPassword()));
 
-			resUser.addProperty(RDF.type, 
-                    model.createResource(User.BASE_USER_URL));
-		
-		for(Role actionRole : _actionRoles){
-			resUser.addProperty(
-                ResourceFactory.createProperty(Role.ROLE_GRANT_PROPERTY_URL), 
-                ResourceFactory.createResource(actionRole.getUrl()));
-		}	
-		
-		resRoot.addProperty(ResourceFactory.createProperty(BASE_USER_PROPERTY_URL),
-            resUser);
-		
-		return model;
+        	resUser.addProperty(DC.date, 
+        			ResourceFactory.createTypedLiteral(this.getDate(), 
+        					XSDDatatype.XSDdateTime));
+
+        	resUser.addProperty(RDF.type, 
+        			model.createResource(User.BASE_USER_URL));
+
+        	synchronized (_actionRoles ) {
+        		for(Role actionRole : _actionRoles){
+        			resUser.addProperty(
+        					ResourceFactory.createProperty(Role.ROLE_GRANT_PROPERTY_URL), 
+        					ResourceFactory.createResource(actionRole.getUrl()));
+        		}	
+        	}
+
+        	resRoot.addProperty(ResourceFactory.createProperty(BASE_USER_PROPERTY_URL),
+        			resUser);
+
+        	return model;
         }
     }
 
