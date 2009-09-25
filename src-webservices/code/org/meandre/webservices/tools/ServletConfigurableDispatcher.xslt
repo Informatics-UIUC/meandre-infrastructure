@@ -131,6 +131,7 @@
 						    var pn1 = pn.indexOf('/services/repository/list_flows.html')!=-1
 						    var pn2 = pn.indexOf('/services/repository/search_flows.html')!=-1
 						    var pn3 = pn.indexOf('/services/repository/flows_by_tag.html')!=-1
+						    var pn4 = pn.indexOf('/services/publish/list_published.html')!=-1
 							if ( pn1 ) {
 								return confirm('Are you sure you want to run this flow');
 							}
@@ -139,6 +140,10 @@
 							}
 							else if ( pn3 ) {
 								return confirm('Are you sure you want to run this flow');
+							}
+							else if ( pn4 ) {
+								alert('Flows cannot be run from this menu. Please run them from the flow list');
+								return false;
 							}
 							else {
 								alert('Only flows are allowed for execution');

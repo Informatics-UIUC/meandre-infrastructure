@@ -1192,6 +1192,16 @@ public class Store {
 
 		return setRes;
 	}
+	
+	/** Returns the list of published components and flows as a repository.
+	 *
+	 * @return The set of published components' URI
+	 */
+	public QueryableRepository getPublishedComponentsAndFlowsAsARepository () {
+		Model modPublic = getPublicRepositoryStore();
+		QueryableRepository qrPublic = new RepositoryImpl(modPublic);
+		return qrPublic;
+	}
 
 	/** Returns the job information backend adapter object linked to this store.
 	 *
