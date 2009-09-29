@@ -65,8 +65,21 @@ def publish_list_published ( request, response, format ):
        instance of the Meandre Server.''' 
     if checkUserRole (request,Role.PUBLISH) :
         content = []
-        for uri in meandre_store.getPublishedComponentsAndFlows() :
-            content.append({'meandre_uri':uri})
+        qr = meandre_store.getPublishedComponentsAndFlowsAsARepository()
+        resources = qr.getAvailableExecutableComponentsOrderedBy('name',-1)
+        for resource in resources:
+            ecd = qr.getExecutableComponentDescription(resource)
+            if ecd is not None :
+                content.append({'meandre_uri':resource.toString(),
+                                'meandre_uri_name':ecd.getName(),
+                                'description':ecd.getDescription()})
+        resources = qr.getAvailableFlowsOrderedBy('name',-1)
+        for resource in resources:
+            fd = qr.getFlowDescription(resource)
+            if fd is not None :
+                content.append({'meandre_uri':resource.toString(),
+                                'meandre_uri_name':fd.getName(),
+                                'description':fd.getDescription()})
         statusOK(response)
         sendTJXContent(response,content,format,getMeandreUser(request))
     else:

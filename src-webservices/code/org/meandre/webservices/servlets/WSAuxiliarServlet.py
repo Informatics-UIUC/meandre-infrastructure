@@ -25,6 +25,8 @@ requestMap = {
 from java.io import ByteArrayOutputStream
 
 from org.meandre.webservices.tools import ServletConfigurableDispatcher
+from org.meandre.core.repository import ExecutableComponentInstanceDescription
+from org.meandre.core.repository import RepositoryImpl
 
 __header = """
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
@@ -379,7 +381,7 @@ def __render_flow ( flow_desc, edit, qr ):
         html += __render_basic_metadata(flow_desc)
         html += __render_descriptor_download(flow_desc.getFlowComponentAsString())
         html += '<tr><th valign="top"><strong>Instances:</strong></th><td>'
-        for ecid in flow_desc.getExecutableComponentInstances() :
+        for ecid in flow_desc.getExecutableComponentInstancesOrderedByName() :
             html += '<table>'+render_component_instance(ecid)+'</table><br/>'
         html += '</td></tr>'
         if edit is False :
@@ -429,10 +431,15 @@ def auxiliar_run_tuned_flow ( request, response, format ):
         if 'flow_uri' in params and 'flow_component_instance' in params and'property_name' in params and 'property_value' in params :
             flow_uri = params['flow_uri'][0]
             model,qr = getEmptyModel(),meandre_store.getRepositoryStore(getMeandreUser(request))
-            flow_desc = qr.getFlowDescription(model.createResource(flow_uri))
+            flow_desc_orig = qr.getFlowDescription(model.createResource(flow_uri))
+            flow_desc = RepositoryImpl(flow_desc_orig.getModel()).getAvailableFlowDescriptions().iterator().next()
             for ecidr, key, value in zip(params['flow_component_instance'],params['property_name'],params['property_value']) :
-                ecid = flow_desc.getExecutableComponentInstanceDescription(ecidr)
-                ecid.getProperties().add(key,value)   
+                print ecidr, key, value
+                ecid = ExecutableComponentInstanceDescription(flow_desc.getExecutableComponentInstanceDescription(ecidr))
+                ecid.getProperties().add(key,value)
+                flow_desc.removeExecutableComponentInstance(model.createResource(ecidr))
+                flow_desc.addExecutableComponentInstance(ecid)
+                print ecid.getProperties()   
             model.add(flow_desc.getModel())
             for ecid in flow_desc.getExecutableComponentInstances() :
                 ecd = qr.getExecutableComponentDescription(ecid.getExecutableComponent())

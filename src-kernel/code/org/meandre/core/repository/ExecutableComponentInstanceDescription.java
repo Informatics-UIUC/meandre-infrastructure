@@ -7,7 +7,8 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * @author Xavier Llor&agrave;
  *
  */
-public class ExecutableComponentInstanceDescription {
+public class ExecutableComponentInstanceDescription
+implements Comparable<ExecutableComponentInstanceDescription> {
 
 
 	/** The resource for the executable component */
@@ -37,6 +38,7 @@ public class ExecutableComponentInstanceDescription {
 		this.pdProperties = null;
 	}
 
+	
 	/** Create a executable component instance description instance
 	 *
 	 * @param resExecutableComponentInstance The resource identifying this instance
@@ -60,6 +62,20 @@ public class ExecutableComponentInstanceDescription {
 	}
 
 
+	/** Create a executable component instance description from another instance
+	 *
+	 * @param ecid The executable instance description to copy
+	 */
+	public  ExecutableComponentInstanceDescription ( ExecutableComponentInstanceDescription ecid ) {
+		this.resExecutableComponentInstance = ecid.resExecutableComponentInstance;
+		this.resComponent = ecid.resComponent;
+		this.sName = ecid.sName;
+		this.sDescription = ecid.sDescription;
+		this.pdProperties = new PropertiesDescription();
+		for ( String sKey:ecid.pdProperties.getKeys() )
+			this.pdProperties.add(sKey, ecid.pdProperties.getValue(sKey));
+	}
+	
 	/** Sets the instance resource.
 	 *
 	 * @param res The instance resources
@@ -138,6 +154,15 @@ public class ExecutableComponentInstanceDescription {
 	 */
 	public PropertiesDescription getProperties () {
 		return pdProperties;
+	}
+	
+	/** Just compares by name, to help produce an alphabetical sort.
+	 * 
+	 * @param ecid The other flow descriptor to test
+	 * @return The result of the comparison
+	 */
+	public int compareTo(ExecutableComponentInstanceDescription ecid) {
+		return this.sName.compareTo(ecid.sName);
 	}
 
 }

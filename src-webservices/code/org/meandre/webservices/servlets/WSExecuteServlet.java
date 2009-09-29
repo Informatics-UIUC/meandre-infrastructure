@@ -107,12 +107,11 @@ public class WSExecuteServlet extends MeandreBaseServlet {
 		QueryableRepository qrRes = new RepositoryImpl(modelAcc);
 		for (FlowDescription fd:qrRes.getAvailableFlowDescriptions()) {
 			for ( ExecutableComponentInstanceDescription ecid: fd.getExecutableComponentInstances() )
-				if ( !qrRes.getAvailableExecutableComponents().contains(ecid.getExecutableComponent()) ) {
-					qrRes.getAvailableExecutableComponentDescriptions().add(
-							qr.getExecutableComponentDescription(ecid.getExecutableComponent()));
-				}
+				if ( !qrRes.getAvailableExecutableComponents().contains(ecid.getExecutableComponent()) ) 
+					modelAcc.add(qr.getExecutableComponentDescription(ecid.getExecutableComponent()).getModel());
 		}
-	
+		qrRes.refreshCache();
+		
 		return qrRes;
 	}
 

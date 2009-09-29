@@ -45,7 +45,7 @@ public class StoreTest {
 		}
 		
 		SystemStore sysStore = store.getSystemStore(cnf,store.getAdminUserNickName());
-		assertEquals(1,sysStore.getPropertyKeys().size());
+		assertEquals(0,sysStore.getPropertyKeys().size());
 	}
 
 }

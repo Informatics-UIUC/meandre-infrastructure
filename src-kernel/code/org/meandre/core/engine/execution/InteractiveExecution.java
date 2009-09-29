@@ -88,12 +88,13 @@ public class InteractiveExecution {
 		Resource resURI = fd.getFlowComponent();
 		pw.println("Preparing flow: "+sURI);
 		pw.println("Unique flow ID: "+sFUID);
-		Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
+		Conductor conductor = null;
 		Executor exec =null;
 
 		// Redirecting the output
 		Probe[] pa = null;
 		try {
+			conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
 			pa = instantiateProbes(saProbes,cnf);
 			MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),pa,false,false);
 			exec = conductor.buildExecutor(qr, resURI, mrProbe,pw,sFUID);
@@ -135,6 +136,7 @@ public class InteractiveExecution {
 
 		}
 		catch ( CorruptedDescriptionException cde ) {
+			job.setPort(-1);
 			bFailSafe  = false;
 			pw.println("Preparation could not be completed correctly!\n");
 			pw.println("----------------------------------------------------------------------------");
@@ -146,6 +148,7 @@ public class InteractiveExecution {
 		}
 		catch ( ConductorException ce ) {
 			bFailSafe  = false;
+			job.setPort(-1);
 			pw.println("----------------------------------------------------------------------------");
 			pw.print("Execution aborted at: ");
 			pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
@@ -158,6 +161,7 @@ public class InteractiveExecution {
 		}
 		catch ( NoClassDefFoundError te ) {
 			bFailSafe  = false;
+			job.setPort(-1);
 			pw.println("----------------------------------------------------------------------------");
 			pw.print("Missing class definition: ");
 			pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
@@ -169,6 +173,7 @@ public class InteractiveExecution {
 			//pw.flush();
 		}
 		catch ( Throwable t ) {
+			job.setPort(-1);
 			bFailSafe = false;
 			try{
 				exec.requestAbort();
@@ -271,12 +276,13 @@ public class InteractiveExecution {
 		// Create the execution
 		FlowDescription fd = qr.getFlowDescription(qr.getModel().createResource(sURI));
 		Resource resURI = fd.getFlowComponent();
-		Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
+		Conductor conductor;
 		Executor exec =null;
 
 		// Redirecting the output
 		Probe probe = null;
 		try {
+			conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
 			probe = new NullProbeImpl();
 			MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),probe,false,false);
 			exec = conductor.buildExecutor(qr, resURI, mrProbe,pw,sFUID);
@@ -305,6 +311,7 @@ public class InteractiveExecution {
 
 		}
 		catch ( CorruptedDescriptionException cde ) {
+			job.setPort(-1);
 			pw.println("----------------------------------------------------------------------------");
 			pw.println("Preparation could not be completed correctly!\n");
 			pw.println("----------------------------------------------------------------------------");
@@ -315,6 +322,7 @@ public class InteractiveExecution {
 			//pw.flush();
 		}
 		catch ( ConductorException ce ) {
+			job.setPort(-1);
 			pw.println("----------------------------------------------------------------------------");
 			pw.print("Execution aborted at: ");
 			pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
@@ -326,6 +334,7 @@ public class InteractiveExecution {
 			//pw.flush();
 		}
 		catch ( NoClassDefFoundError te ) {
+			job.setPort(-1);
 			pw.println("----------------------------------------------------------------------------");
 			pw.print("Missing class definition: ");
 			pw.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
@@ -337,6 +346,7 @@ public class InteractiveExecution {
 			//pw.flush();
 		}
 		catch ( Throwable t ) {
+			job.setPort(-1);
 			try{
 				exec.requestAbort();
 			}

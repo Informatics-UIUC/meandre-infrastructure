@@ -24,7 +24,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 
 
-public class MeandreProxy{
+public class MeandreProxy extends MeandreClient {
 
 	/** The logger we'll write to */
 	protected Logger log = null;
@@ -63,6 +63,7 @@ public class MeandreProxy{
 	/** Creates an empty Meandre Proxy 
 	 */
 	public MeandreProxy () {
+		super("",0);
 		bIsReady = bWasCallOK = false;
         //set logger to default client logger
         setLogger(ClientLoggerFactory.getClientLogger());
@@ -79,6 +80,7 @@ public class MeandreProxy{
 	 */
 	public MeandreProxy ( String sUser, String sPasswd, String sServerHost,
             int iServerPort ) {
+		super(sUser,iServerPort);
         //set logger to default client logger
         setLogger(ClientLoggerFactory.getClientLogger());
 		update(sUser,sPasswd,sServerHost,iServerPort);
