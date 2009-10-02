@@ -192,7 +192,7 @@
 				<pathelement location="${build.dir}"/>
 				<pathelement location="${test.dir}"/>
 				<pathelement location="${ws.test}"/>
-				<pathelement path="${java.class.path}"/>
+				<pathelement location="${java.class.path}"/>
 			</classpath>
 
 			<formatter type="xml"/>
