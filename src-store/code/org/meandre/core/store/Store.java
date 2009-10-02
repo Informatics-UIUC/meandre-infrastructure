@@ -3,7 +3,6 @@ package org.meandre.core.store;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -752,7 +751,7 @@ public class Store {
 					//
 					// Remove the location form the system properties
 					//
-					ss.removeProperty(SystemStore.REPOSITORY_LOCATION, sLocation);       
+					ss.removeProperty(SystemStore.REPOSITORY_LOCATION, sLocation);
                     bRes = true;
                     return bRes;
 				}
@@ -894,7 +893,7 @@ public class Store {
 					        String sMD5 = IOUtils.getTextFromReader(IOUtils.getReaderForResource(uriMD5)).replaceAll("\\r|\\n", "");
 					        sReloFile = resManager.getResourceForMD5(sMD5);
 					    }
-					    catch (FileNotFoundException e) {
+					    catch (IOException e) {
 					    }
 
 					    URL urlCntx = uriCntx.toURL();
