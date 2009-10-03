@@ -3,10 +3,13 @@
     <!-- app name-->
     <property name="app.name" value="meandre"/>
 
-    <!-- when you modify this version make sure to modify the
-        org.meandre.core.utils.Constants.java  in the src-kernel/code
+    <!-- ***************************************************
+	when you modify this version make sure to modify:
+
+	src-kernel/code/org/meandre/core/utils/Constants.java
+	*****************************************************
     -->
-    <property name="build.version" value="1.4.7"/>
+    <property name="build.version" value="1.4.7rc3"/>
 
     <!-- Directory structure of the project -->
     <property name="build.dir" value="${basedir}/bin"/>
