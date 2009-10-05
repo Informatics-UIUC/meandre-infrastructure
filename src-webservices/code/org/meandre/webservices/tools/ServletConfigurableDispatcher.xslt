@@ -629,7 +629,7 @@
 						     			</a> -
 						     			<a>
 						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_webui_uri"/>admin/abort.txt</xsl:attribute> 
-						     				<xsl:attribute name="target">_blank</xsl:attribute> 
+						     				<xsl:attribute name="onclick">return confirm('Are you sure you want to abort the flow execution?');</xsl:attribute>
 											abort
 						     			</a>
 		          					</td>
@@ -640,6 +640,11 @@
 						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_proxy_webui_uri"/></xsl:attribute> 
 											<xsl:attribute name="target">_blank</xsl:attribute> 
 											<xsl:value-of select="flow_instance_proxy_webui_uri"/>
+						     			</a>
+						     			<a>
+						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_proxy_webui_uri"/>admin/abort.txt</xsl:attribute> 
+						     				<xsl:attribute name="onclick">return confirm('Are you sure you want to abort the flow execution?');</xsl:attribute>
+											abort
 						     			</a>
 		          					</td>
 		          				</xsl:if>	
