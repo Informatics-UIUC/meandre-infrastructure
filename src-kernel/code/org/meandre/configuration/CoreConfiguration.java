@@ -34,7 +34,13 @@ public class CoreConfiguration {
 	public static final String MEANDRE_APP_CONTEXT = "MEANDRE_APP_CONTEXT";
     
     /** The Default port*/
-	public static final int DEFAULT_PORT =1714;
+	public static final int DEFAULT_PORT = 1714;
+
+	/** The default conductor queue size */
+	private static final String MEANDRE_CONDUCTOR_DEFAULT_QUEUE_SIZE = "MEANDRE_CONDUCTOR_DEFAULT_QUEUE_SIZE";
+	
+	/** The default conservative queue size */
+	public static final int CONDUCTOR_DEFAULT_QUEUE_SIZE = 6;
 	
 	/** The configuration properties */
 	private Properties propsCore;
@@ -59,6 +65,7 @@ public class CoreConfiguration {
         propsCore.setProperty(MEANDRE_CORE_CONFIG_FILE, INSTALL_DIR + File.separator + "meandre-config-core.xml");
         propsCore.setProperty(MEANDRE_HOME_DIRECTORY,INSTALL_DIR);   
         propsCore.setProperty(MEANDRE_APP_CONTEXT,"");   
+        propsCore.setProperty(MEANDRE_CONDUCTOR_DEFAULT_QUEUE_SIZE,Integer.toString(CONDUCTOR_DEFAULT_QUEUE_SIZE));   
         
         initializeConfiguration();    	
 	}
@@ -94,6 +101,7 @@ public class CoreConfiguration {
         propsCore.setProperty(MEANDRE_CORE_CONFIG_FILE, sInstallDir + File.separator + "meandre-config-core.xml");
         propsCore.setProperty(MEANDRE_HOME_DIRECTORY, sInstallDir);  
         propsCore.setProperty(MEANDRE_APP_CONTEXT,"");   
+        propsCore.setProperty(MEANDRE_CONDUCTOR_DEFAULT_QUEUE_SIZE,Integer.toString(CONDUCTOR_DEFAULT_QUEUE_SIZE));   
         INSTALL_DIR = sInstallDir;
         log = KernelLoggerFactory.getCoreLogger();
 	     
@@ -180,14 +188,14 @@ public class CoreConfiguration {
     	return (sCntx==null || sCntx.length()==0 )?"":"/"+sCntx;
     }
     
-//    /** Returns the current host IP address.
-//     * 
-//     * @return The host IP address
-//     */
-//	public String getHostName() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
+    /** Returns the default conductor queue size.
+     * 
+     * @return The default queue size
+     */
+    public int getConductorDefaultQueueSize() {
+    	String sDefaultQueueSize = propsCore.getProperty(MEANDRE_CONDUCTOR_DEFAULT_QUEUE_SIZE);
+    	return (sDefaultQueueSize==null || sDefaultQueueSize.length()==0 )?CONDUCTOR_DEFAULT_QUEUE_SIZE:Integer.parseInt(sDefaultQueueSize);
+    }
 	
 	/** Compare if two configurations are the same.
 	 * 

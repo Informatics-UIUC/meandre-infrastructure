@@ -72,7 +72,7 @@ public class XStreamTest {
 			Model model = DemoRepositoryGenerator.getTestHelloWorldHetereogenousRepository();
 			QueryableRepository qr = new RepositoryImpl(model);
 			CoreConfiguration cnf = new CoreConfiguration(3714,"./test");
-			Conductor conductor = new Conductor(10,cnf);
+			Conductor conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), System.out);
 			
 			// Starting serialization tests

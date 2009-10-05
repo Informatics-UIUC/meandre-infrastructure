@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
@@ -115,7 +114,7 @@ public class MrProbeTest {
 			CoreConfiguration cnf = new CoreConfiguration();
 			
 			// Basic test running the NullProbeImpl
-			Conductor conductor = new Conductor(10,cnf);
+			Conductor conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 			ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
 			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), new PrintStream(baosOut));
 			runExecutor(exec,baosOut);
@@ -125,7 +124,7 @@ public class MrProbeTest {
 			MeandreRDFDialectProbeImpl rdfModProbe = new MeandreRDFDialectProbeImpl();
 			rdfModProbe.initialize();
 			MrProbe mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,false,false);
-			conductor = new Conductor(10,cnf);
+			conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProv));
 			runExecutor(exec,baosOutProv);
 			rdfModProbe.dispose();
@@ -135,7 +134,7 @@ public class MrProbeTest {
 			rdfModProbe = new MeandreRDFDialectProbeImpl();
 			rdfModProbe.initialize();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,true,false);
-			conductor = new Conductor(10,cnf);
+			conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProv2));
 			runExecutor(exec,baosOutProv2);
 			rdfModProbe.dispose();
@@ -145,7 +144,7 @@ public class MrProbeTest {
 			rdfModProbe = new MeandreRDFDialectProbeImpl();
 			rdfModProbe.initialize();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,false,true);
-			conductor = new Conductor(10,cnf);
+			conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProvSto));
 			runExecutor(exec,baosOutProvSto);
 			rdfModProbe.dispose();
@@ -155,7 +154,7 @@ public class MrProbeTest {
 			rdfModProbe = new MeandreRDFDialectProbeImpl();
 			rdfModProbe.initialize();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,true,true);
-			conductor = new Conductor(10,cnf);
+			conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProvSto3));
 			runExecutor(exec,baosOutProvSto3);
 			rdfModProbe.initialize();
@@ -176,7 +175,7 @@ public class MrProbeTest {
 			Model model = DemoRepositoryGenerator.getTestHelloWorldHetereogenousRepository();
 			QueryableRepository qr = new RepositoryImpl(model);
 			CoreConfiguration cnf = new CoreConfiguration();
-			Conductor conductor = new Conductor(10,cnf);
+			Conductor conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 			StatisticsProbeImpl spi = new StatisticsProbeImpl();
 			spi.initialize();
 			MrProbe mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),spi,false,false);
@@ -269,7 +268,7 @@ public class MrProbeTest {
 			Model model = DemoRepositoryGenerator.getTestHelloWorldRepository();
 			QueryableRepository qr = new RepositoryImpl(model);
 			CoreConfiguration cnf = new CoreConfiguration();
-			Conductor cnd = new Conductor(10,cnf);
+			Conductor cnd = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 			Executor exec = cnd.buildExecutor(qr, qr.getAvailableFlowDescriptions().iterator().next().getFlowComponent(), System.out);
 			WrappedComponent wc = exec.getWrappedComponents().iterator().next();
 			// Run the tests

@@ -94,7 +94,7 @@ public class InteractiveExecution {
 		// Redirecting the output
 		Probe[] pa = null;
 		try {
-			conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
+			conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 			pa = instantiateProbes(saProbes,cnf);
 			MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),pa,false,false);
 			exec = conductor.buildExecutor(qr, resURI, mrProbe,pw,sFUID);
@@ -282,7 +282,7 @@ public class InteractiveExecution {
 		// Redirecting the output
 		Probe probe = null;
 		try {
-			conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
+			conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 			probe = new NullProbeImpl();
 			MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(),probe,false,false);
 			exec = conductor.buildExecutor(qr, resURI, mrProbe,pw,sFUID);

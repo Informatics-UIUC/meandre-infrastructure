@@ -131,7 +131,7 @@ public class ConductorTest {
 	@Test
 	public void testBuildExecutorHelloWorld() {
 		CoreConfiguration cnf = new CoreConfiguration();
-		Conductor conductor = new Conductor(10,cnf);
+		Conductor conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 		
 		try {
 			// Run simple hello world
@@ -154,7 +154,7 @@ public class ConductorTest {
 	@Test
 	public void testBuildExecutorHetereogenous() {
 		CoreConfiguration cnf = new CoreConfiguration();
-		Conductor conductor = new Conductor(10,cnf);
+		Conductor conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 		
 		try {
 			// Run simple hetereogenous hello world (Java+Python)
@@ -179,7 +179,7 @@ public class ConductorTest {
 	@Test
 	public void testBuildExecutorMoreHetereogenous() {
 		CoreConfiguration cnf = new CoreConfiguration();
-		Conductor conductor = new Conductor(10,cnf);
+		Conductor conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 		
 		try {
 			// Run simple hetereogenous hello world (Java+Python)
@@ -203,7 +203,7 @@ public class ConductorTest {
 	@Test
 	public void testBuildExecutorHelloWorldWithDanglingComponents() {
 		CoreConfiguration cnf = new CoreConfiguration();
-		Conductor conductor = new Conductor(10,cnf);
+		Conductor conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 		
 		try {
 			// Run simple hello world dangling input/outputs
@@ -226,7 +226,7 @@ public class ConductorTest {
 	@Test
 	public void testBuildExecutorWithDanglingComponentsAndInAndOutForks() {
 		CoreConfiguration cnf = new CoreConfiguration();
-		Conductor conductor = new Conductor(10,cnf);
+		Conductor conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 		
 		try {
 			// Run simple hello world dangling input/outputs + fork
@@ -249,7 +249,7 @@ public class ConductorTest {
 	@Test
 	public void testDanglingPartiallyConnectedWitExecutor() {
 		CoreConfiguration cnf = new CoreConfiguration();
-		Conductor conductor = new Conductor(10,cnf);
+		Conductor conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 		
 		try {
 			// Run simple hello world

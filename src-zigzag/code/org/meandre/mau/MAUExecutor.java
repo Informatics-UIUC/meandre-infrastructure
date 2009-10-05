@@ -196,7 +196,7 @@ public class MAUExecutor {
 		props.setProperty(CoreConfiguration.MEANDRE_CORE_CONFIG_FILE, "meandre-config-core.xml");
 		CoreConfiguration cnf = new CoreConfiguration(props);
 
-		Conductor conductor = new Conductor(Conductor.DEFAULT_QUEUE_SIZE,cnf);
+		Conductor conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 
 		exec =null;
 		spi = null;
