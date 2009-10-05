@@ -66,7 +66,7 @@ public class ZigZagConsole {
 		bNotDone = true;
 		parser = null;
 		sbZigZag =  new StringBuffer();
-	    resetFlowDescriptor();
+		resetFlowDescriptor();
 	}
 
 	/** Resets the current flow descriptor.
@@ -76,7 +76,7 @@ public class ZigZagConsole {
 		fg = new FlowGenerator();
 		fg.setPrintStream(new PrintStream(new NullOuputStream()));
 		//fg.setPrintStream(System.out);
-	    fg.init(null);
+		fg.init(null);
 	}
 
 	/** Fires the console interpreter.
@@ -252,6 +252,9 @@ public class ZigZagConsole {
 			System.out.println();
 			// Run the flow
 			MAUExecutor mau = new MAUExecutor(sFileName);
+			if (saLine.length==2 ) {
+				mau.setWebUIPortNumber(Integer.parseInt(saLine[1]));
+			}
 			try {
 				mau.run();
 			} 
@@ -410,7 +413,7 @@ public class ZigZagConsole {
 				String sDialect = "RDF/XML-ABBREV";
 				if ( sFormat.equals("nt") ) sDialect="N-TRIPLE";
 				if ( sFormat.equals("ttl")) sDialect="TTL";
-				
+
 				try {
 					File file = new File(sURI);
 					FileOutputStream fos;
@@ -427,9 +430,9 @@ public class ZigZagConsole {
 					System.out.println("\t Problem while closing file "+sURI+".");
 					System.out.println();
 				}
-				
+
 			}
-			
+
 			else {
 				System.out.println();
 				System.out.println("\t Wrong file format. Please see help save for more information.");
@@ -457,9 +460,9 @@ public class ZigZagConsole {
 
 			ExecutableComponentDescription ecd =
 				fg.getRepository()
-				  .getExecutableComponentDescription(
-						  ModelFactory.createDefaultModel().createResource(sURI)
-						);
+				.getExecutableComponentDescription(
+						ModelFactory.createDefaultModel().createResource(sURI)
+				);
 
 			if ( ecd==null ) {
 				ecd = fg.getComponentAliases().get(sURI);
@@ -611,7 +614,7 @@ public class ZigZagConsole {
 								getInputPortName(qr,fd,cd.getTargetInstance(),cd.getTargetInstanceDataPort())+
 								">-"+
 								sInsName
-							);
+						);
 				for ( ConnectorDescription cd:fd.getConnectorDescriptions() )
 					if ( cd.getSourceInstance().equals(resIns) )
 						System.out.println(
@@ -622,7 +625,7 @@ public class ZigZagConsole {
 								getInputPortName(qr,fd,cd.getTargetInstance(),cd.getTargetInstanceDataPort())	+
 								">-"+
 								fg.getInstanceAliasFromResource(cd.getTargetInstance())
-							);
+						);
 
 				System.out.println();
 				bError = false;
@@ -659,7 +662,7 @@ public class ZigZagConsole {
 
 	/** Returns the output port name for given instance and port resource.
 	 *
-	* @param qr The queryable repository to use
+	 * @param qr The queryable repository to use
 	 * @param fd The flow description
 	 * @param resInstance The resource instance
 	 * @param resPort The resource port
@@ -729,7 +732,9 @@ public class ZigZagConsole {
 			System.out.println("\t reset: Resets the current constructed flow built so far.");
 		}
 		else if ( sCmd.equals("run") ) {
-			System.out.println("\t run: Runs the current constructed flow built so far.");
+			System.out.println("\t run [webui_port_number]: Runs the current constructed flow built so far. If a port");
+			System.out.println("\t                  number is provided, the flow will try to bind its webUI port to the");
+			System.out.println("\t                  given number.");
 		}
 		else if ( sCmd.equals("version") ) {
 			System.out.println("\t version: Print the version information for this ZigZag interpreter console.");
