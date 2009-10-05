@@ -26,7 +26,7 @@ def server_shutdown ( request, response, format ):
         content = [{'message':'Server shutting down now!!!'}]    
         statusOK(response)
         sendTJXContent(response,content,format,getMeandreUser(request))
-        meandre_server.delayedStop(1000)
+        meandre_server.delayedStop(5000)
     else:
         errorForbidden(response)
 

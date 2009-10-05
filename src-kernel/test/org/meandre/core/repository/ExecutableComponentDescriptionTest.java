@@ -8,12 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
-import org.meandre.core.repository.CorruptedDescriptionException;
-import org.meandre.core.repository.DataPortDescription;
-import org.meandre.core.repository.ExecutableComponentDescription;
-import org.meandre.core.repository.PropertiesDescriptionDefinition;
-import org.meandre.core.repository.RepositoryImpl;
-import org.meandre.core.repository.TagsDescription;
 import org.meandre.demo.components.PushStringComponent;
 
 import com.hp.hpl.jena.rdf.model.Model;

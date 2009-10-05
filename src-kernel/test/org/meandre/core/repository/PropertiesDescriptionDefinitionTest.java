@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Hashtable;
 
 import org.junit.Test;
-import org.meandre.core.repository.PropertiesDescriptionDefinition;
 
 /** Test case for the behavior of PropertiesDescriptionDefinition class.
  * 

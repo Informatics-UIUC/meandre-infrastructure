@@ -1,17 +1,15 @@
 package org.meandre.core.repository;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
-import org.meandre.core.repository.ConnectorDescription;
-import org.meandre.core.repository.ExecutableComponentInstanceDescription;
-import org.meandre.core.repository.FlowDescription;
-import org.meandre.core.repository.RepositoryImpl;
-import org.meandre.core.repository.TagsDescription;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;

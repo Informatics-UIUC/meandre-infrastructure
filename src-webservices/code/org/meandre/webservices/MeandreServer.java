@@ -86,7 +86,7 @@ public class MeandreServer {
 
 	/** The store to use */
 	private Store store;
-	
+
 	/** The core configuration to use */
 	private CoreConfiguration cnf;
 
@@ -95,17 +95,17 @@ public class MeandreServer {
 
 	/** The backend adapter linked to this server */
 	private CoordinatorBackendAdapter baToStore = null;
-	
+
 	/** Should the server be stoped? */
 	private boolean bStop = false;
-	
+
 	/** Creates a Meandre server with the default configuration.
 	 * 
 	 */
 	public MeandreServer () {
 		log = WSLoggerFactory.getWSLogger();
 		MEANDRE_HOME = ".";
-		
+
 		// Get the core configuration
 		File propFileCore = new File(MEANDRE_HOME+File.separator+"meandre-config-core.xml");
 		if ( propFileCore.exists() ) {
@@ -125,7 +125,7 @@ public class MeandreServer {
 		}
 		else
 			cnf = new CoreConfiguration();
-		
+
 		// Get the store
 		File propFileStore = new File(MEANDRE_HOME+File.separator+"meandre-config-store.xml");
 		if ( propFileStore.exists() ) {
@@ -145,21 +145,21 @@ public class MeandreServer {
 		}
 		else
 			store = new Store(cnf);
-		
+
 	}
-	
+
 	/** Creates (or uses) a default installation in the given install directory
 	 * running on the given port.  
 	 * @param port The port
 	 * @param sInstallDir The directory
 	 */
 	public MeandreServer(int port, String sInstallDir){
-        log = WSLoggerFactory.getWSLogger();
-        MEANDRE_HOME = sInstallDir;
-        cnf = new CoreConfiguration(port, sInstallDir);	   
-        store = new Store(sInstallDir,cnf);
+		log = WSLoggerFactory.getWSLogger();
+		MEANDRE_HOME = sInstallDir;
+		cnf = new CoreConfiguration(port, sInstallDir);	   
+		store = new Store(sInstallDir,cnf);
 	}
-	
+
 	/** Creates a Meandre server running on the provided home directory and store.
 	 * 
 	 * @param sMeandreHome The Meandre home directory
@@ -172,7 +172,7 @@ public class MeandreServer {
 		store = storeMS;
 		cnf = config;
 	}
-	
+
 	/** Sets the Meandre core configuration to use for this server.
 	 * 
 	 * @param config The Meandre core configuration
@@ -180,7 +180,7 @@ public class MeandreServer {
 	public void setCoreConfiguration ( CoreConfiguration config ) {
 		cnf = config;
 	}
-	
+
 	/** Sets the Meandre store for the given server.
 	 * 
 	 * @param storeMS The Meandre store to use
@@ -197,7 +197,7 @@ public class MeandreServer {
 	public void setMeandreHome ( String sMeandreHome ) {
 		MEANDRE_HOME = sMeandreHome;
 	}
-	
+
 	/**
 	 * Run the embedded Jetty server and joins it.
 	 *
@@ -207,7 +207,7 @@ public class MeandreServer {
 		log.info("Starting the WS endpoint...");
 		start(true);
 	}
-	
+
 	/**
 	 * Run the embedded Jetty server.
 	 * @param bJoin Should the thread joing the server or return
@@ -216,7 +216,7 @@ public class MeandreServer {
 	 */
 	public void start (boolean bJoin) throws Exception {
 		log.info("Starting Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+")");
-		
+
 		server = new Server(cnf.getBasePort());
 
 		// Overwrite the default thread pool
@@ -225,16 +225,18 @@ public class MeandreServer {
 		tp.setMaxThreads(MAXIMUM_NUMBER_OF_JETTY_THREADS);
 		tp.setMaxIdleTimeMs(MAXIMUM_JETTY_THREAD_IDLE_TIME);
 		server.setThreadPool(tp);
-		
+
 		// Initialize global file server
 		PluginFactory pf = PluginFactory.getPluginFactory(cnf);
 		PluginFactory.initializeGlobalPublicFileServer(server,log,cnf);
 
 		// Initialize the web services
 		Context cntxGlobal = initializeTheWebServices(server);
-		
+
 		// Initialize the plugins
 		pf.initializeGlobalCorePlugins(server,cntxGlobal,log);
+
+		
 
 		// Launch the server
 		server.start();
@@ -251,9 +253,9 @@ public class MeandreServer {
 		String sCntx = cnf.getAppContext();
 		log.info("Joining Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+") on context <"+((sCntx.length()==0)?"/":sCntx)+">");
 		server.join();
-		
+
 	}
-	
+
 	/** Stops the main Jetty server 
 	 * @throws Exception Jetty could not be stopped
 	 * 
@@ -273,20 +275,22 @@ public class MeandreServer {
 	 * 
 	 */
 	public void delayedStop (final int iDelay) throws Exception {
-		
+
 		log.info("Stoping Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+")");
 		bStop  = true;
 		baToStore.close();
 		store.getJobInformation().close();
-		
+
 		// Spawns a thread for the delayed stop
 		Thread th = new Thread(new Runnable(){
 
 			public void run() {
-				
+
 				try {
 					Thread.sleep(iDelay);
 					server.stop();
+					log.info("Forcing abrupt shutdown of non finilized flows");
+					System.exit(0);
 				} catch (Exception e) {
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
 					PrintStream ps = new PrintStream(baos);
@@ -294,11 +298,11 @@ public class MeandreServer {
 					log.warning("Problem arised while shutting down the server!!!\n"+baos.toString());
 				}
 			}
-			
+
 		});
 		th.start();		
 	}
-	
+
 	/** Initialize the webservices
 	 *
 	 * @param server The server object
@@ -306,31 +310,31 @@ public class MeandreServer {
 	 * @throws IOException Something went really wrong
 	 */
 	private Context initializeTheWebServices(Server server)
-			throws IOException {
-		
+	throws IOException {
+
 		String sCntx = cnf.getAppContext();
-		
+
 		// Install the WebUI proxy before anyother handler
 		server.addHandler(new WebUIProxy(cnf));
-				
+
 		//
 		// Initializing the web services
 		//
 		Context contextWS = new Context(server,"/",Context.SESSIONS);
 		Constraint constraint = new Constraint();
 		constraint.setName(Constraint.__BASIC_AUTH);
-		
-		
+
+
 		//initialize the roles
 		Set<Role> allRoles = Role.getStandardRoles();
 		Iterator<Role> allRolesIter = allRoles.iterator();
 		String[] rolesAsUrls = new String[allRoles.size()];
 		for(int i = 0; i < allRoles.size(); i++){
-		    rolesAsUrls[i] = allRolesIter.next().getUrl();
+			rolesAsUrls[i] = allRolesIter.next().getUrl();
 		}
 		constraint.setRoles(rolesAsUrls);
-		
-		
+
+
 		constraint.setAuthenticate(true);
 
 		ConstraintMapping cm = new ConstraintMapping();
@@ -348,10 +352,10 @@ public class MeandreServer {
 
 		// Start the security service sync between meandre and jetty
 		fireSecuritySyncService(sh);
-		
+
 		// Register the server to the back end
 		registerAndFireBackendAdapter();
-	
+
 		contextWS.addHandler(sh);
 
 		//
@@ -362,7 +366,7 @@ public class MeandreServer {
 		// Adding the publicly provided services
 		//
 		contextWS.addServlet(new ServletHolder((Servlet) new WSPublicServlet(this,store,cnf)), sCntx+"/public/services/*");
-		
+
 		//
 		// Adding restrictedly provided services
 		//
@@ -378,9 +382,10 @@ public class MeandreServer {
 		contextWS.addServlet(new ServletHolder((Servlet) new WSServerServlet(this,store,cnf)),		sCntx+"/services/server/*");
 
 		contextWS.addServlet(new ServletHolder((Servlet) new WSAuxiliarServlet(this,store,cnf)),     sCntx+"/services/auxiliar/*");
+
+		contextWS.setErrorHandler(new MeandreDefaultErrorHandler(cnf));
 		
-		//contextWS.setErrorHandler(errorHandler)
-		
+
 		return contextWS;
 	}
 
@@ -409,7 +414,7 @@ public class MeandreServer {
 						}						
 					}					
 				}
-			).start();
+		).start();
 	}
 
 	/** Registers and fires the backend adapter.
@@ -420,8 +425,8 @@ public class MeandreServer {
 		try {
 			baToStore = (CoordinatorBackendAdapter) Class.forName(
 					"org.meandre.core.services.coordinator.backend."+store.getDatabaseFlavor()+"CoordinatorBackendAdapter"
-				).newInstance();
-			
+			).newInstance();
+
 			// Link it to a store
 			baToStore.linkToService(store.getConnectionToDB(),cnf.getBasePort(), new CoordinatorServiceCallBack() {
 
@@ -434,11 +439,11 @@ public class MeandreServer {
 					try {
 						URL url = new URL(sURL);
 						LineNumberReader lnr = new LineNumberReader(new InputStreamReader(url.openStream()));
-						
+
 						boolean bRes = false;
 						if ( lnr.readLine().equals("Pong"))
 							bRes =  true;
-						
+
 						return bRes;
 					} catch (MalformedURLException e) {
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -452,15 +457,15 @@ public class MeandreServer {
 						return false;
 					}
 				}
-				
+
 			});
-			
+
 			// Create the backend schema if needed
 			baToStore.createSchema();
-			
+
 			// Start the service
 			baToStore.start();
-			
+
 		} catch (InstantiationException e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			e.printStackTrace(new PrintStream(baos));
@@ -478,9 +483,9 @@ public class MeandreServer {
 			e.printStackTrace(new PrintStream(baos));
 			log.severe("Backend adaptor could not create the default schema for the "+store.getDatabaseFlavor()+" backend flavor");
 		}
-		
-		
-		
+
+
+
 	}
 
 
@@ -488,10 +493,10 @@ public class MeandreServer {
 	 *
 	 */
 	public Store getStore(){
-	    return store;
-	    
+		return store;
+
 	}
-	
+
 	/**
 	 * deletes all files on disk that are used by this server, it's store,
 	 * repository, etc. This server must be stopped using the 'stop()' method
@@ -500,21 +505,21 @@ public class MeandreServer {
 	 * @throws IOException
 	 */
 	public static void uninstall(File installationDir) throws IOException{
-	    Set<File> installedFiles = getInstallationFiles(installationDir);
-	    WSLoggerFactory.getWSLogger().info(
-	            "Uninstalling Meandre files in directory: \'" + 
-	            installationDir + "\'");
-	    for(File file: installedFiles){
-	        if(file.exists()){
-	            if(file.isDirectory()){
-	                FileUtil.deleteDirRecursive(file);
-	            }else{
-	                file.delete();	                
-	            }
-	        }
-	    }
+		Set<File> installedFiles = getInstallationFiles(installationDir);
+		WSLoggerFactory.getWSLogger().info(
+				"Uninstalling Meandre files in directory: \'" + 
+				installationDir + "\'");
+		for(File file: installedFiles){
+			if(file.exists()){
+				if(file.isDirectory()){
+					FileUtil.deleteDirRecursive(file);
+				}else{
+					file.delete();	                
+				}
+			}
+		}
 	}
-	
+
 	/**
 	 * retrieves a list of files that are generated by a MeandreServer by
 	 * default. this list is actually static, and may not be complete if
@@ -522,19 +527,19 @@ public class MeandreServer {
 	 * updated. 
 	 */
 	public static Set<File> getInstallationFiles(File meandreHome){
-	    Set<File> installFiles = new HashSet<File>();
-	    
-	    installFiles.add(new File(meandreHome, "meandre-config-store.xml"));
-        installFiles.add(new File(meandreHome, "meandre-config-core.xml"));
-        installFiles.add(new File(meandreHome, "MeandreStore"));
-        installFiles.add(new File(meandreHome, "meandre-realm.properties"));
-        installFiles.add(new File(meandreHome, "meandre-config-plugins.xml"));
-        installFiles.add(new File(meandreHome, "derby.log"));
-        installFiles.add(new File(meandreHome, "published_resources"));
-        installFiles.add(new File(meandreHome, "run"));
-        installFiles.add(new File(meandreHome, "mnt"));
-        
-        return installFiles;
+		Set<File> installFiles = new HashSet<File>();
+
+		installFiles.add(new File(meandreHome, "meandre-config-store.xml"));
+		installFiles.add(new File(meandreHome, "meandre-config-core.xml"));
+		installFiles.add(new File(meandreHome, "MeandreStore"));
+		installFiles.add(new File(meandreHome, "meandre-realm.properties"));
+		installFiles.add(new File(meandreHome, "meandre-config-plugins.xml"));
+		installFiles.add(new File(meandreHome, "derby.log"));
+		installFiles.add(new File(meandreHome, "published_resources"));
+		installFiles.add(new File(meandreHome, "run"));
+		installFiles.add(new File(meandreHome, "mnt"));
+
+		return installFiles;
 	}
 
 

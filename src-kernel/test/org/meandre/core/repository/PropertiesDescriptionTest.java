@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.junit.Test;
-import org.meandre.core.repository.PropertiesDescription;
 
 /** This test class test the interface and behavior of class PropertiesDescription
  * 

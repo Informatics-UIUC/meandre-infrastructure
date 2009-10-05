@@ -3,9 +3,6 @@ package org.meandre.executables;
 import java.io.File;
 
 import org.meandre.executables.shutdown.ShutdownClient;
-import org.meandre.executables.shutdown.ShutdownControlThread;
-import org.meandre.executables.shutdown.Shutdownable;
-import org.meandre.webservices.MeandreServer;
 
 import com.martiansoftware.jsap.FlaggedOption;
 import com.martiansoftware.jsap.JSAP;

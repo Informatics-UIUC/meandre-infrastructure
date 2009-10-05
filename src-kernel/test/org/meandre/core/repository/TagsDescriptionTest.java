@@ -1,12 +1,11 @@
 package org.meandre.core.repository;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
-import org.meandre.core.repository.TagsDescription;
 
 /** This class test the behavior of TagsDescription
  * 

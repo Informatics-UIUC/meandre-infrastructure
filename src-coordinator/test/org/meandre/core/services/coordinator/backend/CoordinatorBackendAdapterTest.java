@@ -1,6 +1,10 @@
 package org.meandre.core.services.coordinator.backend;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -14,10 +18,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.services.coordinator.CoordinatorServiceCallBack;
-import org.meandre.core.services.coordinator.backend.CoordinatorBackendAdapter;
-import org.meandre.core.services.coordinator.backend.CoordinatorBackendAdapterException;
-import org.meandre.core.services.coordinator.backend.DerbyCoordinatorBackendAdapter;
-import org.meandre.core.services.coordinator.backend.MySQLCoordinatorBackendAdapter;
 import org.meandre.core.services.coordinator.logger.CoordinatorLoggerFactory;
 import org.meandre.core.store.Store;
 import org.meandre.core.utils.Constants;

@@ -9,8 +9,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.meandre.core.repository.QueryableRepository;
-import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.demo.repository.DemoRepositoryGenerator;
 
 import com.hp.hpl.jena.rdf.model.Model;

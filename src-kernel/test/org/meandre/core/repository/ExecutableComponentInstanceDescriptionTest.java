@@ -6,8 +6,6 @@ import static org.junit.Assert.assertNull;
 import java.util.Date;
 
 import org.junit.Test;
-import org.meandre.core.repository.ExecutableComponentInstanceDescription;
-import org.meandre.core.repository.PropertiesDescriptionDefinition;
 
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
