@@ -115,7 +115,7 @@ extends Thread {
 			if ( oa!=null )
 				processProbeCommand(oa);
 			
-		} while ( !bDone && !clqStatements.isEmpty() );
+		} while ( !bDone || !clqStatements.isEmpty() );
 	}
 
 
