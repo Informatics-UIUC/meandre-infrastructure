@@ -100,7 +100,7 @@ extends Thread {
 			String sThreadName, Hashtable<String, String> htProperties, MrProbe thdMrProbe,
 			CoreConfiguration cnf,
 			PrintStream console )
-			throws InterruptedException {
+	throws InterruptedException {
 		super(tg,sThreadName);
 
 		// Basic initialization
@@ -169,105 +169,118 @@ extends Thread {
 		}
 
 		// Main loop
-		while ( baStatusFlags[RUNNING] && !baStatusFlags[TERMINATION]) {
+		try {
+			while ( baStatusFlags[RUNNING] && !baStatusFlags[TERMINATION]) {
 
-			if ( isExecutable() ) {
+				if ( isExecutable() ) {
 
-				// The executable component is ready for execution
-				//log.finest("Component "+ec.toString()+" ready for execution");
-				try {
-					// Execute
-					synchronized (baStatusFlags) {
-						baStatusFlags[EXECUTING] = true;
-					}
+					// The executable component is ready for execution
+					//log.finest("Component "+ec.toString()+" ready for execution");
 					try {
-						this.thdMrProbe.probeWrappedComponentFired(this);
-						ec.execute(cc);
-						this.thdMrProbe.probeWrappedComponentCoolingDown(this);
-					}
-					catch ( NoClassDefFoundError ncde ) {
+						// Execute
+						synchronized (baStatusFlags) {
+							baStatusFlags[EXECUTING] = true;
+						}
+						try {
+							this.thdMrProbe.probeWrappedComponentFired(this);
+							ec.execute(cc);
+							this.thdMrProbe.probeWrappedComponentCoolingDown(this);
+						}
+						catch ( NoClassDefFoundError ncde ) {
+							synchronized (baStatusFlags) {
+								baStatusFlags[EXECUTING] = false;
+							}
+							throw new ComponentExecutionException ( ncde );
+						}
 						synchronized (baStatusFlags) {
 							baStatusFlags[EXECUTING] = false;
 						}
-						throw new ComponentExecutionException ( ncde );
+
+						//log.finest("Component "+ec.toString()+" executed");
+
+						// Clean the data proxy
+						resetAndUpdateComponentContext();
+						//log.finest("Component "+ec.toString()+" context updated");
+					} catch (ComponentExecutionException e) {
+						synchronized (baStatusFlags) {
+							baStatusFlags[TERMINATION] = true;
+							sAbortMessage = ExceptionFormatter.formatException(e);
+							this.thdMrProbe.probeWrappedComponentAbort(this);
+						}
+						log.warning(e.getMessage());
+					} catch (ComponentContextException e) {
+						synchronized (baStatusFlags) {
+							baStatusFlags[TERMINATION] = true;
+							sAbortMessage = ExceptionFormatter.formatException(e);
+							this.thdMrProbe.probeWrappedComponentAbort(this);
+						}
+						log.warning(e.getMessage());
 					}
-					synchronized (baStatusFlags) {
-						baStatusFlags[EXECUTING] = false;
+					catch (Exception e) {
+						synchronized (baStatusFlags) {
+							baStatusFlags[TERMINATION] = true;
+							sAbortMessage = ExceptionFormatter.formatException(e);
+							this.thdMrProbe.probeWrappedComponentAbort(this);
+						}
+						log.warning(e.toString());
+					}
+				}
+				else {
+
+					// The executable component is not ready for execution
+					//log.finest("Component "+ec.toString()+" not ready for execution");
+					try {
+						// Should we proceed?
+						synchronized (baStatusFlags) {
+							baStatusFlags[SLEEPING]  = true;
+						}
+						thdMrProper.awake();
+						semBlocking.acquire();
+						synchronized (baStatusFlags) {
+							baStatusFlags[SLEEPING] = false;
+						}
+
+						// Check if termination is requested
+						if ( baStatusFlags[TERMINATION] || !baStatusFlags[RUNNING] )
+							continue;
+						//log.finest("Component "+ec.toString()+" awakened by data push");
+
+						//String sLastUpdated = partialUpdateComponentContext();
+						partialUpdateComponentContext();
+
+						//log.finest("Component "+ec.toString()+" populated input "+qUpdatedActiveBuffer);
+					} catch (InterruptedException e) {
+						synchronized (baStatusFlags) {
+							baStatusFlags[TERMINATION] = true;
+							sAbortMessage = ExceptionFormatter.formatException(e);
+							this.thdMrProbe.probeWrappedComponentAbort(this);
+						}
+						log.warning("The blocking sempahore for "+ec.toString()+" was interrupted!");
+					}
+					catch (ComponentContextException e) {
+						synchronized (baStatusFlags) {
+							baStatusFlags[TERMINATION] = true;
+							sAbortMessage = ExceptionFormatter.formatException(e);
+							this.thdMrProbe.probeWrappedComponentAbort(this);
+						}
+						log.severe("The requested input does not exist "+e.toString());
 					}
 
-					//log.finest("Component "+ec.toString()+" executed");
-
-					// Clean the data proxy
-					resetAndUpdateComponentContext();
-					//log.finest("Component "+ec.toString()+" context updated");
-				} catch (ComponentExecutionException e) {
-					synchronized (baStatusFlags) {
-						baStatusFlags[TERMINATION] = true;
-						sAbortMessage = ExceptionFormatter.formatException(e);
-						this.thdMrProbe.probeWrappedComponentAbort(this);
-					}
-					log.warning(e.getMessage());
-				} catch (ComponentContextException e) {
-					synchronized (baStatusFlags) {
-						baStatusFlags[TERMINATION] = true;
-						sAbortMessage = ExceptionFormatter.formatException(e);
-						this.thdMrProbe.probeWrappedComponentAbort(this);
-					}
-					log.warning(e.getMessage());
 				}
-				catch (Exception e) {
-					synchronized (baStatusFlags) {
-						baStatusFlags[TERMINATION] = true;
-						sAbortMessage = ExceptionFormatter.formatException(e);
-						this.thdMrProbe.probeWrappedComponentAbort(this);
-					}
-					log.warning(e.toString());
-				}
+				//thdMrProper.awake();
 			}
-			else {
-
-				// The executable component is not ready for execution
-				//log.finest("Component "+ec.toString()+" not ready for execution");
-				try {
-					// Should we proceed?
-					synchronized (baStatusFlags) {
-						baStatusFlags[SLEEPING]  = true;
-					}
-					thdMrProper.awake();
-					semBlocking.acquire();
-					synchronized (baStatusFlags) {
-						baStatusFlags[SLEEPING] = false;
-					}
-
-					// Check if termination is requested
-					if ( baStatusFlags[TERMINATION] || !baStatusFlags[RUNNING] )
-						continue;
-					//log.finest("Component "+ec.toString()+" awakened by data push");
-
-					//String sLastUpdated = partialUpdateComponentContext();
-					partialUpdateComponentContext();
-
-					//log.finest("Component "+ec.toString()+" populated input "+qUpdatedActiveBuffer);
-				} catch (InterruptedException e) {
-					synchronized (baStatusFlags) {
-						baStatusFlags[TERMINATION] = true;
-						sAbortMessage = ExceptionFormatter.formatException(e);
-						this.thdMrProbe.probeWrappedComponentAbort(this);
-					}
-					log.warning("The blocking sempahore for "+ec.toString()+" was interrupted!");
-				}
-				catch (ComponentContextException e) {
-					synchronized (baStatusFlags) {
-						baStatusFlags[TERMINATION] = true;
-						sAbortMessage = ExceptionFormatter.formatException(e);
-						this.thdMrProbe.probeWrappedComponentAbort(this);
-					}
-					log.severe("The requested input does not exist "+e.toString());
-				}
-
-			}
-			//thdMrProper.awake();
 		}
+		catch (Throwable t ) {
+			// This should not have happened
+			synchronized (baStatusFlags) {
+				baStatusFlags[TERMINATION] = true;
+				sAbortMessage = ExceptionFormatter.formatException(new Exception(t));
+				this.thdMrProbe.probeWrappedComponentAbort(this);
+			}
+			log.severe("Unexpected exception thrown "+t.toString());
+			this.thdMrProbe.probeWrappedComponentAbort(this);
+		}
+
 		log.finer("Disposing WebUI if any." );
 		cc.stopAllWebUIFragments();
 		log.fine("Finalizing the execution of the wrapping component "+ec.toString());
@@ -287,10 +300,16 @@ extends Thread {
 				this.thdMrProbe.probeWrappedComponentAbort(this);
 			}
 			log.severe("Component disposed failed "+e.toString());
-			e.printStackTrace();
+		}
+		catch (Throwable t) {
+			synchronized (baStatusFlags) {
+				baStatusFlags[TERMINATION] = true;
+				sAbortMessage = ExceptionFormatter.formatException(new Exception(t));
+				this.thdMrProbe.probeWrappedComponentAbort(this);
+			}
+			log.severe("Component disposed failed unexpectedly "+t.toString());
 		}
 		this.thdMrProbe.probeWrappedComponentDispose(this);
-
 	}
 
 
@@ -323,7 +342,7 @@ extends Thread {
 	 * @throws ComponentContextException Something went really wrong
 	 */
 	private void partialUpdateComponentContext()
-			throws ComponentContextException {
+	throws ComponentContextException {
 		// Retrieve the added element to the data proxy
 		try {
 			boolean bNotDone = true;
@@ -337,7 +356,7 @@ extends Thread {
 						cc.setDataComponentToInput(
 								sIN,
 								htInputs.get(sIN).popDataComponent()
-							);
+						);
 						bNotDone = false;
 					}
 			}
@@ -349,12 +368,12 @@ extends Thread {
 		}
 
 
-//		String sLastUpdated = qUpdatedActiveBuffer.poll().toString();
-//
-//		cc.setDataComponentToInput(
-//				sLastUpdated,
-//				htInputs.get(sLastUpdated).popDataComponent()
-//			);
+		//		String sLastUpdated = qUpdatedActiveBuffer.poll().toString();
+		//
+		//		cc.setDataComponentToInput(
+		//				sLastUpdated,
+		//				htInputs.get(sLastUpdated).popDataComponent()
+		//			);
 
 	}
 

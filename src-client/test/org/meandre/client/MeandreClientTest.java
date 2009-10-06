@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -43,6 +44,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
  *
  * @author pgroves
  * Modified by Xavier Llor&agrave;s
+ * Modified by Amit Kumar -added test for runFlow(String,HashMap)
  */
 public class MeandreClientTest {
 
@@ -709,6 +711,31 @@ public class MeandreClientTest {
         return;      
         
     }
+    
+    /**
+     * Test method for 
+     * {@link org.meandre.client.MeandreClient#runFlow(java.lang.String, java.util.HashMap)}.
+     */
+    @Test
+    public void testRunFlowWithProbes() {
+        String sUrl = 
+                "meandre://test.org/flow/test-hello-world-with-python-and-lisp/";
+        String ret;
+        try{
+            HashMap<String,String> hmap = new HashMap<String,String>();
+            hmap.put("statistics", "true");
+            ret = _meandreClient.runFlow(sUrl, hmap);
+            System.out.println("testRunFlow flow output:");
+            System.out.println(ret);
+            
+        }catch(Exception e){
+            e.printStackTrace();
+            fail(e.toString());
+        }
+        return;      
+        
+    }
+    
     
     /**
      * Test method for 
