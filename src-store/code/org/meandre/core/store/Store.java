@@ -1228,21 +1228,21 @@ public class Store {
 	    }
 
 	    for (Statement ctxStmt : lstStatements) {
-	        String ctx = ctxStmt.getObject().toString();
-
-	        try {
-	            URI ctxUri = new URI(ctx);
-	            if (ctxUri.getScheme().equals("context")) {
-	                URL ctxUrl = new URL("http", NetworkTools.getLocalHostName(), cnf.getBasePort(), "/public/resources/contexts" + ctxUri.getPath());
-	                copy.remove(ctxStmt);
-	                copy.add(ctxStmt.getSubject(), RepositoryVocabulary.execution_context, copy.createResource(ctxUrl.toString()));
-	            }
-	        }
-	        catch (URISyntaxException e) {
-	            // do nothing since ctx is likely the actual code for the component (the code is embedded in the RDF)
-	        }
-	        catch (Exception e) {
-	            log.log(Level.WARNING, "Problem rewriting jar context for: " + ctx, e);
+	        RDFNode object = ctxStmt.getObject();
+	        if ( object.isResource() ) {
+				String ctx = object.toString();
+	
+		        try {
+		            URI ctxUri = new URI(ctx);
+		            if (ctxUri.getScheme().equals("context")) {
+		                URL ctxUrl = new URL("http", NetworkTools.getLocalHostName(), cnf.getBasePort(), "/public/resources/contexts" + ctxUri.getPath());
+		                copy.remove(ctxStmt);
+		                copy.add(ctxStmt.getSubject(), RepositoryVocabulary.execution_context, copy.createResource(ctxUrl.toString()));
+		            }
+		        }
+		        catch (Exception e) {
+		            log.log(Level.WARNING, "Problem rewriting jar context for: " + ctx, e);
+		        }
 	        }
 	    }
 
