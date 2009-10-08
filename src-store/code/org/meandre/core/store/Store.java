@@ -12,6 +12,7 @@ import java.io.PrintStream;
 import java.io.StringReader;
 import java.net.ConnectException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -1191,7 +1192,7 @@ public class Store {
 
 		return setRes;
 	}
-	
+
 	/** Returns the list of published components and flows as a repository.
 	 *
 	 * @return The set of published components' URI
@@ -1236,6 +1237,9 @@ public class Store {
 	                copy.remove(ctxStmt);
 	                copy.add(ctxStmt.getSubject(), RepositoryVocabulary.execution_context, copy.createResource(ctxUrl.toString()));
 	            }
+	        }
+	        catch (URISyntaxException e) {
+	            // do nothing since ctx is likely the actual code for the component (the code is embedded in the RDF)
 	        }
 	        catch (Exception e) {
 	            log.log(Level.WARNING, "Problem rewriting jar context for: " + ctx, e);
