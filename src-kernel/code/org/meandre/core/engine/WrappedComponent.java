@@ -138,8 +138,6 @@ extends Thread {
 
 		// Waste the only ticket to the blocking semaphore
 		this.semBlocking.acquire();
-
-		this.thdMrProbe.probeWrappedComponentInitialize(this);
 	}
 
 
@@ -152,6 +150,7 @@ extends Thread {
 		// Initialize the executable component
 		try {
 			this.ec.initialize(cc);
+			this.thdMrProbe.probeWrappedComponentInitialize(this);
 		} catch (ComponentExecutionException e) {
 			synchronized (baStatusFlags) {
 				baStatusFlags[TERMINATION] = true;
