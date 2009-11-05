@@ -34,6 +34,8 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
 
@@ -283,7 +285,20 @@ public class RepositoryImpl implements QueryableRepository {
 		return list;
 	}
 
-
+	/** Returns the properties of a given subject.
+	 *
+	 * @param resSubj The subject resource
+	 * @return Return the list of matching properties
+	 */
+	private List<Statement> getStatementsForSubjectFromModel ( Resource resSubj ) {
+		LinkedList<Statement> lst = new LinkedList<Statement>();
+		StmtIterator props = resSubj.listProperties();
+		while ( props.hasNext() ) {
+			lst.add(props.nextStatement());
+		}
+		return lst;
+	}
+	
 	/** Returns the resources matching that particular subject/predicate combination.
 	 *
 	 * @param resSubj The subject resource
@@ -532,12 +547,43 @@ public class RepositoryImpl implements QueryableRepository {
 		//
 		Hashtable<String,String> htValues = new Hashtable<String,String>();
 		Hashtable<String,String> htDescriptions = new Hashtable<String,String>();
+		Hashtable<String,Hashtable<String,String>> htOthers = new Hashtable<String,Hashtable<String,String>>();
+		
 		for ( Resource resProp:getObjectResourcesFromModel(res, RepositoryVocabulary.property_set, false) ) {
+			//
+			// Original version
+			//
+//			String sKey = getLiteralsFromModel(resProp, RepositoryVocabulary.key, true).iterator().next().getLexicalForm();
+//			htValues.put(sKey,getLiteralsFromModel(resProp, RepositoryVocabulary.value, true).iterator().next().getLexicalForm());
+//			htDescriptions.put(sKey,getLiteralsFromModel(resProp, DC.description, true).iterator().next().getLexicalForm());
+			// 
+			// Modified to add the other external properties somebody may annotate (to satisfy nema guys
+			//
 			String sKey = getLiteralsFromModel(resProp, RepositoryVocabulary.key, true).iterator().next().getLexicalForm();
-			htValues.put(sKey,getLiteralsFromModel(resProp, RepositoryVocabulary.value, true).iterator().next().getLexicalForm());
-			htDescriptions.put(sKey,getLiteralsFromModel(resProp, DC.description, true).iterator().next().getLexicalForm());
+			for ( Statement stm:getStatementsForSubjectFromModel(resProp) ) {
+				if ( stm.getPredicate().equals(RepositoryVocabulary.key) ) {
+					// Do nothing since we already have it
+				}
+				else if ( stm.getPredicate().equals(RDF.type) ) {
+					// Do nothing since we already have it
+				}
+				else if ( stm.getPredicate().equals(RepositoryVocabulary.value) ) {
+					htValues.put(sKey,stm.getLiteral().getLexicalForm());
+				}
+				else if ( stm.getPredicate().equals(DC.description) ) {
+					htDescriptions.put(sKey,stm.getLiteral().getLexicalForm());
+				}
+				else {
+					if ( !htOthers.containsKey(sKey) ) {
+						htOthers.put(sKey,new Hashtable<String, String>());
+					}
+					htOthers.get(sKey).put(stm.getPredicate().toString(), stm.getObject().toString());
+				}
+			}
+			
+			
 		}
-		PropertiesDescriptionDefinition pddProperties = new PropertiesDescriptionDefinition(htValues,htDescriptions);
+		PropertiesDescriptionDefinition pddProperties = new PropertiesDescriptionDefinition(htValues,htDescriptions,htOthers);
 
 
 		/* Original SPARQL version

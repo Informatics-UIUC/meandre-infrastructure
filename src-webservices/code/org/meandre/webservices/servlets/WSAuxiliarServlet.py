@@ -472,6 +472,12 @@ def auxiliar_show ( request, response, format ):
                 html += '<tr><th valign="top"><strong>Name</strong>:</th><td>'+key+'</td></tr>'
                 html += '<tr><th valign="top"><strong>Description</strong>:</th><td>'+prop.getDescription(key)+'</td></tr>'
                 html += '<tr><th valign="top"><strong>Default</strong>:</th><td>'+prop.getValue(key)+'</td></tr>'
+                ops = prop.getOtherProperties(key)
+                if ( ops.size()>0 ) :
+                    html += '<tr><th valign="top"><strong>Other properties</strong>:</th><td>'
+                    for ok in ops.keySet() :
+                       html += ok+': '+ops.get(ok)+'<br/>'
+                    html += '</td></tr>'
                 html += '</table><br/>'
             return html
             

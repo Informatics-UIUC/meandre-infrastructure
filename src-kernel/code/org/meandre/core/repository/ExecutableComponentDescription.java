@@ -3,6 +3,7 @@ package org.meandre.core.repository;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Set;
 
 import org.meandre.core.utils.vocabulary.RepositoryVocabulary;
@@ -354,13 +355,27 @@ public class ExecutableComponentDescription {
 		for ( String sKey:pddProperties.getKeys()) {
 			String sValue = pddProperties.getValue(sKey);
 			String  sDesc = pddProperties.getDescription(sKey);
-			res.addProperty(RepositoryVocabulary.property_set,
-					model.createResource(resExecutableComponent.toString()+"/property/"+sKey)
-						 .addProperty(RDF.type,RepositoryVocabulary.property)
-					     .addProperty(RepositoryVocabulary.key,model.createTypedLiteral(sKey))
-					     .addProperty(RepositoryVocabulary.value,model.createTypedLiteral(sValue))
-					     .addProperty(DC.description,model.createTypedLiteral(sDesc))
-				);
+			Resource prop = model.createResource(resExecutableComponent.toString()+"/property/"+sKey)
+			 							.addProperty(RDF.type,RepositoryVocabulary.property)
+			 							.addProperty(RepositoryVocabulary.key,model.createTypedLiteral(sKey))
+			 							.addProperty(RepositoryVocabulary.value,model.createTypedLiteral(sValue))
+			 							.addProperty(DC.description,model.createTypedLiteral(sDesc));
+			Map<String, String> mapOthers = pddProperties.getOtherProperties(sKey);
+			for ( String othersKey:mapOthers.keySet() ) {
+				String sOV = mapOthers.get(othersKey);
+				Resource resOV = null;
+				try {
+					resOV = model.createResource(sOV);
+				}
+				catch ( Throwable t ) {
+					// Not a resource
+				}
+				if ( resOV!=null )
+					prop.addProperty(model.createProperty(othersKey),resOV ) ;
+				else
+					prop.addProperty(model.createProperty(othersKey),model.createTypedLiteral(sOV) );
+			}
+			res.addProperty(RepositoryVocabulary.property_set,prop);
 		}
 
 		// Adding inputs

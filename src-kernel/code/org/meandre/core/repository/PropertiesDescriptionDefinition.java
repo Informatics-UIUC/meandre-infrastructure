@@ -14,14 +14,35 @@ public class PropertiesDescriptionDefinition extends PropertiesDescription {
 	/** The property description. */
 	private Hashtable<String,String> htDescriptions = null;
 	
+	/** Other properties that may been allocated to this property. */
+	private Hashtable<String, Hashtable<String, String>> htOthers;
+	
 	/** Create a property description definition.
 	 * 
 	 * @param htValues The values
 	 * @param htDescriptions The descriptions
 	 */
-	public PropertiesDescriptionDefinition(Hashtable<String,String> htValues, Hashtable<String,String> htDescriptions) {
+	public PropertiesDescriptionDefinition(
+			Hashtable<String,String> htValues, 
+			Hashtable<String,String> htDescriptions) {
 		super(htValues);
 		this.htDescriptions = htDescriptions;
+		this.htOthers = new Hashtable<String,Hashtable<String,String>>() ;
+	}
+	
+	/** Create a property description definition.
+	 * 
+	 * @param htValues The values
+	 * @param htDescriptions The descriptions
+	 * @param htOthers The other properties attached to this property
+	 */
+	public PropertiesDescriptionDefinition(
+			Hashtable<String,String> htValues, 
+			Hashtable<String,String> htDescriptions, 
+			Hashtable<String,Hashtable<String,String>> htOthers ) {
+		super(htValues);
+		this.htDescriptions = htDescriptions;
+		this.htOthers = htOthers;
 	}
 
 	
@@ -48,5 +69,17 @@ public class PropertiesDescriptionDefinition extends PropertiesDescription {
 	 */
 	public Map<String,String> getDescriptionMap () {
 		return htDescriptions;
+	}
+	
+	/** Returns the other properties that may have been attached to 
+	 * a property description.
+	 * 
+	 * @param sKey The property key
+	 * @return The map for the other properties
+	 */
+	public Map<String, String> getOtherProperties ( String sKey ) {
+		Map<String,String> map = htOthers.get(sKey);
+		if ( map==null ) map = new Hashtable<String,String>();
+		return map;
 	}
 }
