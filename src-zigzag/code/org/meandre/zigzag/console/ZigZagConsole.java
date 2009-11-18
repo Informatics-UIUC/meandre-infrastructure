@@ -181,7 +181,7 @@ public class ZigZagConsole {
 	 * @param sLine The line to parser
 	 * @throws ParseException There was a parser problem
 	 */
-	private void parseCommandLine(String sLine) throws ParseException {
+	protected void parseCommandLine(String sLine) throws ParseException {
 		boolean bParsed = parseSystemCommand(sLine);
 		if ( !bParsed )
 			parseZigZagEntry(sLine);
