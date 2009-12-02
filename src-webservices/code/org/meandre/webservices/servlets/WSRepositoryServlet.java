@@ -295,7 +295,7 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
 							log.info("Adding component "+ecd.getExecutableComponent()+" to "+request.getRemoteUser()+"'s repository");
 						}
 						else
-							log.warning("Discarding upload of the existem component "+ecd.getExecutableComponent()+". No overwrite flag provided.");
+							log.warning("Discarding upload of the existing component "+ecd.getExecutableComponent()+". No overwrite flag provided.");
 					}
 					else {
 						modUser.add(ecd.getModel());
