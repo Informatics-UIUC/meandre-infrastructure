@@ -3,6 +3,7 @@ package org.meandre.plugins.tools;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Writer;
@@ -14,6 +15,7 @@ import java.util.Properties;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -196,9 +198,23 @@ public class JarToolServlet extends HttpServlet implements MeandrePlugin {
 	        throw new FileNotFoundException(sFile);
 
 	    File md5File = new File(PLUGIN_JAR_DIR, sFile + ".md5");
-	    Writer writer = IOUtils.getWriterForResource(md5File.toURI());
-	    writer.write(sMD5);
-	    writer.close();
+	    Writer writer = null;
+
+	    try {
+	        writer = new FileWriter(md5File);
+            writer.write(sMD5);
+        }
+        catch (IOException e) {
+            log.log(Level.SEVERE, "Cannot create the MD5 checksum file for " + sFile, e);
+            throw e;
+        }
+        finally {
+            if (writer != null)
+                try {
+                    writer.close();
+                }
+                catch (Exception e) {}
+        }
 
 	    _md5map.put(sMD5.toLowerCase(), sFile);
 

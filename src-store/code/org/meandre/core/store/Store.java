@@ -12,7 +12,6 @@ import java.io.PrintStream;
 import java.io.StringReader;
 import java.net.ConnectException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -914,16 +913,30 @@ public class Store {
     			    		    log.warning("Overwriting context file: " + savedFile.toString());
 
     						InputStream is = urlCntx.openStream();
-    						byte [] baTmp = new byte[1048576];
+    						byte[] baTmp = new byte[1048576];
     						int iNumBytes = is.read(baTmp);
-    						if ( iNumBytes>0 ) {
+    						if (iNumBytes > 0) {
     							savedFile.delete();
-    							FileOutputStream fos = new FileOutputStream(savedFile);
-    							do {
-    								fos.write(baTmp, 0, iNumBytes);
+    							FileOutputStream fos = null;
+    							try {
+    							    fos = new FileOutputStream(savedFile);
+
+    							    do {
+    							        fos.write(baTmp, 0, iNumBytes);
+    							    }
+    							    while ((iNumBytes = is.read(baTmp)) > -1);
     							}
-    							while ( (iNumBytes=is.read(baTmp))>-1 );
-    							fos.close();
+    							catch (IOException e) {
+    							    log.log(Level.SEVERE, "Cannot create local context file: " + savedFile, e);
+    							    throw e;
+    							}
+    							finally {
+    							    if (fos != null)
+    							        try {
+    							            fos.close();
+    							        }
+    							        catch (IOException ex) {}
+    							}
     						}
 
     						try {
@@ -1231,7 +1244,7 @@ public class Store {
 	        RDFNode object = ctxStmt.getObject();
 	        if ( object.isResource() ) {
 				String ctx = object.toString();
-	
+
 		        try {
 		            URI ctxUri = new URI(ctx);
 		            if (ctxUri.getScheme().equals("context")) {
