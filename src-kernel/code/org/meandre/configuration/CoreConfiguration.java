@@ -99,7 +99,7 @@ public class CoreConfiguration {
      * @param port the port the web services will run on
      * @param sInstallDir the directory used for Meandre's persistent data
      */
-    public CoreConfiguration(int port, String sInstallDir){
+    public CoreConfiguration(int port, String sInstallDir) {
 
         propsCore = new Properties();
 
@@ -115,7 +115,6 @@ public class CoreConfiguration {
 
         initializeConfiguration();
     }
-
 
     /** Initialize the supporting file structures for the given configuration.
      *
@@ -154,12 +153,15 @@ public class CoreConfiguration {
         if (propsCore == null) return;
 
         Level kernelLogLevel = Level.parse(propsCore.getProperty(MEANDRE_KERNEL_LOG_LEVEL, Level.INFO.getName()));
-        KernelLoggerFactory.setLevel(kernelLogLevel);
-
         Level wsLogLevel = Level.parse(propsCore.getProperty(MEANDRE_WS_LOG_LEVEL, Level.INFO.getName()));
-        WSLoggerFactory.setLevel(wsLogLevel);
+
+        setGlobalLoggingLevel(kernelLogLevel, wsLogLevel);
     }
 
+    public void setGlobalLoggingLevel(Level kernelLogLevel, Level wsLogLevel) {
+        KernelLoggerFactory.setLevel(kernelLogLevel);
+        WSLoggerFactory.setLevel(wsLogLevel);
+    }
 
     /**
      * Returns the location of run resources directory for Meandre

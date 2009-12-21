@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.meandre.configuration.CoreConfiguration;
@@ -152,7 +153,7 @@ public class MeandreServer {
 	 * @param port The port
 	 * @param sInstallDir The directory
 	 */
-	public MeandreServer(int port, String sInstallDir){
+	public MeandreServer(int port, String sInstallDir) {
 		log = WSLoggerFactory.getWSLogger();
 		MEANDRE_HOME = sInstallDir;
 		cnf = new CoreConfiguration(port, sInstallDir);
@@ -181,6 +182,10 @@ public class MeandreServer {
 	public void setCoreConfiguration ( CoreConfiguration config ) {
 		cnf = config;
 		cnf.initializeLogging();
+	}
+
+	public void setGlobalLoggingLevel(Level kernelLogLevel, Level wsLogLevel) {
+	    cnf.setGlobalLoggingLevel(kernelLogLevel, wsLogLevel);
 	}
 
 	/** Sets the Meandre store for the given server.

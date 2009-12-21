@@ -3,6 +3,7 @@ package org.meandre.executables;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
 
 import org.meandre.executables.shutdown.ShutdownControlThread;
 import org.meandre.executables.shutdown.Shutdownable;
@@ -15,11 +16,11 @@ import com.martiansoftware.jsap.JSAPResult;
 import com.martiansoftware.jsap.stringparsers.FileStringParser;
 
 /**
- * commandline interface to start up a MeandreServer (Infrastructure-Server). 
+ * commandline interface to start up a MeandreServer (Infrastructure-Server).
  */
 
 public class RunInfrastructureCMD{
-    
+
     public static final String APP_NAME = "MeandreInfrastructure";
 
     /**the name of the file with default locations that will be written
@@ -43,16 +44,19 @@ public class RunInfrastructureCMD{
      * server starts up the first time.  */
     private static String[] _defaultLocations;
 
+    private static Level _kernelLogLevel = null;
+    private static Level _wsLogLevel = null;
+
+
     public static void main(String[] args) throws Exception{
         parseArgs(args);
 
         prepareDefaultLocations();
 
-        ShutdownableServer server = new ShutdownableServer(_serverPort, 
-                _installDir.toString());
+        ShutdownableServer server = new ShutdownableServer(_serverPort, _installDir.toString());
+        server.setGlobalLoggingLevel(_kernelLogLevel, _wsLogLevel);
 
-        ShutdownControlThread sct = new ShutdownControlThread(
-                server, _shutdownPort, _installDir, APP_NAME);
+        ShutdownControlThread sct = new ShutdownControlThread(server, _shutdownPort, _installDir, APP_NAME);
 
         log("RunInfrastructureCMD: Starting ShutdownControlThread");
         sct.start();
@@ -62,13 +66,13 @@ public class RunInfrastructureCMD{
 
     /**
      * populate the static variables of this class.
-     * @throws JSAPException 
-     * @throws UnknownHostException 
+     * @throws JSAPException
+     * @throws UnknownHostException
      */
     private static void parseArgs(String[] args) throws JSAPException{
 
         JSAP jsap = makeCommandLineParser();
-        
+
         JSAPResult config = jsap.parse(args);
 
         if (!config.success()) {
@@ -79,7 +83,9 @@ public class RunInfrastructureCMD{
         _serverPort = config.getInt("meandrePort");
         _shutdownPort = config.getInt("shutdownPort");
         _defaultLocations = config.getStringArray("defaultLocations");
-        
+        _kernelLogLevel = Level.parse(config.getString("kernelLogLevel", "INFO"));
+        _wsLogLevel = Level.parse(config.getString("wsLogLevel", "INFO"));
+
         if(!_installDir.exists()){
             _installDir.mkdirs();
         }
@@ -90,7 +96,7 @@ public class RunInfrastructureCMD{
 
     private static JSAP makeCommandLineParser() throws JSAPException{
         JSAP jsap = new JSAP();
-        
+
         //dir for installation files
         FlaggedOption installDirOpt = new FlaggedOption("installationDir");
         installDirOpt.setShortFlag('d');
@@ -102,6 +108,23 @@ public class RunInfrastructureCMD{
             "exist it will be created and populated with a default installation");
         jsap.registerParameter(installDirOpt);
 
+        //option to specify the kernel log level
+        FlaggedOption kernelLogLevelOpt = new FlaggedOption("kernelLogLevel");
+        kernelLogLevelOpt.setShortFlag(JSAP.NO_SHORTFLAG);
+        kernelLogLevelOpt.setLongFlag("kernel-log-level");
+        kernelLogLevelOpt.setRequired(false);
+        kernelLogLevelOpt.setHelp("The kernel logging level, one of: " +
+        		"ALL, FINEST, FINER, FINE, INFO, WARNING, SEVERE");
+        jsap.registerParameter(kernelLogLevelOpt);
+
+        //option to specify the webservices log level
+        FlaggedOption wsLogLevelOpt = new FlaggedOption("wsLogLevel");
+        wsLogLevelOpt.setShortFlag(JSAP.NO_SHORTFLAG);
+        wsLogLevelOpt.setLongFlag("ws-log-level");
+        wsLogLevelOpt.setRequired(false);
+        wsLogLevelOpt.setHelp("The webservices logging level, one of: " +
+                "ALL, FINEST, FINER, FINE, INFO, WARNING, SEVERE");
+        jsap.registerParameter(wsLogLevelOpt);
 
         //port number for the webservices
         FlaggedOption meandrePortOpt = new FlaggedOption("meandrePort");
@@ -148,7 +171,7 @@ public class RunInfrastructureCMD{
      * so that MeandreServer will load them when it's Store starts up. If
      * the file is already there, it will assume the existing file contains
      * what the user really wants and NOT overwrite the file.
-     * @throws FileNotFoundException 
+     * @throws FileNotFoundException
      */
     private static void prepareDefaultLocations() throws FileNotFoundException{
         //don't bother if no locations were specified on the commandline
@@ -179,7 +202,7 @@ public class RunInfrastructureCMD{
      * error message when the result of the parse fails. The contents of
      * this method are copied from the JASP tutorial at:
      * http://www.martiansoftware.com/jsap/doc/
-     * 
+     *
      * @param parseResult the jsapResult returned when the commandline args
      * where parsed. assumes this 'has errors'
      * @param jsap the jsap used to parse the commandline args that created
@@ -202,14 +225,14 @@ public class RunInfrastructureCMD{
         System.err.println(jsap.getHelp());
         System.exit(1);
     }
-    
+
     private static void log(String msg){
         System.out.println(msg);
     }
     /** a version of MeandreServer that conforms to the Shutdownable interface.
      * This is so a ShutdownControlThread can shut down our server.
      */
-    private static class ShutdownableServer extends MeandreServer 
+    private static class ShutdownableServer extends MeandreServer
             implements Shutdownable{
 
         public ShutdownableServer(int port, String sInstallDir){
@@ -217,6 +240,7 @@ public class RunInfrastructureCMD{
 
         }
 
+        @Override
         public void stop(){
             try{
                 super.stop();
