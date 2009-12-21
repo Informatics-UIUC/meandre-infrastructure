@@ -276,11 +276,11 @@ public class WSRepositoryServlet extends MeandreBaseServlet {
                                         log.log(Level.WARNING, "JAR naming conflict!", e);
                                     }
 							    } else {
-							        log.finer("Skipping upload of '" + sFile + "'. Reason: Found as '" + sJarFile + "'");
+							        log.fine("Skipping upload of '" + sFile + "'. Reason: Found as '" + sJarFile + "'");
 							        sFile = sJarFile;
                                 }
 							} else
-							    log.finer("Skipping upload of '" + sFile + "'. Reason: File size is 0");
+							    log.fine("Skipping upload of '" + sFile + "'. Reason: File size is 0");
 
 							ecd.getContext().add(modUser.createResource("context://localhost/java/"+sFile));
 						}

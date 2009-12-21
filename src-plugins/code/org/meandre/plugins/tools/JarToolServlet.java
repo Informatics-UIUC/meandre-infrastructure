@@ -3,7 +3,6 @@ package org.meandre.plugins.tools;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Writer;
@@ -125,8 +124,6 @@ public class JarToolServlet extends HttpServlet implements MeandrePlugin {
 
 	@Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-	    log.entering(getClass().getName(), "doGet");
-
 		String path = req.getPathInfo();
 		log.finer("Request path: " + path);
 
@@ -179,8 +176,6 @@ public class JarToolServlet extends HttpServlet implements MeandrePlugin {
 	}
 
 	public void addResource(String sFile, String sMD5) throws ResourceConflictException, IOException {
-	    log.entering(getClass().getName(), "doPost");
-
 	    if (sFile == null || sMD5 == null)
 	        throw new NullPointerException("need to supply valid values for the 'sFile' and 'sMD5' parameters");
 
@@ -201,7 +196,7 @@ public class JarToolServlet extends HttpServlet implements MeandrePlugin {
 	    Writer writer = null;
 
 	    try {
-	        writer = new FileWriter(md5File);
+	        writer = IOUtils.getWriterForResource(md5File.toURI());
             writer.write(sMD5);
         }
         catch (IOException e) {

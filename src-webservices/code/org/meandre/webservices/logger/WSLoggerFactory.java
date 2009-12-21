@@ -12,11 +12,11 @@ import org.meandre.core.logger.MeandreFormatter;
 
 
 /** This class implements a disposable logger factory for demo components and flows.
- * 
+ *
  * @author Xavier Llor&agrave; (modified Amit Kumar -Added Formatter)
  */
 public class WSLoggerFactory {
-	
+
 
 	/** Number of rotating files */
 	private static final int LOG_NUM_ROTATING_FILES = 10;
@@ -26,10 +26,10 @@ public class WSLoggerFactory {
 
 	/** The base logger for the demo code */
 	private static Logger logWS = null;
-	
+
 	/** The basic handler for all the loggers */
 	public static Handler handlerWS = null;
-	
+
 	// Initializing the logger and its handlers
 	static {
 		logWS = Logger.getLogger(WSLoggerFactory.class.getName());
@@ -44,7 +44,7 @@ public class WSLoggerFactory {
 				Handler[] handlerList=logger.getHandlers();
 				for(int i=0;i< handlerList.length;i++){
 					handlerList[i].setFormatter(new MeandreFormatter(false));
-				}	
+				}
 			}
 			Handler[] handlerList=logWS.getHandlers();
 			for(int i=0;i< handlerList.length;i++){
@@ -59,20 +59,22 @@ public class WSLoggerFactory {
 		}
 		handlerWS.setLevel(Level.INFO);
 	}
-	
+
 	/** Returns the core main logger.
-	 * 
-	 * @return The core logger 
+	 *
+	 * @return The core logger
 	 */
 	public static Logger getWSLogger() {
 		return logWS;
 	}
-	
+
 	/** Set the level to use on for the logger and handler.
-	 * 
+	 *
 	 * @param level The requested level
 	 */
 	public static void setLevel ( Level level ) {
+	    logWS.info(String.format("Changing the logging level from %s to %s", logWS.getLevel().getName(), level.getName()));
+
 		logWS.setLevel(level);
 		handlerWS.setLevel(level);
 	}

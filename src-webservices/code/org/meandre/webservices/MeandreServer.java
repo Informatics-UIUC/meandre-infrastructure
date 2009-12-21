@@ -17,8 +17,6 @@ import java.util.Set;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
-import javax.servlet.Servlet;
-
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.security.Role;
 import org.meandre.core.services.coordinator.CoordinatorServiceCallBack;
@@ -76,7 +74,7 @@ public class MeandreServer {
 	public final static String WS_BASE_URL = "http://meandre.org/services/";
 
 	/** The logger for the WebServices */
-	private Logger log;
+	private final Logger log;
 
 	/** The base directory for Jetty */
 	public String MEANDRE_HOME;
@@ -100,7 +98,7 @@ public class MeandreServer {
 	private boolean bStop = false;
 
 	/** Creates a Meandre server with the default configuration.
-	 * 
+	 *
 	 */
 	public MeandreServer () {
 		log = WSLoggerFactory.getWSLogger();
@@ -146,22 +144,24 @@ public class MeandreServer {
 		else
 			store = new Store(cnf);
 
+		cnf.initializeLogging();
 	}
 
 	/** Creates (or uses) a default installation in the given install directory
-	 * running on the given port.  
+	 * running on the given port.
 	 * @param port The port
 	 * @param sInstallDir The directory
 	 */
 	public MeandreServer(int port, String sInstallDir){
 		log = WSLoggerFactory.getWSLogger();
 		MEANDRE_HOME = sInstallDir;
-		cnf = new CoreConfiguration(port, sInstallDir);	   
+		cnf = new CoreConfiguration(port, sInstallDir);
+		cnf.initializeLogging();
 		store = new Store(sInstallDir,cnf);
 	}
 
 	/** Creates a Meandre server running on the provided home directory and store.
-	 * 
+	 *
 	 * @param sMeandreHome The Meandre home directory
 	 * @param config The Meandre core configuration to use
 	 * @param storeMS The Meandre store to use
@@ -171,18 +171,20 @@ public class MeandreServer {
 		MEANDRE_HOME = sMeandreHome;
 		store = storeMS;
 		cnf = config;
+		cnf.initializeLogging();
 	}
 
 	/** Sets the Meandre core configuration to use for this server.
-	 * 
+	 *
 	 * @param config The Meandre core configuration
 	 */
 	public void setCoreConfiguration ( CoreConfiguration config ) {
 		cnf = config;
+		cnf.initializeLogging();
 	}
 
 	/** Sets the Meandre store for the given server.
-	 * 
+	 *
 	 * @param storeMS The Meandre store to use
 	 */
 	public void setStore ( Store storeMS ) {
@@ -191,7 +193,7 @@ public class MeandreServer {
 
 
 	/** Sets the Meandre home directory.
-	 * 
+	 *
 	 * @param sMeandreHome The Meandre home directory
 	 */
 	public void setMeandreHome ( String sMeandreHome ) {
@@ -236,7 +238,7 @@ public class MeandreServer {
 		// Initialize the plugins
 		pf.initializeGlobalCorePlugins(server,cntxGlobal,log);
 
-		
+
 
 		// Launch the server
 		server.start();
@@ -245,9 +247,9 @@ public class MeandreServer {
 	}
 
 	/** Joins the main Jetty server.
-	 * 
+	 *
 	 * @throws InterruptedException Jetty could not be joined
-	 * 
+	 *
 	 */
 	public void join () throws InterruptedException {
 		String sCntx = cnf.getAppContext();
@@ -256,9 +258,9 @@ public class MeandreServer {
 
 	}
 
-	/** Stops the main Jetty server 
+	/** Stops the main Jetty server
 	 * @throws Exception Jetty could not be stopped
-	 * 
+	 *
 	 */
 	public void stop () throws Exception {
 		log.info("Stoping Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+")");
@@ -269,10 +271,10 @@ public class MeandreServer {
 	}
 
 	/** Stops the main Jetty server with a certain delay
-	 * 
+	 *
 	 * @param iDelay
 	 * @throws Exception Jetty could not be stopped
-	 * 
+	 *
 	 */
 	public void delayedStop (final int iDelay) throws Exception {
 
@@ -300,7 +302,7 @@ public class MeandreServer {
 			}
 
 		});
-		th.start();		
+		th.start();
 	}
 
 	/** Initialize the webservices
@@ -365,34 +367,34 @@ public class MeandreServer {
 		//
 		// Adding the publicly provided services
 		//
-		contextWS.addServlet(new ServletHolder((Servlet) new WSPublicServlet(this,store,cnf)), sCntx+"/public/services/*");
+		contextWS.addServlet(new ServletHolder(new WSPublicServlet(this,store,cnf)), sCntx+"/public/services/*");
 
 		//
 		// Adding restrictedly provided services
 		//
-		contextWS.addServlet(new ServletHolder((Servlet) new WSAboutServlet(this,store,cnf)), 		sCntx+"/services/about/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSLocationsServlet(this,store,cnf)),	sCntx+"/services/locations/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSRepositoryServlet(this,store,cnf)),	sCntx+"/services/repository/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSExecuteServlet(this,store,cnf)),		sCntx+"/services/execute/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSPublishServlet(this,store,cnf)),		sCntx+"/services/publish/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSSecurityServlet(this,store,cnf)),		sCntx+"/services/security/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSCoordinatorServlet(this,store,cnf,baToStore)),		sCntx+"/services/coordinator/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSJobServlet(this,store,cnf)),		sCntx+"/services/jobs/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSLogsServlet(this,store,cnf)),		sCntx+"/services/logs/*");
-		contextWS.addServlet(new ServletHolder((Servlet) new WSServerServlet(this,store,cnf)),		sCntx+"/services/server/*");
+		contextWS.addServlet(new ServletHolder(new WSAboutServlet(this,store,cnf)), 		sCntx+"/services/about/*");
+		contextWS.addServlet(new ServletHolder(new WSLocationsServlet(this,store,cnf)),	sCntx+"/services/locations/*");
+		contextWS.addServlet(new ServletHolder(new WSRepositoryServlet(this,store,cnf)),	sCntx+"/services/repository/*");
+		contextWS.addServlet(new ServletHolder(new WSExecuteServlet(this,store,cnf)),		sCntx+"/services/execute/*");
+		contextWS.addServlet(new ServletHolder(new WSPublishServlet(this,store,cnf)),		sCntx+"/services/publish/*");
+		contextWS.addServlet(new ServletHolder(new WSSecurityServlet(this,store,cnf)),		sCntx+"/services/security/*");
+		contextWS.addServlet(new ServletHolder(new WSCoordinatorServlet(this,store,cnf,baToStore)),		sCntx+"/services/coordinator/*");
+		contextWS.addServlet(new ServletHolder(new WSJobServlet(this,store,cnf)),		sCntx+"/services/jobs/*");
+		contextWS.addServlet(new ServletHolder(new WSLogsServlet(this,store,cnf)),		sCntx+"/services/logs/*");
+		contextWS.addServlet(new ServletHolder(new WSServerServlet(this,store,cnf)),		sCntx+"/services/server/*");
 
-		contextWS.addServlet(new ServletHolder((Servlet) new WSAuxiliarServlet(this,store,cnf)),     sCntx+"/services/auxiliar/*");
+		contextWS.addServlet(new ServletHolder(new WSAuxiliarServlet(this,store,cnf)),     sCntx+"/services/auxiliar/*");
 
 		contextWS.setErrorHandler(new MeandreDefaultErrorHandler(cnf));
-		
+
 
 		return contextWS;
 	}
 
-	/** Fires the Security Sync Service. This services syncs the meandre-realm.xml used 
+	/** Fires the Security Sync Service. This services syncs the meandre-realm.xml used
 	 * by the Jetty authentication to the Meandre security information.
-	 * 
-	 * @param sh The security handle	
+	 *
+	 * @param sh The security handle
 	 */
 	private void fireSecuritySyncService(final SecurityHandler sh) {
 		// Force the refresh of the realm
@@ -411,14 +413,14 @@ public class MeandreServer {
 							} catch (Throwable t) {
 								log.warning("Security realm sync service:"+t.toString());
 							}
-						}						
-					}					
+						}
+					}
 				}
 		).start();
 	}
 
 	/** Registers and fires the backend adapter.
-	 * 
+	 *
 	 */
 	private void registerAndFireBackendAdapter() {
 		// Instantiate the adaptor
@@ -489,7 +491,7 @@ public class MeandreServer {
 	}
 
 
-	/** get the Store this server is using. 
+	/** get the Store this server is using.
 	 *
 	 */
 	public Store getStore(){
@@ -501,20 +503,20 @@ public class MeandreServer {
 	 * deletes all files on disk that are used by this server, it's store,
 	 * repository, etc. This server must be stopped using the 'stop()' method
 	 * before the uninstallation can be done.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public static void uninstall(File installationDir) throws IOException{
 		Set<File> installedFiles = getInstallationFiles(installationDir);
 		WSLoggerFactory.getWSLogger().info(
-				"Uninstalling Meandre files in directory: \'" + 
+				"Uninstalling Meandre files in directory: \'" +
 				installationDir + "\'");
 		for(File file: installedFiles){
 			if(file.exists()){
 				if(file.isDirectory()){
 					FileUtil.deleteDirRecursive(file);
 				}else{
-					file.delete();	                
+					file.delete();
 				}
 			}
 		}
@@ -524,7 +526,7 @@ public class MeandreServer {
 	 * retrieves a list of files that are generated by a MeandreServer by
 	 * default. this list is actually static, and may not be complete if
 	 * changes are made to objects MeandreServer uses but this list isn't
-	 * updated. 
+	 * updated.
 	 */
 	public static Set<File> getInstallationFiles(File meandreHome){
 		Set<File> installFiles = new HashSet<File>();

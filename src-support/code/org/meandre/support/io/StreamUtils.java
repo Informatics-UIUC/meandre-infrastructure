@@ -49,9 +49,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 
 /**
  * @author Boris Capitanu
@@ -103,7 +106,13 @@ public abstract class StreamUtils {
         URL url = getURLforResource(uri);
 
         if (url.getProtocol().equalsIgnoreCase("file"))
-            return new FileOutputStream(url.getFile());
+            try {
+                return new FileOutputStream(new File(url.toURI()));
+            }
+            catch (URISyntaxException e) {
+                // should never happen
+                throw new RuntimeException(e);
+            }
         else
             // TODO: add webdav support
             throw new UnsupportedOperationException("Can only write to file:// or local resources");
@@ -122,7 +131,13 @@ public abstract class StreamUtils {
         }
         catch (IllegalArgumentException e) {
             // URI not absolute - trying as local file
-            return new File(uri.toString()).toURI().toURL();
+            try {
+                return new File(URLDecoder.decode(uri.toString(), "UTF-8")).toURI().toURL();
+            }
+            catch (UnsupportedEncodingException e1) {
+                // should never happen
+                throw new RuntimeException(e1);
+            }
         }
     }
 }

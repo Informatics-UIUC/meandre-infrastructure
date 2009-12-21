@@ -9,7 +9,7 @@
 	src-kernel/code/org/meandre/core/utils/Constants.java
 	*****************************************************
     -->
-    <property name="build.version" value="1.4.7"/>
+    <property name="build.version" value="1.4.8"/>
 
     <!-- Directory structure of the project -->
     <property name="build.dir" value="${basedir}/bin"/>

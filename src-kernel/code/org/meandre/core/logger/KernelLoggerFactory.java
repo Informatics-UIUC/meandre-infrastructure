@@ -8,7 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** This class implements the basic factory for loggers.
- * 
+ *
  * @author Xavier Llor&agrave; (modified -Amit Kumar added Formatter)
  */
 public class KernelLoggerFactory {
@@ -21,7 +21,7 @@ public class KernelLoggerFactory {
 
 	/** The base logger for the core */
 	private static Logger logCore = null;
-	
+
 	/** The basic handler for the core logger */
 	public static Handler handlerCore = null;
 
@@ -39,7 +39,7 @@ public class KernelLoggerFactory {
 				Handler[] handlerList=logger.getHandlers();
 				for(int i=0;i< handlerList.length;i++){
 					handlerList[i].setFormatter(new MeandreFormatter());
-				}	
+				}
 			}
 			Handler[] handlerList=logCore.getHandlers();
 			for(int i=0;i< handlerList.length;i++){
@@ -54,20 +54,21 @@ public class KernelLoggerFactory {
 		}
 		handlerCore.setLevel(Level.INFO);
 	}
-	
+
 	/** Returns the core main logger.
-	 * 
-	 * @return The core logger 
+	 *
+	 * @return The core logger
 	 */
 	public static Logger getCoreLogger() {
 		return logCore;
 	}
-	
+
 	/** Set the level to use on for the logger and handler.
-	 * 
+	 *
 	 * @param level The requested level
 	 */
 	public static void setLevel ( Level level ) {
+	    logCore.info(String.format("Changing the logging level from %s to %s", logCore.getLevel().getName(), level.getName()));
 		logCore.setLevel(level);
 		handlerCore.setLevel(level);
 	}
