@@ -69,7 +69,7 @@ public class MeandreServer {
 	private static final int MINIMUM_NUMBER_OF_JETTY_THREADS = 6;
 
 	/** The rate at which the realm sync file will be kept synchronized with the store */
-	private static final int SECURITY_REALM_SYNC = 20000;
+	private static final int SECURITY_REALM_SYNC = 300000;
 
 	/** The base URL for Meandre WS */
 	public final static String WS_BASE_URL = "http://meandre.org/services/";
@@ -410,8 +410,9 @@ public class MeandreServer {
 					public void run() {
 						while (!bStop ) {
 							try {
-								HashUserRealm hur = (HashUserRealm) sh.getUserRealm();
-								hur.setConfig(store.getRealmFilename());
+//								HashUserRealm hur = (HashUserRealm) sh.getUserRealm();
+//								hur.setConfig(store.getRealmFilename());
+								sh.setUserRealm(new HashUserRealm("Meandre Flow Execution Engine",store.getRealmFilename()));
 								Thread.sleep(SECURITY_REALM_SYNC);
 							} catch (Exception e) {
 								log.warning("Security realm sync service:"+e.toString());
