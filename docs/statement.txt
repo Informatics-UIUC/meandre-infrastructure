@@ -1,1 +1,4 @@
-The statement to guide 1.5.0 development.
+Design statement for Meandre Infrastructure 1.5.0 development.
+
+"Create a cloud-ready state-less infrastructure able to scale and
+ deploy on virtualized environments with zero intervention."

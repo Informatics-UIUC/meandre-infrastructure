@@ -6,3 +6,8 @@ In order to compile the infrastructure you need:
 * Jena 2.6.2 or higher
 * Joda 1.6 or higher
 * Specs 1.6.2 or higher
+
+In order to run the compiled infrastructure you will need to run
+at least one instance of MongoDB. MongoDB can be downloaded from
+
+* MongoDB http://www.mongodb.org/display/DOCS/Downloads (stable recommended)
