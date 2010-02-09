@@ -1,0 +1,8 @@
+In order to compile the infrastructure you need:
+
+* Scala 2.7.6 or higher
+* Mongo DB Java driver 1.2 or higher
+* Crochet 0.1.4 or higher
+* Jena 2.6.2 or higher
+* Joda 1.6 or higher
+* Specs 1.6.2 or higher
