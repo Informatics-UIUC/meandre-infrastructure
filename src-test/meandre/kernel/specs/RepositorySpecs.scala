@@ -23,7 +23,7 @@ object RepositorySpecs extends Specification {
     val components = DescriptorsFactory.buildComponentDescriptors(TestRepositories.demoRepositoryModel)
     val repository = DescriptorsFactory(TestRepositories.demoRepositoryModel)          
 
-    "be able to store and retrieve flows" in {
+    "be able to store flows and components" in {
       val repo  = Repository(Configuration(),"test_user")
       repo.removeAll
       repo.size must beEqualTo(0)
@@ -38,9 +38,55 @@ object RepositorySpecs extends Specification {
       repo add repository
       repo.size must beEqualTo(7)
       repo.removeAll
+    }
+
+    "be able to store and retrieve components" in {
+      val repo  = Repository(Configuration(),"test_user")
+      repo.removeAll
       repo.size must beEqualTo(0)
+      repo add repository
+      repo.size must beEqualTo(7)
+      val cds = repo.components
+      cds.size must beEqualTo(components.size)
+      repo.removeAll
+      repo.size must beEqualTo(0)
+    }
+
+    "be able to store and retrieve flows" in {
+      val repo  = Repository(Configuration(),"test_user")
+      repo.removeAll
+      repo.size must beEqualTo(0)
+      repo add repository
+      repo.size must beEqualTo(7)
+      val fds = repo.flows
+      fds.size must beEqualTo(flows.size)
+      repo.removeAll
+      repo.size must beEqualTo(0)
+    }
 
 
+    "be able to store and retrieve components metadata" in {
+      val repo  = Repository(Configuration(),"test_user")
+      repo.removeAll
+      repo.size must beEqualTo(0)
+      repo add repository
+      repo.size must beEqualTo(7)
+      val cds = repo.componentsMedatada
+      cds.size must beEqualTo(components.size)
+      repo.removeAll
+      repo.size must beEqualTo(0)
+    }
+
+    "be able to store and retrieve flows metadata" in {
+      val repo  = Repository(Configuration(),"test_user")
+      repo.removeAll
+      repo.size must beEqualTo(0)
+      repo add repository
+      repo.size must beEqualTo(7)
+      val fds = repo.flowsMetadata
+      fds.size must beEqualTo(flows.size)
+      repo.removeAll
+      repo.size must beEqualTo(0)
     }
   }
 }

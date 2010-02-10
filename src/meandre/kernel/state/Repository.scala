@@ -2,10 +2,10 @@ package meandre.state
 
 import meandre.Implicits._
 import meandre.kernel.Configuration
-import java.io.{ObjectOutputStream, ByteArrayOutputStream}
-import com.mongodb.{BasicDBList, BasicDBObject, Mongo}
-import com.hp.hpl.jena.rdf.model.Model
 import meandre.kernel.rdf._
+import com.mongodb.{DBObject, BasicDBList, BasicDBObject, Mongo}
+import java.io.{ByteArrayInputStream, ObjectInputStream, ObjectOutputStream, ByteArrayOutputStream}
+import com.hp.hpl.jena.rdf.model.{ModelFactory, Model}
 
 /**
  * Provides access to the user repository.
@@ -43,22 +43,25 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    * @param flow The flow descriptor to convert
    * @return The encapsulating BasicDBObject
    */
-  implicit private def descriptor2BasicDBObject ( desc:Descriptor ) : BasicDBObject = {
+   private implicit def descriptor2BasicDBObject ( desc:Descriptor ) : BasicDBObject = {
     // Serializing the descriptor
     val baosSer = new ByteArrayOutputStream
     new ObjectOutputStream(baosSer) writeObject desc
+    val tagList:BasicDBList = desc.description.tags
     // Creating the tokens
     // TODO Text should be HTML unparsed
     val tkns = new BasicDBList
     for ( t <- (desc.description.name + " " +
                 desc.description.creator.getOrElse("") + " " +
                 desc.description.rights.getOrElse("") +  " " +
+                desc.description.tags.foldLeft("")((a,t)=>a+" "+t+" ") +
                 desc.description.description.getOrElse("")).split("""\s+""") ) tkns add t
     // Creating the BasicDBObject
     val bdbo = new BasicDBObject
     bdbo.put(K_ID,desc.uri)
     bdbo.put(K_NAME,desc.description.name)
     bdbo.put(K_DATE,desc.description.creationDate)
+    bdbo.put(K_TAGS,tagList)
     bdbo.put(K_CREATOR,desc.description.creator.getOrElse("Unknown!"))
     bdbo.put(K_RIGHTS,desc.description.rights.getOrElse("Unknown!"))
     bdbo.put(K_DESC,desc.description.description.getOrElse("Unknown!"))
@@ -82,8 +85,86 @@ class Repository ( val cnf:Configuration, val userName:String ) {
     bdbo
   }
 
-  /** Implicit conversion of a flow descriptor to a Basic DB Object
+  //---------------------------------------------------------------------------
+
+  /**Update the serialized descriptor.
    *
+   * @param desc The descriptor to reserialize to the store
+   */
+  private def updateSerializedDescriptor ( desc:Descriptor ) = {
+    // Serializing the descriptor
+    val baosSer = new ByteArrayOutputStream
+    new ObjectOutputStream(baosSer) writeObject desc
+    val bdbo = new BasicDBObject
+    bdbo.put(K_BIN,baosSer.toByteArray)
+    collection.update(wrapURI(desc),bdbo,true,false)
+  }
+
+  /** Given an arbitrary DBObject this method tries to regenerate the component
+   *  description of the component.
+   *
+   *  @param dbObj The object to process
+   *  @return The component descriptor if it could be regenerated
+   */
+  private def regenerateComponentDescriptorFromDBObject ( dbObj:DBObject ) : Option[ComponentDescriptor] = {
+    var res:Option[ComponentDescriptor] = None
+
+    try {
+      val ois = new ObjectInputStream(new ByteArrayInputStream((dbObj get K_BIN).asInstanceOf[Array[Byte]]))
+      val dsc = ois.readObject.asInstanceOf[ComponentDescriptor]
+      res = Some(dsc)
+    }
+    catch {
+      case _ => try {
+                  val mod = ModelFactory.createDefaultModel
+                  val bais = new ByteArrayInputStream((dbObj get K_TTL).asInstanceOf[Array[Byte]])
+                  res = Some(DescriptorsFactory.buildComponentDescriptors(mod.read(bais,null,"TTL"))(0))
+                  updateSerializedDescriptor(res.get)
+                }
+                catch {
+                  case _ => None
+                }
+
+    }
+    res
+  }
+
+  /** Given an arbitrary DBObject this method tries to regenerate the flow
+   *  description of the component.
+   *
+   *  @param dbObj The object to process
+   *  @return The flow descriptor if it could be regenerated
+   */
+  private def regenerateFlowDescriptorFromDBObject ( dbObj:DBObject ) : Option[FlowDescriptor] = {
+    var res:Option[FlowDescriptor] = None
+
+    try {
+      val ois = new ObjectInputStream(new ByteArrayInputStream((dbObj get K_BIN).asInstanceOf[Array[Byte]]))
+      val dsc = ois.readObject.asInstanceOf[FlowDescriptor]
+      res = Some(dsc)
+    }
+    catch {
+      case _ => try {
+                  val mod = ModelFactory.createDefaultModel
+                  val bais = new ByteArrayInputStream((dbObj get K_TTL).asInstanceOf[Array[Byte]])
+                  res = Some(DescriptorsFactory.buildFlowDescriptors(mod.read(bais,null,"TTL"))(0))
+                  updateSerializedDescriptor(res.get)
+                }
+                catch {
+                  case _ => None
+                }
+
+    }
+    res
+  }
+
+
+
+  //---------------------------------------------------------------------------
+
+
+  /**Implicit conversion of a flow descriptor to a Basic DB Object
+    *
    * @param flow The flow descriptor to convert
    * @return The encapsulating BasicDBObject
    */
@@ -108,7 +189,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
     bdbo
   }
 
-  /**Given descriptor returns a Basic DB Object with the _id field set
+  /** Given descriptor returns a Basic DB Object with the _id field set
    *
    * @param desc The descriptor to wrap
    * @return The BasicDBObject with the _id field set
@@ -221,6 +302,109 @@ class Repository ( val cnf:Configuration, val userName:String ) {
         case _ =>  None
       }
     )
+
+
+  /** Returns all the component metadata stored in the repository that match
+   *  a given query and sorted by the given criteria. Important: Remember that
+   *  for efficiency purposes, you need to specify the sorting order in the
+   *  reverse order you want them.
+   *
+   * @param query The query to run
+   * @param sort The sort condition
+   * @param skip The number of elements to skip
+   * @param limit The maximum number of elements to returns
+   * @return A list of component descriptors contained in the repository
+   */
+  protected def queryMetadata(query:String,sort:String,skip:Int,limit:Int) = {
+    var res:List[Map[String,Any]] = Nil
+    val cur = collection.find(query).sort(sort).skip(skip).limit(limit)
+    while (cur.hasNext) {
+      val bdbo = cur.next.asInstanceOf[BasicDBObject]
+      val bdbl = (bdbo get K_TAGS).asInstanceOf[BasicDBList]
+      val tagList = List[String]() ++ (0 until bdbl.size).toList.map(bdbl.get(_).toString)
+      res ::= Map (
+          "uri"     -> bdbo.getString(K_ID),
+          "name"    -> bdbo.getString(K_NAME),
+          "date"    -> bdbo.get(K_DATE),
+          "creator" -> bdbo.get(K_CREATOR),
+          "rights"  -> bdbo.get(K_RIGHTS),
+          "tags"    -> tagList,
+          "desc"    -> bdbo.getString(K_DESC)
+        )
+    }
+
+    res
+  }
+
+  /** Returns all the component descriptors stored in the repository that match
+   *  a given query and sorted by the given criteria. Important: Remember that
+   *  for efficiency purposes, you need to specify the sorting order in the
+   *  reverse order you want them.
+   *
+   * @param query The query to run
+   * @param sort The sort condition
+   * @param skip The number of elements to skip
+   * @param limit The maximum number of elements to returns
+   * @return A list of component descriptors contained in the repository
+   */
+  protected def queryComponents(query:String,sort:String,skip:Int,limit:Int) = {
+    var res:List[ComponentDescriptor] = Nil
+    val cur = collection.find(query).sort(sort).skip(skip).limit(limit)
+    while (cur.hasNext)
+      regenerateComponentDescriptorFromDBObject(cur.next) match {
+        case Some(cd) => res ::= cd
+        case None =>
+      }
+    res
+  }
+
+  /** Returns all the flow descriptors stored in the repository that match
+   *  a given query and sorted by the given criteria. Important: Remember that
+   *  for efficiency purposes, you need to specify the sorting order in the
+   *  reverse order you want them.
+   *
+   * @param query The query to run
+   * @param sort The sort condition
+   * @param skip The number of elements to skip
+   * @param limit The maximum number of elements to returns
+   * @return A list of flow descriptors contained in the repository
+   */
+  protected def queryFlows(query:String,sort:String,skip:Int,limit:Int) = {
+    var res:List[FlowDescriptor] = Nil
+    val cur = collection.find(query).sort(sort).skip(skip).limit(limit)
+    while (cur.hasNext)
+      regenerateFlowDescriptorFromDBObject(cur.next) match {
+        case Some(cd) => res ::= cd
+        case None =>
+      }
+    res
+  }
+
+  /** Returns all the component descriptors stored in the repository.
+   *
+   * @return A list of flow descriptors contained in the repository
+   */
+  def components = queryComponents("{\"" + K_TYPE + "\": \"" + V_COMPONENT + "\"}","{}",0,Math.MAX_INT)
+
+  /** Returns all the flow descriptors stored in the repository.
+   *
+   * @return A list of flow descriptors contained in the repository
+   */
+  def flows = queryFlows("{\"" + K_TYPE + "\": \"" + V_FLOW + "\"}","{}",0,Math.MAX_INT)
+
+
+  /** Returns all the component metadata stored in the repository.
+   *
+   * @return A list of flow metadata contained in the repository
+   */
+  def componentsMedatada = queryMetadata("{\"" + K_TYPE + "\": \"" + V_COMPONENT + "\"}","{}",0,Math.MAX_INT)
+
+  /** Returns all the flow metadata stored in the repository.
+   *
+   * @return A list of flow metadata contained in the repository
+   */
+  def flowsMetadata = queryMetadata("{\"" + K_TYPE + "\": \"" + V_FLOW + "\"}","{}",0,Math.MAX_INT)
+
 
 }
 

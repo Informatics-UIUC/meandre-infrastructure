@@ -1,6 +1,5 @@
 package meandre
 
-import com.mongodb.BasicDBObject
 import com.mongodb.util.JSON
 import com.hp.hpl.jena.rdf.model.{Resource, ModelFactory, Model}
 import java.text.SimpleDateFormat
@@ -8,6 +7,7 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
 import com.hp.hpl.jena.vocabulary._
 import kernel.rdf._
 import meandre.kernel.rdf.{MeandreRepositoryVocabulary=>MRV}
+import com.mongodb.{BasicDBList, BasicDBObject}
 
 /**
  * A collection of implicit conversion methods
@@ -25,6 +25,17 @@ object Implicits {
    * @throws JSONParseException If failed to parse the string
    */
   implicit def String2BasicDBObject(s:String):BasicDBObject = JSON.parse(s).asInstanceOf[BasicDBObject]
+
+  /**Converts a list of objects into a Basic DB List.
+   *
+   * @param l The list to convert
+   * @return The converted Basic DB List
+   */
+  implicit def List2BasicDBList[A](l:List[A]) = {
+    val res = new BasicDBList
+    l.foreach(o => res.add(o.asInstanceOf[Object]))
+    res
+  }
 
   /**Converts a simple descriptor into a list of descriptors with the descriptor in it.
    *
