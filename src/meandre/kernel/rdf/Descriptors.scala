@@ -85,6 +85,7 @@ case class FiringAny() extends FiringPolicy
  * @author Xavier Llora
  */
 case class ConnectorDescription (
+    uri:String,
 		sourceInstanceDataPort: String,
 		targetInstanceDataPort: String,
 		sourceInstance: String,
@@ -138,7 +139,7 @@ extends Descriptor(uri,description,properties)
 case class FlowDescriptor (
 		override val uri: String,
 		override val description: CommonDescription,
-		override val properties: Map[String,Property],
+		override val properties: Map[String,PropertyDescription],
 		instances: List[ComponentInstanceDescription],
 		connectors: List[ConnectorDescription]
 )
@@ -319,7 +320,7 @@ object DescriptorsFactory  {
 		while ( uris.hasNext ) {
 			val uri = uris.nextResource
 			res ::= ComponentDescriptor (
-					uri.toString,
+					if (uri.toString.endsWith("/")) uri.toString else uri.toString+"/",
 					getCommonDescription(uri,model),
 					Map( getProperties(uri,model) map { s:PropertyDescription=>(s.key,s) } :_* ),
 					mustGet(uri,MeandreRepositoryVocabulary.runnable,model).toLowerCase,
@@ -368,6 +369,7 @@ object DescriptorsFactory  {
 	  		if conURI.isResource )
 		  yield conURI match {
 			  case conURI:Resource => ConnectorDescription(
+            conURI.toString,
 					  safeGet(conURI,MeandreRepositoryVocabulary.connector_instance_data_port_source,model).get,
 					  safeGet(conURI,MeandreRepositoryVocabulary.connector_instance_data_port_target,model).get,
 					  safeGet(conURI,MeandreRepositoryVocabulary.connector_instance_source,model).get,
@@ -440,7 +442,7 @@ object DescriptorsFactory  {
 		while ( uris.hasNext ) {
 			val uri = uris.nextResource
 			res ::= FlowDescriptor (
-					uri.toString,
+					if (uri.toString.endsWith("/")) uri.toString else uri.toString+"/",
 					getCommonDescription(uri,model),
 					Map( getProperties(uri,model) map { s:PropertyDescription=>(s.key,s) } :_* ),
 					getInstances(uri,model),

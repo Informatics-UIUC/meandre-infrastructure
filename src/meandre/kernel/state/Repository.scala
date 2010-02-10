@@ -5,6 +5,7 @@ import meandre.kernel.Configuration
 import meandre.kernel.rdf.{ComponentDescriptor, FlowDescriptor, Descriptor}
 import java.io.{ObjectOutputStream, ByteArrayOutputStream}
 import com.mongodb.{BasicDBList, BasicDBObject, Mongo}
+import com.hp.hpl.jena.rdf.model.Model
 
 /**
  * Provides access to the user repository.
@@ -18,13 +19,16 @@ class Repository ( val cnf:Configuration, val userName:String ) {
   private val K_ID      = "_id"
   private val K_TOKENS  = "_tokens"
   private val K_TYPE    = "_type"
+  private val K_BIN     = "_bin"
+  private val K_TTL     = "_ttl"
+  private val K_RDF     = "_rdf"
+  private val K_NT      = "_nt"
   private val K_NAME    = "name"
   private val K_DESC    = "desc"
   private val K_CREATOR = "creator"
   private val K_DATE    = "ts"
   private val K_RIGHTS  = "rights"
   private val K_TAGS    = "tags"
-  private val K_BIN     = "bin"
 
   private val V_COMPONENT = "component"
   private val V_FLOW      = "flow"
@@ -38,8 +42,8 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    */
   private implicit def flowDescriptor2BasicDBObject ( desc:Descriptor ) : BasicDBObject = {
     // Serializing the descriptor
-    val baos = new ByteArrayOutputStream
-    new ObjectOutputStream(baos) writeObject desc
+    val baosSer = new ByteArrayOutputStream
+    new ObjectOutputStream(baosSer) writeObject desc
     // Creating the tokens
     // TODO Text should be HTML unparsed
     val tkns = new BasicDBList
@@ -59,8 +63,20 @@ class Repository ( val cnf:Configuration, val userName:String ) {
     bdbo.put(K_CREATOR,desc.description.creator.getOrElse("Unknown!"))
     bdbo.put(K_RIGHTS,desc.description.rights.getOrElse("Unknown!"))
     bdbo.put(K_DESC,desc.description.description.getOrElse("Unknown!"))
-    bdbo.put(K_BIN,baos.toByteArray)
+    bdbo.put(K_BIN,baosSer.toByteArray)
     bdbo.put(K_TOKENS,tkns)
+    // Serializing the RDF
+    val model:Model = desc.asInstanceOf[FlowDescriptor]
+    val baosRDF = new ByteArrayOutputStream()
+    val baosTTL = new ByteArrayOutputStream()
+    val baosNT  = new ByteArrayOutputStream()
+    model.write(baosRDF,"RDF/XML-ABBREV")
+    model.write(baosTTL,"TTL")
+    model.write(baosNT, "N-TRIPLE")
+    bdbo.put(K_RDF,baosRDF.toByteArray)
+    bdbo.put(K_TTL,baosTTL.toByteArray)
+    bdbo.put(K_NT, baosNT.toByteArray)
+    // Return the object
     bdbo
   }
 
