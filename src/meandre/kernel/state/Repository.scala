@@ -332,7 +332,6 @@ class Repository ( val cnf:Configuration, val userName:String ) {
           "desc"    -> bdbo.getString(K_DESC)
         )
     }
-
     res
   }
 
@@ -405,7 +404,78 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    */
   def flowsMetadata = queryMetadata("{\"" + K_TYPE + "\": \"" + V_FLOW + "\"}","{}",0,Math.MAX_INT)
 
+  /** Return the tags that match the query.
+   *
+   * @param query The query
+   * @return The set containing the tags
+   */
+  protected def queryTags ( query:String ) = {
+    var set = Set[String]()
+    val cursor = collection.find(query)
+    while ( cursor.hasNext ) {
+      val tags = cursor.next.get(K_TAGS).asInstanceOf[BasicDBList]
+      (0 until tags.size).toList.foreach( i => set+=tags.get(i).toString )
+    }
+    set
+  }
 
+  /** Returns all the tags in the repository.
+   *
+   * @return The set of tags
+   */
+  def tags = queryTags("{}")
+
+  /** Returns all the tags for flows in the repository.
+   *
+   * @return The set of tags
+   */
+  def flowsTags = queryTags("{\"" + K_TYPE + "\": \"" + V_FLOW + "\"}")
+
+  /** Returns all the tags for components in the repository.
+   *
+   * @return The set of tags
+   */
+  def componentsTags = queryTags("{\"" + K_TYPE + "\": \"" + V_COMPONENT + "\"}")
+
+  /** Return the tag cloud that match the query.
+   *
+   * @param query The query
+   * @return The map containing the counts
+   */
+  protected def queryTagCloud ( query:String ) = {
+    var map = scala.collection.mutable.Map[String,Int]()
+    val cursor = collection.find(query)
+    while ( cursor.hasNext ) {
+      val tags = cursor.next.get(K_TAGS).asInstanceOf[BasicDBList]
+      (0 until tags.size).toList.foreach( i => {
+        val key = tags.get(i).toString
+        if (map contains key) map(key) += 1 
+        else                  map(key)  = 1
+      })
+    }
+    map.foldLeft(Map[String,Int]())( (m,kv) => m+kv )
+  }
+
+  /** Return the tag cloud for the user repository
+   *
+   * @return A map with the tags and counts
+   */
+  def tagCloud = queryTagCloud("{}")
+
+
+  /** Return the tag cloud  for the user flows in the repository
+   *
+   * @return A map with the tags and counts
+   */
+  def flowsTagCloud = queryTagCloud("{\"" + K_TYPE + "\": \"" + V_FLOW + "\"}")
+
+
+  /** Return the tag cloud for the user components in the repository
+   *
+   * @return A map with the tags and counts
+   */
+  def componentsTagCloud = queryTagCloud("{\"" + K_TYPE + "\": \"" + V_COMPONENT + "\"}")
+  
 }
 
 /**The companion object for the Repository class.

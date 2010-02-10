@@ -88,5 +88,34 @@ object RepositorySpecs extends Specification {
       repo.removeAll
       repo.size must beEqualTo(0)
     }
+
+    "be able to group tags and separate them by component and flows" in {
+      val repo  = Repository(Configuration(),"test_user")
+      repo.removeAll
+      repo.size must beEqualTo(0)
+      repo add repository
+      repo.size must beEqualTo(7)
+      repo.tags.size must beEqualTo(10)
+      repo.componentsTags.size must beEqualTo(10)
+      repo.flowsTags.size must beEqualTo(2)
+      repo.removeAll
+      repo.size must beEqualTo(0)
+    }
+
+
+    "be able to generate tag clouds for all the repository or by component and flows" in {
+      val repo  = Repository(Configuration(),"test_user")
+      repo.removeAll
+      repo.size must beEqualTo(0)
+      repo add repository
+      repo.size must beEqualTo(7)
+      repo.tagCloud.size must beEqualTo(10)
+      repo.componentsTagCloud.size must beEqualTo(10)
+      repo.flowsTagCloud.size must beEqualTo(2)
+      repo.removeAll
+      repo.size must beEqualTo(0)
+    }
+
+
   }
 }
