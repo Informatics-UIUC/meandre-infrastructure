@@ -6,7 +6,8 @@ import com.hp.hpl.jena.rdf.model.{Resource, ModelFactory, Model}
 import java.text.SimpleDateFormat
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
 import com.hp.hpl.jena.vocabulary._
-import kernel.rdf.{Descriptor, MeandreRepositoryVocabulary => MRV, ConnectorDescription, FlowDescriptor}
+import kernel.rdf._
+import meandre.kernel.rdf.{MeandreRepositoryVocabulary=>MRV}
 
 /**
  * A collection of implicit conversion methods
@@ -31,6 +32,20 @@ object Implicits {
    * @return The list of one element containing the provided descriptor
    */
   implicit def DescriptorToList(desc:Descriptor):List[Descriptor] = List(desc)
+
+  /**Converts a flow descriptor into a list of flow descriptors with the descriptor in it.
+   *
+   * @param flow The flow descriptor to wrap into a list
+   * @return The list of one element containing the provided descriptor
+   */
+  implicit def FlowDescriptorToList(flow:FlowDescriptor):List[FlowDescriptor] = List(flow)
+
+  /**Converts a simple component descriptor into a list of descriptors with the descriptor in it.
+   *
+   * @param comp The component descriptor to wrap into a list
+   * @return The list of one element containing the provided descriptor
+   */
+  implicit def ComponentDescriptorToList(desc:ComponentDescriptor):List[ComponentDescriptor] = List(desc)
 
   /** Given a flow descriptor, it returns the minimal equivalent Jena model
    *  which describes it.
@@ -77,7 +92,7 @@ object Implicits {
           resOV = Some(model.createResource(othersVal))
         }
         catch {
-          case _ =>
+          case _ => // Not a resource will be treated as literal
         }
         resOV match {
           case Some(res) => prop.addProperty(model.createProperty(othersKey),res)
@@ -143,5 +158,125 @@ object Implicits {
 
     model
   }
+
+
+  /** Given a component descriptor, it returns the minimal equivalent Jena model
+   *  which describes it.
+   *
+   * @param comp The component descriptor to convert
+   * @return The converted model
+   */
+  implicit def ComponentDescriptor2Model(comp:ComponentDescriptor):Model = {
+    val model = ModelFactory.createDefaultModel
+
+    // Setting the name spaces
+    model.setNsPrefix("", MRV.NS)
+    model.setNsPrefix("xsd",  XSD.getURI)
+    model.setNsPrefix("rdf",  RDF.getURI)
+    model.setNsPrefix("rdfs", RDFS.getURI)
+    model.setNsPrefix("dc",   DC_11.getURI)
+
+    val res = model.createResource(comp.uri)
+
+    // Plain properties
+    res.addProperty(MRV.name, model.createTypedLiteral(comp.description.name.asInstanceOf[Any]))
+            .addProperty(DC_11.description, model.createTypedLiteral(comp.description.description.getOrElse("Unknown!"),XSDDatatype.XSDstring))
+            .addProperty(DC_11.rights, model.createTypedLiteral(comp.description.rights.getOrElse("Unknown!"),XSDDatatype.XSDstring))
+            .addProperty(DC_11.creator, model.createTypedLiteral(comp.description.creator.getOrElse("Unknown!"),XSDDatatype.XSDstring))
+            .addProperty(DC_11.date, model.createTypedLiteral(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(comp.description.creationDate), XSDDatatype.XSDdateTime))
+            .addProperty(RDF.`type`, MRV.executable_component)
+            
+            .addProperty(DC_11.format,model.createTypedLiteral(comp.format,XSDDatatype.XSDstring))
+            .addProperty(MRV.runnable,model.createTypedLiteral(comp.runnable,XSDDatatype.XSDstring))
+            .addProperty(MRV.firing_policy,model.createTypedLiteral(comp.firingPolicy match {
+                    case s:FiringAll => "all"
+                    case s:FiringAny => "any"
+                    case _ => "all"
+                  },XSDDatatype.XSDstring))
+            .addProperty(MRV.resource_location,model.createResource(comp.resourceLocation))
+
+
+    // Adding properties
+    comp.properties.foreach ( kv => {
+      val sKey = kv._1
+      val propDesc = kv._2
+      val sValue = propDesc.value
+      val sDesc = propDesc.description.getOrElse("Unknown!")
+      val prop = model.createResource(comp.uri+"/property/"+sKey.replaceAll("\\s+","-"))
+                        .addProperty(RDF.`type`,MRV.property)
+                        .addProperty(MRV.key,model.createTypedLiteral(sKey,XSDDatatype.XSDstring))
+                        .addProperty(MRV.value,model.createTypedLiteral(sValue,XSDDatatype.XSDstring))
+                        .addProperty(DC_11.description,model.createTypedLiteral(sDesc,XSDDatatype.XSDstring))
+
+
+      propDesc.other.foreach ( (kvop) => {
+        val othersKey = kvop._1
+        val othersVal = kvop._2
+        var resOV:Option[Resource] = None
+        try {
+          resOV = Some(model.createResource(othersVal))
+        }
+        catch {
+          case _ => // Not a resource will be treated as literal
+        }
+        resOV match {
+          case Some(res) => prop.addProperty(model.createProperty(othersKey),res)
+          case None      => prop.addProperty(model.createProperty(othersKey),model.createTypedLiteral(othersVal,XSDDatatype.XSDstring))
+        }
+        res.addProperty(MRV.property_set,prop)
+      })
+    })
+
+    // Adding tags
+    comp.description.tags.foreach(
+      tag => res.addProperty(MRV.tag, model.createTypedLiteral(tag,XSDDatatype.XSDstring))
+    )
+
+    // Adding execution contexts
+    comp.context.foreach(context => context match {
+      case URIContext(uri) => res.addProperty(MRV.execution_context, model.createResource(uri))
+      case EmbeddedContext(payload) => res.addProperty(MRV.execution_context, model.createTypedLiteral(payload, XSDDatatype.XSDstring))
+    })
+
+    // Adding inputs
+    comp.inputs.foreach ( port => {
+      val sID = port.uri
+      val sName = port.name
+      val resPort = model.createResource(sID)
+      val sDesc = port.description.getOrElse("Unknown!")
+      res.addProperty(MRV.input_data_port,
+          model.createResource(sID)
+               .addProperty(RDF.`type`,MRV.data_port)
+               .addProperty(DC_11.identifier,model.createTypedLiteral(sID,XSDDatatype.XSDstring))
+               .addProperty(MRV.name,model.createTypedLiteral(sName,XSDDatatype.XSDstring))
+               .addProperty(DC_11.description,model.createTypedLiteral(sDesc,XSDDatatype.XSDstring)))
+    })
+
+
+    // Adding outputs
+    comp.outputs.foreach ( port => {
+      val sID = port.uri
+      val sName = port.name
+      val resPort = model.createResource(sID)
+      val sDesc = port.description.getOrElse("Unknown!")
+      res.addProperty(MRV.output_data_port,
+          model.createResource(sID)
+               .addProperty(RDF.`type`,MRV.data_port)
+               .addProperty(DC_11.identifier,model.createTypedLiteral(sID,XSDDatatype.XSDstring))
+               .addProperty(MRV.name,model.createTypedLiteral(sName,XSDDatatype.XSDstring))
+               .addProperty(DC_11.description,model.createTypedLiteral(sDesc,XSDDatatype.XSDstring)))
+    })
+
+    // Adding the component mode
+    res.addProperty(MRV.mode, comp.mode match {
+      case m:ComputeMode => MRV.mode_compute
+      case m:WebUIMode => MRV.mode_webui
+      case _ => MRV.mode_compute
+    });
+
+    model
+
+  }
+
 
 }

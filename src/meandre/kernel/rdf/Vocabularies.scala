@@ -106,6 +106,13 @@ object MeandreRepositoryVocabulary {
 
 	/** The mode property */
 	val mode = m_model.createProperty(NS+"mode")
+   
+	/** The mode property */
+	val mode_compute = m_model.createProperty(NS+"component/type/compute")
+
+	/** The mode property */
+  val mode_webui = m_model.createProperty(NS+"component/type/webui")
+
 }
 
 

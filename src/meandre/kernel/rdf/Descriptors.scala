@@ -102,8 +102,22 @@ case class ComponentInstanceDescription (
 		description: Option[String],
 		componentUri: String,
 		properties: Map[String,Property]
-) 
-
+)
+/**The basic mode of execution of a component
+ *
+ * @author Xavier Llora
+ */
+case class ModeDescription()
+/**The mode of execution of a component is a compute one
+ *
+ * @author Xavier Llora
+ */
+case class ComputeMode() extends ModeDescription()
+/**The basic mode of execution of a component is a WebUI one
+ *
+ * @author Xavier Llora
+ */
+case class WebUIMode() extends ModeDescription()
 /** The base class for all the possible descriptors (including components and flows).
  *  This class contains the basic information that defines a descriptor, the uri, 
  *  the common description, and the properties.
@@ -122,11 +136,12 @@ abstract case class Descriptor(
 case class ComponentDescriptor (
 		override val uri: String,
 		override val description: CommonDescription,
-		override val properties: Map[String,Property],
+		override val properties: Map[String,PropertyDescription],
 		runnable: String,
 		format: String,
 		firingPolicy: FiringPolicy,
 		resourceLocation: String,
+    mode: ModeDescription,
 		context: List[Context],
 		inputs: List[Port],
 		outputs: List[Port]
@@ -327,7 +342,13 @@ object DescriptorsFactory  {
 					mustGet(uri,DC_11.format,model).toLowerCase,
 					if (mustGet(uri,MeandreRepositoryVocabulary.firing_policy,model).toLowerCase=="any") FiringAny() else FiringAll(),
 					mustGet(uri,MeandreRepositoryVocabulary.resource_location,model),
-					getMultivalueProperty(uri,MeandreRepositoryVocabulary.execution_context,model).map(
+					safeGet(uri,MeandreRepositoryVocabulary.mode,model) match {
+            case None => ComputeMode()
+            case Some(s:Resource) if s==MeandreRepositoryVocabulary.mode_compute => ComputeMode()
+            case Some(s:Resource) if s==MeandreRepositoryVocabulary.mode_webui => WebUIMode()
+            case _ => ComputeMode()
+          },
+          getMultivalueProperty(uri,MeandreRepositoryVocabulary.execution_context,model).map(
 					  (s) => s match {
 					  		case s:Resource => URIContext(s.toString)
 					  		case s:Literal => EmbeddedContext(s.getLexicalForm)

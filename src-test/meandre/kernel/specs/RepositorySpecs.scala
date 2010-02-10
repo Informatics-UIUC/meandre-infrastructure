@@ -29,6 +29,17 @@ object RepositorySpecs extends Specification {
       repo.size must beEqualTo(0)
       repo addFlows flows
       repo.size must beEqualTo(1)
+      repo.removeAllFlows
+      repo.size must beEqualTo(0)
+      repo addComponents components
+      repo.size must beEqualTo(6)
+      repo.removeAllComponents
+      repo.size must beEqualTo(0)
+      repo add repository
+      repo.size must beEqualTo(7)
+      repo.removeAll
+      repo.size must beEqualTo(0)
+
 
     }
   }

@@ -2,10 +2,10 @@ package meandre.state
 
 import meandre.Implicits._
 import meandre.kernel.Configuration
-import meandre.kernel.rdf.{ComponentDescriptor, FlowDescriptor, Descriptor}
 import java.io.{ObjectOutputStream, ByteArrayOutputStream}
 import com.mongodb.{BasicDBList, BasicDBObject, Mongo}
 import com.hp.hpl.jena.rdf.model.Model
+import meandre.kernel.rdf._
 
 /**
  * Provides access to the user repository.
@@ -19,6 +19,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
   private val K_ID      = "_id"
   private val K_TOKENS  = "_tokens"
   private val K_TYPE    = "_type"
+  private val K_MODE    = "_mode"
   private val K_BIN     = "_bin"
   private val K_TTL     = "_ttl"
   private val K_RDF     = "_rdf"
@@ -32,15 +33,17 @@ class Repository ( val cnf:Configuration, val userName:String ) {
 
   private val V_COMPONENT = "component"
   private val V_FLOW      = "flow"
+  private val V_COMPUTE   = "compute"
+  private val V_WEBUI     = "webui"
 
   //---------------------------------------------------------------------------
 
-  /**Implicit conversion of a flow descriptor to a Basic DB Object
+  /** Implicit conversion of a descriptor to a Basic DB Object
    *
    * @param flow The flow descriptor to convert
    * @return The encapsulating BasicDBObject
    */
-  private implicit def flowDescriptor2BasicDBObject ( desc:Descriptor ) : BasicDBObject = {
+  implicit private def descriptor2BasicDBObject ( desc:Descriptor ) : BasicDBObject = {
     // Serializing the descriptor
     val baosSer = new ByteArrayOutputStream
     new ObjectOutputStream(baosSer) writeObject desc
@@ -54,10 +57,6 @@ class Repository ( val cnf:Configuration, val userName:String ) {
     // Creating the BasicDBObject
     val bdbo = new BasicDBObject
     bdbo.put(K_ID,desc.uri)
-    bdbo.put(K_TYPE,desc match {
-      case c:ComponentDescriptor => V_COMPONENT
-      case f:FlowDescriptor => V_FLOW
-    })
     bdbo.put(K_NAME,desc.description.name)
     bdbo.put(K_DATE,desc.description.creationDate)
     bdbo.put(K_CREATOR,desc.description.creator.getOrElse("Unknown!"))
@@ -66,7 +65,10 @@ class Repository ( val cnf:Configuration, val userName:String ) {
     bdbo.put(K_BIN,baosSer.toByteArray)
     bdbo.put(K_TOKENS,tkns)
     // Serializing the RDF
-    val model:Model = desc.asInstanceOf[FlowDescriptor]
+    val model:Model = desc match {
+      case d:FlowDescriptor => d
+      case c:ComponentDescriptor => c
+    }
     val baosRDF = new ByteArrayOutputStream()
     val baosTTL = new ByteArrayOutputStream()
     val baosNT  = new ByteArrayOutputStream()
@@ -77,6 +79,32 @@ class Repository ( val cnf:Configuration, val userName:String ) {
     bdbo.put(K_TTL,baosTTL.toByteArray)
     bdbo.put(K_NT, baosNT.toByteArray)
     // Return the object
+    bdbo
+  }
+
+  /** Implicit conversion of a flow descriptor to a Basic DB Object
+   *
+   * @param flow The flow descriptor to convert
+   * @return The encapsulating BasicDBObject
+   */
+  private implicit def flowDescriptor2BasicDBObject ( flow:FlowDescriptor ) : BasicDBObject = {
+    val bdbo = descriptor2BasicDBObject(flow)
+    bdbo.put(K_TYPE,V_FLOW)
+    bdbo
+  }
+
+  /** Implicit conversion of a component descriptor to a Basic DB Object
+   *
+   * @param comp The component descriptor to convert
+   * @return The encapsulating BasicDBObject
+   */
+  private implicit def componentDescriptor2BasicDBObject ( comp:ComponentDescriptor ) : BasicDBObject = {
+    val bdbo = descriptor2BasicDBObject(comp)
+    bdbo.put(K_TYPE,V_COMPONENT)
+    bdbo.put(K_MODE,comp.mode match {
+      case m:ComputeMode    => V_COMPUTE
+      case m:FlowDescriptor => V_WEBUI
+    })
     bdbo
   }
 
@@ -114,6 +142,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
 
   /** Ensure index creation */
   collection.ensureIndex("{\""+K_TYPE+"\": 1}")
+  collection.ensureIndex("{\""+K_MODE+"\": 1}")
   collection.ensureIndex("{\""+K_TOKENS+"\": 1}")
 
   //---------------------------------------------------------------------------
@@ -152,8 +181,23 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    */
   def removeAllFlows = collection remove "{\"" + K_TYPE + "\": \"" + V_FLOW + "\"}"
 
-  /** Add the given flows to the repository. If the flow exist it gets
-   *  replace by the new provided instance
+  /** Add the given descriptors to the repository. If the descriptor exists it gets
+   *  replaced by the new provided instance
+   *
+   * @param flows The list of flows to add
+   */
+  def add ( flows:List[Descriptor] ) : List[Option[String]] = flows.map (
+      _ match {
+        case flow:FlowDescriptor => collection.update(wrapURI(flow),flow,true,false)
+                                    Some(flow.uri)
+        case component:ComponentDescriptor => collection.update(wrapURI(component),component,true,false)
+                                                      Some(component.uri)
+        case _ =>  None
+      }
+    )
+
+  /** Add the given flows to the repository. If the flow exists it gets
+   *  replaced by the new provided instance
    *
    * @param flows The list of flows to add
    */
@@ -161,6 +205,19 @@ class Repository ( val cnf:Configuration, val userName:String ) {
       _ match {
         case flow:FlowDescriptor => collection.update(wrapURI(flow),flow,true,false)
                                     Some(flow.uri)
+        case _ =>  None
+      }
+    )
+
+  /** Add the given components to the repository. If the component exist it gets
+   *  replaced by the new provided instance
+   *
+   * @param components The list of flows to add
+   */
+  def addComponents ( components:List[Descriptor] ) : List[Option[String]] = components.map (
+      _ match {
+        case component:ComponentDescriptor => collection.update(wrapURI(component),component,true,false)
+                                              Some(component.uri)
         case _ =>  None
       }
     )
