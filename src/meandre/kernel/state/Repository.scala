@@ -16,21 +16,6 @@ import com.hp.hpl.jena.rdf.model.{ModelFactory, Model}
  */
 class Repository ( val cnf:Configuration, val userName:String ) {
 
-  private val K_ID      = "_id"
-  private val K_TOKENS  = "_tokens"
-  private val K_TYPE    = "_type"
-  private val K_MODE    = "_mode"
-  private val K_BIN     = "_bin"
-  private val K_TTL     = "_ttl"
-  private val K_RDF     = "_rdf"
-  private val K_NT      = "_nt"
-  private val K_NAME    = "name"
-  private val K_DESC    = "desc"
-  private val K_CREATOR = "creator"
-  private val K_DATE    = "ts"
-  private val K_RIGHTS  = "rights"
-  private val K_TAGS    = "tags"
-
   private val V_COMPONENT = "component"
   private val V_FLOW      = "flow"
   private val V_COMPUTE   = "compute"

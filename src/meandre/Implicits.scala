@@ -18,6 +18,28 @@ import com.mongodb.{BasicDBList, BasicDBObject}
  */
 object Implicits {
 
+
+  //----------------------------------------------------------------------
+
+  
+  val K_ID      = "_id"
+  val K_TOKENS  = "_tokens"
+  val K_TYPE    = "_type"
+  val K_MODE    = "_mode"
+  val K_BIN     = "_bin"
+  val K_TTL     = "_ttl"
+  val K_RDF     = "_rdf"
+  val K_NT      = "_nt"
+  val K_NAME    = "name"
+  val K_DESC    = "desc"
+  val K_CREATOR = "creator"
+  val K_DATE    = "ts"
+  val K_RIGHTS  = "rights"
+  val K_TAGS    = "tags"
+
+  //----------------------------------------------------------------------
+
+
   /** Attempts to parse a JSON String into s Basic DB object.
    *
    * @param s The JSON string to parse
