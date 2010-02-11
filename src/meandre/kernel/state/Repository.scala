@@ -329,7 +329,8 @@ class Repository ( val cnf:Configuration, val userName:String ) {
           "creator" -> bdbo.get(K_CREATOR),
           "rights"  -> bdbo.get(K_RIGHTS),
           "tags"    -> tagList,
-          "desc"    -> bdbo.getString(K_DESC)
+          "desc"    -> bdbo.getString(K_DESC),
+          "type"    -> bdbo.getString(K_TYPE)
         )
     }
     res
@@ -391,6 +392,44 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    */
   def flows = queryFlows("{\"" + K_TYPE + "\": \"" + V_FLOW + "\"}","{}",0,Math.MAX_INT)
 
+  /**Return the component descriptor for a give uri.
+   *
+   * @param uir The uri of the component to retrieve
+   * @return The component descriptor if found, None otherwise
+   */
+  def componentFor(uri:String) = {
+    val cl = queryComponents("{\"" + K_ID + "\": \"" + uri + "\",\"" + K_TYPE + "\": \"" + V_COMPONENT + "\"}","{}",0,Math.MAX_INT)
+    if ( cl.size==1 ) Some(cl(0))
+    else None
+  }
+
+
+  /**Return the flow descriptor for a give uri.
+   *
+   * @param uir The uri of the flow to retrieve
+   * @return The flow descriptor if found, None otherwise
+   */
+  def flowFor(uri:String) = {
+    val fl = queryFlows("{\"" + K_ID + "\": \"" + uri + "\",\"" + K_TYPE + "\": \"" + V_FLOW + "\"}","{}",0,Math.MAX_INT)
+    if ( fl.size==1 ) Some(fl(0))
+    else None
+  }
+
+
+  /**Return the descriptor for a give uri.
+   *
+   * @param uir The uri of the descriptor to retrieve
+   * @return The descriptor if found, None otherwise
+   */
+  def descriptorFor(uri:String):Option[Descriptor] = {
+    componentFor(uri) match {
+      case None => flowFor(uri) match {
+        case None => None
+        case f => f
+      }
+      case c => c
+    }
+  }
 
   /** Returns all the component metadata stored in the repository.
    *
@@ -403,6 +442,16 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    * @return A list of flow metadata contained in the repository
    */
   def flowsMetadata = queryMetadata("{\"" + K_TYPE + "\": \"" + V_FLOW + "\"}","{}",0,Math.MAX_INT)
+
+  /**Returns the metadata for the given uri.
+   *
+   * @param uri The uri to get metadata from
+   */
+  def metadataFor ( uri:String ) = {
+    val l = queryMetadata("{\"" + K_ID + "\": \"" + uri + "\"}","{}",0,1)
+    if (l.size==0) None
+    else Some(l(0))
+  }
 
   /** Return the tags that match the query.
    *

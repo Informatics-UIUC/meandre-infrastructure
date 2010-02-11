@@ -335,7 +335,7 @@ object DescriptorsFactory  {
 		while ( uris.hasNext ) {
 			val uri = uris.nextResource
 			res ::= ComponentDescriptor (
-					if (uri.toString.endsWith("/")) uri.toString else uri.toString+"/",
+					uri.toString,
 					getCommonDescription(uri,model),
 					Map( getProperties(uri,model) map { s:PropertyDescription=>(s.key,s) } :_* ),
 					mustGet(uri,MeandreRepositoryVocabulary.runnable,model).toLowerCase,
@@ -463,7 +463,7 @@ object DescriptorsFactory  {
 		while ( uris.hasNext ) {
 			val uri = uris.nextResource
 			res ::= FlowDescriptor (
-					if (uri.toString.endsWith("/")) uri.toString else uri.toString+"/",
+					uri.toString,
 					getCommonDescription(uri,model),
 					Map( getProperties(uri,model) map { s:PropertyDescription=>(s.key,s) } :_* ),
 					getInstances(uri,model),

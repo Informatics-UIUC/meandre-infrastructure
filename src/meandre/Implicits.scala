@@ -90,7 +90,7 @@ object Implicits {
       val propDesc = kv._2
       val sValue = propDesc.value
       val sDesc = propDesc.description.getOrElse("Unknown!")
-      val prop = model.createResource(flow.uri+"/property/"+sKey.replaceAll("\\s+","-"))
+      val prop = model.createResource(flow.uri+(if (flow.uri.endsWith("/")) "" else "/")+"property/"+sKey.replaceAll("\\s+","-"))
                         .addProperty(RDF.`type`,MRV.property)
                         .addProperty(MRV.key,model.createTypedLiteral(sKey,XSDDatatype.XSDstring))
                         .addProperty(MRV.value,model.createTypedLiteral(sValue,XSDDatatype.XSDstring))
@@ -120,7 +120,7 @@ object Implicits {
 
     // Adding connectors
     if (flow.connectors.size > 0) {
-      val resCons = model.createResource(flow.uri + "connector/set")
+      val resCons = model.createResource(flow.uri+(if (flow.uri.endsWith("/")) "" else "/")+"connector/set")
       res.addProperty(MRV.connectors, resCons)
       flow.connectors.foreach ( cd =>  {
           val sConID = cd.uri
@@ -142,7 +142,7 @@ object Implicits {
 
     // Adding instances
     if ( flow.instances.size>0 ) {
-      val resCons = model.createResource(flow.uri+"components/set")
+      val resCons = model.createResource(flow.uri+(if (flow.uri.endsWith("/")) "" else "/")+"components/set")
       res.addProperty(MRV.components_instances,resCons)
       flow.instances.foreach ( ecid => {
           val sConID = ecid.uri
@@ -159,7 +159,7 @@ object Implicits {
           // Adding properties if any
           ecid.properties.foreach ( (kv) => {
              resIns.addProperty(MRV.property_set,
-                                model.createResource(sConID+"/property/"+kv._1).addProperty(MRV.key, model.createTypedLiteral(kv._1,XSDDatatype.XSDstring))
+                                model.createResource(sConID+(if (sConID.endsWith("/")) "" else "/")+"property/"+kv._1).addProperty(MRV.key, model.createTypedLiteral(kv._1,XSDDatatype.XSDstring))
                                                                                .addProperty(MRV.value, model.createTypedLiteral(kv._2,XSDDatatype.XSDstring))
                                                                                .addProperty(RDF.`type`, MRV.property)
              )
@@ -213,7 +213,7 @@ object Implicits {
       val propDesc = kv._2
       val sValue = propDesc.value
       val sDesc = propDesc.description.getOrElse("Unknown!")
-      val prop = model.createResource(comp.uri+"/property/"+sKey.replaceAll("\\s+","-"))
+      val prop = model.createResource(comp.uri+(if (comp.uri.endsWith("/")) "" else "/")+"property/"+sKey.replaceAll("\\s+","-"))
                         .addProperty(RDF.`type`,MRV.property)
                         .addProperty(MRV.key,model.createTypedLiteral(sKey,XSDDatatype.XSDstring))
                         .addProperty(MRV.value,model.createTypedLiteral(sValue,XSDDatatype.XSDstring))
