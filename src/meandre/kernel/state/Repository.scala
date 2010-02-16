@@ -16,6 +16,8 @@ import com.hp.hpl.jena.rdf.model.{ModelFactory, Model}
  */
 class Repository ( val cnf:Configuration, val userName:String ) {
 
+  type RDFURI = String
+  
   private val V_COMPONENT = "component"
   private val V_FLOW      = "flow"
   private val V_COMPUTE   = "compute"
@@ -85,6 +87,39 @@ class Repository ( val cnf:Configuration, val userName:String ) {
     collection.update(wrapURI(desc),bdbo,true,false)
   }
 
+
+  /**Update the rdf for the given descriptor.
+   *
+   * @param desc Updates the raw rdf for the given descriptor
+   */
+  def updateRDFFor ( uri:String, rdf:String ) : Option[String] = {
+    // Serializing the RDF
+    val model:Model = DescriptorsFactory readModelFromText rdf
+    if ( model.size>0 ) {
+      try {
+        val bdboCnd = wrapURI(uri)
+
+        val bdboUpdate = new BasicDBObject
+        val baosRDF = new ByteArrayOutputStream()
+        val baosTTL = new ByteArrayOutputStream()
+        val baosNT  = new ByteArrayOutputStream()
+        model.write(baosRDF,"RDF/XML-ABBREV")
+        model.write(baosTTL,"TTL")
+        model.write(baosNT, "N-TRIPLE")
+        bdboUpdate.put(K_RDF,baosRDF.toByteArray)
+        bdboUpdate.put(K_TTL,baosTTL.toByteArray)
+        bdboUpdate.put(K_NT, baosNT.toByteArray)
+
+        collection.update(bdboCnd,bdboUpdate,true,false)
+        Some(uri)
+      }
+      catch {
+        case _ => None
+      }
+    }
+    else None
+  }
+
   /** Given an arbitrary DBObject this method tries to regenerate the component
    *  description of the component.
    *
@@ -103,7 +138,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
       case _ => try {
                   val mod = ModelFactory.createDefaultModel
                   val bais = new ByteArrayInputStream((dbObj get K_TTL).asInstanceOf[Array[Byte]])
-                  res = Some(DescriptorsFactory.buildComponentDescriptors(mod.read(bais,null,"TTL"))(0))
+                  res = DescriptorsFactory.buildComponentDescriptors(mod.read(bais,null,"TTL")) find {_.uri==dbObj.get(K_ID).toString}
                   updateSerializedDescriptor(res.get)
                 }
                 catch {
@@ -132,7 +167,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
       case _ => try {
                   val mod = ModelFactory.createDefaultModel
                   val bais = new ByteArrayInputStream((dbObj get K_TTL).asInstanceOf[Array[Byte]])
-                  res = Some(DescriptorsFactory.buildFlowDescriptors(mod.read(bais,null,"TTL"))(0))
+                  res = DescriptorsFactory.buildFlowDescriptors(mod.read(bais,null,"TTL")) find {_.uri==dbObj.get(K_ID).toString}
                   updateSerializedDescriptor(res.get)
                 }
                 catch {
@@ -176,14 +211,21 @@ class Repository ( val cnf:Configuration, val userName:String ) {
 
   /** Given descriptor returns a Basic DB Object with the _id field set
    *
+   * @param uri The uri to wrap
+   * @return The BasicDBObject with the _id field set
+   */
+  private def wrapURI ( uri:String ) : BasicDBObject = {
+    val bdbo = new BasicDBObject
+    bdbo.put(K_ID,uri)
+    bdbo
+  }
+
+  /** Given descriptor returns a Basic DB Object with the _id field set
+   *
    * @param desc The descriptor to wrap
    * @return The BasicDBObject with the _id field set
    */
-  private def wrapURI ( desc:Descriptor ) = {
-    val bdbo = new BasicDBObject
-    bdbo.put(K_ID,desc.uri)
-    bdbo
-  }
+  private def wrapURI ( desc:Descriptor ) : BasicDBObject = wrapURI(desc.uri)
 
   //---------------------------------------------------------------------------
 
@@ -250,14 +292,14 @@ class Repository ( val cnf:Configuration, val userName:String ) {
   /** Add the given descriptors to the repository. If the descriptor exists it gets
    *  replaced by the new provided instance
    *
-   * @param flows The list of flows to add
+   * @param desc The list of flows to add
    */
-  def add ( flows:List[Descriptor] ) : List[Option[String]] = flows.map (
+  def add ( descs:List[Descriptor] ) : List[Option[String]] = descs.map (
       _ match {
         case flow:FlowDescriptor => collection.update(wrapURI(flow),flow,true,false)
                                     Some(flow.uri)
         case component:ComponentDescriptor => collection.update(wrapURI(component),component,true,false)
-                                                      Some(component.uri)
+                                              Some(component.uri)
         case _ =>  None
       }
     )
@@ -382,7 +424,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    * @param uir The uri of the component to retrieve
    * @return The component descriptor if found, None otherwise
    */
-  def componentFor(uri:String) = {
+  def componentFor(uri:RDFURI) = {
     val cl = queryComponents("{\"" + K_ID + "\": \"" + uri + "\",\"" + K_TYPE + "\": \"" + V_COMPONENT + "\"}","{}",0,Math.MAX_INT)
     if ( cl.size==1 ) Some(cl(0))
     else None
@@ -394,7 +436,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    * @param uir The uri of the flow to retrieve
    * @return The flow descriptor if found, None otherwise
    */
-  def flowFor(uri:String) = {
+  def flowFor(uri:RDFURI) = {
     val fl = queryFlows("{\"" + K_ID + "\": \"" + uri + "\",\"" + K_TYPE + "\": \"" + V_FLOW + "\"}","{}",0,Math.MAX_INT)
     if ( fl.size==1 ) Some(fl(0))
     else None
@@ -406,7 +448,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    * @param uir The uri of the descriptor to retrieve
    * @return The descriptor if found, None otherwise
    */
-  def descriptorFor(uri:String):Option[Descriptor] = {
+  def descriptorFor(uri:RDFURI):Option[Descriptor] = {
     componentFor(uri) match {
       case None => flowFor(uri) match {
         case None => None
@@ -432,7 +474,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    *
    * @param uri The uri to get metadata from
    */
-  def metadataFor ( uri:String ) = {
+  def metadataFor ( uri:RDFURI ) = {
     val l = queryMetadata("{\"" + K_ID + "\": \"" + uri + "\"}","{}",0,1)
     if (l.size==0) None
     else Some(l(0))

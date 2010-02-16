@@ -8,6 +8,7 @@ import com.hp.hpl.jena.vocabulary._
 import kernel.rdf._
 import meandre.kernel.rdf.{MeandreRepositoryVocabulary=>MRV}
 import com.mongodb.{BasicDBList, BasicDBObject}
+import collection.jcl.MutableIterator.Wrapper
 
 /**
  * A collection of implicit conversion methods
@@ -38,6 +39,13 @@ object Implicits {
   val K_TAGS    = "tags"
 
   //----------------------------------------------------------------------
+
+  /**Given a Java iterator it wraps it into a Scala one.
+   *
+   * @param it The Java iterator
+   * @return The Scala one
+   */
+  implicit def javaIteratorToScalaIterator[A](it : java.util.Iterator[A]) = new Wrapper(it)
 
 
   /** Attempts to parse a JSON String into s Basic DB object.

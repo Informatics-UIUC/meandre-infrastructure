@@ -97,4 +97,19 @@ object Tools {
   def sortMetadataByDate[A <: Map[String,Any]](l: List[A]) =
     l.sort((a, b) => a(K_DATE).asInstanceOf[Date].before(a(K_DATE).asInstanceOf[Date]))
 
+  /** Performs a a safe operation against a piece of code that can throw
+   *  exceptions.
+   *
+   * @param op The operation to perform
+   * @return The either construct containing the result
+   */
+  def safeOp[A](op: => A): Either[Throwable, A] = {
+    try {
+      Right(op)
+    }
+    catch {
+      case t => Left(t)
+    }
+  }
+
 }

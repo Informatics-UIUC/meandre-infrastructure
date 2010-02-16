@@ -6,6 +6,7 @@ import com.hp.hpl.jena.vocabulary._
 import com.hp.hpl.jena.vocabulary.RDF.`type`
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.io.StringReader
 
 /** The base class of the context hierarchy 
  * 
@@ -124,7 +125,7 @@ case class WebUIMode() extends ModeDescription()
  * 
  * @author Xavier Llora
  */
-abstract case class Descriptor(
+abstract sealed case class Descriptor(
 		uri: String,
 		description: CommonDescription,
 		properties: Map[String,Property]
@@ -167,12 +168,12 @@ extends Descriptor(uri,description,properties)
  */
 object DescriptorsFactory  {
  
-	/** Attemps to read a RDF model
+	/** Attempts to read a RDF model from a URL
      *
      * @param url The url to parse
      * @return The read model as a Jena object
      */
-	protected def readModel ( url:String ) = {
+	def readModelFromURL ( url:String ) = {
 		val model = ModelFactory.createDefaultModel
 		try {
 			model.read(url.toString)
@@ -186,8 +187,30 @@ object DescriptorsFactory  {
 		}
 		finally { model }
 	}
-  
-	/** Safely gets the given property for the passed resource in the given model.
+
+
+  /**Attempts to read a RDF model from text
+   *
+   * @param text The text to parse
+   * @return The read model as a Jena object
+   */
+  def readModelFromText(text: String) = {
+    val model = ModelFactory.createDefaultModel
+    try {
+      model.read(new StringReader(text),"RDF/XML")
+    } catch {
+      case _ => try {model.read(new StringReader(text), "TTL")}
+      catch {
+        case _ => try {model.read(new StringReader(text), "N-TRIPLE")}
+        finally {model}
+      }
+      finally {model}
+    }
+    finally {model}
+  }
+
+
+  /** Safely gets the given property for the passed resource in the given model.
 	 * 
 	 * @param uri The resource to poke
      * @param prop The property to get
@@ -367,7 +390,7 @@ object DescriptorsFactory  {
    * @param url The url contained a serialized RDF model
    * @return The list of component descriptors stored in the model
    */
-  def buildComponentDescriptors(url: String) = buildComponentDescriptorsModel(readModel(url))
+  def buildComponentDescriptors(url: String) = buildComponentDescriptorsModel(readModelFromURL(url))
 
   /** Given a Jena model retrieves all the relevant information for components in the
      *  serialized RDF pointed to.
@@ -479,7 +502,7 @@ object DescriptorsFactory  {
    * @param url The url contained a serialized RDF model
      * @return The list of component descriptors stored in the model
    */
-  def buildFlowDescriptors ( url: String ) = buildFlowDescriptorsModel(readModel(url))
+  def buildFlowDescriptors ( url: String ) = buildFlowDescriptorsModel(readModelFromURL(url))
 	
 	/** Given a Jena model retrieves all the relevant information for flows in the
    *  serialized RDF pointed to.
@@ -496,7 +519,7 @@ object DescriptorsFactory  {
 	 * @return The list of descriptors found 
 	 */
 	def buildDescriptors ( url:String ) : List[Descriptor] = {
-		val model = readModel(url)
+		val model = readModelFromURL(url)
 		buildComponentDescriptorsModel(model)++buildFlowDescriptorsModel(model)
 	}
 

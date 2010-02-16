@@ -11,6 +11,8 @@ class Configuration (val host:String, val port:Int, val auth:Option[(String,Stri
 
   val MEANDRE_USER_COLLECTION_PREFIX = "meandre_user_"
 
+  val MEANDRE_CONTEXT_FS_COLLECTION = "meandre_context_fs"
+  
   protected var MDBN = "Meandre"
 
   def MEANDRE_DB_NAME = MDBN
