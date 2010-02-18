@@ -289,6 +289,18 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    */
   def removeAllFlows = collection remove "{\"" + K_TYPE + "\": \"" + V_FLOW + "\"}"
 
+  /**Remove the provided URI component/flow
+   *
+   * @param uri The URI to remove
+   */
+  def remove (uri:RDFURI) = collection remove wrapURI(uri)
+
+  /**Remove the provided descriptor
+   *
+   * @param uri The URI to remove
+   */
+  def remove (desc:Descriptor) = collection remove wrapURI(desc)
+
   /** Add the given descriptors to the repository. If the descriptor exists it gets
    *  replaced by the new provided instance
    *
@@ -551,11 +563,44 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    * @return A map with the tags and counts
    */
   def componentsTagCloud = queryTagCloud("{\"" + K_TYPE + "\": \"" + V_COMPONENT + "\"}")
+
+  /**Updates the metadata of a component.
+   *
+   * @param uri The uri to update
+   * @param metadata A placeholder for extra metadata storage
+   * @return The URI if succeded
+   */
+  def updateMetadata ( uri:RDFURI, metadata:String ) = {
+    val cnd = wrapURI(uri)
+    val update = new BasicDBObject
+    update.put(K_METADATA,metadata)
+    collection.update(cnd,update,true,false)
+  }
+
+
+  /**Get the metadata of a component.
+   *
+   * @param uri The uri to update
+   * @param metadata A placeholder for extra metadata storage
+   * @return The URI if succeded
+   */
+  def getMetadata ( uri:RDFURI ) = {
+    val cur = collection find wrapURI(uri)
+    if ( cur.hasNext ) Some(cur.next.get(K_METADATA).toString)
+    else               None
+  }
+
+  /** Check if a given URI exist in the store.
+   *
+   * @param uri The URI to check
+   * @return True if exist, false otherwise
+   */
+  def exist ( uri:RDFURI ) = 0 < collection.getCount(wrapURI(uri))
   
 }
 
 /**The companion object for the Repository class.
- *
+  *
  */
 object Repository {
 

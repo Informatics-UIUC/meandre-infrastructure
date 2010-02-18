@@ -44,6 +44,28 @@ object ContextsPoolSpecs extends Specification {
       cp.remove("/test/1.zip").isRight must beTrue
 
     }
+
+    "Be able to save a file and delete them all " in {
+
+      // Count the number of files
+      var tmp = cp.size
+      tmp.isRight must beTrue
+      val numFiles:Int = cp.size.right.get
+      // Create a file
+      val nf = cp.save("/test/1.zip","application/zip",TEST_CONTENT.openStream)
+      nf.isRight must beTrue
+      tmp = cp.size
+      tmp.isRight must beTrue
+      tmp.right.get must beEqualTo(numFiles+1)
+      // Query for the file
+      val baos = new ByteArrayOutputStream
+      val file = cp.write("/test/1.zip",baos)
+      file.isRight must beTrue
+      baos.size must beGreaterThan(0)
+      // Delete files
+      cp.removeAll.right.get must beTrue
+
+    }
     
   }
 

@@ -130,6 +130,20 @@ object RepositorySpecs extends Specification {
       cleanRepo(repo)
     }
 
+    "be able to add and retreive metadata using URIs"in {
+      val meta = "Metadata foo"
+      val repo = initRepo(repository)
+      val uris = repository.map(_.uri)
+      uris.foreach( uri => {
+        repo.updateMetadata(uri,meta)
+        repo getMetadata uri match {
+          case Some(m) => m must be equalTo(meta)
+          case None    => fail
+        }
+      })
+      cleanRepo(repo)
+    }
+
 
   }
 }

@@ -143,7 +143,7 @@ case class ComponentDescriptor (
 		firingPolicy: FiringPolicy,
 		resourceLocation: String,
     mode: ModeDescription,
-		context: List[Context],
+		var context: List[Context],
 		inputs: List[Port],
 		outputs: List[Port]
 )

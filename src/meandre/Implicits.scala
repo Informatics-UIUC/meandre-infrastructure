@@ -9,6 +9,7 @@ import kernel.rdf._
 import meandre.kernel.rdf.{MeandreRepositoryVocabulary=>MRV}
 import com.mongodb.{BasicDBList, BasicDBObject}
 import collection.jcl.MutableIterator.Wrapper
+import java.io.ByteArrayOutputStream
 
 /**
  * A collection of implicit conversion methods
@@ -23,20 +24,21 @@ object Implicits {
   //----------------------------------------------------------------------
 
   
-  val K_ID      = "_id"
-  val K_TOKENS  = "_tokens"
-  val K_TYPE    = "_type"
-  val K_MODE    = "_mode"
-  val K_BIN     = "_bin"
-  val K_TTL     = "_ttl"
-  val K_RDF     = "_rdf"
-  val K_NT      = "_nt"
-  val K_NAME    = "name"
-  val K_DESC    = "desc"
-  val K_CREATOR = "creator"
-  val K_DATE    = "ts"
-  val K_RIGHTS  = "rights"
-  val K_TAGS    = "tags"
+  val K_ID       = "_id"
+  val K_TOKENS   = "_tokens"
+  val K_TYPE     = "_type"
+  val K_MODE     = "_mode"
+  val K_BIN      = "_bin"
+  val K_TTL      = "_ttl"
+  val K_RDF      = "_rdf"
+  val K_NT       = "_nt"
+  val K_NAME     = "name"
+  val K_DESC     = "desc"
+  val K_CREATOR  = "creator"
+  val K_DATE     = "ts"
+  val K_RIGHTS   = "rights"
+  val K_TAGS     = "tags"
+  val K_METADATA = "metadata"
 
   //----------------------------------------------------------------------
 
@@ -54,39 +56,25 @@ object Implicits {
    * @return The parsed Basic DB Object
    * @throws JSONParseException If failed to parse the string
    */
-  implicit def String2BasicDBObject(s:String):BasicDBObject = JSON.parse(s).asInstanceOf[BasicDBObject]
+  implicit def string2BasicDBObject(s:String):BasicDBObject = JSON.parse(s).asInstanceOf[BasicDBObject]
 
   /**Converts a list of objects into a Basic DB List.
    *
    * @param l The list to convert
    * @return The converted Basic DB List
    */
-  implicit def List2BasicDBList[A](l:List[A]) = {
+  implicit def list2BasicDBList[A](l:List[A]) = {
     val res = new BasicDBList
     l.foreach(o => res.add(o.asInstanceOf[Object]))
     res
   }
 
-  /**Converts a simple descriptor into a list of descriptors with the descriptor in it.
+  /**Converts an element to a list of one element.
    *
-   * @param desc The descriptor to wrap into a list
-   * @return The list of one element containing the provided descriptor
+   * @param a The element to turn in to a
+   * @return The list containing the provided element
    */
-  implicit def DescriptorToList(desc:Descriptor):List[Descriptor] = List(desc)
-
-  /**Converts a flow descriptor into a list of flow descriptors with the descriptor in it.
-   *
-   * @param flow The flow descriptor to wrap into a list
-   * @return The list of one element containing the provided descriptor
-   */
-  implicit def FlowDescriptorToList(flow:FlowDescriptor):List[FlowDescriptor] = List(flow)
-
-  /**Converts a simple component descriptor into a list of descriptors with the descriptor in it.
-   *
-   * @param comp The component descriptor to wrap into a list
-   * @return The list of one element containing the provided descriptor
-   */
-  implicit def ComponentDescriptorToList(desc:ComponentDescriptor):List[ComponentDescriptor] = List(desc)
+  implicit def anyToList [A] ( a:A ) : List[A] = List(a)
 
   /** Given a flow descriptor, it returns the minimal equivalent Jena model
    *  which describes it.
@@ -94,7 +82,7 @@ object Implicits {
    * @param flow The flow descriptor to convert
    * @return The converted model
    */
-  implicit def FlowDescriptor2Model(flow:FlowDescriptor):Model = {
+  implicit def flowDescriptor2Model(flow:FlowDescriptor):Model = {
     val model = ModelFactory.createDefaultModel
 
     // Setting the name spaces
@@ -207,7 +195,7 @@ object Implicits {
    * @param comp The component descriptor to convert
    * @return The converted model
    */
-  implicit def ComponentDescriptor2Model(comp:ComponentDescriptor):Model = {
+  implicit def componentDescriptor2Model(comp:ComponentDescriptor):Model = {
     val model = ModelFactory.createDefaultModel
 
     // Setting the name spaces
@@ -319,5 +307,19 @@ object Implicits {
 
   }
 
+  /**Given a descriptor it returns its RDF/XML serialized form.
+   *
+   * @param desc The descriptor
+   * @return The RDF/XML
+   */
+  implicit def descriptor2String ( desc:Descriptor ) : String = {
+    val model:Model = desc match {
+      case f:FlowDescriptor => flowDescriptor2Model(f)
+      case c:ComponentDescriptor => componentDescriptor2Model(c)
+    }
+    val baos = new ByteArrayOutputStream
+    model.write(baos,null,"RDF/XML")
+    baos.toString
+  }
 
 }

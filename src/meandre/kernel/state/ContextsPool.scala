@@ -1,11 +1,11 @@
 package meandre.kernel.state
 
 import meandre.kernel.Configuration
-import meandre.Implicits.javaIteratorToScalaIterator
 import meandre.kernel.Tools.safeOp
 import com.mongodb.gridfs.GridFS
-import com.mongodb.Mongo
 import java.io.{OutputStream, InputStream}
+import collection.jcl.{Buffer, IterableWrapper, CollectionWrapper}
+import com.mongodb.{BasicDBObject, Mongo}
 
 /**
  * This class implements a simple abstraction to allow a simple
@@ -65,6 +65,14 @@ class ContextsPool (val cnf:Configuration) {
     fileName
   }
 
+  /**Remove all the contexts in the pool
+   *
+   */
+  def removeAll = safeOp {
+    gfs.remove(new BasicDBObject)
+    true
+  }
+
   /** Updates the given content into the context with the given name and mime type.
     *
     * @param fileName The name of the context
@@ -88,4 +96,16 @@ class ContextsPool (val cnf:Configuration) {
     if (file!=null) { file writeTo os ; fileName }
     else throw new Exception("File "+fileName+" not found")
   }
+}
+
+/**The companion object for the context pool.
+ *
+ */
+object ContextsPool {
+
+  /**Creates a new instance of the context pool.
+   *
+   * @param cnf The configuration for this context pool
+   */
+  def apply ( cnf:Configuration ) = new ContextsPool(cnf)
 }

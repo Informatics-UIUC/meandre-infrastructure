@@ -97,6 +97,8 @@ object Tools {
   def sortMetadataByDate[A <: Map[String,Any]](l: List[A]) =
     l.sort((a, b) => a(K_DATE).asInstanceOf[Date].before(a(K_DATE).asInstanceOf[Date]))
 
+  //----------------------------------------------------------------------
+
   /** Performs a a safe operation against a piece of code that can throw
    *  exceptions.
    *
@@ -110,6 +112,44 @@ object Tools {
     catch {
       case t => Left(t)
     }
+  }
+
+
+  //----------------------------------------------------------------------
+
+  /** Zips three lists into one.
+   *
+   * @param la The first list
+   * @param lb The second list
+   * @param lc The third list
+   * @return The zipped list
+   */
+  def zip3 [A,B,C] ( la:List[A], lb:List[B], lc:List[C] ) :List[(A,B,C)] = {
+    def zip3$ ( la:List[A], lb:List[B], lc:List[C], res:List[(A,B,C)] ) : List[(A,B,C)] = (la,lb,lc) match {
+      case (Nil,_,_) => res.reverse
+      case (_,Nil,_) => res.reverse
+      case (_,_,Nil) => res.reverse
+      case (as,bs,cs)   => zip3$(as.tail,bs.tail,cs.tail,(as.head,bs.head,cs.head)::res)
+    }
+    zip3$(la,lb,lc,Nil)
+  }
+
+
+  /** Zips four lists into one.
+   *
+   * @param la The first list
+   * @param lb The second list
+   * @param lc The third list
+   * @return The zipped list
+   */
+  def zip4 [A,B,C] ( la:List[A], lb:List[B], lc:List[C] ) :List[(A,B,C)] = {
+    def zip4$ ( la:List[A], lb:List[B], lc:List[C], res:List[(A,B,C)] ) : List[(A,B,C)] = (la,lb,lc) match {
+      case (Nil,_,_) => res.reverse
+      case (_,Nil,_) => res.reverse
+      case (_,_,Nil) => res.reverse
+      case (as,bs,cs)   => zip4$(as.tail,bs.tail,cs.tail,(as.head,bs.head,cs.head)::res)
+    }
+    zip4$(la,lb,lc,Nil)
   }
 
 }

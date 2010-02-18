@@ -1,11 +1,23 @@
 package meandre.kernel.state
 
 import meandre.kernel.Configuration
+import meandre.kernel.Tools.zip3
 import com.mongodb.Mongo
 import java.io.InputStream
 import meandre.state.Repository
-import meandre.kernel.rdf.{FlowDescriptor, ComponentDescriptor, DescriptorsFactory}
 import meandre.Implicits._
+import meandre.kernel.rdf._
+
+/**A base case class for all addable elements to the store */
+abstract sealed case class Element()
+
+/**The case class that describes a location element */
+case class LocationElement(url: String) extends Element()
+
+/**The case class that describes a bundled element */
+case class BundledElement(desc:Descriptor, names: List[String], mimeTypes: List[String], contexts: List[InputStream]) extends Element
+
+//---------------------------------------------------------------------------
 
 /**
  * Implements the main stateless wrapper to available stored data
@@ -15,56 +27,36 @@ import meandre.Implicits._
  *
  */
 
-class Store(val cnf: Configuration, val user: String, val overwrite:Boolean, val embed:Boolean) {
+class Store(override val cnf: Configuration, override val userName: String, val overwrite:Boolean, val embed:Boolean)
+extends Repository(cnf,userName) {
 
   //---------------------------------------------------------------------------
 
-  type RDFURI = String
+  /** The contexts pool to use */
+  private val contextsPool = ContextsPool(cnf)
+
 
   //---------------------------------------------------------------------------
 
-  /**A base case class for all addable elements to the store */
-  abstract sealed case class Element()
-
-  /**The case class that describes a location element */
-  case class LocationElement(url: RDFURI) extends Element()
-
-  /**The case class that describes a bundled element */
-  case class BundledElement(rdf: String, names: List[Option[String]], contexts: List[InputStream]) extends Element
-
-  //---------------------------------------------------------------------------
-
-  /**The name of the Meandre store repository collection */
-  private val MEANDRE_COLLECTION = "meandre"
-
-  /**The mongo db connection object */
-  private val mongo = new Mongo(cnf.host, cnf.port)
-
-  /**The Meandre database */
-  private val db = mongo getDB cnf.MEANDRE_DB_NAME
-  cnf.auth match {
-    case Some((user, password)) => db.authenticate(user, password.toCharArray)
-    case None =>
+  /** Adds or overwrite a component as appropriate.
+   *
+   * @param d The descriptor to add to the repository
+   * @return The uri if succeeded, None otherwise
+   */
+  private def addToRepository ( d:Descriptor ) = overwrite match {
+    case false if exist(d.uri) => None
+    case _ => add(d).head
   }
 
-  /**The user collection */
-  private val collection = db getCollection MEANDRE_COLLECTION
-
-  /**Test connectivity. Will thrown an exception if cannot connect */
-  collection.find.count
-
-  /**Create the repository wrapper for the given user*/
-  private val repository = Repository(cnf,user)
-
   //---------------------------------------------------------------------------
 
-  /**Attempts to add all the provided elements to the user repository.
+  /**Attempts to add all the provided elements to the userName repository.
    *
-   * @param elements The list of elements to add to teh user repository
+   * @param elements The list of elements to add to teh userName repository
    * @return The list containing the rdf uri of the added components/flows or None
    *         if it could not be added (failed or overwrite was not set)
    */
-  def addElements[A <: Element](elements: List[A]): List[Either[Throwable, List[RDFURI]]] = elements map {
+  def addElements[A <: Element](elements: List[A]): List[Either[Throwable, List[Option[RDFURI]]]] = elements map {
     _ match {
       //
       // It is a location that needs to be added
@@ -74,26 +66,66 @@ class Store(val cnf: Configuration, val user: String, val overwrite:Boolean, val
       //
       // It is a bundled descriptor usually the result of and upload
       //
-      case BundledElement(rdf, names, contexts) => try {
-        val res:List[Option[String]] = DescriptorsFactory(rdf) map {
-          _ match {
+      case BundledElement(desc, names, mimes, contexts) => try {
+        val namingOK = names.length == contexts.length
+        val res:Option[RDFURI] = desc match {
             // Adding a flow to the repository
-            case f: FlowDescriptor => repository.add(f).head match {
-              case Some(uri) => repository.updateRDFFor(uri,rdf)
-                                Some(uri)
-              case None => None
+            case f: FlowDescriptor => addToRepository(f)
+            // Adding a component to the repository if naming is OK
+            case c: ComponentDescriptor if !namingOK =>  None
+            // Adding a component to the repository if naming is OK
+            case c: ComponentDescriptor if  namingOK => {
+              // Safe the files to the context pool
+              var cnames:List[String] = List(if (c.uri.endsWith("/") ) c.uri+"implementation/"
+                                             else c.uri+"/implementation/")
+              val addedContexts = zip3(names,mimes,contexts).map( _ match {
+                case (name,mime,is) => {
+                  val modName = "context://localhost/"+name.replaceAll("""\s+""","-")
+                  cnames ::= modName
+                  contextsPool.update(modName,mime,is)
+                }}
+              ).foldLeft(true)((a,b)=>a&&b.isRight)
+              addedContexts match {
+                case false => None
+                case true => c.context = cnames.map(URIContext(_)) ; addToRepository(c)
+              }
             }
-            // Adding a component to the repository
-            case c: ComponentDescriptor => None
+            case _ => None
           }
-        }
-        Right(res filter {_.isDefined} map {_.get})
+        Right(res)
       }
       catch {
-        case t => Left(t)
+        case t => println(t.toString+"!!!!!!!!!!!!!!!");Left(t)
       }
     }
   }
 
+  /** Remove everything from the store
+   *
+   */
+  override def removeAll = {
+    super.removeAll
+    contextsPool.removeAll
+  }
+
+}
+
+/**The companion object for the store.
+ *
+ *
+ * @author Xavier Llora
+ * @date Feb 15, 2010 at 3:39:05 PM
+ *
+ */
+object Store {
+
+  /**Creates a new instance of the store.
+   *
+   * @param cnf The configuration object
+   * @param user The user store to build
+   * @param overwrite Should component/flows be overwrote
+   * @param embed Should component context be embedded?
+   */
+  def apply (cnf: Configuration, user: String, overwrite:Boolean, embed:Boolean) = new Store(cnf,user,overwrite,embed)
 
 }
