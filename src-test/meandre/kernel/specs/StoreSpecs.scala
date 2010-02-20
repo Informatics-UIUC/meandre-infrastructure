@@ -25,24 +25,49 @@ object StoreSpecs extends Specification {
 
   "A user store" should {
 
-    "be able to store flows without overwrite and embed" in {
+    "be able to store flows and components without overwriting" in {
       val resName = List("ctx1.txt","ctx2.txt","ctx3.txt")
       val mimeType = List("text/plain","text/plain","text/plain")
       val isCnt = List(new ByteArrayInputStream(TestRepositories.demoRepositoryInTTL.getBytes),
                        new ByteArrayInputStream(TestRepositories.demoRepositoryInTTL.getBytes),
                        new ByteArrayInputStream(TestRepositories.demoRepositoryInTTL.getBytes))
-      val store = Store(cnf,"test_user",false,false)
+      val store = Store(cnf,"test_user",false)
       store.removeAll
       val cnt = store.size
-      store.remove(flow.uri)
       store.addElements(List(BundledElement(flow,Nil,Nil,Nil)))
       store.exist(flow.uri) must beTrue
+      store.size must beEqualTo(1)
+      store.addElements(List(BundledElement(flow,Nil,Nil,Nil)))
+      store.size must beEqualTo(1)            
       store.addElements(BundledElement(component,resName,mimeType,isCnt))
       store.exist(component.uri) must beTrue
-      store.removeAll
-      store.size must beEqualTo(0)
+//      store.removeAll
+//      store.size must beEqualTo(0)
 
     }
+
+
+//    "be able to store flows and components overwriting" in {
+//      // TODO Check that overwrite works
+//      val resName = List("ctx1.txt","ctx2.txt","ctx3.txt")
+//      val mimeType = List("text/plain","text/plain","text/plain")
+//      val isCnt = List(new ByteArrayInputStream(TestRepositories.demoRepositoryInTTL.getBytes),
+//                       new ByteArrayInputStream(TestRepositories.demoRepositoryInTTL.getBytes),
+//                       new ByteArrayInputStream(TestRepositories.demoRepositoryInTTL.getBytes))
+//      val store = Store(cnf,"test_user",false)
+//      store.removeAll
+//      val cnt = store.size
+//      store.addElements(List(BundledElement(flow,Nil,Nil,Nil)))
+//      store.exist(flow.uri) must beTrue
+//      store.size must beEqualTo(1)
+//      store.addElements(List(BundledElement(flow,Nil,Nil,Nil)))
+//      store.size must beEqualTo(1)
+//      store.addElements(BundledElement(component,resName,mimeType,isCnt))
+//      store.exist(component.uri) must beTrue
+//      store.removeAll
+//      store.size must beEqualTo(0)
+//
+//    }
 
   }
 

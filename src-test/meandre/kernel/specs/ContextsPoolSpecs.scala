@@ -37,11 +37,12 @@ object ContextsPoolSpecs extends Specification {
       tmp.right.get must beEqualTo(numFiles+1)
       // Query for the file
       val baos = new ByteArrayOutputStream
-      val file = cp.write("/test/1.zip",baos)
+      val file = cp.write(nf.right.get._2,baos)
       file.isRight must beTrue
       baos.size must beGreaterThan(0)
       // Delete files
-      cp.remove("/test/1.zip").isRight must beTrue
+      cp.remove(nf.right.get._2).isRight must beTrue
+      cp.size.right.get must beEqualTo(numFiles)
 
     }
 
@@ -59,11 +60,12 @@ object ContextsPoolSpecs extends Specification {
       tmp.right.get must beEqualTo(numFiles+1)
       // Query for the file
       val baos = new ByteArrayOutputStream
-      val file = cp.write("/test/1.zip",baos)
+      val file = cp.write(nf.right.get._2,baos)
       file.isRight must beTrue
       baos.size must beGreaterThan(0)
       // Delete files
-      cp.removeAll.right.get must beTrue
+      cp.removeAll.isRight must beTrue
+      cp.size.right.get must beEqualTo(0)
 
     }
     

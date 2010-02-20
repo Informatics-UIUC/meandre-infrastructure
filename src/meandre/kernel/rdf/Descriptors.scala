@@ -7,6 +7,7 @@ import com.hp.hpl.jena.vocabulary.RDF.`type`
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.io.StringReader
+import java.net.URL
 
 /** The base class of the context hierarchy 
  * 
@@ -167,20 +168,33 @@ extends Descriptor(uri,description,properties)
  * @author Xavier Llora
  */
 object DescriptorsFactory  {
- 
-	/** Attempts to read a RDF model from a URL
-     *
-     * @param url The url to parse
-     * @return The read model as a Jena object
-     */
+
+  /** Opens an input stream for the given URL. The connection is opened
+   *  with timeouts for connection and reading.
+   *
+   * @param url The url to open
+   * @return The opened input stream
+   */
+  private def getInputStreamForURL ( url:String ) = {
+    val httpConnection = (new URL(url)).openConnection
+    httpConnection.setConnectTimeout(10000)
+    httpConnection.setReadTimeout(10000)
+    httpConnection.getInputStream
+  }
+
+  /**Attempts to read a RDF model from a URL
+    *
+   * @param url The url to parse
+   * @return The read model as a Jena object
+   */
 	def readModelFromURL ( url:String ) = {
 		val model = ModelFactory.createDefaultModel
 		try {
-			model.read(url.toString)
+			model.read(getInputStreamForURL(url),null,"RDF/XML")
 		} catch  {
-			case _ => try { model.read(url.toString,"TTL") } 
+			case _ => try { model.read(getInputStreamForURL(url),null,"TTL") }
                   catch {
-                  		case _ => try { model.read(url.toString,"N-TRIPLE") } 
+                  		case _ => try { model.read(getInputStreamForURL(url),null,"N-TRIPLE") } 
                   				  finally { model }
                   }
                   finally { model }

@@ -49,11 +49,13 @@ class ContextsPool (val cnf:Configuration) {
    * @return The file name if succeed
    */
   def save(fileName: String, mimeType: String, is: InputStream) = safeOp {
+    val nfn = if ( fileName startsWith "/" ) fileName else "/"+fileName
     val file = gfs.createFile(is)
-    file.setFilename(fileName)
     file.setContentType(mimeType)
     file.save
-    fileName
+    file.setFilename("context://localhost/"+file.getMD5+nfn)
+    file.save
+    (file.getMD5,file.getFilename)
   }
 
   /** Remove the given context

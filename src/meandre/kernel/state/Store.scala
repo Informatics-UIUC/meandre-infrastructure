@@ -7,6 +7,8 @@ import java.io.InputStream
 import meandre.state.Repository
 import meandre.Implicits._
 import meandre.kernel.rdf._
+import java.net.URL
+import com.hp.hpl.jena.rdf.model.ModelFactory
 
 /**A base case class for all addable elements to the store */
 abstract sealed case class Element()
@@ -27,7 +29,7 @@ case class BundledElement(desc:Descriptor, names: List[String], mimeTypes: List[
  *
  */
 
-class Store(override val cnf: Configuration, override val userName: String, val overwrite:Boolean, val embed:Boolean)
+class Store(override val cnf: Configuration, override val userName: String, val overwrite:Boolean)
 extends Repository(cnf,userName) {
 
   //---------------------------------------------------------------------------
@@ -61,7 +63,16 @@ extends Repository(cnf,userName) {
       //
       // It is a location that needs to be added
       //
-      case LocationElement(url) => Left(new Exception("Not implemented yet"))
+      case LocationElement(url) => try {
+        val descs = DescriptorsFactory.buildDescriptors(url)
+        // TODO iterate over the descriptors. If flow add it directly. If a component
+        // TODO open an input stream for each of the resources (if not embedded, if so
+        // TODO wrap them into and input stream)
+        Left(new Exception("Unimplemented"))
+      }
+      catch {
+        case t => Left(t)
+      }
 
       //
       // It is a bundled descriptor usually the result of and upload
@@ -80,9 +91,13 @@ extends Repository(cnf,userName) {
                                              else c.uri+"/implementation/")
               val addedContexts = zip3(names,mimes,contexts).map( _ match {
                 case (name,mime,is) => {
-                  val modName = "context://localhost/"+name.replaceAll("""\s+""","-")
-                  cnames ::= modName
-                  contextsPool.update(modName,mime,is)
+                  val  modName = name.replaceAll("""\s+""","-")
+                  val fileName = contextsPool.update(modName,mime,is) 
+                  cnames ::= (fileName match {
+                    case Left(_) => ""
+                    case Right(Pair(_,fn:String)) => fn
+                  })
+                  fileName
                 }}
               ).foldLeft(true)((a,b)=>a&&b.isRight)
               addedContexts match {
@@ -95,7 +110,7 @@ extends Repository(cnf,userName) {
         Right(res)
       }
       catch {
-        case t => println(t.toString+"!!!!!!!!!!!!!!!");Left(t)
+        case t => Left(t)
       }
     }
   }
@@ -124,8 +139,7 @@ object Store {
    * @param cnf The configuration object
    * @param user The user store to build
    * @param overwrite Should component/flows be overwrote
-   * @param embed Should component context be embedded?
    */
-  def apply (cnf: Configuration, user: String, overwrite:Boolean, embed:Boolean) = new Store(cnf,user,overwrite,embed)
+  def apply (cnf: Configuration, user: String, overwrite:Boolean) = new Store(cnf,user,overwrite)
 
 }
