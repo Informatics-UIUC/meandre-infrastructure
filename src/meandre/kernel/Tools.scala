@@ -3,6 +3,7 @@ package meandre.kernel
 import rdf.Descriptor
 import meandre.Implicits._
 import java.util.Date
+import java.net.URL
 
 /**
  * Provides a simple collection of commodity tools for sorting descriptors,
@@ -151,5 +152,22 @@ object Tools {
     }
     zip4$(la,lb,lc,Nil)
   }
+
+
+  //----------------------------------------------------------------------
+
+  /**Opens an input stream for the given URL. The connection is opened
+   *  with timeouts for connection and reading.
+   *
+   * @param url The url to open
+   * @return The opened input stream
+   */
+  def getInputStreamForURL(url: String) = {
+    val httpConnection = (new URL(url)).openConnection
+    httpConnection.setConnectTimeout(10000)
+    httpConnection.setReadTimeout(10000)
+    (httpConnection.getContentType,httpConnection.getContentEncoding,httpConnection.getInputStream)
+  }
+
 
 }

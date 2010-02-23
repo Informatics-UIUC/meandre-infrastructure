@@ -42,9 +42,9 @@ object RepositorySpecs extends Specification {
   }
 
   "A repository " should {
-    val flows      = DescriptorsFactory.buildFlowDescriptors(TestRepositories.demoRepositoryModel)
-    val components = DescriptorsFactory.buildComponentDescriptors(TestRepositories.demoRepositoryModel)
-    val repository = DescriptorsFactory(TestRepositories.demoRepositoryModel)          
+    val flows      = DescriptorsFactory.buildFlowDescriptors(TestRepositories.testRepositoryModel)
+    val components = DescriptorsFactory.buildComponentDescriptors(TestRepositories.testRepositoryModel)
+    val repository = DescriptorsFactory(TestRepositories.testRepositoryModel)
 
     "be able to store flows and components" in {
       val repo  = Repository(Configuration(),"test_user")

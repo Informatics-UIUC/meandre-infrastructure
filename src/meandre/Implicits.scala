@@ -39,6 +39,7 @@ object Implicits {
   val K_RIGHTS   = "rights"
   val K_TAGS     = "tags"
   val K_METADATA = "metadata"
+  val K_LOCATION = "location"
 
   //----------------------------------------------------------------------
 

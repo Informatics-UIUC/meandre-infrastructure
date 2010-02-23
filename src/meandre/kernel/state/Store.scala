@@ -9,6 +9,7 @@ import meandre.Implicits._
 import meandre.kernel.rdf._
 import java.net.URL
 import com.hp.hpl.jena.rdf.model.ModelFactory
+import meandre.kernel.Tools.getInputStreamForURL
 
 /**A base case class for all addable elements to the store */
 abstract sealed case class Element()
@@ -18,6 +19,10 @@ case class LocationElement(url: String) extends Element()
 
 /**The case class that describes a bundled element */
 case class BundledElement(desc:Descriptor, names: List[String], mimeTypes: List[String], contexts: List[InputStream]) extends Element
+
+/**The case class that describes a partially bundled element where the context already exist on the store */
+case class PartiallyBundledElement(desc:Descriptor, names: List[String], mimeTypes: List[String], contexts: List[String]) extends Element
+
 
 //---------------------------------------------------------------------------
 
@@ -50,6 +55,19 @@ extends Repository(cnf,userName) {
     case _ => add(d).head
   }
 
+  /**Given a certain context://localhost url it uses the location to rebuild
+   * the original url to fetch the context
+   *
+   * @param location The location where the context url came from
+   * @param url The context url to rewrite
+   * @return The rewritten url
+   */
+  private def rewriteContextURL( location:String, url:String ) = {
+    val splitLocation = location.split("/")
+    val base = splitLocation.take(splitLocation.size-1).reduceLeft((a,b)=>a+"/"+b)
+    url.replaceAll("context://localhost",base)
+  }
+
   //---------------------------------------------------------------------------
 
   /**Attempts to add all the provided elements to the userName repository.
@@ -65,10 +83,58 @@ extends Repository(cnf,userName) {
       //
       case LocationElement(url) => try {
         val descs = DescriptorsFactory.buildDescriptors(url)
-        // TODO iterate over the descriptors. If flow add it directly. If a component
-        // TODO open an input stream for each of the resources (if not embedded, if so
-        // TODO wrap them into and input stream)
-        Left(new Exception("Unimplemented"))
+        // Get the descriptors and the unique set of urls to pull
+        val (comps:Iterable[ComponentDescriptor],flows) = descs partition (_.isInstanceOf[ComponentDescriptor])
+        var uris:List[String] = Nil
+        comps foreach (c => c.context foreach (_ match {
+          case URIContext(uri) => uris ::= uri
+          case _ =>
+        }))
+
+        // Process and filter uris
+        val processedURIs = uris map ( _ match {
+          case s if s.startsWith("http") => Some(s)
+          case s if s.startsWith("context://localhost") => Some(rewriteContextURL(url,s))
+          case _ => None
+        })
+        uris = processedURIs.filter(_.isDefined).map(_.get)
+
+        // Pull and store the remote contexts
+        var lstCtxMap:List[Pair[String,String]] = Nil
+        Set(uris:_*) foreach ( uri => {
+          val fileName = uri.split("/").reverse.first
+          // TODO Will need to check if MD5 exist to avoid pulling existing jars
+          val (contentType,contentEncoding,is) = getInputStreamForURL(uri)
+          contextsPool.update(fileName,contentType,is) match {
+              case Left(t)  => throw t
+              case Right(s:Pair[String,String]) => lstCtxMap ::= s._2 -> uri
+          }
+        })
+        val cntxsMap = Map(lstCtxMap:_*)
+        // Add all the flows blindly
+        val addedFlowURIs = flows map (addToRepository(_))
+        // Add all the components with proper context rewriting
+        val rewrittenComps = comps map ( c => {
+          val nc = c.context map ( _ match {
+            case URIContext(uri) if  cntxsMap.contains(uri) =>  URIContext(cntxsMap(uri))
+            case URIContext(uri) if !cntxsMap.contains(uri) =>  URIContext(uri)
+            case s => s
+          })
+          c.context = nc
+          c
+        })
+        val addedComponentURIs = rewrittenComps map (addToRepository(_))
+        val addedURIs = descs map (c => Some(c.uri))
+
+        // Update all the descriptors's metadata adding the original location
+        (addedFlowURIs++addedComponentURIs) foreach ( uri => {
+          val doc = collection.findOne(wrapURI(uri.get))
+          doc.put(K_LOCATION,url)
+          collection.update(wrapURI(uri.get),doc,false,false)
+        })
+
+        // Return the list of uris added
+        Right(addedURIs)
       }
       catch {
         case t => Left(t)
@@ -77,7 +143,7 @@ extends Repository(cnf,userName) {
       //
       // It is a bundled descriptor usually the result of and upload
       //
-      case BundledElement(desc, names, mimes, contexts) => try {
+      case be@BundledElement(desc, names, mimes, contexts) => try {
         val namingOK = names.length == contexts.length
         val res:Option[RDFURI] = desc match {
             // Adding a flow to the repository
@@ -92,7 +158,7 @@ extends Repository(cnf,userName) {
               val addedContexts = zip3(names,mimes,contexts).map( _ match {
                 case (name,mime,is) => {
                   val  modName = name.replaceAll("""\s+""","-")
-                  val fileName = contextsPool.update(modName,mime,is) 
+                  val fileName = contextsPool.update(modName,mime,is)
                   cnames ::= (fileName match {
                     case Left(_) => ""
                     case Right(Pair(_,fn:String)) => fn
@@ -114,6 +180,8 @@ extends Repository(cnf,userName) {
       }
     }
   }
+
+ 
 
   /** Remove everything from the store
    *

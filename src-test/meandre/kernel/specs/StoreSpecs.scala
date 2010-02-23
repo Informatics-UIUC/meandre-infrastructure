@@ -5,8 +5,9 @@ import data.TestRepositories
 import org.specs.Specification
 import meandre.kernel.Configuration
 import meandre.kernel.rdf.DescriptorsFactory
-import meandre.kernel.state.{BundledElement, Store}
 import java.io.ByteArrayInputStream
+import scala.Option
+import meandre.kernel.state.{LocationElement, BundledElement, Store}
 
 /**
  * This class implements the specifications for a given store
@@ -20,54 +21,68 @@ object StoreSpecs extends Specification {
 
   val cnf = Configuration()
   cnf.MEANDRE_DB_NAME = "Meandre_Test"
-  val flow      = DescriptorsFactory.buildFlowDescriptors(TestRepositories.demoRepositoryModel).head
-  val component = DescriptorsFactory.buildComponentDescriptors(TestRepositories.demoRepositoryModel).head
+  val flow      = DescriptorsFactory.buildFlowDescriptors(TestRepositories.testRepositoryModel).head
+  val component = DescriptorsFactory.buildComponentDescriptors(TestRepositories.testRepositoryModel).head
 
+  def checkAllDefined[A] ( xs:List[Either[Throwable,List[Option[A]]]]) =
+    xs.forall( x => x.isRight && x.right.get.forall(_.isDefined))
+  
   "A user store" should {
 
     "be able to store flows and components without overwriting" in {
       val resName = List("ctx1.txt","ctx2.txt","ctx3.txt")
       val mimeType = List("text/plain","text/plain","text/plain")
-      val isCnt = List(new ByteArrayInputStream(TestRepositories.demoRepositoryInTTL.getBytes),
-                       new ByteArrayInputStream(TestRepositories.demoRepositoryInTTL.getBytes),
-                       new ByteArrayInputStream(TestRepositories.demoRepositoryInTTL.getBytes))
+      val isCnt = List(new ByteArrayInputStream(TestRepositories.testRepositoryInTTL.getBytes),
+                       new ByteArrayInputStream(TestRepositories.testRepositoryInTTL.getBytes),
+                       new ByteArrayInputStream(TestRepositories.testRepositoryInTTL.getBytes))
       val store = Store(cnf,"test_user",false)
       store.removeAll
       val cnt = store.size
-      store.addElements(List(BundledElement(flow,Nil,Nil,Nil)))
+      val resFirstAdd = store.addElements(BundledElement(flow,Nil,Nil,Nil))
+      resFirstAdd foreach ( r => checkAllDefined(r) must beTrue )
       store.exist(flow.uri) must beTrue
       store.size must beEqualTo(1)
-      store.addElements(List(BundledElement(flow,Nil,Nil,Nil)))
-      store.size must beEqualTo(1)            
+      val resSecondAdd = store.addElements(BundledElement(flow,Nil,Nil,Nil))
+      resSecondAdd foreach ( s => checkAllDefined(s) must beFalse )
+      store.size must beEqualTo(1)
       store.addElements(BundledElement(component,resName,mimeType,isCnt))
       store.exist(component.uri) must beTrue
-//      store.removeAll
-//      store.size must beEqualTo(0)
-
+      store.removeAll
+      store.size must beEqualTo(0)
     }
 
 
-//    "be able to store flows and components overwriting" in {
-//      // TODO Check that overwrite works
-//      val resName = List("ctx1.txt","ctx2.txt","ctx3.txt")
-//      val mimeType = List("text/plain","text/plain","text/plain")
-//      val isCnt = List(new ByteArrayInputStream(TestRepositories.demoRepositoryInTTL.getBytes),
-//                       new ByteArrayInputStream(TestRepositories.demoRepositoryInTTL.getBytes),
-//                       new ByteArrayInputStream(TestRepositories.demoRepositoryInTTL.getBytes))
-//      val store = Store(cnf,"test_user",false)
-//      store.removeAll
-//      val cnt = store.size
-//      store.addElements(List(BundledElement(flow,Nil,Nil,Nil)))
-//      store.exist(flow.uri) must beTrue
-//      store.size must beEqualTo(1)
-//      store.addElements(List(BundledElement(flow,Nil,Nil,Nil)))
-//      store.size must beEqualTo(1)
-//      store.addElements(BundledElement(component,resName,mimeType,isCnt))
-//      store.exist(component.uri) must beTrue
-//      store.removeAll
-//      store.size must beEqualTo(0)
-//
-//    }
+    "be able to store flows and components overwriting" in {
+      val resName = List("ctx1.txt","ctx2.txt","ctx3.txt")
+      val mimeType = List("text/plain","text/plain","text/plain")
+      val isCnt = List(new ByteArrayInputStream(TestRepositories.testRepositoryInTTL.getBytes),
+                       new ByteArrayInputStream(TestRepositories.testRepositoryInTTL.getBytes),
+                       new ByteArrayInputStream(TestRepositories.testRepositoryInTTL.getBytes))
+      val store = Store(cnf,"test_user",true)
+      store.removeAll
+      val cnt = store.size
+      val resFirstAdd = store.addElements(BundledElement(flow,Nil,Nil,Nil))
+      resFirstAdd foreach ( r => checkAllDefined(r) must beTrue )
+      store.exist(flow.uri) must beTrue
+      store.size must beEqualTo(1)
+      val resSecondAdd = store.addElements(BundledElement(flow,Nil,Nil,Nil))
+      resSecondAdd foreach ( s => checkAllDefined(s) must beTrue )
+      store.size must beEqualTo(1)
+      store.addElements(BundledElement(component,resName,mimeType,isCnt))
+      store.exist(component.uri) must beTrue
+      store.removeAll
+      store.size must beEqualTo(0)
+    }
+
+    "be able to add locations" in {
+      val store = Store(cnf,"test_user",true)
+      store.removeAll
+      store.isEmpty must beTrue
+      val res = store.addElements(LocationElement(TestRepositories.testRemoteLocation))
+      store.size must beEqualTo(14)
+      store.removeAll
+      store.isEmpty must beTrue
+    }
 
   }
 

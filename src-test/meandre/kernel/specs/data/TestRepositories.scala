@@ -13,7 +13,7 @@ import java.io.StringReader
 
 object TestRepositories  {
 
-  val demoRepositoryInTTL = """@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+  val testRepositoryInTTL = """@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 @prefix dc:      <http://purl.org/dc/elements/1.1/> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -324,6 +324,9 @@ object TestRepositories  {
               <meandre://test.org/flow/test-hello-world-with-python-and-lisp/instance/concatenate_string/2> .
   """
 
-  val demoRepositoryModel = ModelFactory.createDefaultModel
-  demoRepositoryModel.read(new StringReader(demoRepositoryInTTL),null,"TTL")
+  val testRepositoryModel = ModelFactory.createDefaultModel
+  testRepositoryModel.read(new StringReader(testRepositoryInTTL),null,"TTL")
+
+  val testRemoteLocation = "http://repository.seasr.org/Meandre/Locations/Latest/Flows/hits-summarizer/repository.ttl"
+
 }

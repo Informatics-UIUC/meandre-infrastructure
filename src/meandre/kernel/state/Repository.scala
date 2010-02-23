@@ -30,7 +30,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    * @param flow The flow descriptor to convert
    * @return The encapsulating BasicDBObject
    */
-   private implicit def descriptor2BasicDBObject ( desc:Descriptor ) : BasicDBObject = {
+   protected implicit def descriptor2BasicDBObject ( desc:Descriptor ) : BasicDBObject = {
     // Serializing the descriptor
     val baosSer = new ByteArrayOutputStream
     new ObjectOutputStream(baosSer) writeObject desc
@@ -78,7 +78,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    *
    * @param desc The descriptor to reserialize to the store
    */
-  private def updateSerializedDescriptor ( desc:Descriptor ) = {
+  protected def updateSerializedDescriptor ( desc:Descriptor ) = {
     // Serializing the descriptor
     val baosSer = new ByteArrayOutputStream
     new ObjectOutputStream(baosSer) writeObject desc
@@ -126,7 +126,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    *  @param dbObj The object to process
    *  @return The component descriptor if it could be regenerated
    */
-  private def regenerateComponentDescriptorFromDBObject ( dbObj:DBObject ) : Option[ComponentDescriptor] = {
+  protected def regenerateComponentDescriptorFromDBObject ( dbObj:DBObject ) : Option[ComponentDescriptor] = {
     var res:Option[ComponentDescriptor] = None
 
     try {
@@ -155,7 +155,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    *  @param dbObj The object to process
    *  @return The flow descriptor if it could be regenerated
    */
-  private def regenerateFlowDescriptorFromDBObject ( dbObj:DBObject ) : Option[FlowDescriptor] = {
+  protected def regenerateFlowDescriptorFromDBObject ( dbObj:DBObject ) : Option[FlowDescriptor] = {
     var res:Option[FlowDescriptor] = None
 
     try {
@@ -188,7 +188,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    * @param flow The flow descriptor to convert
    * @return The encapsulating BasicDBObject
    */
-  private implicit def flowDescriptor2BasicDBObject ( flow:FlowDescriptor ) : BasicDBObject = {
+  protected implicit def flowDescriptor2BasicDBObject ( flow:FlowDescriptor ) : BasicDBObject = {
     val bdbo = descriptor2BasicDBObject(flow)
     bdbo.put(K_TYPE,V_FLOW)
     bdbo
@@ -199,7 +199,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    * @param comp The component descriptor to convert
    * @return The encapsulating BasicDBObject
    */
-  private implicit def componentDescriptor2BasicDBObject ( comp:ComponentDescriptor ) : BasicDBObject = {
+  protected implicit def componentDescriptor2BasicDBObject ( comp:ComponentDescriptor ) : BasicDBObject = {
     val bdbo = descriptor2BasicDBObject(comp)
     bdbo.put(K_TYPE,V_COMPONENT)
     bdbo.put(K_MODE,comp.mode match {
@@ -214,7 +214,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    * @param uri The uri to wrap
    * @return The BasicDBObject with the _id field set
    */
-  private def wrapURI ( uri:String ) : BasicDBObject = {
+  protected def wrapURI ( uri:String ) : BasicDBObject = {
     val bdbo = new BasicDBObject
     bdbo.put(K_ID,uri)
     bdbo
@@ -225,7 +225,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    * @param desc The descriptor to wrap
    * @return The BasicDBObject with the _id field set
    */
-  private def wrapURI ( desc:Descriptor ) : BasicDBObject = wrapURI(desc.uri)
+  protected def wrapURI ( desc:Descriptor ) : BasicDBObject = wrapURI(desc.uri)
 
   //---------------------------------------------------------------------------
 
@@ -243,7 +243,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
   }
 
   /** The user collection */
-  private val collection = db getCollection USER_COLLECTION_NAME
+  protected val collection = db getCollection USER_COLLECTION_NAME
 
   /** Test connectivity. Will thrown an exception if cannot connect */
   collection.find.count
@@ -261,8 +261,14 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    */
   def size = collection.find.count
 
-  /** Returns the number of flows in a repository
+  /**Returns true is the respository is empty.
    *
+   * @return True if the respository is empty, false otherwise
+   */
+  def isEmpty = size==0
+
+  /**Returns the number of flows in a repository
+    *
    * @return The number of flows in the user repository
    */
   def sizeFlows = collection.find("{\""+K_TYPE+"\": \""+V_FLOW+"\"}").count
