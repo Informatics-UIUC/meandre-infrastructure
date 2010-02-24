@@ -22,11 +22,35 @@ div.response {
 	background: white;
 	margin-top: 20px;
 	padding:3px;
-	border: 1px solid #FF7F00;
+	border: 1px solid #AAAAAA;
 }
 
 table.response {
-	background-color: lavender;
+	width: 100%;
+	background-color: white;
+	border-collapse:collapse;
+	border: 1px solid #AAAAAA;
+}
+
+tr.response-header{
+	background-color: #CCCCCC;
+	margin : 0px;
+	font-size: 11px;
+	font-weight: lighter;
+	font-family: Geneva, Tahoma, Helvetica, Arial;
+}
+
+th {
+	border: 1px solid #AAAAAA;
+	color: #white;
+}
+
+td {
+	padding-left: 3px;
+	padding-right: 3px;
+	border: 1px solid #AAAAAA;
+	font-size: 11px;
+	color: #888888;
 }
 
 div.footer {
