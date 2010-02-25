@@ -1,6 +1,6 @@
 package meandre.kernel.specs
 
-import data.TestRepositories
+import data.SpecsRepositories
 import org.specs.Specification
 import meandre.kernel.Configuration
 import meandre.state.Repository
@@ -42,9 +42,9 @@ object RepositorySpecs extends Specification {
   }
 
   "A repository " should {
-    val flows      = DescriptorsFactory.buildFlowDescriptors(TestRepositories.testRepositoryModel)
-    val components = DescriptorsFactory.buildComponentDescriptors(TestRepositories.testRepositoryModel)
-    val repository = DescriptorsFactory(TestRepositories.testRepositoryModel)
+    val flows      = DescriptorsFactory.buildFlowDescriptors(SpecsRepositories.testRepositoryModel)
+    val components = DescriptorsFactory.buildComponentDescriptors(SpecsRepositories.testRepositoryModel)
+    val repository = DescriptorsFactory(SpecsRepositories.testRepositoryModel)
 
     "be able to store flows and components" in {
       val repo  = Repository(Configuration(),"test_user")

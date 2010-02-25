@@ -1,6 +1,6 @@
 package meandre.kernel.specs
 
-import data.TestRepositories
+import data.SpecsRepositories
 import java.io.File
 
 import org.specs._
@@ -8,7 +8,7 @@ import meandre.kernel.rdf.{FlowDescriptor, ComponentDescriptor, Descriptor, Desc
 
 object RDFSpecs extends Specification {
 
-  val model = TestRepositories.testRepositoryModel
+  val model = SpecsRepositories.testRepositoryModel
 
   "A description factory" should {
 	  "must extract components and flows in demo repository" in {

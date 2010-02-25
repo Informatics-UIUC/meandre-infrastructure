@@ -11,7 +11,7 @@ import java.io.StringReader
  * 
  */
 
-object TestRepositories  {
+object SpecsRepositories  {
 
   val testRepositoryInTTL = """@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 @prefix dc:      <http://purl.org/dc/elements/1.1/> .

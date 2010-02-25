@@ -3,7 +3,7 @@ body {
 	font-family: Helvetica, Webdings, Arial;
 	font-size: small;
 	color: #212121;
-	margin: 1;
+	margin: 1px;
 	min-width: 800px;
 }
 
@@ -42,7 +42,7 @@ tr.response-header{
 
 th {
 	border: 1px solid #AAAAAA;
-	color: #white;
+	color: white;
 }
 
 td {

@@ -1,13 +1,151 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-    <title>MI - Templating</title>
-    <link rel="stylesheet" type="text/css" href="style.css"> 
-</head>
-<body>
+package meandre.webservices
 
-<div class="header">
+import java.io.PrintWriter
+import xml.{Text, Elem}
+import com.mongodb.BasicDBObject
+import meandre.Implicits._
+import java.util.{ArrayList, Date}
+
+/**
+ * This class wraps a basic db object and adds template oriented
+ * functionality.
+ *
+ * @author Xavier Llora
+ * @date Feb 24, 2010 at 2:10:34 PM
+ *
+ */
+
+class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
+
+  /**Given a response document, it formats it according to the provided
+   * format.
+   *
+   * @param format The target format
+   * @param writer The basic object containing the response to format
+   */
+  def format ( format:String, writer:PrintWriter ) : RichBasicDBObject = format match {
+    case "json" => writer.println(asJSON) ; this
+    case "xml"  => writer.println(asXML)  ; this
+    case "html" => writer.println("html") ; this
+    case _      => writer.println(self)   ; this
+  }
+
+  /** Curried version of the format function */
+  protected val cFormat = Function.curried(format _)
+
+  /** Converts to json */
+  val asJSONTo = cFormat("json")
+
+  /** Converts to xml */
+  val asXMLTo  = cFormat("xml")
+
+  /** Converts to html */
+  val asHTMLTo = cFormat("html")
+
+  /** Converts the document into a JSON string
+    *
+    * @return The json of the given object
+    */
+  def asJSON  = self.toString
+
+  /** Converts the document into XML
+   *
+   * @return The XML of the given object
+   */
+  def asXML : Elem = {
+    def transformObject ( d:BasicDBObject ) : Elem = {
+      <meandre_item>
+        {
+          for ( k <- d.keySet.iterator )
+            yield Elem(null, k, scala.xml.Null, scala.xml.TopScope, d.get(k) match {
+                     // The value is an object
+                     case t:BasicDBObject => transformObject(t)
+                     // The value is not a list
+                     case a:ArrayList[Object] => <meandre_list>{transformArray(a)}</meandre_list>
+                     // The value is just a terminal
+                     case t => Text(t.toString)
+                  })
+        }
+      </meandre_item>
+    }
+
+    def transformArray ( a:ArrayList[Object] ) : Any =
+      for ( i<-List.range(0,a.size) )
+        yield Elem(null, "meandre_list_item", scala.xml.Null, scala.xml.TopScope,a.get(i) match {
+          // The element is an object
+          case t:BasicDBObject => transformObject(t)
+          // The element is another list
+          case a:ArrayList[Object] => <meandre_list>{transformArray(a)}</meandre_list>
+          // Basic type
+          case t => Text(t.toString)
+        })
+
+    <meandre_response>{transformObject(self)}</meandre_response>
+  }
+  
+}
+
+/**
+ * This class contains templates and basic mechanics for rendering request
+ * responses. Main output formats are JSON, XML, and HTML.
+ *
+ * @author Xavier Llora
+ * @date Feb 24, 2010 at 2:10:34 PM
+ * 
+ */
+
+object Templating {
+
+  /**Provides implicit conversion from a basic db object to a rich
+   * basic db object
+   *
+   * @param bdbo The basic db object to enrich
+   * @return The enriched basic db object
+   */
+  implicit def basicDBObject2RichBasicDBObject ( bdbo:BasicDBObject ) = new RichBasicDBObject(bdbo)
+
+
+  /**Provides implicit conversion from a rich basic db object to a
+   * basic db object
+   *
+   * @param rbdbo The enriched basic db object to enrich
+   * @return The basic bd object
+   */
+  implicit def richBasicDBObject2BasicDBObject ( rbdbo:RichBasicDBObject ) = rbdbo.self
+
+
+  def html ( title:String, pathPrefix:String, response:String ) =
+    "<html>"+
+     htmlHeader(title,pathPrefix)+
+    "<body>"+
+     htmlMenu +
+    """<br/>
+       <div class="response">"""+
+       response +
+    """</div>"""+
+     htmlFooter +
+    """</body>
+     </html>"""
+
+  /** The html header section */
+  def htmlHeader ( title:String, pathPrefix:String ) = """
+    <head>
+      <title>MI - """+title+"""</title>
+      <link rel="stylesheet" type="text/css" href="""+'"'+pathPrefix+"""style.css"> 
+    </head>
+  """
+
+  /** The html page footer */
+  def htmlFooter = """
+    <div class="footer">
+        <p class="footer">&copy; DITA, NCSA, and UofI, 2007-2010.</p>
+        <p class="footer-date">"""+new Date+"""</p>
+    </div>
+  """
+
+  /** The HTML menu */
+  val htmlMenu = """
+    <div class="header">
     <p class="header-info">anonymous@dev-demo.seasr.org:1714</p>
 
     <ul class="pureCssMenu pureCssMenum">
@@ -177,7 +315,7 @@
 
                 <li class="pureCssMenui"><a class="pureCssMenui" href="#">Role map</a></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="#">Rovoke all user roles</a></li>
-                
+
             </ul>
 
 
@@ -196,42 +334,7 @@
                 <li class="pureCssMenui"><a class="pureCssMenui" href="http://dev-tools.seasr.org/fisheye/browse/Meandre-Infrastructure">SVN browser</a></li>
             </ul>
 
-
-
-
-    </ul>
-</div>
-<br/>
-<div class="response">
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec arcu urna, mattis in tincidunt sit amet, facilisis eu lorem. Integer vitae mauris quis massa gravida hendrerit eu quis ante. Duis facilisis lobortis ligula ut gravida. Morbi pulvinar egestas ullamcorper. Fusce tincidunt venenatis dui sed accumsan. Integer aliquet venenatis ante, vestibulum lobortis est laoreet nec. Fusce dictum dui fermentum nulla fermentum faucibus. Sed et tortor sit amet risus convallis tempus. Donec ornare, elit lobortis elementum dapibus, dolor tortor posuere leo, sit amet faucibus magna elit nec nisi. Morbi non mauris quis purus pulvinar fermentum ac sed tortor. Nam sagittis quam quis tortor tristique bibendum in a risus. Aliquam erat volutpat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec pulvinar rhoncus nulla, vitae placerat massa porta id. Nulla turpis nisl, lobortis ac bibendum quis, mollis aliquet tellus. Duis non libero eros.</p>
-    <pre>
-        [
-         {"meandre_role_name":"Publish","meandre_role_uri":"http://www.meandre.org/accounting/property/role/Publish" },
-         {"meandre_role_name":"Home","meandre_role_uri":"http://www.meandre.org/accounting/property/role/Home"},
-         {"meandre_role_name":"Flows","meandre_role_uri":"http://www.meandre.org/accounting/property/role/Flows"},
-         {"meandre_role_name":"Repository","meandre_role_uri":"http://www.meandre.org/accounting/property/role/Repository"},
-         {"meandre_role_name":"Components","meandre_role_uri":"http://www.meandre.org/accounting/property/role/Components"},
-         {"meandre_role_name":"Execution","meandre_role_uri":"http://www.meandre.org/accounting/property/role/Execution"},
-         {"meandre_role_name":"Admin","meandre_role_uri":"http://www.meandre.org/accounting/property/role/Admin"},
-         {"meandre_role_name":"Workbench","meandre_role_uri":"http://www.meandre.org/accounting/property/role/Workbench"},
-         {"meandre_role_name":"Profile","meandre_role_uri":"http://www.meandre.org/accounting/property/role/Profile"}
-        ]
-    </pre>
-    <table class="response">
-        <tr class="response-header"><th>Blah</th><th>Blah</th><th>Blah</th><th>Blah</th></tr>
-        <tr><td>1</td><td>2</td><td>3</td><td>4</td></tr>
-        <tr><td>1</td><td>2</td><td>3</td><td>4</td></tr>
-        <tr><td>1</td><td>2</td><td>3</td><td>4</td></tr>
-        <tr><td>1</td><td>2</td><td>3</td><td>4</td></tr>
-        <tr><td>1</td><td>2</td><td>3</td><td>4</td></tr>
-    </table>
-
-</div>
-
-<div class="footer">
-    <p class="footer">&copy; DITA, NCSA, and UofI, 2007-2010.</p>
-    <p class="footer-date">Tue Feb 23 14:57:01 CST 2010</p>
-</div>
-
-</body>
-</html>
+        </ul>
+  </div>
+  """
+}

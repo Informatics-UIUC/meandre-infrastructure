@@ -1,7 +1,7 @@
 package meandre.kernel.specs
 
 import meandre.Implicits._
-import data.TestRepositories
+import data.SpecsRepositories
 import org.specs.Specification
 import meandre.kernel.Configuration
 import meandre.kernel.rdf.DescriptorsFactory
@@ -21,8 +21,8 @@ object StoreSpecs extends Specification {
 
   val cnf = Configuration()
   cnf.MEANDRE_DB_NAME = "Meandre_Test"
-  val flow      = DescriptorsFactory.buildFlowDescriptors(TestRepositories.testRepositoryModel).head
-  val component = DescriptorsFactory.buildComponentDescriptors(TestRepositories.testRepositoryModel).head
+  val flow      = DescriptorsFactory.buildFlowDescriptors(SpecsRepositories.testRepositoryModel).head
+  val component = DescriptorsFactory.buildComponentDescriptors(SpecsRepositories.testRepositoryModel).head
 
   def checkAllDefined[A] ( xs:List[Either[Throwable,List[Option[A]]]]) =
     xs.forall( x => x.isRight && x.right.get.forall(_.isDefined))
@@ -32,9 +32,9 @@ object StoreSpecs extends Specification {
     "be able to store flows and components without overwriting" in {
       val resName = List("ctx1.txt","ctx2.txt","ctx3.txt")
       val mimeType = List("text/plain","text/plain","text/plain")
-      val isCnt = List(new ByteArrayInputStream(TestRepositories.testRepositoryInTTL.getBytes),
-                       new ByteArrayInputStream(TestRepositories.testRepositoryInTTL.getBytes),
-                       new ByteArrayInputStream(TestRepositories.testRepositoryInTTL.getBytes))
+      val isCnt = List(new ByteArrayInputStream(SpecsRepositories.testRepositoryInTTL.getBytes),
+                       new ByteArrayInputStream(SpecsRepositories.testRepositoryInTTL.getBytes),
+                       new ByteArrayInputStream(SpecsRepositories.testRepositoryInTTL.getBytes))
       val store = Store(cnf,"test_user",false)
       store.removeAll
       val cnt = store.size
@@ -55,9 +55,9 @@ object StoreSpecs extends Specification {
     "be able to store flows and components overwriting" in {
       val resName = List("ctx1.txt","ctx2.txt","ctx3.txt")
       val mimeType = List("text/plain","text/plain","text/plain")
-      val isCnt = List(new ByteArrayInputStream(TestRepositories.testRepositoryInTTL.getBytes),
-                       new ByteArrayInputStream(TestRepositories.testRepositoryInTTL.getBytes),
-                       new ByteArrayInputStream(TestRepositories.testRepositoryInTTL.getBytes))
+      val isCnt = List(new ByteArrayInputStream(SpecsRepositories.testRepositoryInTTL.getBytes),
+                       new ByteArrayInputStream(SpecsRepositories.testRepositoryInTTL.getBytes),
+                       new ByteArrayInputStream(SpecsRepositories.testRepositoryInTTL.getBytes))
       val store = Store(cnf,"test_user",true)
       store.removeAll
       val cnt = store.size
@@ -78,7 +78,7 @@ object StoreSpecs extends Specification {
       val store = Store(cnf,"test_user",true)
       store.removeAll
       store.isEmpty must beTrue
-      val res = store.addElements(LocationElement(TestRepositories.testRemoteLocation))
+      val res = store.addElements(LocationElement(SpecsRepositories.testRemoteLocation))
       store.size must beEqualTo(14)
       store.removeAll
       store.isEmpty must beTrue
