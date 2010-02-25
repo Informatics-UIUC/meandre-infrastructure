@@ -203,6 +203,73 @@
 </div>
 <br/>
 <div class="response">
+    <!-- Simple document -->
+    <h3 class="response">Response status <span class="response-success">OK</span></h3>
+    
+    <table class="document">
+        <tr><td class="dockey">Hello</td><td class="docvalue">Potato</td></tr>
+        <tr><td class="dockey">Goodbye</td><td class="docvalue">Onion</td></tr>
+        <tr><td class="dockey">Some url comment</td><td class="docvalue">http://www.ibm.com/developerworks/library/x-scalaxml/</td></tr>
+        <tr><td class="dockey">Potato</td><td class="docvalue">Boy it is hot here!!!</td></tr>
+    </table>
+
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+
+    <h3 class="response">Response status <span class="response-partial">INCOMPLETE</span></h3>
+    <p class="response-partial">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi commodo dictum orci. Nullam feugiat ipsum vitae velit ultricies eget congue diam sodales. Nulla quis augue lectus, et consequat erat.</p>
+    <h3 class="response">Partially completed request payload</h3>
+    <!-- Nested document -->
+    <table class="document">
+        <tr><td class="dockey">Hello</td><td class="docvalue">Potato</td></tr>
+        <tr><td class="dockey">Goodbye</td><td class="docvalue">
+            <table class="document">
+                <tr><td class="dockey">Hello</td><td class="docvalue">Potato</td></tr>
+                <tr><td class="dockey">Goodbye</td><td class="docvalue">Onion</td></tr>
+                <tr><td class="dockey">Some url comment</td><td class="docvalue">http://www.ibm.com/developerworks/library/x-scalaxml/</td></tr>
+                <tr><td class="dockey">Potato</td><td class="docvalue">Boy it is hot here!!!</td></tr>
+            </table>
+        </td></tr>
+        <tr><td class="dockey">Some url comment</td><td class="docvalue">http://www.ibm.com/developerworks/library/x-scalaxml/</td></tr>
+        <tr><td class="dockey">Potato</td><td class="docvalue">Boy it is hot here!!!</td></tr>
+    </table>
+
+    <h3 class="response">Incomplete request payload</h3>
+    <table class="document">
+        <tr><td class="dockey">Hello</td><td class="docvalue">Potato</td></tr>
+        <tr><td class="dockey">Goodbye</td><td class="docvalue">Onion</td></tr>
+        <tr><td class="dockey">Some url comment</td><td class="docvalue">http://www.ibm.com/developerworks/library/x-scalaxml/</td></tr>
+        <tr><td class="dockey">Potato</td><td class="docvalue">Boy it is hot here!!!</td></tr>
+    </table>
+
+
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+
+    <h3 class="response">Response status <span class="response-fail">FAIL</span></h3>
+    <p class="response-fail">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi commodo dictum orci. Nullam feugiat ipsum vitae velit ultricies eget congue diam sodales. Nulla quis augue lectus, et consequat erat.</p>
+    <!-- Nested document -->
+    <h3 class="response">Failure payload</h3>
+    <table class="document">
+        <tr><td class="dockey">Hello</td><td class="docvalue">Potato</td></tr>
+        <tr><td class="dockey">Goodbye</td><td class="docvalue">Onion</td></tr>
+        <tr><td class="dockey">Some url comment</td><td class="docvalue">http://www.ibm.com/developerworks/library/x-scalaxml/</td></tr>
+        <tr><td class="dockey">Potato</td><td class="docvalue">Boy it is hot here!!!</td></tr>
+    </table>
+
+
+    <!--
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec arcu urna, mattis in tincidunt sit amet, facilisis eu lorem. Integer vitae mauris quis massa gravida hendrerit eu quis ante. Duis facilisis lobortis ligula ut gravida. Morbi pulvinar egestas ullamcorper. Fusce tincidunt venenatis dui sed accumsan. Integer aliquet venenatis ante, vestibulum lobortis est laoreet nec. Fusce dictum dui fermentum nulla fermentum faucibus. Sed et tortor sit amet risus convallis tempus. Donec ornare, elit lobortis elementum dapibus, dolor tortor posuere leo, sit amet faucibus magna elit nec nisi. Morbi non mauris quis purus pulvinar fermentum ac sed tortor. Nam sagittis quam quis tortor tristique bibendum in a risus. Aliquam erat volutpat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec pulvinar rhoncus nulla, vitae placerat massa porta id. Nulla turpis nisl, lobortis ac bibendum quis, mollis aliquet tellus. Duis non libero eros.</p>
     <pre>
         [
@@ -225,6 +292,7 @@
         <tr><td>1</td><td>2</td><td>3</td><td>4</td></tr>
         <tr><td>1</td><td>2</td><td>3</td><td>4</td></tr>
     </table>
+    -->
 
 </div>
 
