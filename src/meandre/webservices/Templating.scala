@@ -5,6 +5,7 @@ import xml.{Text, Elem}
 import com.mongodb.BasicDBObject
 import meandre.Implicits._
 import java.util.{ArrayList, Date}
+import meandre.kernel.Configuration
 
 /**
  * This class wraps a basic db object and adds template oriented
@@ -82,7 +83,78 @@ class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
 
     <meandre_response>{transformObject(self)}</meandre_response>
   }
-  
+
+  /** Converts the document into HTML
+   *
+   * @return The HTML string of the given object
+   */
+  def asHTML = {
+    val sbRes = new StringBuilder
+
+    def transformObject ( d:BasicDBObject ) : Elem = {
+      <table class="document">
+        {
+          for ( k <- d.keySet.iterator )
+            yield <tr><td class="dockey">{k}</td><td class="docvalue">
+                  { d.get(k) match {
+                     // The value is an object
+                     case t:BasicDBObject => transformObject(t)
+                     // The value is not a list
+                     case a:ArrayList[Object] => {transformArray(a)}
+                     // The value is just a terminal
+                     case t => Text(t.toString)
+                    }
+                  }
+                  </td></tr>
+        }
+      </table>
+    }
+
+    def transformArray ( a:ArrayList[Object] ) : Any =
+      for ( i<-List.range(0,a.size) )
+        yield <ul>{a.get(i) match {
+          // The element is an object
+          case t:BasicDBObject => <li>{transformObject(t)}</li>
+          // The element is another list
+          case a:ArrayList[Object] => <li>{transformArray(a)}</li>
+          // Basic type
+          case t => <li>{Text(t.toString)}</li>
+        }}</ul>
+
+
+    def transformDocument( d:BasicDBObject ) = d.get("status") match {
+      
+      // The document respesents a successful request
+      case "OK" => sbRes.append(<h3 class="response">Response status <span class="response-success">FAIL</span></h3>)
+                   sbRes.append(transformObject(d.get("success").asInstanceOf[BasicDBObject]))
+
+      // The document represents an incomplete response
+      case "INCOMPLETE" => sbRes.append(<h3 class="response">Response status <span class="response-incomplete">INCOMPLETE</span></h3>)
+                           sbRes.append(<p class="response-incomplete">{d.getString("message")}</p>)
+                           sbRes.append(<h3 class="response">Partially completed request payload</h3>)
+                           sbRes.append(transformObject(d.get("success").asInstanceOf[BasicDBObject]))
+                           sbRes.append(<h3 class="response">Incomplete request payload</h3>)
+                           sbRes.append(transformObject(d.get("failure").asInstanceOf[BasicDBObject]))
+
+      // Document represents a failure response
+      case "FAIL" => sbRes.append(<h3 class="response">Response status <span class="response-fail">FAIL</span></h3>)
+                     sbRes.append(<p class="response-fail">{d.getString("message")}</p>)
+                     sbRes.append(transformObject(d.get("failure").asInstanceOf[BasicDBObject]))
+
+      // Unknown document
+      case null => sbRes.append(<h3 class="response">Response status <span class="response-fail">FAIL</span></h3>)
+                   sbRes.append(<p class="response-fail">Unknown response document! Missing "status" field!</p>)
+                   sbRes.append(transformObject(d))
+    }
+
+    // Extract and set basic variables
+    val title    = if (self.containsKey("title")) self.getString("title") else "Meandre Infrastructure "+Configuration.INFRASTRUCTURE_VERSION
+    val prefix   = "/" // Hardcoded for now TODO: Is there a better way than hard coding it without losing beauty
+    // Transform the response
+    transformDocument(self)
+    // Generate the html
+    Templating.html(title,prefix,sbRes.toString)
+  }
 }
 
 /**
@@ -115,17 +187,18 @@ object Templating {
 
 
   def html ( title:String, pathPrefix:String, response:String ) =
-    "<html>"+
-     htmlHeader(title,pathPrefix)+
-    "<body>"+
-     htmlMenu +
-    """<br/>
-       <div class="response">"""+
-       response +
-    """</div>"""+
-     htmlFooter +
-    """</body>
-     </html>"""
+    new StringBuffer ("<html>")
+      .append(htmlHeader(title,pathPrefix))
+      .append("<body>")
+      .append(htmlMenu )
+      .append("""<br/>
+                 <div class="response">""")
+      .append(response)
+      .append("""</div>""")
+      .append(htmlFooter)
+      .append("""</body>
+                 </html>""")
+      .toString
 
   /** The html header section */
   def htmlHeader ( title:String, pathPrefix:String ) = """

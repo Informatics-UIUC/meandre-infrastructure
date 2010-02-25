@@ -30,6 +30,10 @@ class Configuration (val host:String, val port:Int, val auth:Option[(String,Stri
  */
 object Configuration {
 
+  /** The infrastructure version */
+  val INFRASTRUCTURE_VERSION = "1.5.0-vcli-alpha"
+
+  /** A default configuration */
   private val cnf = new Configuration("localhost",27017,None)
 
   /**Returns the default infrastructure object

@@ -52,11 +52,11 @@ p.response-success {
     font-weight: bold;
 }
 
-span.response-partial {
+span.response-incomplete {
     color: orange;
 }
 
-p.response-partial {
+p.response-incomplete {
     padding: 6px;
     padding-top: 0px;
     color: orange;

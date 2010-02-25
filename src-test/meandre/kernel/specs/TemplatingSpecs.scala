@@ -1,6 +1,6 @@
 package meandre.kernel.specs
 
-import data.SpecsData
+import meandre.kernel.specs.data.SpecsData
 import org.specs.Specification
 import com.mongodb.BasicDBObject
 import java.io.{PrintWriter, ByteArrayOutputStream}
