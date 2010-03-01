@@ -1,15 +1,15 @@
-package meandre
+package meandre.kernel
 
 import com.mongodb.util.JSON
 import com.hp.hpl.jena.rdf.model.{Resource, ModelFactory, Model}
 import java.text.SimpleDateFormat
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
 import com.hp.hpl.jena.vocabulary._
-import kernel.rdf._
-import meandre.kernel.rdf.{MeandreRepositoryVocabulary=>MRV}
 import com.mongodb.{BasicDBList, BasicDBObject}
 import collection.jcl.MutableIterator.Wrapper
 import java.io.ByteArrayOutputStream
+import rdf._
+import meandre.kernel.rdf.{MeandreRepositoryVocabulary=>MRV}
 
 /**
  * A collection of implicit conversion methods

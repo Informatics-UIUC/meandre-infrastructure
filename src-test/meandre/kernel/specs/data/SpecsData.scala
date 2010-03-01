@@ -1,6 +1,6 @@
 package meandre.kernel.specs.data
 
-import meandre.Implicits._
+import meandre.kernel.Implicits._
 import meandre.webservices._
 import meandre.webservices.Templating._
 import com.mongodb._
@@ -15,7 +15,7 @@ import com.mongodb._
 
 object SpecsData {
 
-  val heterogeneousResponse:BasicDBObject = """
+  def heterogeneousResponse:BasicDBObject = """
        {
          "hello":"world",
          "vegies": ["french","fries","ketchup"],

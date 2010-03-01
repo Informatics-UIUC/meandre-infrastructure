@@ -1,7 +1,7 @@
 package meandre.kernel.state
 
 import meandre.kernel.Configuration
-import meandre.kernel.Tools.safeOp
+import meandre.Tools.safeOp
 import com.mongodb.gridfs.GridFS
 import java.io.{OutputStream, InputStream}
 import collection.jcl.{Buffer, IterableWrapper, CollectionWrapper}

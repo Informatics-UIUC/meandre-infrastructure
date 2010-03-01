@@ -1,15 +1,15 @@
 package meandre.kernel.state
 
 import meandre.kernel.Configuration
-import meandre.kernel.Tools.zip3
+import meandre.Tools.zip3
 import com.mongodb.Mongo
 import java.io.InputStream
 import meandre.state.Repository
-import meandre.Implicits._
+import meandre.kernel.Implicits._
 import meandre.kernel.rdf._
 import java.net.URL
 import com.hp.hpl.jena.rdf.model.ModelFactory
-import meandre.kernel.Tools.getInputStreamForURL
+import meandre.Tools.getInputStreamForURL
 
 /**A base case class for all addable elements to the store */
 abstract sealed case class Element()

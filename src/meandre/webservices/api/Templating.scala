@@ -3,9 +3,10 @@ package meandre.webservices
 import java.io.PrintWriter
 import xml.{Text, Elem}
 import com.mongodb.BasicDBObject
-import meandre.Implicits._
+import meandre.kernel.Implicits._
 import java.util.{ArrayList, Date}
 import meandre.kernel.Configuration
+import javax.servlet.http.HttpServletResponse
 
 /**
  * This class wraps a basic db object and adds template oriented
@@ -18,16 +19,43 @@ import meandre.kernel.Configuration
 
 class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
 
-  /**Given a response document, it formats it according to the provided
+
+  /** Given a response document, it formats it according to the provided
    * format.
    *
    * @param format The target format
-   * @param writer The basic object containing the response to format
+   * @param response The response target
+   */
+  def formatToResponse ( format:String, response:HttpServletResponse ) : RichBasicDBObject = format match {
+    case "json" => response.setContentType("application/json") ; response.getWriter.println(asJSON) ; this
+    case "xml"  => response.setContentType("application/xml")  ; response.getWriter.println(asXML)  ; this
+    case "html" => response.setContentType("text/html")        ; response.getWriter.println(asHTML) ; this
+    case _      => response.setContentType("text/plain")       ; response.getWriter.println(self)   ; this
+  }
+
+
+  /** Curried version of the format to response function */
+  protected val cResFormat = Function.curried(formatToResponse _)
+
+  /** Converts to json */
+  val reponseAsJSONTo = cResFormat("json")
+
+  /** Converts to xml */
+  val reponseAsXMLTo  = cResFormat("xml")
+
+  /** Converts to html */
+  val reponseAsHTMLTo = cResFormat("html")
+
+  /** Given a response document, it formats it according to the provided
+   * format.
+   *
+   * @param format The target format
+   * @param response The basic object containing the response to format
    */
   def format ( format:String, writer:PrintWriter ) : RichBasicDBObject = format match {
     case "json" => writer.println(asJSON) ; this
     case "xml"  => writer.println(asXML)  ; this
-    case "html" => writer.println("html") ; this
+    case "html" => writer.println(asHTML) ; this
     case _      => writer.println(self)   ; this
   }
 
@@ -125,21 +153,21 @@ class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
     def transformDocument( d:BasicDBObject ) = d.get("status") match {
       
       // The document respesents a successful request
-      case "OK" => sbRes.append(<h3 class="response">Response status <span class="response-success">FAIL</span></h3>)
-                   sbRes.append(transformObject(d.get("success").asInstanceOf[BasicDBObject]))
+      case "OK" => sbRes.append(<h3 class="response">Response status <span class="response-success">OK</span></h3>)
+                   if (d.containsField("success")) sbRes.append(transformObject(d.get("success").asInstanceOf[BasicDBObject]))
 
       // The document represents an incomplete response
       case "INCOMPLETE" => sbRes.append(<h3 class="response">Response status <span class="response-incomplete">INCOMPLETE</span></h3>)
-                           sbRes.append(<p class="response-incomplete">{d.getString("message")}</p>)
+                           sbRes.append(<p class="response-incomplete">{if (d.containsField("message")) d.getString("message") else "No message provided"}</p>)
                            sbRes.append(<h3 class="response">Partially completed request payload</h3>)
-                           sbRes.append(transformObject(d.get("success").asInstanceOf[BasicDBObject]))
+                           if (d.containsField("success"))sbRes.append(transformObject(d.get("success").asInstanceOf[BasicDBObject]))
                            sbRes.append(<h3 class="response">Incomplete request payload</h3>)
-                           sbRes.append(transformObject(d.get("failure").asInstanceOf[BasicDBObject]))
+                           if (d.containsField("failure"))sbRes.append(transformObject(d.get("failure").asInstanceOf[BasicDBObject]))
 
       // Document represents a failure response
       case "FAIL" => sbRes.append(<h3 class="response">Response status <span class="response-fail">FAIL</span></h3>)
-                     sbRes.append(<p class="response-fail">{d.getString("message")}</p>)
-                     sbRes.append(transformObject(d.get("failure").asInstanceOf[BasicDBObject]))
+                     sbRes.append(<p class="response-fail">{if (d.containsField("message")) d.getString("message") else "No message provided"}</p>)
+                     if (d.containsField("failure")) sbRes.append(transformObject(d.get("failure").asInstanceOf[BasicDBObject]))
 
       // Unknown document
       case null => sbRes.append(<h3 class="response">Response status <span class="response-fail">FAIL</span></h3>)
@@ -204,7 +232,7 @@ object Templating {
   def htmlHeader ( title:String, pathPrefix:String ) = """
     <head>
       <title>MI - """+title+"""</title>
-      <link rel="stylesheet" type="text/css" href="""+'"'+pathPrefix+"""style.css"> 
+      <link rel="stylesheet" type="text/css" href="""+'"'+pathPrefix+"""style.css" /> 
     </head>
   """
 

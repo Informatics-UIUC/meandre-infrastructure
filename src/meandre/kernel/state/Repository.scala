@@ -1,6 +1,6 @@
 package meandre.state
 
-import meandre.Implicits._
+import meandre.kernel.Implicits._
 import meandre.kernel.Configuration
 import meandre.kernel.rdf._
 import com.mongodb.{DBObject, BasicDBList, BasicDBObject, Mongo}

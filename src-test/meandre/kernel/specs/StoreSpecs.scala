@@ -1,6 +1,6 @@
 package meandre.kernel.specs
 
-import meandre.Implicits._
+import meandre.kernel.Implicits._
 import data.SpecsRepositories
 import org.specs.Specification
 import meandre.kernel.Configuration
@@ -17,7 +17,7 @@ import meandre.kernel.state.{LocationElement, BundledElement, Store}
  * 
  */
 
-object StoreSpecs extends Specification {
+object StoreSpecs extends Specification("The store specification") {
 
   val cnf = Configuration()
   cnf.MEANDRE_DB_NAME = "Meandre_Test"

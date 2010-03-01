@@ -1,7 +1,7 @@
-package meandre.kernel
+package meandre
 
-import rdf.Descriptor
-import meandre.Implicits._
+import kernel.rdf.Descriptor
+import meandre.kernel.Implicits._
 import java.util.Date
 import java.net.URL
 

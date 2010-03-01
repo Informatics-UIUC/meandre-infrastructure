@@ -14,7 +14,7 @@ import meandre.kernel.rdf.{FlowDescriptor, ComponentDescriptor, Descriptor, Desc
  *
  */
 
-object RepositorySpecs extends Specification {
+object RepositorySpecs extends Specification("The repository specification") {
   val cnf = Configuration()
   cnf.MEANDRE_DB_NAME = "Meandre_Test"
 

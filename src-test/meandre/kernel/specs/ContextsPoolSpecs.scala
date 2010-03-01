@@ -15,7 +15,7 @@ import java.io.ByteArrayOutputStream
  * 
  */
 
-object ContextsPoolSpecs extends Specification {
+object ContextsPoolSpecs extends Specification("The context pool specification") {
   val cnf = Configuration()
   cnf.MEANDRE_DB_NAME = "Meandre_Test"
   val cp = new ContextsPool(cnf)

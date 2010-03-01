@@ -6,7 +6,7 @@ import java.io.File
 import org.specs._
 import meandre.kernel.rdf.{FlowDescriptor, ComponentDescriptor, Descriptor, DescriptorsFactory}
 
-object RDFSpecs extends Specification {
+object RDFSpecs extends Specification("The RDF tools specification") {
 
   val model = SpecsRepositories.testRepositoryModel
 
