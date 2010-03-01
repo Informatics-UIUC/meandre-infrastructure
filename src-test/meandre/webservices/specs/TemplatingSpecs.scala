@@ -21,8 +21,8 @@ object TemplatingSpecs extends Specification("The templating specification") {
 
   /**Simple aux function that serializes to text.
    *
-   * @param format The format to serialize to
-   * @param bdbo The basic object to serialize
+   * @param format The format to serializeTo to
+   * @param bdbo The basic object to serializeTo
    * @return The string containing the serialized object
    */
   protected def serialize ( format:String, bdbo:BasicDBObject ) = {
@@ -43,7 +43,7 @@ object TemplatingSpecs extends Specification("The templating specification") {
 
   "XML templating" should {
 
-    "be able to serialize heterogeneous objects" in {
+    "be able to serializeTo heterogeneous objects" in {
       val response   = SpecsData.heterogeneousResponse
       val serialized = serialize("xml",response)
       serialized.length must beEqualTo(1027)
@@ -60,7 +60,7 @@ object TemplatingSpecs extends Specification("The templating specification") {
 
   "HTML templating" should {
 
-    "be able to serialize successful reponse objects" in {
+    "be able to serializeTo successful reponse objects" in {
       val response:BasicDBObject = """{"status":"OK"}"""
       response.put("success",SpecsData.heterogeneousResponse)
       val serialized = serialize("html",response)
@@ -71,7 +71,7 @@ object TemplatingSpecs extends Specification("The templating specification") {
     }
 
 
-    "be able to serialize failure reponse objects" in {
+    "be able to serializeTo failure reponse objects" in {
       val response:BasicDBObject = """{"status":"INCOMPLETE"}"""
       response.put("message","Wow couldn't do it all!!!")
       response.put("success",SpecsData.heterogeneousResponse)
@@ -87,7 +87,7 @@ object TemplatingSpecs extends Specification("The templating specification") {
     }
 
 
-    "be able to serialize partial reponse objects" in {
+    "be able to serializeTo partial reponse objects" in {
       val response:BasicDBObject = """{"status":"INCOMPLETE"}"""
       response.put("message","Failed misserably")
       response.put("failure",SpecsData.heterogeneousResponse)

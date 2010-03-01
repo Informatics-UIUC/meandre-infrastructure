@@ -40,7 +40,7 @@ class MeandreInfrastructureAPISpecs extends Specification("The Meandre Infrastru
 
   "Ping services " should {
 
-    "return pong in" in {
+    "return pong" in {
        client.ping match {
          case Right((200,pong)) => val json:BasicDBObject = pong
                                    pong.getString("status")  must beEqualTo("OK")

@@ -22,18 +22,46 @@ class MeandreInfrastructureAPI extends CrochetServlet {
   /**Sets the response type for the given response
    *
    * @param format The format to set up on the content type response
-   * @param response The reponse object to set up
    */
-  private def setResponseType (format:String, response:HttpServletResponse) = format match {
-    case "json" => response setContentType "application/json"
-    case "xml"  => response setContentType "application/xml"
-    case "html" => response setContentType "text/html"
+  protected def canonicalResponseType = elements(0) match {
+    case "json" => "application/json"
+    case "xml"  => "application/xml"
+    case "html" => "text/html"
+    case _      => "text/plain"
   }
 
-  get("""/public/services/ping.(json|xml|html)""".r) {
-    val format = elements(0)
-    val res:BasicDBObject = """{"status":"OK","message":"pong"}"""
-    res.formatToResponse(format,response)
+  /** The guard is set to always return true.
+   *
+   * @return true always
+   */
+  protected def tautologyGuard = true
+
+  /**The method is designed as public, since authentication always returns true.
+   *
+   * @param path The path to authorize
+   * @param user The user to authenticate
+   * @return true always
+   */
+  protected def public (path:String,user:Option[String]):Boolean = true
+
+  //
+  // The basic welcome message
+  //
+  get("/") {
+    val res:BasicDBObject = """
+      {
+        "status":"OK",
+        "success":{"Welcome":"You have reach the HTML interface for the Meandre Infrastructure"}
+      }"""
+    res serializeTo "html"
+  }
+
+  //
+  // The well known ping
+  //
+  get("""/public/services/ping.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    val res:BasicDBObject = """{"status":"OK","success":{"message":"pong"}}"""
+    res serializeTo elements(0)
   }
 
 

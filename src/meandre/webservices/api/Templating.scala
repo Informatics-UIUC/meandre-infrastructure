@@ -20,17 +20,18 @@ import javax.servlet.http.HttpServletResponse
 class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
 
 
+
   /** Given a response document, it formats it according to the provided
    * format.
    *
    * @param format The target format
    * @param response The response target
    */
-  def formatToResponse ( format:String, response:HttpServletResponse ) : RichBasicDBObject = format match {
-    case "json" => response.setContentType("application/json") ; response.getWriter.println(asJSON) ; this
-    case "xml"  => response.setContentType("application/xml")  ; response.getWriter.println(asXML)  ; this
-    case "html" => response.setContentType("text/html")        ; response.getWriter.println(asHTML) ; this
-    case _      => response.setContentType("text/plain")       ; response.getWriter.println(self)   ; this
+  def formatToResponse ( format:String, response:HttpServletResponse ) = format match {
+    case "json" => response.setContentType("application/json") ; response.getWriter.println(asJSON)
+    case "xml"  => response.setContentType("application/xml")  ; response.getWriter.println(asXML)
+    case "html" => response.setContentType("text/html")        ; response.getWriter.println(asHTML)
+    case _      => response.setContentType("text/plain")       ; response.getWriter.println(self)   
   }
 
 
@@ -70,6 +71,21 @@ class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
 
   /** Converts to html */
   val asHTMLTo = cFormat("html")
+
+
+  /** Given a response document, it formats it according to the provided
+   * format.
+   *
+   * @param format The target format
+   * @param response The basic object containing the response to format
+   */
+  def serializeTo ( format:String ) : String = format match {
+    case "json" => asJSON.toString
+    case "xml"  => asXML.toString
+    case "html" => asHTML.toString
+    case _      => asJSON.toString
+  }
+
 
   /** Converts the document into a JSON string
     *
@@ -218,7 +234,7 @@ object Templating {
     new StringBuffer ("<html>")
       .append(htmlHeader(title,pathPrefix))
       .append("<body>")
-      .append(htmlMenu )
+      .append(htmlMenu(pathPrefix) )
       .append("""<br/>
                  <div class="response">""")
       .append(response)
@@ -232,7 +248,7 @@ object Templating {
   def htmlHeader ( title:String, pathPrefix:String ) = """
     <head>
       <title>MI - """+title+"""</title>
-      <link rel="stylesheet" type="text/css" href="""+'"'+pathPrefix+"""style.css" /> 
+      <link rel="stylesheet" type="text/css" href="""+'"'+pathPrefix+"""static/style.css" /> 
     </head>
   """
 
@@ -245,12 +261,12 @@ object Templating {
   """
 
   /** The HTML menu */
-  val htmlMenu = """
+  def htmlMenu (pathPrefix:String ) = """
     <div class="header">
     <p class="header-info">anonymous@dev-demo.seasr.org:1714</p>
 
     <ul class="pureCssMenu pureCssMenum">
-        <li class="pureCssMenui"><a class="pureCssMenui" href="http://seasr.org/meandre">Meandre</a></li>
+        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+pathPrefix+'"'+""">Meandre</a></li>
 
         <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Repository</span><![if gt IE 6]></a><![endif]>
             <!--[if lte IE 6]>
@@ -428,6 +444,7 @@ object Templating {
                 <tr>
                     <td><![endif]-->
             <ul class="pureCssMenum">
+                <li class="pureCssMenui"><a class="pureCssMenui" href="http://seasr.org/meandre/">Meandre web site</a></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="http://seasr.org/meandre/documentation/">Documentation</a></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="http://dev-tools.seasr.org/confluence/display/MDR/Welcome">Development wiki</a></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="http://dev-tools.seasr.org/confluence/display/COOK/Quick+recipes+to+make+Meandre+Pies">Cookbook</a></li>

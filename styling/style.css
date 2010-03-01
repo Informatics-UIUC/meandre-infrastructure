@@ -90,7 +90,7 @@ td.dockey {
     border-right: 0 none;
     border: 0 none;
     font-weight: bold;
-    font-size: 1em;
+    font-size: 11px;
     color: black;
     padding: 3px;
 }
@@ -100,7 +100,7 @@ td.docvalue {
     height: 11px;
     border: 0 none;
     font-weight: lighter;
-    font-size: 1em;
+    font-size: 11px;
     color: black;
     padding: 3px;
 }
