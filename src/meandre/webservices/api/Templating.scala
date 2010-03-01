@@ -435,7 +435,14 @@ object Templating {
 
             </ul>
 
-
+        <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Public</span><![if gt IE 6]></a><![endif]>
+            <!--[if lte IE 6]>
+            <table>
+                <tr>
+                    <td><![endif]-->
+            <ul class="pureCssMenum">
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+pathPrefix+"""public/services/ping.html">Ping</a></li>
+            </ul>
 
 
         <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Help</span><![if gt IE 6]></a><![endif]>
