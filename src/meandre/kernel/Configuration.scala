@@ -9,6 +9,8 @@ package meandre.kernel
  */
 class Configuration (val host:String, val port:Int, val auth:Option[(String,String)]) {
 
+  val MEANDRE_REALM_COLLECTION = "meandre.realm"
+  
   val MEANDRE_USER_COLLECTION_PREFIX = "meandre.user."
 
   val MEANDRE_CONTEXT_FS_COLLECTION = "meandre.context.fs"

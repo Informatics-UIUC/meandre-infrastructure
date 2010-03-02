@@ -1,4 +1,4 @@
-package meandre.webservices
+package meandre.webservices.api
 
 import java.io.PrintWriter
 import xml.{Text, Elem}

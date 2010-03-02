@@ -6,7 +6,7 @@ import org.specs.Specification
 import com.mongodb.BasicDBObject
 import java.io.{PrintWriter, ByteArrayOutputStream}
 import meandre.webservices._
-import meandre.webservices.Templating._
+import meandre.webservices.api.Templating._
 import xml.{Elem, XML}
 
 /**

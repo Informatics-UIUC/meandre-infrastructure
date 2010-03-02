@@ -1,11 +1,12 @@
 package meandre.webservices.specs
 
 import org.specs.Specification
-import meandre.webservices.MeandreInfrastructureAPI
 import crochet.CrochetServer
 import meandre.webservices.client.MeandreInfrastructureAPIClient
 import meandre.kernel.Implicits._
 import com.mongodb.BasicDBObject
+import meandre.webservices.api.MeandreInfrastructurePublicAPI
+import meandre.kernel.Configuration
 
 /**
  * The basic specs for the Meandre Infrastructure APIs
@@ -17,7 +18,7 @@ import com.mongodb.BasicDBObject
 
 class MeandreInfrastructureAPISpecs extends Specification("The Meandre Infrastructure specification") {
   val TEST_SERVER_PORT = 6969
-  val api = new MeandreInfrastructureAPI()
+  val api = new MeandreInfrastructurePublicAPI(Configuration())
   val client = MeandreInfrastructureAPIClient("http", "localhost", TEST_SERVER_PORT)
   var server: CrochetServer = null
 

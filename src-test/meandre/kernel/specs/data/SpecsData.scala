@@ -2,7 +2,7 @@ package meandre.kernel.specs.data
 
 import meandre.kernel.Implicits._
 import meandre.webservices._
-import meandre.webservices.Templating._
+import meandre.webservices.api.Templating._
 import com.mongodb._
 
 /**
