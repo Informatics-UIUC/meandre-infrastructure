@@ -6,7 +6,11 @@ import java.io.File
 import meandre.kernel.Configuration
 import org.mortbay.jetty.servlet.{ServletHolder, DefaultServlet, Context}
 import meandre.webservices.realm.MongoDBRealm
-import org.mortbay.jetty.security.{HashUserRealm, SecurityHandler, ConstraintMapping, Constraint}
+import org.mortbay.jetty.security.{SecurityHandler, ConstraintMapping, Constraint}
+import snare.Snare
+import com.mongodb.BasicDBObject
+import snare.ui.WebMonitor
+import meandre.kernel.Implicits._
 
 /**
  * The Meandre server class
@@ -20,6 +24,28 @@ class MeandreServer(val cnf:Configuration, val port: Int, val prefix: String, va
   // The main server
   //
   protected val server = new Server(port)
+
+  //
+  // The server Snare monitor
+  //
+  protected val snareMon = Snare(
+    cnf.MEANDRE_CLUSTER_POOL + "@" + port,
+    cnf.MEANDRE_CLUSTER_POOL,
+    """{"server": {
+          "port":"""+port+""",
+          "prefix":"""+'"'+prefix+'"'+""",
+          "static":"""+'"'+staticFolder+'"'+""",
+          "resources":"""+'"'+staticFolder+'"'+"""
+        },
+        "mongodb": {
+          "port":"""+cnf.port+""",
+          "host":"""+'"'+cnf.host+'"'+"""
+        }
+    }""",
+    cnf.host,
+    cnf.port,
+    monitorCallback)
+
 
   //
   // The bounded thread pool
@@ -82,6 +108,12 @@ class MeandreServer(val cnf:Configuration, val port: Int, val prefix: String, va
   contextWS.addServlet(new ServletHolder(new MeandreInfrastructurePublicAPI(cnf)), prefix+"/public/services/*")
 
   //
+  // Add the snare web monitor
+  //
+  // TODO Add the servlet
+  contextWS.addServlet(new ServletHolder(WebMonitor(prefix+"/services",cnf.MEANDRE_CLUSTER_POOL)), prefix+"/services/snare/*")
+
+  //
   // Add the services that require registration
   //
   contextWS.addServlet(new ServletHolder(new MeandreInfrastructurePrivateAPI(cnf)), prefix+"/services/*")
@@ -90,23 +122,21 @@ class MeandreServer(val cnf:Configuration, val port: Int, val prefix: String, va
   // Add the basic welcome page
   //
   contextWS.addServlet(new ServletHolder(new MeandreInfrastructureRootAPI(cnf)), prefix+"/*")
-
-  //
-  // Add the basic default error handler
-  //
-  contextWS.setErrorHandler(new MeandreDefaultErrorHandler)
-
-  //
-  // TODO Add the Snare registration and activation code here
-  //
-
   //
   // Basic methods to manage the server
   //
-  def start = server.start
-  def  stop = server.stop
+  def start = { snareMon.activity = true ; server.start }
+  def  stop = { snareMon.activity = false ;server.stop }
   def  join = server.join
-  def    go = { server.start; server.join }
+  def    go = { start; server.join }
+
+  //
+  // The Snare monitor callback function
+  //
+  def monitorCallback ( msg:BasicDBObject ) = {
+    println(msg);
+    true
+  }
 }
 
 /**
@@ -128,10 +158,10 @@ object MeandreServer {
   val MINIMUM_NUMBER_OF_JETTY_THREADS = 6;
 
   /** The default static folder */
-  val STATIC_FOLDER = new File(".").getCanonicalFile+File.separator+"static"
+  val STATIC_FOLDER = new File(".").getCanonicalPath+File.separator+"static"
 
   /** The default public folder */
-  val PUBLIC_RESOURCE_FOLDER = new File(".").getCanonicalFile+File.separator+"public"
+  val PUBLIC_RESOURCE_FOLDER = new File(".").getCanonicalPath+File.separator+"public"
 
   /** A default configuration */
   val DEFAULT_CONFIGURATION = Configuration()

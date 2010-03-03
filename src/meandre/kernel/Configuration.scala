@@ -20,6 +20,8 @@ class Configuration (val host:String, val port:Int, val auth:Option[(String,Stri
   def MEANDRE_DB_NAME = MDBN
   def MEANDRE_DB_NAME_= (name:String) = MDBN=name
 
+  val MEANDRE_CLUSTER_POOL = "MeandreInf"
+
 }
 
 /**

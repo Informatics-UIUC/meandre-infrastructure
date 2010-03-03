@@ -399,8 +399,8 @@ object Templating {
                             <td><![endif]-->
                     <ul class="pureCssMenum">
                         <li class="pureCssMenui"><a class="pureCssMenui" href="#">Log</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Status</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Information</a></li>
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/snare/MeandreInf/heartbeat")+'"'+""" target="_blank">Status</a></li>
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/snare/MeandreInf/info")+'"'+""" target="_blank">Information</a></li>
                         <li class="pureCssMenui"><a class="pureCssMenui" href="#">Properties</a></li>
                         <li class="pureCssMenui"><a class="pureCssMenui" href="#">Shutdown server</a></li>
                     </ul>
