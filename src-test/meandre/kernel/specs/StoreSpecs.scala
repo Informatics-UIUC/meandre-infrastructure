@@ -78,7 +78,7 @@ object StoreSpecs extends Specification("The store specification") {
       val store = Store(cnf,"test_user",true)
       store.removeAll
       store.isEmpty must beTrue
-      val res = store.addElements(LocationElement(SpecsRepositories.testRemoteLocation))
+      val res = store.addElements(LocationElement(SpecsRepositories.testRemoteLocation,"Test location"))
       store.size must beEqualTo(14)
       store.removeAll
       store.isEmpty must beTrue

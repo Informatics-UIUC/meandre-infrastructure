@@ -19,6 +19,10 @@ import org.mortbay.jetty.{MimeTypes, HttpConnection}
 
 class MeandreInfrastructureAbstractAPI extends CrochetServlet {
 
+  protected val REQUEST_FAIL = "FAIL"
+  protected val REQUEST_OK = "OK"
+  protected val REQUEST_INCOMPLETE = "INCOMPLETE"
+  
   /**Sets the response type for the given response
    *
    * @param format The format to set up on the content type response
@@ -49,10 +53,10 @@ class MeandreInfrastructureAbstractAPI extends CrochetServlet {
    *
    * @param request The request that generated the error
    */
-  def formatStackTrace(request: HttpServletRequest) = {
+  def formatStackTrace(thOrig:Throwable) = {
     val sw = new StringWriter()
     val pw = new PrintWriter(sw)
-    var t = request.getAttribute("javax.servlet.error.exception").asInstanceOf[Throwable]
+    var t = thOrig
 
     while (t != null) {
       t printStackTrace pw
@@ -108,7 +112,7 @@ class MeandreInfrastructureAbstractAPI extends CrochetServlet {
                                    response: HttpServletResponse, e: Throwable) = {
     handle(path, request, response,
       HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-      "Internal server error processing " + path, formatStackTrace(request))
+      "Internal server error processing " + path, formatStackTrace(e))
   }
 
 

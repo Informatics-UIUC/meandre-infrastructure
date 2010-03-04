@@ -77,7 +77,8 @@ p.response-fail {
 table.document {
     border-collapse: collapse;
     /*width:99%;*/
-    margin:5px;
+    margin-left:0px;
+    margin-right:0px;
     margin-bottom:10px;
     padding-bottom:0px;
 }

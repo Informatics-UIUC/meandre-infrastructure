@@ -23,7 +23,7 @@ class MeandreInfrastructurePublicAPI(cnf:Configuration) extends MeandreInfrastru
   //
   // The well known ping
   //
-  get("""/public/services/ping.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+  get("""/public/services/ping\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
     val res:BasicDBObject = """{
          "status":"OK",
          "success":{"message":"pong"}

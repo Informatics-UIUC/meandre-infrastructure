@@ -2,11 +2,11 @@ package meandre.webservices.api
 
 import java.io.PrintWriter
 import xml.{Text, Elem}
-import com.mongodb.BasicDBObject
 import meandre.kernel.Implicits._
 import java.util.{ArrayList, Date}
 import meandre.kernel.Configuration
 import javax.servlet.http.HttpServletResponse
+import com.mongodb.{BasicDBList, BasicDBObject}
 
 /**
  * This class wraps a basic db object and adds template oriented
@@ -165,30 +165,37 @@ class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
           case t => <li>{Text(t.toString)}</li>
         }}</ul>
 
+    def transformObjectOrArray ( a:Any ) = a match {
+      case a:BasicDBList       => transformArray(a)
+      case a:ArrayList[Object] => transformArray(a)
+      case o:BasicDBObject     => transformObject(o)
+      case u => u.toString
+    }
+
 
     def transformDocument( d:BasicDBObject ) = d.get("status") match {
       
       // The document respesents a successful request
       case "OK" => sbRes.append(<h3 class="response">Response status <span class="response-success">OK</span></h3>)
-                   if (d.containsField("success")) sbRes.append(transformObject(d.get("success").asInstanceOf[BasicDBObject]))
+                   if (d.containsField("success")) sbRes.append(transformObjectOrArray(d.get("success")))
 
       // The document represents an incomplete response
       case "INCOMPLETE" => sbRes.append(<h3 class="response">Response status <span class="response-incomplete">INCOMPLETE</span></h3>)
                            sbRes.append(<p class="response-incomplete">{if (d.containsField("message")) d.getString("message") else "No message provided"}</p>)
                            sbRes.append(<h3 class="response">Partially completed request payload</h3>)
-                           if (d.containsField("success"))sbRes.append(transformObject(d.get("success").asInstanceOf[BasicDBObject]))
+                           if (d.containsField("success"))sbRes.append(transformObjectOrArray(d.get("success")))
                            sbRes.append(<h3 class="response">Incomplete request payload</h3>)
-                           if (d.containsField("failure"))sbRes.append(transformObject(d.get("failure").asInstanceOf[BasicDBObject]))
+                           if (d.containsField("failure"))sbRes.append(transformObjectOrArray(d.get("failure")))
 
       // Document represents a failure response
       case "FAIL" => sbRes.append(<h3 class="response">Response status <span class="response-fail">FAIL</span></h3>)
                      sbRes.append(<p class="response-fail">{if (d.containsField("message")) d.getString("message") else "No message provided"}</p>)
-                     if (d.containsField("failure")) sbRes.append(transformObject(d.get("failure").asInstanceOf[BasicDBObject]))
+                     if (d.containsField("failure")) sbRes.append(transformObjectOrArray(d.get("failure")))
 
       // Unknown document
       case null => sbRes.append(<h3 class="response">Response status <span class="response-fail">FAIL</span></h3>)
                    sbRes.append(<p class="response-fail">Unknown response document! Missing "status" field!</p>)
-                   sbRes.append(transformObject(d))
+                   sbRes.append(transformObjectOrArray(d))
     }
 
     // Extract and set basic variables
@@ -280,8 +287,8 @@ object Templating {
                         <tr>
                             <td><![endif]-->
                     <ul class="pureCssMenum">
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Add</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">List</a></li>
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/add_location.html")+'"'+""">Add</a></li>
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/locations/list.html")+'"'+""">List</a></li>
                         <li class="pureCssMenui"><a class="pureCssMenui" href="#">Remove all</a></li>
                     </ul>
                     <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>

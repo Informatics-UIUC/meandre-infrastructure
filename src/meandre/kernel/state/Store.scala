@@ -2,7 +2,6 @@ package meandre.kernel.state
 
 import meandre.kernel.Configuration
 import meandre.Tools.zip3
-import com.mongodb.Mongo
 import java.io.InputStream
 import meandre.state.Repository
 import meandre.kernel.Implicits._
@@ -10,12 +9,13 @@ import meandre.kernel.rdf._
 import java.net.URL
 import com.hp.hpl.jena.rdf.model.ModelFactory
 import meandre.Tools.getInputStreamForURL
+import com.mongodb.{BasicDBObject, Mongo}
 
 /**A base case class for all addable elements to the store */
 abstract sealed case class Element()
 
 /**The case class that describes a location element */
-case class LocationElement(url: String) extends Element()
+case class LocationElement(url: String, desc:String) extends Element()
 
 /**The case class that describes a bundled element */
 case class BundledElement(desc:Descriptor, names: List[String], mimeTypes: List[String], contexts: List[InputStream]) extends Element
@@ -81,7 +81,7 @@ extends Repository(cnf,userName) {
       //
       // It is a location that needs to be added
       //
-      case LocationElement(url) => try {
+      case LocationElement(url,description) => try {
         val descs = DescriptorsFactory.buildDescriptors(url)
         // Get the descriptors and the unique set of urls to pull
         val (comps:Iterable[ComponentDescriptor],flows) = descs partition (_.isInstanceOf[ComponentDescriptor])
@@ -127,10 +127,14 @@ extends Repository(cnf,userName) {
         val addedURIs = descs map (c => Some(c.uri))
 
         // Update all the descriptors's metadata adding the original location
-        (addedFlowURIs++addedComponentURIs) foreach ( uri => {
-          val doc = collection.findOne(wrapURI(uri.get))
-          doc.put(K_LOCATION,url)
-          collection.update(wrapURI(uri.get),doc,false,false)
+        (addedFlowURIs++addedComponentURIs) foreach ( uriOption => uriOption match {
+          case Some(uri) =>  val doc = collection.findOne(wrapURI(uri))
+                             val li = new BasicDBObject
+                             li.put(K_LOCATION,url)
+                             li.put(K_DESCRIPTION,description)
+                             doc.put(K_LOCATION,li)
+                             collection.update(wrapURI(uri),doc,false,false)
+          case None => 
         })
 
         // Return the list of uris added
@@ -181,7 +185,19 @@ extends Repository(cnf,userName) {
     }
   }
 
- 
+  /**Returns the list of locations in the Store
+   *
+   * @return The list of locations
+   */
+  def locations = {
+    val cur = collection.find("""{"location": {"$exists":true}}""")
+    var res:Map[String,BasicDBObject] = Map()
+    while ( cur.hasNext ) {
+      val loc = cur.next.get(K_LOCATION).asInstanceOf[BasicDBObject]
+      res += loc.getString(K_LOCATION) -> loc
+    }
+    res
+  }
 
   /** Remove everything from the store
    *

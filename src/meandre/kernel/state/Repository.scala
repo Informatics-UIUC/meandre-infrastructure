@@ -246,7 +246,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
   protected val collection = db getCollection USER_COLLECTION_NAME
 
   /** Test connectivity. Will thrown an exception if cannot connect */
-  collection.find.count
+  //collection.find.count
 
   /** Ensure index creation */
   collection.ensureIndex("{\""+K_TYPE+"\": 1}")
