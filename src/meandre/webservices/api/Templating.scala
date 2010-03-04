@@ -156,14 +156,25 @@ class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
 
     def transformArray ( a:ArrayList[Object] ) : Any =
       for ( i<-List.range(0,a.size) )
-        yield <ul>{a.get(i) match {
+        yield <div>{a.get(i) match {
           // The element is an object
-          case t:BasicDBObject => <li>{transformObject(t)}</li>
+          case t:BasicDBObject => <p>{transformObject(t)}</p>
           // The element is another list
-          case a:ArrayList[Object] => <li>{transformArray(a)}</li>
+          case a:ArrayList[Object] => <p>{transformArray(a)}</p>
           // Basic type
-          case t => <li>{Text(t.toString)}</li>
-        }}</ul>
+          case t => <p>{Text(t.toString)}</p>
+        }}</div>
+
+//    def transformArray ( a:ArrayList[Object] ) : Any =
+//      for ( i<-List.range(0,a.size) )
+//        yield <ul>{a.get(i) match {
+//          // The element is an object
+//          case t:BasicDBObject => <li>{transformObject(t)}</li>
+//          // The element is another list
+//          case a:ArrayList[Object] => <li>{transformArray(a)}</li>
+//          // Basic type
+//          case t => <li>{Text(t.toString)}</li>
+//        }}</ul>
 
     def transformObjectOrArray ( a:Any ) = a match {
       case a:BasicDBList       => transformArray(a)
