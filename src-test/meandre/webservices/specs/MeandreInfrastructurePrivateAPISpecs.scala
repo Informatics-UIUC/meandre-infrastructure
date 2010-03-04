@@ -39,6 +39,14 @@ class MeandreInfrastructurePrivateAPISpecs extends Specification("The Meandre In
     server = null
   }
 
+  // TODO: Add specification for add location
+  // TODO: Add specification for list location
+  // TODO: Add specification for remove location
+  // TODO: Add specification for remove all locations
+
+  // TODO: Add specification for list components
+  // TODO: Add specification for list flows
+
   "Ping services " should {
 
     "return pong" in {

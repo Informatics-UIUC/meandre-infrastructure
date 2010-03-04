@@ -297,13 +297,13 @@ class Repository ( val cnf:Configuration, val userName:String ) {
 
   /**Remove the provided URI component/flow
    *
-   * @param uri The URI to remove
+   * @param uri The URI to removeLocations
    */
   def remove (uri:RDFURI) = collection remove wrapURI(uri)
 
   /**Remove the provided descriptor
    *
-   * @param uri The URI to remove
+   * @param uri The URI to removeLocations
    */
   def remove (desc:Descriptor) = collection remove wrapURI(desc)
 
@@ -367,16 +367,29 @@ class Repository ( val cnf:Configuration, val userName:String ) {
       val bdbo = cur.next.asInstanceOf[BasicDBObject]
       val bdbl = (bdbo get K_TAGS).asInstanceOf[BasicDBList]
       val tagList = List[String]() ++ (0 until bdbl.size).toList.map(bdbl.get(_).toString)
-      res ::= Map (
-          "uri"     -> bdbo.getString(K_ID),
-          "name"    -> bdbo.getString(K_NAME),
-          "date"    -> bdbo.get(K_DATE),
-          "creator" -> bdbo.get(K_CREATOR),
-          "rights"  -> bdbo.get(K_RIGHTS),
-          "tags"    -> tagList,
-          "desc"    -> bdbo.getString(K_DESC),
-          "type"    -> bdbo.getString(K_TYPE)
-        )
+      if ( bdbo.containsField(K_LOCATION) )
+        res ::= Map (
+            "uri"     -> bdbo.getString(K_ID),
+            "name"    -> bdbo.getString(K_NAME),
+            "date"    -> bdbo.get(K_DATE),
+            "creator" -> bdbo.get(K_CREATOR),
+            "rights"  -> bdbo.get(K_RIGHTS),
+            "tags"    -> tagList,
+            "desc"    -> bdbo.getString(K_DESC),
+            "type"    -> bdbo.getString(K_TYPE),
+            "location"-> bdbo.get(K_LOCATION).asInstanceOf[BasicDBObject].getString(K_LOCATION)
+          )
+      else
+        res ::= Map (
+            "uri"     -> bdbo.getString(K_ID),
+            "name"    -> bdbo.getString(K_NAME),
+            "date"    -> bdbo.get(K_DATE),
+            "creator" -> bdbo.get(K_CREATOR),
+            "rights"  -> bdbo.get(K_RIGHTS),
+            "tags"    -> tagList,
+            "desc"    -> bdbo.getString(K_DESC),
+            "type"    -> bdbo.getString(K_TYPE)
+          )
     }
     res
   }

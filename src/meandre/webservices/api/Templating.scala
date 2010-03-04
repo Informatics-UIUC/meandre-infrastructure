@@ -299,8 +299,9 @@ object Templating {
                             <td><![endif]-->
                     <ul class="pureCssMenum">
                         <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/add_location.html")+'"'+""">Add</a></li>
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/remove_location.html")+'"'+""">Remove</a></li>
                         <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/locations/list.html")+'"'+""">List</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Remove all</a></li>
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/locations/remove_all.html")+'"'+""">Remove all</a></li>
                     </ul>
                     <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Components</span><![if gt IE 6]></a><![endif]>
@@ -309,6 +310,7 @@ object Templating {
                         <tr>
                             <td><![endif]-->
                     <ul class="pureCssMenum">
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/list_components.html")+'"'+""">List</a></li>
                         <li class="pureCssMenui"><a class="pureCssMenui" href="#">Sorted by name</a></li>
                         <li class="pureCssMenui"><a class="pureCssMenui" href="#">Sorted by date</a></li>
                     </ul>
@@ -319,6 +321,7 @@ object Templating {
                         <tr>
                             <td><![endif]-->
                     <ul class="pureCssMenum">
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/list_flows.html")+'"'+""">List</a></li>
                         <li class="pureCssMenui"><a class="pureCssMenui" href="#">Sorted by name</a></li>
                         <li class="pureCssMenui"><a class="pureCssMenui" href="#">Sorted by date</a></li>
                     </ul>

@@ -16,7 +16,7 @@ import meandre.kernel.Configuration
  *
  */
 
-class MeandreInfrastructureAPISpecs extends Specification("The Meandre Infrastructure specification") {
+class MeandreInfrastructurePublicAPISpecs extends Specification("The Meandre Infrastructure specification") {
   val TEST_SERVER_PORT = 6969
   val api = new MeandreInfrastructurePublicAPI(Configuration())
   val client = MeandreInfrastructureAPIClient("http", "localhost", TEST_SERVER_PORT)

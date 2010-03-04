@@ -64,6 +64,52 @@ class MeandreInfrastructurePrivateAPI(cnf:Configuration) extends MeandreInfrastr
     res serializeTo elements(0)
   }
 
+
+ get("""/services/locations/remove\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+   val res:BasicDBObject = request.getRemoteUser match {
+      case null => """{
+          "status":"%s",
+          "failure":{"message":"Unable to retrieve user"}
+        }""".format(REQUEST_FAIL)
+      case user if paramsMap.contains("location") =>
+             val store = Store(cnf,user,false)
+             val prms = paramsMap("location")
+             store.removeLocations(prms)
+             val (bundle,response,removed) = (new BasicDBObject,new BasicDBObject,new BasicDBList)
+             prms foreach ( removed add _ )
+             bundle.put("status",REQUEST_OK)
+             response.put("removed_locations",removed)
+             bundle.put("success",response)
+             bundle
+      case user => """{
+          "status":"%s",
+          "failure":{"message":"Missing location url to removeLocations"}
+        }""".format(REQUEST_FAIL)
+   }
+   res serializeTo elements(0)
+ }
+
+   get("""/services/locations/remove_all\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+   val res:BasicDBObject = request.getRemoteUser match {
+      case null => """{
+          "status":"%s",
+          "failure":{"message":"Unable to retrieve user"}
+        }""".format(REQUEST_FAIL)
+      case user => val store = Store(cnf,user,false)
+                   val locations = store.locations
+                   store.removeAll
+                   val res = new BasicDBObject
+                   res.put("status",REQUEST_OK)
+                   val list = new BasicDBList
+                   locations foreach ( l => list.add(l._2) )
+                   val labeled = new BasicDBObject
+                   labeled.put("locations",list)
+                   res.put("success",labeled)
+                   res
+   }
+   res serializeTo elements(0)
+ }
+
   get("""/services/locations/list\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
     val res:BasicDBObject = request.getRemoteUser match {
       case null => """{
@@ -83,6 +129,61 @@ class MeandreInfrastructurePrivateAPI(cnf:Configuration) extends MeandreInfrastr
     res serializeTo elements(0)
   }
 
+
+  get("""/services/repository/list_components\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    val res:BasicDBObject = request.getRemoteUser match {
+      case null => """{
+          "status":"%s",
+          "failure":{"message":"Unable to retrieve user"}
+        }""".format(REQUEST_FAIL)
+      case user => val locations = Store(cnf,user,false).componentsMedatada
+                   val res = new BasicDBObject
+                   res.put("status",REQUEST_OK)
+                   val list = new BasicDBList
+                   locations foreach (
+                           metadata =>{
+                              val component:BasicDBObject = """{"uri":"%s"}""".format(metadata("uri"))
+                              val info:BasicDBObject = new BasicDBObject
+                              metadata foreach ( entry => info.put(entry._1,entry._2) )
+                              component.put("metadata",info)
+                              list add component
+                           }
+                   )
+                   val labeled = new BasicDBObject
+                   labeled.put("locations",list)
+                   res.put("success",labeled)
+                   res
+    }
+    res serializeTo elements(0)
+  }
+
+
+  get("""/services/repository/list_flows\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    val res:BasicDBObject = request.getRemoteUser match {
+      case null => """{
+          "status":"%s",
+          "failure":{"message":"Unable to retrieve user"}
+        }""".format(REQUEST_FAIL)
+      case user => val locations = Store(cnf,user,false).flowsMetadata
+                   val res = new BasicDBObject
+                   res.put("status",REQUEST_OK)
+                   val list = new BasicDBList
+                   locations foreach (
+                           metadata =>{
+                              val component:BasicDBObject = """{"uri":"%s"}""".format(metadata("uri"))
+                              val info:BasicDBObject = new BasicDBObject
+                              metadata foreach ( entry => info.put(entry._1,entry._2) )
+                              component.put("metadata",info)
+                              list add component
+                           }
+                   )
+                   val labeled = new BasicDBObject
+                   labeled.put("locations",list)
+                   res.put("success",labeled)
+                   res
+    }
+    res serializeTo elements(0)
+  }
 
   //
   // The well known ping

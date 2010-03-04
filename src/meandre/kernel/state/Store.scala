@@ -199,8 +199,32 @@ extends Repository(cnf,userName) {
     res
   }
 
-  /** Remove everything from the store
+
+  /** Attempts to remove a locations and all the components and flows that came
+   *  from it.
    *
+   * @param urls The urls to removeLocations
+   */
+  def removeLocations ( urls:Seq[String] ) = {
+    urls foreach (
+      url => {
+           val cnd:BasicDBObject = """{ "location.location": "%s" }""".format(url)
+           collection.remove(cnd)
+      }
+    )
+  }
+
+  /** Attempts to remove all locations and all the components and flows that came
+   *  from it.
+   *
+   */
+  def removeAllLocations = {
+    val cnd:BasicDBObject = """{ "location.location": { "$exists":true } }"""
+    collection.remove(cnd)
+  }
+
+  /**Remove everything from the store
+    *
    */
   override def removeAll = {
     super.removeAll
