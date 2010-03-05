@@ -10,6 +10,7 @@ import java.net.URL
 import com.hp.hpl.jena.rdf.model.ModelFactory
 import meandre.Tools.getInputStreamForURL
 import com.mongodb.{BasicDBObject, Mongo}
+import scala.concurrent.ops._
 
 /**A base case class for all addable elements to the store */
 abstract sealed case class Element()
@@ -68,6 +69,19 @@ extends Repository(cnf,userName) {
     url.replaceAll("context://localhost",base)
   }
 
+  /**A basic map with parallel processing as defined in Scala by Example
+   * http://www.scala-lang.org/docu/files/ScalaByExample.pdf
+   *
+   * @param f The function
+   * @param xs The sequence
+   * @return The array
+   */
+  def parMap[A, B](xs: List[A], f: A => B): List[B] = {
+    val results = new Array[B](xs.length)
+    replicate (0, xs.length) {i => results(i) = f(xs(i))}
+    results.toList
+  }
+  
   //---------------------------------------------------------------------------
 
   /**Attempts to add all the provided elements to the userName repository.
@@ -159,17 +173,18 @@ extends Repository(cnf,userName) {
               // Safe the files to the context pool
               var cnames:List[String] = List(if (c.uri.endsWith("/") ) c.uri+"implementation/"
                                              else c.uri+"/implementation/")
-              val addedContexts = zip3(names,mimes,contexts).map( _ match {
-                case (name,mime,is) => {
-                  val  modName = name.replaceAll("""\s+""","-")
-                  // TODO network can be improved by using Futures and then collecting values
-                  val fileName = contextsPool.update(modName,mime,is)
-                  cnames ::= (fileName match {
-                    case Left(_) => ""
-                    case Right(Pair(_,fn:String)) => fn
-                  })
-                  fileName
-                }}
+              val addedContexts = parMap(zip3(names,mimes,contexts),
+                {pair:Tuple3[String,String,InputStream] => pair match {
+                    case (name,mime,is) => {
+                      val  modName = name.replaceAll("""\s+""","-")
+                      // TODO network can be improved by using Futures and then collecting values
+                      val fileName = contextsPool.update(modName,mime,is)
+                      cnames ::= (fileName match {
+                        case Left(_) => ""
+                        case Right(Pair(_,fn:String)) => fn
+                      })
+                      fileName
+                }}}
               ).foldLeft(true)((a,b)=>a&&b.isRight)
               addedContexts match {
                 case false => None
