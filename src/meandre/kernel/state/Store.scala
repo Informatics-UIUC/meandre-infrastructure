@@ -162,6 +162,7 @@ extends Repository(cnf,userName) {
               val addedContexts = zip3(names,mimes,contexts).map( _ match {
                 case (name,mime,is) => {
                   val  modName = name.replaceAll("""\s+""","-")
+                  // TODO network can be improved by using Futures and then collecting values
                   val fileName = contextsPool.update(modName,mime,is)
                   cnames ::= (fileName match {
                     case Left(_) => ""
