@@ -36,6 +36,7 @@ object Implicits {
   val K_DESC     = "desc"
   val K_CREATOR  = "creator"
   val K_DATE     = "ts"
+  val K_MD_DATE  = "date"
   val K_RIGHTS   = "rights"
   val K_TAGS     = "tags"
   val K_METADATA = "metadata"

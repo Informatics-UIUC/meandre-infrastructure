@@ -22,16 +22,77 @@ class MeandreInfrastructureAbstractAPI extends CrochetServlet {
   protected val REQUEST_FAIL = "FAIL"
   protected val REQUEST_OK = "OK"
   protected val REQUEST_INCOMPLETE = "INCOMPLETE"
-  
+
+  /**Tries to convert a String into an integer. Returns 0 if fails.
+   *
+   * @param s The string to convert
+   * @return The converted integer or 0 if it fails
+   */
+  protected def safeParseInt(s: String): Int = {
+
+    try {
+      Integer.parseInt(params("count"))
+    }
+    catch {
+      case _ => 0
+    }
+  }
+
+  /**Assembles an OK response.
+   *
+   * @param payload The response payload
+   * @return The assembled response
+   */
+  protected def OKResponse(payload: Any) = {
+    val res = new BasicDBObject
+    res.put("status", REQUEST_OK)
+    res.put("success", payload)
+    res
+  }
+
+  /**Assembles a failure response.
+   *
+   * @param msg The failure message
+   * @param payload The failure payload
+   * @return The assembled response
+   */
+  protected def FailResponse(msg: String, payload:BasicDBObject): BasicDBObject = {
+    val res:BasicDBObject = """{
+          "status":"%s",
+          "message":"%s"
+    }""".format(REQUEST_FAIL, msg)
+    res.put("failure",payload)
+    res
+  }
+
+  /**Assembles a partial failure response.
+   *
+   * @param msg The partial failure message
+   * @param successPayload The response payload
+   * @param failurePayload The failure payload
+   * @return The assembled response
+   */
+  protected def PartialFailResponse(msg:String, successPayload:BasicDBObject,failurePayload:BasicDBObject): BasicDBObject = {
+    val res: BasicDBObject = """{
+            "status":"%s",
+            "message":"%s"
+      }""".format(REQUEST_FAIL, msg)
+    res.put("success", successPayload)
+    res.put("failure", failurePayload)
+    res
+  }
+
+
   /**Sets the response type for the given response
    *
    * @param format The format to set up on the content type response
    */
-  protected def canonicalResponseType = elements(0) match {
-    case "json" => "application/json"
-    case "xml"  => "application/xml"
-    case "html" => "text/html"
-    case _      => "text/plain"
+  protected def canonicalResponseType = elements match {
+    case Nil       => "text/plain"
+    case "json"::_ => "application/json"
+    case  "xml"::_ => "application/xml"
+    case "html"::_ => "text/html"
+    case _         => "text/plain"
   }
 
   /** The guard is set to always return true.

@@ -311,8 +311,8 @@ object Templating {
                             <td><![endif]-->
                     <ul class="pureCssMenum">
                         <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/list_components.html")+'"'+""">List</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Sorted by name</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Sorted by date</a></li>
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/list_components.html?order=name")+'"'+""">Sorted by name</a></li>
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/list_components.html?order=date")+'"'+""">Sorted by date</a></li>
                     </ul>
                     <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Flows</span><![if gt IE 6]></a><![endif]>
@@ -322,8 +322,8 @@ object Templating {
                             <td><![endif]-->
                     <ul class="pureCssMenum">
                         <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/list_flows.html")+'"'+""">List</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Sorted by name</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Sorted by date</a></li>
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/list_flows.html?order=name")+'"'+""">Sorted by name</a></li>
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/list_flows.html?order=date")+'"'+""">Sorted by date</a></li>
                     </ul>
                     <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Tags</span><![if gt IE 6]></a><![endif]>
@@ -332,24 +332,14 @@ object Templating {
                         <tr>
                             <td><![endif]-->
                     <ul class="pureCssMenum">
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">All</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Components</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Flows</a></li>
-                    </ul>
-                    <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
-                <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Public</span><![if gt IE 6]></a><![endif]>
-                    <!--[if lte IE 6]>
-                    <table>
-                        <tr>
-                            <td><![endif]-->
-                    <ul class="pureCssMenum">
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Published repository</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Demo repository</a></li>
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/tags.html")+'"'+""">All</a></li>
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/tags_components.html")+'"'+""">Components</a></li>
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/tags_flows.html")+'"'+""">Flows</a></li>
                     </ul>
                     <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 
-                <li class="pureCssMenui"><a class="pureCssMenui" href="#">Clear</a></li>
-                <li class="pureCssMenui"><a class="pureCssMenui" href="#">Regenerate</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/clear.html")+'"'+""">Clear</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/regenerate.html")+'"'+""">Regenerate</a></li>
             </ul>
             <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 
@@ -463,6 +453,8 @@ object Templating {
                     <td><![endif]-->
             <ul class="pureCssMenum">
                 <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+pathPrefix+"""public/services/ping.html">Ping</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="#">Published repository</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="#">Demo repository</a></li>
             </ul>
 
 

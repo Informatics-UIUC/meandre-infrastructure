@@ -96,7 +96,7 @@ object Tools {
    * @return The sorted list
    */
   def sortMetadataByDate[A <: Map[String,Any]](l: List[A]) =
-    l.sort((a, b) => a(K_DATE).asInstanceOf[Date].before(a(K_DATE).asInstanceOf[Date]))
+    l.sort((a, b) => a(K_MD_DATE).asInstanceOf[Date].before(b(K_MD_DATE).asInstanceOf[Date]))
 
   //----------------------------------------------------------------------
 
