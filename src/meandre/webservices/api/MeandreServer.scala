@@ -112,7 +112,7 @@ class MeandreServer(val cnf:Configuration, val prefix: String, val staticFolder:
   // Add the snare web monitor
   //
   // TODO Add the servlet
-  contextWS.addServlet(new ServletHolder(WebMonitor(prefix+"services",cnf.MEANDRE_CLUSTER_POOL)), prefix+"/services/snare/*")
+  contextWS.addServlet(new ServletHolder(WebMonitor(prefix+"services",cnf.MEANDRE_CLUSTER_POOL)), prefix+"services/snare/*")
 
   //
   // Add the services that require registration
