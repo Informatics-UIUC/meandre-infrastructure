@@ -38,7 +38,7 @@ object Configuration {
   val INFRASTRUCTURE_VERSION = "1.5.0-vcli-alpha"
 
   /** A default configuration */
-  private val cnf = new Configuration("locahost",1714,"localhost",27017,None)
+  private val cnf = new Configuration("localhost",1714,"localhost",27017,None)
 
   /**Returns the default infrastructure object
    *

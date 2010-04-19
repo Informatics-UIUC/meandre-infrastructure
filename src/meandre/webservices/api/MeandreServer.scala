@@ -25,7 +25,6 @@ class MeandreServer(val cnf:Configuration, val prefix: String, val staticFolder:
   //
   protected val server = new Server(cnf.serverPort)
 
-  println("Prefix = <%s>" format prefix)
   //
   // The server Snare monitor
   //
