@@ -18,7 +18,7 @@ import meandre.kernel.Configuration
  * 
  */
 
-class MeandreInfrastructurePublicAPI(cnf:Configuration) extends MeandreInfrastructureAbstractAPI {
+class MeandreInfrastructurePublicAPI(cnf:Configuration) extends MeandreInfrastructureAbstractAPI(cnf) {
 
   //
   // The well known ping

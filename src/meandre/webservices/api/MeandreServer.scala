@@ -19,23 +19,25 @@ import meandre.kernel.Implicits._
  * @date Mar 2, 2010 at 10:52:40 AM
  *
  */
-class MeandreServer(val cnf:Configuration, val port: Int, val prefix: String, val staticFolder:String, val resourceFolder:String, val idle: Int, val maxThreads: Int, val minThreads: Int) {
+class MeandreServer(val cnf:Configuration, val prefix: String, val staticFolder:String, val resourceFolder:String, val idle: Int, val maxThreads: Int, val minThreads: Int) {
   //
   // The main server
   //
-  protected val server = new Server(port)
+  protected val server = new Server(cnf.serverPort)
 
+  println("Prefix = <%s>" format prefix)
   //
   // The server Snare monitor
   //
   protected val snareMon = Snare(
-    cnf.MEANDRE_CLUSTER_POOL + "@" + port,
+    cnf.MEANDRE_CLUSTER_POOL + "@" + cnf.server + ":" + cnf.serverPort,
     cnf.MEANDRE_CLUSTER_POOL,
     """{"server": {
-          "port":"""+port+""",
+          "host":"""+'"'+cnf.server+'"'+""",
+          "port":"""+cnf.serverPort+""",
           "prefix":"""+'"'+prefix+'"'+""",
           "static":"""+'"'+staticFolder+'"'+""",
-          "resources":"""+'"'+staticFolder+'"'+"""
+          "resources":"""+'"'+resourceFolder+'"'+"""
         },
         "mongodb": {
           "port":"""+cnf.port+""",
@@ -59,7 +61,7 @@ class MeandreServer(val cnf:Configuration, val port: Int, val prefix: String, va
   //
   // Static folder serving servlet
   //
-  protected val staticContext = new Context(server,"/static",Context.NO_SESSIONS)
+  protected val staticContext = new Context(server,prefix+"static",Context.NO_SESSIONS)
   protected val staticFileServlet = new DefaultServlet
   staticContext setResourceBase staticFolder
   staticContext.addServlet(new ServletHolder(staticFileServlet), "/*")
@@ -67,7 +69,7 @@ class MeandreServer(val cnf:Configuration, val port: Int, val prefix: String, va
   //
   // Public resources serveing servlet
   //
-  protected val resourceContext = new Context(server,"/public/resources",Context.NO_SESSIONS)
+  protected val resourceContext = new Context(server,prefix+"public/resources",Context.NO_SESSIONS)
   protected val resourceFileServlet = new DefaultServlet
   resourceContext setResourceBase resourceFolder
   resourceContext.addServlet(new ServletHolder(resourceFileServlet), "/*")
@@ -80,7 +82,7 @@ class MeandreServer(val cnf:Configuration, val port: Int, val prefix: String, va
   //
   // The basic context for authenticated services
   //
-  protected val contextWS  = new Context(server,"/",Context.SESSIONS)
+  protected val contextWS  = new Context(server,prefix,Context.SESSIONS)
   protected val constraint = new Constraint()
   constraint.setName(Constraint.__BASIC_AUTH)
   constraint.setRoles(MongoDBRealm.AVAILABLE_ROLES)
@@ -88,7 +90,7 @@ class MeandreServer(val cnf:Configuration, val port: Int, val prefix: String, va
 
   protected val cm = new ConstraintMapping();
   cm.setConstraint(constraint);
-  cm.setPathSpec(prefix+"/services/*");
+  cm.setPathSpec(prefix+"services/*");
   protected val sJettyHome = System.getProperty("jetty.home") match {
     case null => new File(".").getCanonicalFile
     case s    => s
@@ -105,23 +107,23 @@ class MeandreServer(val cnf:Configuration, val port: Int, val prefix: String, va
   //
   // Add the public services
   //
-  contextWS.addServlet(new ServletHolder(new MeandreInfrastructurePublicAPI(cnf)), prefix+"/public/services/*")
+  contextWS.addServlet(new ServletHolder(new MeandreInfrastructurePublicAPI(cnf)), prefix+"public/services/*")
 
   //
   // Add the snare web monitor
   //
   // TODO Add the servlet
-  contextWS.addServlet(new ServletHolder(WebMonitor(prefix+"/services",cnf.MEANDRE_CLUSTER_POOL)), prefix+"/services/snare/*")
+  contextWS.addServlet(new ServletHolder(WebMonitor(prefix+"services",cnf.MEANDRE_CLUSTER_POOL)), prefix+"/services/snare/*")
 
   //
   // Add the services that require registration
   //
-  contextWS.addServlet(new ServletHolder(new MeandreInfrastructurePrivateAPI(cnf)), prefix+"/services/*")
+  contextWS.addServlet(new ServletHolder(new MeandreInfrastructurePrivateAPI(cnf)), prefix+"services/*")
 
   //
   // Add the basic welcome page
   //
-  contextWS.addServlet(new ServletHolder(new MeandreInfrastructureRootAPI(cnf)), prefix+"/*")
+  contextWS.addServlet(new ServletHolder(new MeandreInfrastructureRootAPI(cnf)), prefix+"*")
   //
   // Basic methods to manage the server
   //
@@ -167,18 +169,16 @@ object MeandreServer {
   val DEFAULT_CONFIGURATION = Configuration()
 
   /** The default service configuration */
-  val DEFAULT_PREFIX = ""
+  val DEFAULT_PREFIX = "/"
 
 
-  def apply() = new MeandreServer(DEFAULT_CONFIGURATION, 1714, DEFAULT_PREFIX, STATIC_FOLDER, PUBLIC_RESOURCE_FOLDER, MAXIMUM_JETTY_THREAD_IDLE_TIME, MAXIMUM_NUMBER_OF_JETTY_THREADS, MINIMUM_NUMBER_OF_JETTY_THREADS)
+  def apply() = new MeandreServer(DEFAULT_CONFIGURATION, DEFAULT_PREFIX, STATIC_FOLDER, PUBLIC_RESOURCE_FOLDER, MAXIMUM_JETTY_THREAD_IDLE_TIME, MAXIMUM_NUMBER_OF_JETTY_THREADS, MINIMUM_NUMBER_OF_JETTY_THREADS)
 
-  def apply(cnf:Configuration) = new MeandreServer(cnf, 1714, DEFAULT_PREFIX, STATIC_FOLDER, PUBLIC_RESOURCE_FOLDER, MAXIMUM_JETTY_THREAD_IDLE_TIME, MAXIMUM_NUMBER_OF_JETTY_THREADS, MINIMUM_NUMBER_OF_JETTY_THREADS)
+  def apply(cnf:Configuration) = new MeandreServer(cnf, DEFAULT_PREFIX, STATIC_FOLDER, PUBLIC_RESOURCE_FOLDER, MAXIMUM_JETTY_THREAD_IDLE_TIME, MAXIMUM_NUMBER_OF_JETTY_THREADS, MINIMUM_NUMBER_OF_JETTY_THREADS)
 
-  def apply(cnf:Configuration, port: Int) = new MeandreServer(cnf, port, DEFAULT_PREFIX, STATIC_FOLDER, PUBLIC_RESOURCE_FOLDER, MAXIMUM_JETTY_THREAD_IDLE_TIME, MAXIMUM_NUMBER_OF_JETTY_THREADS, MINIMUM_NUMBER_OF_JETTY_THREADS)
+  def apply(cnf:Configuration, prefix: String) = new MeandreServer(cnf, prefix, STATIC_FOLDER, PUBLIC_RESOURCE_FOLDER, MAXIMUM_JETTY_THREAD_IDLE_TIME, MAXIMUM_NUMBER_OF_JETTY_THREADS, MINIMUM_NUMBER_OF_JETTY_THREADS)
 
-  def apply(cnf:Configuration, port: Int, prefix: String) = new MeandreServer(cnf, port, prefix, STATIC_FOLDER, PUBLIC_RESOURCE_FOLDER, MAXIMUM_JETTY_THREAD_IDLE_TIME, MAXIMUM_NUMBER_OF_JETTY_THREADS, MINIMUM_NUMBER_OF_JETTY_THREADS)
+  def apply(cnf:Configuration, prefix: String, staticFolder:String, resourceFolder:String) = new MeandreServer(cnf, prefix, staticFolder, resourceFolder, MAXIMUM_JETTY_THREAD_IDLE_TIME, MAXIMUM_NUMBER_OF_JETTY_THREADS, MINIMUM_NUMBER_OF_JETTY_THREADS)
 
-  def apply(cnf:Configuration, port: Int, prefix: String, staticFolder:String, resourceFolder:String) = new MeandreServer(cnf, port, prefix, staticFolder, resourceFolder, MAXIMUM_JETTY_THREAD_IDLE_TIME, MAXIMUM_NUMBER_OF_JETTY_THREADS, MINIMUM_NUMBER_OF_JETTY_THREADS)
-
-  def apply(cnf:Configuration, port: Int, prefix: String, staticFolder:String, resourceFolder:String, idle: Int, maxThreads: Int, minThreads: Int) = new MeandreServer(cnf, port, prefix, staticFolder, resourceFolder, idle, maxThreads, minThreads)
+  def apply(cnf:Configuration, prefix: String, staticFolder:String, resourceFolder:String, idle: Int, maxThreads: Int, minThreads: Int) = new MeandreServer(cnf, prefix, staticFolder, resourceFolder, idle, maxThreads, minThreads)
 }

@@ -6,9 +6,9 @@ import meandre.webservices.api.{MeandreServer}
 //
 // One server
 //
-val TEST_SERVER_PORT = 8080
+val TEST_SERVER_PORT = 1714
 val cnf = Configuration()
-val server = MeandreServer(cnf, TEST_SERVER_PORT, "", "/Users/xavier/Documents/Workspace - IdeaProjects/Meandre-Infrastructure/styling", "/Users/xavier/Documents/Workspace - IdeaProjects/Meandre-Infrastructure/docs")
+val server = MeandreServer(cnf, "/", "/Users/xavier/Documents/Workspace - IdeaProjects/Meandre-Infrastructure/styling", "/Users/xavier/Documents/Workspace - IdeaProjects/Meandre-Infrastructure/docs")
 server.go
 
 

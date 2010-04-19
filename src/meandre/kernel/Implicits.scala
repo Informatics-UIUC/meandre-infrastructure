@@ -43,6 +43,11 @@ object Implicits {
   val K_LOCATION = "location"
   val K_DESCRIPTION = "description"
 
+  val V_COMPONENT = "component"
+  val V_FLOW      = "flow"
+  val V_COMPUTE   = "compute"
+  val V_WEBUI     = "webui"
+
 
   //----------------------------------------------------------------------
 

@@ -7,6 +7,7 @@ import meandre.webservices.api.Templating._
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import java.io.{Writer, PrintWriter, StringWriter}
 import org.mortbay.jetty.{MimeTypes, HttpConnection}
+import meandre.kernel.Configuration
 
 /**
  * The Meandre infrastructure implementation of the services API
@@ -17,7 +18,7 @@ import org.mortbay.jetty.{MimeTypes, HttpConnection}
  */
 
 
-class MeandreInfrastructureAbstractAPI extends CrochetServlet {
+class MeandreInfrastructureAbstractAPI(conf:Configuration) extends CrochetServlet {
 
   protected val REQUEST_FAIL = "FAIL"
   protected val REQUEST_OK = "OK"
@@ -43,10 +44,13 @@ class MeandreInfrastructureAbstractAPI extends CrochetServlet {
    * @param payload The response payload
    * @return The assembled response
    */
-  protected def OKResponse(payload: Any) = {
+  protected def OKResponse(payload: Any, user:String) = {
     val res = new BasicDBObject
     res.put("status", REQUEST_OK)
     res.put("success", payload)
+    res.put("meandre_user",user)
+    res.put("meandre_host",conf.server)
+    res.put("meandre_port",conf.serverPort)
     res
   }
 
@@ -56,12 +60,15 @@ class MeandreInfrastructureAbstractAPI extends CrochetServlet {
    * @param payload The failure payload
    * @return The assembled response
    */
-  protected def FailResponse(msg: String, payload:BasicDBObject): BasicDBObject = {
+  protected def FailResponse(msg: String, payload:BasicDBObject, user:String): BasicDBObject = {
     val res:BasicDBObject = """{
           "status":"%s",
           "message":"%s"
     }""".format(REQUEST_FAIL, msg)
     res.put("failure",payload)
+    res.put("meandre_user",user)
+    res.put("meandre_host",conf.server)
+    res.put("meandre_port",conf.serverPort)
     res
   }
 
@@ -72,13 +79,16 @@ class MeandreInfrastructureAbstractAPI extends CrochetServlet {
    * @param failurePayload The failure payload
    * @return The assembled response
    */
-  protected def PartialFailResponse(msg:String, successPayload:BasicDBObject,failurePayload:BasicDBObject): BasicDBObject = {
+  protected def PartialFailResponse(msg:String, successPayload:BasicDBObject,failurePayload:BasicDBObject, user:String): BasicDBObject = {
     val res: BasicDBObject = """{
             "status":"%s",
             "message":"%s"
       }""".format(REQUEST_FAIL, msg)
     res.put("success", successPayload)
     res.put("failure", failurePayload)
+    res.put("meandre_user",user)
+    res.put("meandre_host",conf.server)
+    res.put("meandre_port",conf.serverPort)
     res
   }
 

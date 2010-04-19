@@ -8,7 +8,7 @@
 <body>
 
 <div class="header">
-    <p class="header-info">anonymous@dev-demo.seasr.org:1714</p>
+    <p style="float:right;" class="header-info">anonymous@dev-demo.seasr.org:1714</p>
 
     <ul class="pureCssMenu pureCssMenum">
         <li class="pureCssMenui"><a class="pureCssMenui" href="http://seasr.org/meandre">Meandre</a></li>
@@ -195,11 +195,17 @@
                 <li class="pureCssMenui"><a class="pureCssMenui" href="http://dev-tools.seasr.org/jira/secure/Dashboard.jspa">Issue tracking</a></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="http://dev-tools.seasr.org/fisheye/browse/Meandre-Infrastructure">SVN browser</a></li>
             </ul>
-
+           <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 
 
 
     </ul>
+    <div>
+        <form name="sfc" method="get" action="/services/repository/search_components.html"><input type="text" id="sc" name="q" value="Search components..." onclick="document.sfc.sc.value=''"/></form>
+        <form name="sff" method="get" action="/services/repository/search_components.html"><input type="text" id="sf" name="q" value="Search flows..." onclick="document.sff.sf.value=''"/></form>
+
+    </div>
+    
 </div>
 <br/>
 <div class="response">

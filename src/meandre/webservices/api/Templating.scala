@@ -212,10 +212,23 @@ class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
     // Extract and set basic variables
     val title    = if (self.containsKey("title")) self.getString("title") else "Meandre Infrastructure "+Configuration.INFRASTRUCTURE_VERSION
     val prefix   = "/" // Hardcoded for now TODO: Is there a better way than hard coding it without losing beauty
+    // Extract user, host, and port
+    val user = self.containsKey("meandre_user") match {
+      case true => self.get("meandre_user").toString
+      case false => "anonymous"
+    }
+    val host = self.containsKey("meandre_host") match {
+      case true => self.get("meandre_host").toString
+      case false => "localhost"
+    }
+    val port = self.containsKey("meandre_port") match {
+      case true => self.get("meandre_port").asInstanceOf[Int]
+      case false => 1714
+    }
     // Transform the response
     transformDocument(self)
     // Generate the html
-    Templating.html(title,prefix,sbRes.toString)
+    Templating.html(title,user,host,port,prefix,sbRes.toString)
   }
 }
 
@@ -248,11 +261,11 @@ object Templating {
   implicit def richBasicDBObject2BasicDBObject ( rbdbo:RichBasicDBObject ) = rbdbo.self
 
 
-  def html ( title:String, pathPrefix:String, response:String ) =
+  def html ( title:String, user:String, host:String, port:Int, pathPrefix:String, response:String ) =
     new StringBuffer ("<html>")
       .append(htmlHeader(title,pathPrefix))
       .append("<body>")
-      .append(htmlMenu(pathPrefix) )
+      .append(htmlMenu(pathPrefix,user,host,port) )
       .append("""<br/>
                  <div class="response">""")
       .append(response)
@@ -279,9 +292,9 @@ object Templating {
   """
 
   /** The HTML menu */
-  def htmlMenu (pathPrefix:String ) = """
+  def htmlMenu (pathPrefix:String, user:String, host:String, port:Int ) = """
     <div class="header">
-    <p class="header-info">anonymous@dev-demo.seasr.org:1714</p>
+    <p class="header-info">"""+user+"@"+host+":"+port+"</p>"+"""
 
     <ul class="pureCssMenu pureCssMenum">
         <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+pathPrefix+'"'+""">Meandre</a></li>

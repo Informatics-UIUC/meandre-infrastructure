@@ -6,7 +6,11 @@ body {
         
     color: #212121;
     margin: 9px;
-    min-width: 800px;
+    min-width: 950px;
+}
+
+form.q {
+    float:left;    
 }
 
 div.header {

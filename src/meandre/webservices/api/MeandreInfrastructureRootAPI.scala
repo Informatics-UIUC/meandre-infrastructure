@@ -13,7 +13,7 @@ import meandre.webservices.api.Templating._
  */
 
 
-class MeandreInfrastructureRootAPI(cnf: Configuration) extends MeandreInfrastructureAbstractAPI {
+class MeandreInfrastructureRootAPI(cnf: Configuration) extends MeandreInfrastructureAbstractAPI(cnf) {
 
 
     //

@@ -17,11 +17,6 @@ import com.hp.hpl.jena.rdf.model.{ModelFactory, Model}
 class Repository ( val cnf:Configuration, val userName:String ) {
 
   type RDFURI = String
-  
-  private val V_COMPONENT = "component"
-  private val V_FLOW      = "flow"
-  private val V_COMPUTE   = "compute"
-  private val V_WEBUI     = "webui"
 
   //---------------------------------------------------------------------------
 
@@ -360,7 +355,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    * @param limit The maximum number of elements to returns
    * @return A list of component descriptors contained in the repository
    */
-  protected def queryMetadata(query:String,sort:String,skip:Int,limit:Int) = {
+   def queryMetadata(query:String,sort:String,skip:Int,limit:Int) = {
     var res:List[Map[String,Any]] = Nil
     val cur = collection.find(query).sort(sort).skip(skip).limit(limit)
     while (cur.hasNext) {
