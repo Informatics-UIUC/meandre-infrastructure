@@ -19,6 +19,8 @@ import com.mongodb.{BasicDBList, BasicDBObject}
 
 class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
 
+  /** The regular expression to match arbitrary urls */
+  val urlRegex = "\\w+([_-]\\w+)*://(\\w+([_-]\\w+)*(\\.\\w+([_-]\\w+)*)*/?)*".r
 
 
   /** Given a response document, it formats it according to the provided
@@ -225,10 +227,37 @@ class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
       case true => self.get("meandre_port").asInstanceOf[Int]
       case false => 1714
     }
+    //
     // Transform the response
+    //
     transformDocument(self)
+    //
+    // Mutate urls
+    //
+    var text = sbRes.toString
+    var sbProcessedRes = new StringBuffer
+    var cnt = 0
+    for(m <- urlRegex.findAllIn(text).matchData) {
+
+      val pre = text.substring(0,m.start-cnt)
+      text = text.substring(m.start-cnt)
+      cnt = m.start
+
+      val url = text.substring(0,m.end-cnt)
+      text = text.substring(m.end-cnt)
+      cnt = m.end
+
+      sbProcessedRes.append(pre)
+      sbProcessedRes.append(url match {
+        case u if u.startsWith("meandre://") => """<a href="%s">%s</a> (_,_,_)""".format(u,u)
+        case u => """<a href="%s">%s</a>""".format(url,url)
+      })
+
+    }
+    sbProcessedRes.append(text)
+
     // Generate the html
-    Templating.html(title,user,host,port,prefix,sbRes.toString)
+    Templating.html(title,user,host,port,prefix,sbProcessedRes.toString)
   }
 }
 

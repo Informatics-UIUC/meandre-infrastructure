@@ -44,7 +44,13 @@ p.response {
     font-weight: bolder;
 }
 
+a {
+    color: #FF7F00;
+}
 
+a:visited {
+    color: #AA4F00;
+}
 span.response-success {
     color: green;
 }
