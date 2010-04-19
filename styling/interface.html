@@ -98,6 +98,7 @@
                     </ul>
                     <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
             </ul>
+           <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 
 
         <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Infrastructure</span><![if gt IE 6]></a><![endif]>
@@ -179,7 +180,7 @@
                 <li class="pureCssMenui"><a class="pureCssMenui" href="#">Rovoke all user roles</a></li>
                 
             </ul>
-
+           <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 
 
 
@@ -197,15 +198,19 @@
             </ul>
            <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 
-
-
+        
     </ul>
-    <div>
-        <form name="sfc" method="get" action="/services/repository/search_components.html"><input type="text" id="sc" name="q" value="Search components..." onclick="document.sfc.sc.value=''"/></form>
-        <form name="sff" method="get" action="/services/repository/search_components.html"><input type="text" id="sf" name="q" value="Search flows..." onclick="document.sff.sf.value=''"/></form>
+    <ul style="margin-left:6px; padding:0px;" class="pureCssMenu pureCssMenum">
+        <li class="pureCssMenui">
+          <form style="padding:0; margin:0;" name="sfc" method="get" action="/services/repository/search.html">
+            <input type="text" id="sc" name="q" value="Search..." onclick="document.sfc.sc.value=''"/>
+          </form>
 
-    </div>
-    
+        <li>
+          <a style="margin-right:3px" href="#">Advanced search</a>
+        </li>
+        </li>
+      </ul>
 </div>
 <br/>
 <div class="response">

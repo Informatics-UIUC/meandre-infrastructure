@@ -15,21 +15,25 @@ import meandre.kernel.Configuration
  *
  * @author Xavier Llora
  * @date Mar 1, 2010 at 9:26:33 AM
- * 
+ *
  */
 
-class MeandreInfrastructurePublicAPI(cnf:Configuration) extends MeandreInfrastructureAbstractAPI(cnf) {
+class MeandreInfrastructurePublicAPI(cnf: Configuration) extends MeandreInfrastructureAbstractAPI(cnf) {
+
+
+  // ---------------------------------------------------------------------------
 
   //
   // The well known ping
   //
   get("""/public/services/ping\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
-    val res:BasicDBObject = """{
+    val res: BasicDBObject = """{
          "status":"OK",
          "success":{"message":"pong"}
     }"""
     res serializeTo elements(0)
   }
 
+  // ---------------------------------------------------------------------------
 
 }

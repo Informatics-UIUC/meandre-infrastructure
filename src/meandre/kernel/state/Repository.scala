@@ -247,6 +247,8 @@ class Repository ( val cnf:Configuration, val userName:String ) {
   collection.ensureIndex("{\""+K_TYPE+"\": 1}")
   collection.ensureIndex("{\""+K_MODE+"\": 1}")
   collection.ensureIndex("{\""+K_TOKENS+"\": 1}")
+  collection.ensureIndex("{\""+K_DATE+"\": 1}")
+  collection.ensureIndex("{\""+K_NAME+"\": 1}")
 
   //---------------------------------------------------------------------------
 

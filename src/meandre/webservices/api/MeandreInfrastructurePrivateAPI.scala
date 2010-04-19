@@ -19,20 +19,8 @@ import meandre.state.Repository
 
 class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrastructureAbstractAPI(cnf) {
 
-  /**This function makes sure that there is a valid remote authenticated user.
-   *
-   * @param The function that needs to be called back if everything goes as planned
-   */
-  def requestFor(body: String => BasicDBObject) = {
-    val res: BasicDBObject = request.getRemoteUser match {
-      case null => FailResponse("Unable to retrieve user","{}","anonymous")
-      case user => body(user)
-    }
-    res serializeTo elements(0)
-  }
-
+ 
   // ---------------------------------------------------------------------------
-
 
   get("""/services/locations/add\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
     requestFor {
@@ -76,6 +64,8 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
   }
 
 
+  // ---------------------------------------------------------------------------
+
   get("""/services/repository/regenerate\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
     requestFor {
       user =>
@@ -102,6 +92,8 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
     }
   }
 
+  // ---------------------------------------------------------------------------
+
   get("""/services/locations/remove\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
     requestFor {
       user =>
@@ -122,6 +114,8 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
     }
   }
 
+  // ---------------------------------------------------------------------------
+
   get("""/services/locations/remove_all\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
     requestFor {
       user =>
@@ -136,6 +130,8 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
     }
   }
 
+  // ---------------------------------------------------------------------------
+
   get("""/services/locations/list\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
     requestFor {
       user =>
@@ -148,21 +144,23 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
     }
   }
 
+  // ---------------------------------------------------------------------------
 
   get("""/services/repository/list_components\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
     requestFor {
       user =>
-        var componentsMD = Store(cnf, user, false).componentsMedatada
-        if ( params.contains("order") ) {
-          componentsMD = params("order") match {
-            case "name" => sortMetadataByName(componentsMD)
-            case "date" => sortMetadataByDate(componentsMD)
-            case _      => componentsMD
+        val st = Store(cnf, user, false)
+        var cnd = "{}"
+        val skip = if (params.contains("offset")) safeParseInt(params("offset")) else 0
+        val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else Math.MAX_INT            
+        if (params.contains("order")) {
+          cnd = params("order") match {
+            case "name" => """{"%s":-1}""".format(K_NAME)
+            case "date" => """{"%s":-1}""".format(K_DATE)
+            case _ => "{}"
           }
         }
-        if ( params.contains("count") ) {
-          componentsMD = componentsMD.take(safeParseInt(params("count")))
-        }
+        val componentsMD = st.queryMetadata("{\"" + K_TYPE + "\": \"" + V_COMPONENT + "\""+"""}""",cnd,skip,limit)
         val list = new BasicDBList
         componentsMD foreach (
                 metadata => {
@@ -182,21 +180,23 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
     }
   }
 
+  // ---------------------------------------------------------------------------
 
   get("""/services/repository/list_flows\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
     requestFor {
       user =>
-        var flowsMD = Store(cnf, user, false).flowsMetadata
+        val st = Store(cnf, user, false)
+        var cnd = "{}"
+        val skip = if (params.contains("offset")) safeParseInt(params("offset")) else 0
+        val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else Math.MAX_INT
         if (params.contains("order")) {
-          flowsMD = params("order") match {
-            case "name" => sortMetadataByName(flowsMD)
-            case "date" => sortMetadataByDate(flowsMD)
-            case _ => flowsMD
+          cnd = params("order") match {
+            case "name" => """{"%s":-1}""".format(K_NAME)
+            case "date" => """{"%s":-1}""".format(K_DATE)
+            case _ => "{}"
           }
         }
-        if (params.contains("count")) {
-          flowsMD = flowsMD.take(safeParseInt(params("count")))
-        }
+        val flowsMD = st.queryMetadata("{\"" + K_TYPE + "\": \"" + V_COMPONENT + "\""+"""}""",cnd,skip,limit)
         val list = new BasicDBList
         flowsMD foreach (
                 metadata => {
@@ -216,6 +216,8 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
     }
   }
 
+  // ---------------------------------------------------------------------------
+
   get("""/services/repository/clear\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
     requestFor {
       user =>
@@ -225,6 +227,8 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
         OKResponse(labeled,user)
     }
   }
+
+  // ---------------------------------------------------------------------------
 
   get("""/services/repository/tags\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
     requestFor {
@@ -238,6 +242,8 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
     }
   }
 
+  // ---------------------------------------------------------------------------
+
   get("""/services/repository/tags_components\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
     requestFor {
       user =>
@@ -250,6 +256,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
     }
   }
 
+  // ---------------------------------------------------------------------------
 
   get("""/services/repository/tags_flows\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
     requestFor {
@@ -263,6 +270,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
     }
   }
 
+  // ---------------------------------------------------------------------------
 
   get("""/services/repository/search_components\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
     requestFor {
@@ -287,9 +295,9 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
             val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else Math.MAX_INT
             var cnd = "{}"
             if (params.contains("order")) {
-              params("order") match {
-                case "name" => """{"%s":1}""".format(K_NAME)
-                case "date" => """{"%s":1}""".format(K_DATE)
+              cnd = params("order") match {
+                case "name" => """{"%s":-1}""".format(K_NAME)
+                case "date" => """{"%s":-1}""".format(K_DATE)
                 case _ => "{}"
               }
             }
@@ -315,6 +323,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
     }
   }
 
+  // ---------------------------------------------------------------------------
 
   get("""/services/repository/search_flows\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
     requestFor {
@@ -339,9 +348,9 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
             val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else Math.MAX_INT
             var cnd = "{}"
             if (params.contains("order")) {
-              params("order") match {
-                case "name" => """{"%s":1}""".format(K_NAME)
-                case "date" => """{"%s":1}""".format(K_DATE)
+              cnd = params("order") match {
+                case "name" => """{"%s":-1}""".format(K_NAME)
+                case "date" => """{"%s":-1}""".format(K_DATE)
                 case _ => "{}"
               }
             }
@@ -366,5 +375,61 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
         }
     }
   }
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/repository/search\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        if (!params.contains("q")) {
+          val emptySearch = new BasicDBObject
+          emptySearch.put("query_results", "No searchable terms provided!")
+          OKResponse(emptySearch,user)
+        }
+        else {
+          val st = Store(cnf, user, false)
+          var q = params("q").replace("\"|'", " ").split("""\s+""")
+          if (q.size == 0) {
+            val emptySearch = new BasicDBObject
+            emptySearch.put("query_results", "No searchable terms provided!")
+            OKResponse(emptySearch,user)
+          }
+          else {
+            val qs = if (q.size == 1) "\"" + q(0) + "\""
+                     else q.map(s => "\"" + s + "\"").reduceLeft(_ + ',' + _)
+            val skip = if (params.contains("offset")) safeParseInt(params("offset")) else 0
+            val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else Math.MAX_INT
+            var cnd = "{}"
+            if (params.contains("order")) {
+              cnd = params("order") match {
+                case "name" => """{"%s":-1}""".format(K_NAME)
+                case "date" => """{"%s":-1}""".format(K_DATE)
+                case _ => "{}"
+              }
+            }
+            val flowsMD = st.queryMetadata("""{"_tokens":{"$all":[%s]}}""".format(qs),cnd, skip, limit)
+            val list = new BasicDBList
+            flowsMD foreach (
+                    metadata => {
+                      val flow: BasicDBObject = """{"uri":"%s","name":"%s"}""".format(metadata("uri"), metadata("name"))
+                      val info: BasicDBObject = new BasicDBObject
+                      metadata foreach (entry => info.put(entry._1, entry._2))
+                      //info removeField "type"
+                      info removeField "name"
+                      info removeField "uri"
+                      flow.put("metadata", info)
+                      list add flow
+                    }
+                    )
+            val labeled = new BasicDBObject
+            labeled.put("repository", list)
+            OKResponse(labeled,user)
+          }
+        }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+
 
 }

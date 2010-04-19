@@ -39,33 +39,49 @@
         </li>
         </li>
       </ul>
-
-
+    
 </div>
 <br/>
 <div class="response">
     <!-- Simple document -->
-    <h3 class="response">Remove a location to the user repository</h3>
+    <h3 class="response">Search</h3>
 
-    <br/>
-    <br/>
-    <br/>
+        <form action="../services/repository/search.html" method="GET">
+            <table class="document">
+                <tr><td class="dockey">Search:</td><td class="docvalue"><input type="text" name="q" size="80"/></td></tr>
+                <tr><td class="dockey">Offset:</td><td class="docvalue"><input type="text" name="offset" value="0" size="10"/></td></tr>
+                <tr><td class="dockey">Limit:</td><td class="docvalue"><input type="text" name="limit" value="100"size="10"/></td></tr>
+                <tr><td class="dockey">Sort by:</td><td class="docvalue"><input type="text" name="order" value="name"size="10"/> (options: name, date)</td></tr>
+                <tr><td colspan="2"><input type="submit" name="Add"/><input type="reset" name="Clear"></td></tr>
+            </table>
+        </form>
 
-    <form action="../services/locations/remove.html" method="GET">
+    <h3 class="response">Search components</h3>
+
+    <form action="../services/repository/search_components.html" method="GET">
         <table class="document">
-            <tr><td class="dockey">Location URL</td><td class="docvalue"><input type="text" name="location" size="80"/></td></tr>
+            <tr><td class="dockey">Search:</td><td class="docvalue"><input type="text" name="q" size="80"/></td></tr>
+            <tr><td class="dockey">Offset:</td><td class="docvalue"><input type="text" name="offset" value="0" size="10"/></td></tr>
+            <tr><td class="dockey">Limit:</td><td class="docvalue"><input type="text" name="limit" value="100"size="10"/></td></tr>
+            <tr><td class="dockey">Sort by:</td><td class="docvalue"><input type="text" name="order" value="name"size="10"/> (options: name, date)</td></tr>
+            <tr><td colspan="2"><input type="submit" name="Add"/><input type="reset" name="Clear"></td></tr>
+        </table>
+    </form>
+
+    <h3 class="response">Search flows</h3>
+
+
+    <form action="../services/repository/search_flows.html" method="GET">
+        <table class="document">
+            <tr><td class="dockey">Search:</td><td class="docvalue"><input type="text" name="q" size="80"/></td></tr>
+            <tr><td class="dockey">Offset:</td><td class="docvalue"><input type="text" name="offset" value="0" size="10"/></td></tr>
+            <tr><td class="dockey">Limit:</td><td class="docvalue"><input type="text" name="limit" value="100"size="10"/></td></tr>
+            <tr><td class="dockey">Sort by:</td><td class="docvalue"><input type="text" name="order" value="name"size="10"/> (options: name, date)</td></tr>
             <tr><td colspan="2"><input type="submit" name="Add"/><input type="reset" name="Clear"></td></tr>
         </table>
     </form>
 
     <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-
 
 </div>
 

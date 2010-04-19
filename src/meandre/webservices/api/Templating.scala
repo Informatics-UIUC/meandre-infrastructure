@@ -356,83 +356,81 @@ object Templating {
             </ul>
             <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 
-        <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Publish</span><![if gt IE 6]></a><![endif]>
-            <!--[if lte IE 6]>
-            <table>
-                <tr>
-                    <td><![endif]-->
-            <ul class="pureCssMenum">
-                <li class="pureCssMenui"><a class="pureCssMenui" href="#">List published</a></li>
-                <li class="pureCssMenui"><a class="pureCssMenui" href="#">Publish all</a></li>
-                <li class="pureCssMenui"><a class="pureCssMenui" href="#">Unpublish all</a></li>
+    <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Publish</span><![if gt IE 6]></a><![endif]>
+        <!--[if lte IE 6]>
+        <table>
+            <tr>
+                <td><![endif]-->
+        <ul class="pureCssMenum">
+            <li class="pureCssMenui"><a class="pureCssMenui" href="#">List published</a></li>
+            <li class="pureCssMenui"><a class="pureCssMenui" href="#">Publish all</a></li>
+            <li class="pureCssMenui"><a class="pureCssMenui" href="#">Unpublish all</a></li>
 
-                <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Others</span><![if gt IE 6]></a><![endif]>
-                    <!--[if lte IE 6]>
-                    <table>
-                        <tr>
-                            <td><![endif]-->
-                    <ul class="pureCssMenum">
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Published repository</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Demo repository</a></li>
-                    </ul>
-                    <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
-            </ul>
+            <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Others</span><![if gt IE 6]></a><![endif]>
+                <!--[if lte IE 6]>
+                <table>
+                    <tr>
+                        <td><![endif]-->
+                <ul class="pureCssMenum">
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Published repository</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Demo repository</a></li>
+                </ul>
+                <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+        </ul>
+        <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 
-
-        <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Infrastructure</span><![if gt IE 6]></a><![endif]>
-            <!--[if lte IE 6]>
-            <table>
-                <tr>
-                    <td><![endif]-->
-            <ul class="pureCssMenum">
-                <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Execution</span><![if gt IE 6]></a><![endif]>
-                    <!--[if lte IE 6]>
-                    <table>
-                        <tr>
-                            <td><![endif]-->
-                    <ul class="pureCssMenum">
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Run a flow</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Run a repository</a></li>
-                    </ul>
-                    <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
-                <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Jobs</span><![if gt IE 6]></a><![endif]>
-                    <!--[if lte IE 6]>
-                    <table>
-                        <tr>
-                            <td><![endif]-->
-                    <ul class="pureCssMenum">
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Running flows</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Job statuses</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Job consoles</a></li>
-                    </ul>
-                    <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
-                <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Logs</span><![if gt IE 6]></a><![endif]>
-                    <!--[if lte IE 6]>
-                    <table>
-                        <tr>
-                            <td><![endif]-->
-                    <ul class="pureCssMenum">
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Summarized</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Detailed</a></li>
-                    </ul>
-                    <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
-                <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Cluster</span><![if gt IE 6]></a><![endif]>
-                    <!--[if lte IE 6]>
-                    <table>
-                        <tr>
-                            <td><![endif]-->
-                    <ul class="pureCssMenum">
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Log</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/snare/MeandreInf/heartbeat")+'"'+""" target="_blank">Status</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/snare/MeandreInf/info")+'"'+""" target="_blank">Information</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Properties</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Shutdown server</a></li>
-                    </ul>
-                    <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
-            </ul>
-            <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
-
-
+    <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Infrastructure</span><![if gt IE 6]></a><![endif]>
+        <!--[if lte IE 6]>
+        <table>
+            <tr>
+                <td><![endif]-->
+        <ul class="pureCssMenum">
+            <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Execution</span><![if gt IE 6]></a><![endif]>
+                <!--[if lte IE 6]>
+                <table>
+                    <tr>
+                        <td><![endif]-->
+                <ul class="pureCssMenum">
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Run a flow</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Run a repository</a></li>
+                </ul>
+                <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+            <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Jobs</span><![if gt IE 6]></a><![endif]>
+                <!--[if lte IE 6]>
+                <table>
+                    <tr>
+                        <td><![endif]-->
+                <ul class="pureCssMenum">
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Running flows</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Job statuses</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Job consoles</a></li>
+                </ul>
+                <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+            <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Logs</span><![if gt IE 6]></a><![endif]>
+                <!--[if lte IE 6]>
+                <table>
+                    <tr>
+                        <td><![endif]-->
+                <ul class="pureCssMenum">
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Summarized</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Detailed</a></li>
+                </ul>
+                <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+            <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Cluster</span><![if gt IE 6]></a><![endif]>
+                <!--[if lte IE 6]>
+                <table>
+                    <tr>
+                        <td><![endif]-->
+                <ul class="pureCssMenum">
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Log</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/snare/MeandreInf/heartbeat")+'"'+""" target="_blank">Status</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/snare/MeandreInf/info")+'"'+""" target="_blank">Information</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Properties</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Shutdown server</a></li>
+                </ul>
+                <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+        </ul>
+        <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 
         <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Security</span><![if gt IE 6]></a><![endif]>
             <!--[if lte IE 6]>
@@ -458,6 +456,7 @@ object Templating {
                 <li class="pureCssMenui"><a class="pureCssMenui" href="#">Rovoke all user roles</a></li>
 
             </ul>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 
         <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Public</span><![if gt IE 6]></a><![endif]>
             <!--[if lte IE 6]>
@@ -469,7 +468,7 @@ object Templating {
                 <li class="pureCssMenui"><a class="pureCssMenui" href="#">Published repository</a></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="#">Demo repository</a></li>
             </ul>
-
+            <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 
         <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Help</span><![if gt IE 6]></a><![endif]>
             <!--[if lte IE 6]>
@@ -484,8 +483,20 @@ object Templating {
                 <li class="pureCssMenui"><a class="pureCssMenui" href="http://dev-tools.seasr.org/jira/secure/Dashboard.jspa">Issue tracking</a></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="http://dev-tools.seasr.org/fisheye/browse/Meandre-Infrastructure">SVN browser</a></li>
             </ul>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+      </ul>
+      
+      <ul style="margin-left:6px; padding:0px;" class="pureCssMenu pureCssMenum">
+        <li class="pureCssMenui">
+          <form style="padding:0; margin:0;" name="sfc" method="get" action="/services/repository/search.html">
+            <input type="text" id="sc" name="q" value="Search..." onclick="document.sfc.sc.value=''"/>
+          </form>
 
-        </ul>
+        <li>
+          <a style="margin-right:3px" href="""+'"'+(pathPrefix+"static/advanced_search.html")+'"'+""">Advanced search</a>
+        </li>
+        </li>
+      </ul>
   </div>
   """
 }

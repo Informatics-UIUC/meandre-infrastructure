@@ -176,6 +176,18 @@ class MeandreInfrastructureAbstractAPI(conf:Configuration) extends CrochetServle
   }
 
 
+  /**This function makes sure that there is a valid remote authenticated user.
+   *
+   * @param The function that needs to be called back if everything goes as planned
+   */
+  def requestFor(body: String => BasicDBObject) = {
+    val res: BasicDBObject = request.getRemoteUser match {
+      case null => FailResponse("Unable to retrieve user", "{}", "anonymous")
+      case user => body(user)
+    }
+    res serializeTo elements(0)
+  }
+
   //
   // Internal server error thrown while processing the request
   //
@@ -208,6 +220,5 @@ class MeandreInfrastructureAbstractAPI(conf:Configuration) extends CrochetServle
       "Request not found " + path,
       "Path does not align with Meandre API "+path )
   }
-
 
 }
