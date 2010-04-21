@@ -30,10 +30,13 @@ class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
    * @param response The response target
    */
   def formatToResponse ( format:String, response:HttpServletResponse ) = format match {
-    case "json" => response.setContentType("application/json") ; response.getWriter.println(asJSON)
-    case "xml"  => response.setContentType("application/xml")  ; response.getWriter.println(asXML)
-    case "html" => response.setContentType("text/html")        ; response.getWriter.println(asHTML)
-    case _      => response.setContentType("text/plain")       ; response.getWriter.println(self)   
+    case "json" => response.setContentType("application/json")    ; response.getWriter.println(asJSON)
+    case "xml"  => response.setContentType("application/xml")     ; response.getWriter.println(asXML)
+    case "html" => response.setContentType("text/html")           ; response.getWriter.println(asHTML)
+    case "rdf"  => response.setContentType("application/rdf+xml") ; response.getWriter.println(asRDF)
+    case "ttl"  => response.setContentType("text/plain")          ; response.getWriter.println(asTTL)
+    case "nt"   => response.setContentType("text/plain")          ; response.getWriter.println(asNT)
+    case _      => response.setContentType("text/plain")          ; response.getWriter.println(self)
   }
 
 
@@ -49,6 +52,15 @@ class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
   /** Converts to html */
   val reponseAsHTMLTo = cResFormat("html")
 
+  /** Converts to rdf */
+  val reponseAsRDFTo = cResFormat("rdf")
+
+  /** Converts to ttl */
+  val reponseAsTTLTo = cResFormat("ttl")
+
+  /** Converts to nt */
+  val reponseAsNTTo = cResFormat("nt")
+
   /** Given a response document, it formats it according to the provided
    * format.
    *
@@ -59,6 +71,9 @@ class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
     case "json" => writer.println(asJSON) ; this
     case "xml"  => writer.println(asXML)  ; this
     case "html" => writer.println(asHTML) ; this
+    case "rdf"  => writer.println(asRDF)  ; this
+    case "ttl"  => writer.println(asTTL)  ; this
+    case "nt"   => writer.println(asNT)   ; this
     case _      => writer.println(self)   ; this
   }
 
@@ -74,20 +89,50 @@ class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
   /** Converts to html */
   val asHTMLTo = cFormat("html")
 
+  /** Converts to rdf */
+  val asRDFTo = cFormat("rdf")
 
-  /** Given a response document, it formats it according to the provided
+  /** Converts to ttl */
+  val asTTLTo = cFormat("ttl")
+
+  /** Converts to nt */
+  val asNTTo = cFormat("nt")
+
+  /** Given a response document, it formats it according to the requested
    * format.
    *
-   * @param format The target format
    * @param response The basic object containing the response to format
    */
   def serializeTo ( format:String ) : String = format match {
     case "json" => asJSON.toString
     case "xml"  => asXML.toString
     case "html" => asHTML.toString
+    case "rdf"  => asRDF.toString
+    case "ttl"  => asTTL.toString
+    case "nt"   => asNT.toString
     case _      => asJSON.toString
   }
 
+  /** Given a response document, it formats it according to the requested
+   * format.
+   *
+   * @param response The basic object containing the response to format
+   */
+  def asRDF = self.get("success").asInstanceOf[BasicDBObject].getString("rdf")
+
+  /** Given a response document, it formats it according to the requested
+   * format.
+   *
+   * @param response The basic object containing the response to format
+   */
+  def asTTL = self.get("success").asInstanceOf[BasicDBObject].getString("ttl")
+
+  /** Given a response document, it formats it according to the requested
+   * format.
+   *
+   * @param response The basic object containing the response to format
+   */
+  def asNT = self.get("success").asInstanceOf[BasicDBObject].getString("nt")
 
   /** Converts the document into a JSON string
     *
@@ -249,7 +294,8 @@ class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
 
       sbProcessedRes.append(pre)
       sbProcessedRes.append(url match {
-        case u if u.startsWith("meandre://") => """<a href="%s">%s</a> (_,_,_)""".format(u,u)
+        // TODO Add functionality to the mendre specific links
+        case u if u.startsWith("meandre://") => """<a href="%sservices/repository/describe.html?uri=%s">%s</a> (<a href="%sservices/repository/describe.rdf?uri=%s">RDF</a>,<a href="%sservices/repository/describe.ttl?uri=%s">TTL</a>,<a href="%sservices/repository/describe.nt?uri=%s">NT</a>) [<a href="%sservices/repository/remove.html?uri=%s">Remove</a>]""".format(prefix,u,u,u,prefix,u,prefix,u,prefix,u,prefix,u)
         case u => """<a href="%s">%s</a>""".format(url,url)
       })
 

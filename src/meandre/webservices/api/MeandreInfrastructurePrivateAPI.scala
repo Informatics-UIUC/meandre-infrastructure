@@ -7,6 +7,8 @@ import meandre.kernel.Configuration
 import meandre.kernel.state.{LocationElement, Store}
 import com.mongodb.{BasicDBList, BasicDBObject}
 import meandre.state.Repository
+import com.hp.hpl.jena.rdf.model.ModelFactory
+import java.io.{ByteArrayOutputStream, StringReader}
 
 /**
  * The Meandre infrastructure implementation of the services API
@@ -425,6 +427,78 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
             labeled.put("repository", list)
             OKResponse(labeled,user)
           }
+        }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/repository/describe\.(rdf|ttl|nt)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+         val rdfType = elements(0) match {
+           case "ttl" => "TURTLE"
+           case "nt"  => "N3"
+           case _     => "RDF/XML-ABBREV"
+         }
+         val st = Store(cnf, user, false)
+         val res = new BasicDBObject
+         params.contains("uri") match {
+           case true  => st.getRDFForURI(params("uri"),elements(0)) match {
+                            case None     => FailResponse(params("uri")+" no a known URI", res, user)
+                            case Some(ba) => res.put(elements(0),new String(ba)) ; OKResponse(res,user)
+                         }
+           case false => val rdf = new StringBuffer(10000)
+                         st.getAllRDF(None,"nt").foldLeft(rdf)((a,b)=>a.append(new String(b)+'\n'))
+                         rdfType match {
+                           case "N3" => res.put(elements(0),rdf.toString) ; OKResponse(res,user)
+                           case _    => val model = ModelFactory.createDefaultModel
+                                        model.read(new StringReader(rdf.toString),null,"N-TRIPLE")
+                                        val baos = new ByteArrayOutputStream
+                                        model.write(baos,rdfType)
+                                        res.put(elements(0),baos.toString) ; OKResponse(res,user)
+                         }
+         }
+    }
+  }
+
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/repository/describe.(html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        params.contains("uri") match {
+          case false => FailResponse("Missing required URIs of the components/flows to remove", new BasicDBObject, user)
+          case true  => val descs = new BasicDBList
+                        val st = Store(cnf, user, false)
+                        paramsMap("uri").foreach(
+                          uri => st.descriptorFor(uri) match {
+                            case None =>
+                            case Some(descriptor) => descs add descriptor2BasicDBObject(descriptor)
+                          }
+                        )
+                        val res = new BasicDBObject
+                        res.put("descriptors",descs) ; OKResponse(res,user)
+        }
+    }
+  }
+
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/repository/remove\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        params.contains("uri") match {
+          case false => FailResponse("Missing required URIs of the components/flows to remove", new BasicDBObject, user)
+          case true  => val uris = new BasicDBList
+                        val st = Store(cnf, user, false)
+                        paramsMap("uri").foreach(
+                          uri => { st.remove(uri) ; uris.add(uri) }
+                        )
+                        val res = new BasicDBObject
+                        res.put("uris",uris) ; OKResponse(res,user)
         }
     }
   }

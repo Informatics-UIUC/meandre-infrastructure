@@ -1,9 +1,10 @@
 package meandre
 
-import kernel.rdf.Descriptor
+import kernel.rdf.{CommonDescription, Property, Descriptor}
 import meandre.kernel.Implicits._
 import java.util.Date
 import java.net.URL
+import com.mongodb.{DBObject, BasicDBObject}
 
 /**
  * Provides a simple collection of commodity tools for sorting descriptors,
@@ -169,5 +170,40 @@ object Tools {
     (httpConnection.getContentType,httpConnection.getContentEncoding,httpConnection.getInputStream)
   }
 
+
+  //----------------------------------------------------------------------
+
+  def descriptor2BasicDBObject ( desc:Descriptor ) =  {
+
+    def processCommonDescription(cd:CommonDescription) = {
+      val res:BasicDBObject = """
+             {
+              "name":"%s",
+              "description":"%s",
+              "creator":"%s",
+              "creationDate":"%s",
+              "rights":"%s",
+              "tags":"%s"
+             }
+          """.format(
+            cd.name,
+            cd.description.getOrElse(""),
+            cd.creator.getOrElse(""),
+            cd.creationDate,
+            cd.rights.getOrElse(""),
+            cd.tags.foldLeft("")((a,b)=>a+b+", ").replaceAll(", $","")
+          )
+      res
+    }
+
+    // TODO HERE!!! Working on this!!!
+    def processProperties(cp:Map[String,Property]) = {}
+
+
+    val res = new BasicDBObject
+    res.put("uri",desc.uri)
+    res.putAll(processCommonDescription(desc.description).asInstanceOf[DBObject])
+    res
+  }
 
 }

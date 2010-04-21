@@ -6,8 +6,9 @@ import com.hp.hpl.jena.vocabulary._
 import com.hp.hpl.jena.vocabulary.RDF.`type`
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.io.StringReader
 import java.net.URL
+import java.io.{InputStreamReader, StringReader}
+import com.mongodb.BasicDBObject
 
 /** The base class of the context hierarchy 
  * 
@@ -130,7 +131,8 @@ abstract sealed case class Descriptor(
 		uri: String,
 		description: CommonDescription,
 		properties: Map[String,Property]
-)
+) 
+
 /** The component descriptor contains all the related information for a component.
  * 
  * @author Xavier Llora
@@ -190,11 +192,11 @@ object DescriptorsFactory  {
 	def readModelFromURL ( url:String ) = {
 		val model = ModelFactory.createDefaultModel
 		try {
-			model.read(getInputStreamForURL(url),null,"RDF/XML")
+			model.read(new InputStreamReader(getInputStreamForURL(url)),null,"RDF/XML")
 		} catch  {
 			case _ => try { model.read(getInputStreamForURL(url),null,"TTL") }
                   catch {
-                  		case _ => try { model.read(getInputStreamForURL(url),null,"N-TRIPLE") } 
+                  		case _ => try { model.read(new InputStreamReader(getInputStreamForURL(url)),null,"N-TRIPLE") } 
                   				  finally { model }
                   }
                   finally { model }
@@ -211,11 +213,11 @@ object DescriptorsFactory  {
   def readModelFromText(text: String) = {
     val model = ModelFactory.createDefaultModel
     try {
-      model.read(new StringReader(text),"RDF/XML")
+      model.read(new StringReader(text),null,"RDF/XML")
     } catch {
-      case _ => try {model.read(new StringReader(text), "TTL")}
+      case _ => try {model.read(new StringReader(text),null,"TTL")}
       catch {
-        case _ => try {model.read(new StringReader(text), "N-TRIPLE")}
+        case _ => try {model.read(new StringReader(text),null,"N-TRIPLE")}
         finally {model}
       }
       finally {model}

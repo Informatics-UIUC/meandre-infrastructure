@@ -6,6 +6,7 @@ import meandre.kernel.rdf._
 import com.mongodb.{DBObject, BasicDBList, BasicDBObject, Mongo}
 import java.io.{ByteArrayInputStream, ObjectInputStream, ObjectOutputStream, ByteArrayOutputStream}
 import com.hp.hpl.jena.rdf.model.{ModelFactory, Model}
+import scala.Option
 
 /**
  * Provides access to the user repository.
@@ -612,7 +613,55 @@ class Repository ( val cnf:Configuration, val userName:String ) {
    * @return True if exist, false otherwise
    */
   def exist ( uri:RDFURI ) = 0 < collection.getCount(wrapURI(uri))
-  
+
+  /**Given a URI returns the bytes of the RDF in the requested flavor.
+   *
+   * @param uri The URI of the requested component/flow
+   * @param flavor The flavor of the requested component (TTL,NT,RDF)
+   * @return An option containing the bytes if found
+   */
+  def getRDFForURI ( uri:RDFURI, flavor:String ) = {
+    val key = flavor match {
+      case "ttl" => K_TTL
+      case "nt"  => K_NT
+      case _     => K_RDF
+    }
+    val cnd:BasicDBObject = """{"%s":"%s"}"""  format (K_ID,uri)
+    val fld:BasicDBObject = """{"%s": %d }"""  format (key,1)
+    collection findOne (cnd,fld) match {
+      case null => None
+      case rdf  => Some(rdf.get(key).asInstanceOf[Array[Byte]])
+    }
+  }
+
+
+  /**Given a URI returns the bytes of the RDF in the requested flavor.
+   *
+   * @param ctype The type of the requested components/flows
+   * @param flavor The flavor of the requested component (TTL,NT,RDF)
+   * @return An option containing the bytes if found
+   */
+  def getAllRDF ( ctype:Option[String], flavor:String ) = {
+    val key = flavor match {
+      case "ttl" => K_TTL
+      case "nt"  => K_NT
+      case _     => K_RDF
+    }
+    val cnd = ctype match {
+      case Some(V_FLOW)      => """{"%s":"%s"}"""  format (K_TYPE,V_FLOW)
+      case Some(V_COMPONENT) => """{"%s":"%s"}"""  format (K_TYPE,V_COMPONENT)
+      case _                 => "{}"
+    }
+    val fld:BasicDBObject = """{"%s": %d }"""  format (key,1)
+    var res:List[Array[Byte]] = Nil
+    val cur = collection find (cnd,fld)
+    while ( cur.hasNext ) {
+      res ::= cur.next.get(key).asInstanceOf[Array[Byte]]
+    }
+    res
+  }
+
+
 }
 
 /**The companion object for the Repository class.
