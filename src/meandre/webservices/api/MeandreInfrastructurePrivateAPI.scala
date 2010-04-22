@@ -4,11 +4,15 @@ import meandre.Tools._
 import meandre.kernel.Implicits._
 import meandre.webservices.api.Templating._
 import meandre.kernel.Configuration
-import meandre.kernel.state.{LocationElement, Store}
 import com.mongodb.{BasicDBList, BasicDBObject}
 import meandre.state.Repository
-import com.hp.hpl.jena.rdf.model.ModelFactory
-import java.io.{ByteArrayOutputStream, StringReader}
+import org.apache.commons.fileupload.disk.DiskFileItemFactory
+import org.apache.commons.fileupload.servlet.ServletFileUpload
+import org.apache.commons.fileupload.FileItem
+import com.hp.hpl.jena.rdf.model.{Model, ModelFactory}
+import java.io.{ByteArrayInputStream, InputStream, ByteArrayOutputStream, StringReader}
+import meandre.kernel.state.{BundledElement, LocationElement, Store}
+import meandre.kernel.rdf._
 
 /**
  * The Meandre infrastructure implementation of the services API
@@ -497,6 +501,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
       user =>
         params.contains("uri") match {
           case false => FailResponse("Missing required URIs of the components/flows to remove", new BasicDBObject, user)
+
           case true  => val uris = new BasicDBList
                         val st = Store(cnf, user, false)
                         paramsMap("uri").foreach(
@@ -505,6 +510,142 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
                         val res = new BasicDBObject
                         res.put("uris",uris) ; OKResponse(res,user)
         }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+
+  post("""/services/repository/add\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+
+        //
+        // TODO Currently deprecating embedding, should I rethink this decision?
+        //
+        //var embed = false
+        var overwrite = false
+        val upload = new ServletFileUpload(new DiskFileItemFactory)
+        val lstItems = upload parseRequest request
+        val itr = lstItems.iterator
+
+        var descs: List[Descriptor] = Nil
+        var cntxs: Map[String, (String,Array[Byte])] = Map()
+
+        while (itr.hasNext) {
+          val item = itr.next.asInstanceOf[FileItem]
+
+          // Get the name of the field
+          val fieldName = item.getFieldName
+
+          // check if the current item is a form field or an uploaded file
+          if (fieldName equals "repository") {
+            val data = item.getString
+            val sRDFContent = new String(data)
+            if (sRDFContent.length > 0)
+              descs = descs ++ DescriptorsFactory.buildDescriptors(DescriptorsFactory.readModelFromText(sRDFContent))
+          }
+          else if (fieldName equals "context") {
+            val sFile = item.getName
+            val data = item.get
+            if (data.length > 0) {
+              cntxs += sFile -> (item.getContentType,data)
+            }
+          }
+//          else if (fieldName equals "embed") {
+//            val sValue = item.getString.trim
+//            if (sValue.length > 0)
+//              embed = sValue match {
+//                case "true" => true
+//                case _ => false
+//              }
+//          }
+          else if (fieldName equals "overwrite") {
+            val sValue = item.getString.trim
+            if (sValue.length > 0)
+              overwrite = sValue match {
+                case "true" => true
+                case _ => false
+              }
+          }
+        }
+
+        if ( descs.isEmpty )
+          FailResponse("Missing required repository field", new BasicDBObject, user)
+        else {
+          val st = Store(cnf, user, overwrite)
+          val scntxs = cntxs.toList.sort( (a,b) => (a._1 compareTo b._1) < 0 )
+          val names = scntxs.map(_._1)
+          val types = scntxs.map(_._2._1)
+
+          val out = descs.map( _ match {
+            case c:ComponentDescriptor =>
+              val iss = scntxs.map( kv => new ByteArrayInputStream(kv._2._2) )
+              st.addElements(BundledElement(c,names,types,iss))
+
+            case f:FlowDescriptor =>
+              st.addElements(BundledElement(f,Nil,Nil,Nil))
+          })
+
+          // Return type
+          val res = new BasicDBObject
+          val uris = new BasicDBList
+          out.foreach(_.foreach(_ match {
+            case Right(s) => s.foreach(_ match {
+              case Some(uri) => uris add uri
+              case _ =>
+            })
+            case _ =>
+          }))
+          res.put("uris", uris )
+          OKResponse(res, user)
+        }
+
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/repository/integrity\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        val st = Store(cnf, user, false)
+        //
+        // Check for missing components
+        //
+        val missingComponents = new BasicDBObject
+        st.flows.foreach( f => {
+          val mc = new BasicDBList
+          f.instances.foreach(
+            cid => if (!st.exist(cid.componentUri)) mc add cid.componentUri
+          )
+          if ( !mc.isEmpty )
+            missingComponents.put(f.uri,mc)
+        })
+        //
+        // Check for missing contexts
+        //
+        val missingContexts = new BasicDBObject
+        val outsiders = new BasicDBList
+        st.components.foreach ( c => {
+          val mc = new BasicDBList
+          c.context.foreach ( _ match {
+            case URIContext(uri) if (uri.startsWith("context://localhost") && !st.containsContext(uri)) => mc add uri
+            case URIContext(uri) if (!uri.startsWith("context://localhost") && !uri.startsWith(c.uri)) => outsiders add uri
+            case _ =>
+          })
+          if ( !mc.isEmpty )
+            missingContexts.put(c.uri,mc)
+        })
+
+        //
+        // Generate the response
+        //
+        val res = new BasicDBObject
+        res.put("missing components", missingComponents)
+        res.put("missing contexts", missingContexts)
+        res.put("external contexts", outsiders)
+        OKResponse(res, user)
+
     }
   }
 

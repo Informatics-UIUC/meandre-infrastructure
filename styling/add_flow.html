@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>MI - Add Location</title>
+    <title>MI - Add Component</title>
     <link rel="stylesheet" type="text/css" href="style.css"> 
 </head>
 <body>
@@ -12,7 +12,7 @@
     <ul class="pureCssMenu pureCssMenum">
         <li class="pureCssMenui"><a class="pureCssMenui" href="../">Meandre</a></li>
 
-        <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Help</span><![if gt IE 6]></a><![endif]>
+        <li class="pureCssMenui"><a class="pureCssMenui" href="add_component.html#"><span>Help</span><![if gt IE 6]></a><![endif]>
             <!--[if lte IE 6]>
             <table>
                 <tr>
@@ -43,18 +43,51 @@
 <br/>
 <div class="response">
     <!-- Simple document -->
-    <h3 class="response">Add a location to the user repository</h3>
+    <h3 class="response">Add a component to the user repository</h3>
 
-    <br/>
-    <br/>
-    <br/>
+   
 
-    <form action="../services/locations/add.html" method="GET">
+    <form action="../services/repository/add.html" enctype="multipart/form-data" method="POST">
         <table class="document">
-            <tr><td class="dockey">Location URL</td><td class="docvalue"><input type="text" name="location" size="80"/></td></tr>
-            <tr><td class="dockey">Description</td><td class="docvalue"><textarea name="description" cols="80"></textarea></td></tr>
-            <tr><td colspan="2"><input type="submit" name="Add"/><input type="reset" name="Clear"></td></tr>
-        </table>
+            <tr>
+                <td>
+                    <h3>Descriptor:</h3>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="file" name="repository"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="file" name="repository"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="file" name="repository"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Embedded? </label><input type="checkbox" name="embed" value="true"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Overwrite? </label><input type="checkbox" name="overwrite" value="true"/>
+                </td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="submit" class="submit" value="Upload"/>
+                    <input type="reset" class="reset" value="Clear data"/>
+                </td>
+            </tr>         </table>
     </form>
 
     <br/>

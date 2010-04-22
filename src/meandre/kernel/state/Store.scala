@@ -201,6 +201,16 @@ extends Repository(cnf,userName) {
     }
   }
 
+  /**Check if the user store contains the requested context.
+   *
+   * @param context The uri of the context to check
+   * @retuns True if the context exist, false otherwise
+   */
+  def containsContext ( context:String ):Boolean = contextsPool.containsContext(context) match {
+    case Right(t) => t
+    case _ => false
+  }
+
   /**Returns the list of locations in the Store
    *
    * @return The list of locations

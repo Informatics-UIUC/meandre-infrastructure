@@ -295,7 +295,7 @@ class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
       sbProcessedRes.append(pre)
       sbProcessedRes.append(url match {
         // TODO Add functionality to the mendre specific links
-        case u if u.startsWith("meandre://") => """<a href="%sservices/repository/describe.html?uri=%s">%s</a> (<a href="%sservices/repository/describe.rdf?uri=%s">RDF</a>,<a href="%sservices/repository/describe.ttl?uri=%s">TTL</a>,<a href="%sservices/repository/describe.nt?uri=%s">NT</a>) [<a href="%sservices/repository/remove.html?uri=%s">Remove</a>]""".format(prefix,u,u,u,prefix,u,prefix,u,prefix,u,prefix,u)
+        case u if u.startsWith("meandre://") => """<a href="%sservices/repository/describe.html?uri=%s">%s</a> (<a href="%sservices/repository/describe.rdf?uri=%s">RDF</a>,<a href="%sservices/repository/describe.ttl?uri=%s">TTL</a>,<a href="%sservices/repository/describe.nt?uri=%s">NT</a>) [<a href="%sservices/repository/remove.html?uri=%s">Remove</a>]""".format(prefix,u,u,prefix,u,prefix,u,prefix,u,prefix,u)
         case u => """<a href="%s">%s</a> [<a href="%sservices/repository/describe.html?uri=%s">Desc?</a>]""".format(url,url,prefix,url)
       })
 
@@ -401,6 +401,7 @@ object Templating {
                         <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/list_components.html")+'"'+""">List</a></li>
                         <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/list_components.html?order=name")+'"'+""">Sorted by name</a></li>
                         <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/list_components.html?order=date")+'"'+""">Sorted by date</a></li>
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/add_component.html")+'"'+""">Add</a></li>
                     </ul>
                     <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Flows</span><![if gt IE 6]></a><![endif]>
@@ -412,6 +413,7 @@ object Templating {
                         <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/list_flows.html")+'"'+""">List</a></li>
                         <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/list_flows.html?order=name")+'"'+""">Sorted by name</a></li>
                         <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/list_flows.html?order=date")+'"'+""">Sorted by date</a></li>
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/add_flow.html")+'"'+""">Add</a></li>
                     </ul>
                     <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Tags</span><![if gt IE 6]></a><![endif]>
@@ -426,8 +428,9 @@ object Templating {
                     </ul>
                     <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 
-                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/clear.html")+'"'+""">Clear</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/integrity.html")+'"'+""">Integrity</a></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/regenerate.html")+'"'+""">Regenerate</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/clear.html")+'"'+""">Clear</a></li> 
             </ul>
             <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 

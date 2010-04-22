@@ -98,10 +98,19 @@ class ContextsPool (val cnf:Configuration) {
     if (file!=null) { file writeTo os ; fileName }
     else throw new Exception("File "+fileName+" not found")
   }
+
+  /**Return true if the file exists.
+   *
+   * @param fileName The file name to check
+   * @return True if exist
+   */
+  def containsContext ( fileName:String ) = safeOp {
+    !gfs.find(fileName).isEmpty 
+  }
 }
 
 /**The companion object for the context pool.
- *
+  *
  */
 object ContextsPool {
 
