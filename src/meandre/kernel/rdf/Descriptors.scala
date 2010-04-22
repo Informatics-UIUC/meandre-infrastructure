@@ -14,7 +14,7 @@ import com.mongodb.BasicDBObject
  * 
  * @author Xavier Llora
  */
-abstract class Context ()                                  
+abstract sealed class Context ()                                  
 /** A representation of a context indicating a resource
  * 
  * @author Xavier Llora
@@ -71,7 +71,7 @@ case class CommonDescription (
  * 
  * @author Xavier Llora
  */
-abstract class FiringPolicy()
+abstract sealed class FiringPolicy()
 /** The firing policy that indicates that data on all ports should be present 
  * 
  * @author Xavier Llora
@@ -110,7 +110,7 @@ case class ComponentInstanceDescription (
  *
  * @author Xavier Llora
  */
-case class ModeDescription()
+sealed case class ModeDescription()
 /**The mode of execution of a component is a compute one
  *
  * @author Xavier Llora
@@ -130,7 +130,7 @@ case class WebUIMode() extends ModeDescription()
 abstract sealed case class Descriptor(
 		uri: String,
 		description: CommonDescription,
-		properties: Map[String,Property]
+		properties: Map[String,PropertyDescription]
 ) 
 
 /** The component descriptor contains all the related information for a component.

@@ -1,10 +1,10 @@
 package meandre
 
-import kernel.rdf.{CommonDescription, Property, Descriptor}
+import kernel.rdf._
 import meandre.kernel.Implicits._
 import java.util.Date
 import java.net.URL
-import com.mongodb.{DBObject, BasicDBObject}
+import com.mongodb.{BasicDBList, DBObject, BasicDBObject}
 
 /**
  * Provides a simple collection of commodity tools for sorting descriptors,
@@ -173,6 +173,11 @@ object Tools {
 
   //----------------------------------------------------------------------
 
+  /**Given a descriptor returns a BasicDBObject containing the data.
+   *
+   * @param desc The descriptor to transform
+   * @return The JSON object containing the descriptor
+   */
   def descriptor2BasicDBObject ( desc:Descriptor ) =  {
 
     def processCommonDescription(cd:CommonDescription) = {
@@ -196,13 +201,66 @@ object Tools {
       res
     }
 
-    // TODO HERE!!! Working on this!!!
-    def processProperties(cp:Map[String,Property]) = {}
+    def processProperties(cp:Map[String,PropertyDescription]) = {
+      val res = new BasicDBList
+      cp.toList.map(
+        kv => {
+          val p = new BasicDBObject
+          p.put("name", kv._2.key)
+          p.put("value", kv._2.value)
+          p.put("description", kv._2.description.getOrElse(""))
+          kv._2.other.foreach(okv=>p.put(okv._1,okv._2))
+          p
+        }
+      ).sort((a,b)=>a.get("name").toString<b.get("name").toString).foreach(res add _)
+      res
+    }
 
+    def processPortList(pl:List[Port]) = {
+
+      def processPort(port:Port) = {
+        val res = new BasicDBObject
+        res.put("uri",port.uri)
+        res.put("name",port.name)
+        res.put("description",port.description.getOrElse(""))
+        res
+      }
+
+      val rl = new BasicDBList
+      pl.foreach(p => rl.add(processPort(p)))
+      rl
+    }
 
     val res = new BasicDBObject
     res.put("uri",desc.uri)
     res.putAll(processCommonDescription(desc.description).asInstanceOf[DBObject])
+    res.put("properties",processProperties(desc.properties).asInstanceOf[DBObject])
+
+    desc match {
+      case d:ComponentDescriptor =>
+              res.put("runnable",d.runnable)
+              res.put("format",d.format)
+              res.put("firing policy",d.firingPolicy match {
+                case f:FiringAll => "all"
+                case f:FiringAny => "any"
+              })
+              res.put("resource location",d.resourceLocation)
+              res.put("mode",d.mode match {
+                case m:ComputeMode => "compute"
+                case m:WebUIMode   => "web mode"
+              })
+              val lc = new BasicDBList
+              d.context.foreach ( _ match {
+                case URIContext(uri)     => lc add uri
+                case EmbeddedContext(ec) => lc add ec
+              })
+              res.put("contexts",lc)
+              res.put("inputs",processPortList(d.inputs))
+              res.put("outputs",processPortList(d.outputs))
+
+      case d:FlowDescriptor =>     // TODO I'm here (need to do add the flow)
+    }
+
     res
   }
 

@@ -478,8 +478,13 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
                             case Some(descriptor) => descs add descriptor2BasicDBObject(descriptor)
                           }
                         )
-                        val res = new BasicDBObject
-                        res.put("descriptors",descs) ; OKResponse(res,user)
+                        if ( descs.size>0 ) {
+                          val res = new BasicDBObject
+                          res.put("descriptors",descs) ; OKResponse(res,user)
+                        }
+                        else {
+                          FailResponse("Unknow URI %s" format params("uri"), new BasicDBObject, user)
+                        }
         }
     }
   }

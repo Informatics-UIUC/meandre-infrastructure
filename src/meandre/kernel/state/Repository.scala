@@ -199,8 +199,8 @@ class Repository ( val cnf:Configuration, val userName:String ) {
     val bdbo = descriptor2BasicDBObject(comp)
     bdbo.put(K_TYPE,V_COMPONENT)
     bdbo.put(K_MODE,comp.mode match {
-      case m:ComputeMode    => V_COMPUTE
-      case m:FlowDescriptor => V_WEBUI
+      case m:ComputeMode => V_COMPUTE
+      case m:WebUIMode   => V_WEBUI
     })
     bdbo
   }
