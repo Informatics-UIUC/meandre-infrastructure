@@ -296,7 +296,7 @@ class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
       sbProcessedRes.append(url match {
         // TODO Add functionality to the mendre specific links
         case u if u.startsWith("meandre://") => """<a href="%sservices/repository/describe.html?uri=%s">%s</a> (<a href="%sservices/repository/describe.rdf?uri=%s">RDF</a>,<a href="%sservices/repository/describe.ttl?uri=%s">TTL</a>,<a href="%sservices/repository/describe.nt?uri=%s">NT</a>) [<a href="%sservices/repository/remove.html?uri=%s">Remove</a>]""".format(prefix,u,u,u,prefix,u,prefix,u,prefix,u,prefix,u)
-        case u => """<a href="%s">%s</a>""".format(url,url)
+        case u => """<a href="%s">%s</a> [<a href="%sservices/repository/describe.html?uri=%s">Desc?</a>]""".format(url,url,prefix,url)
       })
 
     }

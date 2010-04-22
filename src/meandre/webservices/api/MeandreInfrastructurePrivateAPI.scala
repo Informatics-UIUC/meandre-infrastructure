@@ -198,7 +198,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
             case _ => "{}"
           }
         }
-        val flowsMD = st.queryMetadata("{\"" + K_TYPE + "\": \"" + V_COMPONENT + "\""+"""}""",cnd,skip,limit)
+        val flowsMD = st.queryMetadata("{\"" + K_TYPE + "\": \"" + V_FLOW + "\""+"""}""",cnd,skip,limit)
         val list = new BasicDBList
         flowsMD foreach (
                 metadata => {

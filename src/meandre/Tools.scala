@@ -231,6 +231,56 @@ object Tools {
       rl
     }
 
+    def processComponentInstanceList(cl:List[ComponentInstanceDescription]) ={
+
+      def processComponentInstance(cid:ComponentInstanceDescription)  = {
+        val res = new BasicDBObject
+        res.put("uri",cid.uri)
+        res.put("name",cid.name)
+        res.put("description",cid.description.getOrElse(""))
+        res.put("component uri",cid.componentUri)
+        val lp = new BasicDBList
+        cid.properties.toList.map(
+          kv => {
+            val p = new BasicDBObject
+            p.put("name", kv._2.key)
+            p.put("value", kv._2.value)
+            kv._2.other.foreach(okv=>p.put(okv._1,okv._2))
+            p
+          }
+        ).sort((a,b)=>a.get("name").toString<b.get("name").toString).foreach(lp add _)
+        res.put("properties",lp)
+        res
+      }
+
+      val rl = new BasicDBList
+      cl.foreach(cid => rl.add(processComponentInstance(cid)))
+      rl
+    }
+
+    def processConnectorsList ( lcd:List[ConnectorDescription] ) = {
+
+      def processConnector ( con:ConnectorDescription ) ={
+        val res = new BasicDBObject
+
+        res.put("uri",con.uri)
+        res.put("source instance",con.sourceInstance)
+        res.put("source instance data port",con.sourceInstanceDataPort)
+        res.put("target instance",con.targetInstance)
+        res.put("target instance data port",con.targetInstanceDataPort)
+
+        res
+      }
+
+      val rl = new BasicDBList
+      lcd.foreach(con => rl.add(processConnector(con)) )
+      rl
+    }
+
+    //
+    // Generate the JSON representation
+    //
+
     val res = new BasicDBObject
     res.put("uri",desc.uri)
     res.putAll(processCommonDescription(desc.description).asInstanceOf[DBObject])
@@ -258,7 +308,10 @@ object Tools {
               res.put("inputs",processPortList(d.inputs))
               res.put("outputs",processPortList(d.outputs))
 
-      case d:FlowDescriptor =>     // TODO I'm here (need to do add the flow)
+      case d:FlowDescriptor =>
+              res.put("instances",processComponentInstanceList(d.instances))
+              res.put("connectors",processConnectorsList(d.connectors))
+
     }
 
     res
