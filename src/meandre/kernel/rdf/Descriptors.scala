@@ -194,9 +194,9 @@ object DescriptorsFactory  {
 		try {
 			model.read(new InputStreamReader(getInputStreamForURL(url)),null,"RDF/XML")
 		} catch  {
-			case _ => try { model.read(getInputStreamForURL(url),null,"TTL") }
+			case _ => try { model.read(new InputStreamReader(getInputStreamForURL(url)),null,"TURTLE") }
                   catch {
-                  		case _ => try { model.read(new InputStreamReader(getInputStreamForURL(url)),null,"N-TRIPLE") } 
+                  		case s => try { model.read(new InputStreamReader(getInputStreamForURL(url)),null,"N-TRIPLE") } 
                   				  finally { model }
                   }
                   finally { model }

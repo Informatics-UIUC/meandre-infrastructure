@@ -184,7 +184,6 @@ extends Repository(cnf,userName) {
                 {pair:Tuple3[String,String,InputStream] => pair match {
                     case (name,mime,is) => {
                       val  modName = name.replaceAll("""\s+""","-")
-                      // TODO network can be improved by using Futures and then collecting values
                       val fileName = contextsPool.update(modName,mime,is)
                       cnames ::= (fileName match {
                         case Left(_) => ""

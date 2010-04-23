@@ -51,13 +51,6 @@ class MeandreInfrastructureResourcesAPI(cnf: Configuration) extends HttpServlet 
         response.sendError(SC_NOT_FOUND, "Context %s not found" format fileName)
 
     }
-
-
-//    val res: BasicDBObject = """{
-//         "status":"OK",
-//         "success":{"message":"%s","exists":"%s"}
-//    }""".format(elements(0),contextsPool.containsContext("context://localhost"+elements(0)))
-//    res serializeTo "json"
   }
 
   // ---------------------------------------------------------------------------

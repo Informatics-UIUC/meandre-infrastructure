@@ -1,6 +1,7 @@
 package meandre.kernel.state
 
 import meandre.kernel.Configuration
+import meandre.kernel.Implicits._
 import meandre.Tools.safeOp
 import com.mongodb.gridfs.GridFS
 import java.io.{OutputStream, InputStream}
@@ -23,6 +24,8 @@ class ContextsPool (val cnf:Configuration) {
   val mongo = new Mongo
   val    db = mongo getDB cnf.MEANDRE_DB_NAME
   val   gfs = new GridFS(db,cnf.MEANDRE_CONTEXT_FS_COLLECTION)
+  val colFS = db getCollection cnf.MEANDRE_CONTEXT_FS_COLLECTION+".files"
+  val colCK = db getCollection cnf.MEANDRE_CONTEXT_FS_COLLECTION+".chunks"
 
   //----------------------------------------------------------------------
 
@@ -57,7 +60,22 @@ class ContextsPool (val cnf:Configuration) {
     file.save
     file.setFilename("context://localhost/resources/%s%s" format (file.getMD5,nfn))
     file.save
-    (file.getMD5,file.getFilename)
+    val (finalMD5, finalFileName) = (file.getMD5,file.getFilename)
+    //
+    // Clean left overs
+    //
+    val cnd:BasicDBObject    = ("""{"filename":"%s"}""" format finalFileName)
+    val sortF:BasicDBObject  = """{"filename":1,"uploadDate":-1}"""
+    val cur = colFS.find(cnd).sort(sortF).skip(1)
+    while ( cur.hasNext ) {
+      val fileDoc = cur.next
+      val id = fileDoc.get("_id")
+      val chunksCnd = new BasicDBObject
+      chunksCnd.put("files_id",id)
+      colCK.remove(chunksCnd)
+      colFS.remove(fileDoc)
+    }
+    (finalMD5, finalFileName)
   }
 
   /** Remove the given context
