@@ -517,20 +517,11 @@ object Templating {
                 <tr>
                     <td><![endif]-->
             <ul class="pureCssMenum">
-                <li class="pureCssMenui"><a class="pureCssMenui" href="#">Create user</a></li>
-                <li class="pureCssMenui"><a class="pureCssMenui" href="#">Delete user</a></li>
-                <li class="pureCssMenui"><a class="pureCssMenui" href="#">List users</a></li>
-                <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Roles</span><![if gt IE 6]></a><![endif]>
-                    <!--[if lte IE 6]>
-                    <table>
-                        <tr>
-                            <td><![endif]-->
-                    <ul class="pureCssMenum">
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">User roles</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="#">Valid roles</a></li>
-                    </ul>
-                    <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
-
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/add_user.html")+'"'+""">Create user</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/remove_user.html")+'"'+"""">Delete user</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/security/users.html")+'"'+"""">List users</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/security/valid_roles.html")+'"'+"""">Valid roles</a></li>
+                
                 <li class="pureCssMenui"><a class="pureCssMenui" href="#">Role map</a></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="#">Rovoke all user roles</a></li>
 

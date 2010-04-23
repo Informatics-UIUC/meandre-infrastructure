@@ -128,10 +128,10 @@ object Tools {
    */
   def zip3 [A,B,C] ( la:List[A], lb:List[B], lc:List[C] ) :List[(A,B,C)] = {
     def zip3$ ( la:List[A], lb:List[B], lc:List[C], res:List[(A,B,C)] ) : List[(A,B,C)] = (la,lb,lc) match {
-      case (Nil,_,_) => res.reverse
-      case (_,Nil,_) => res.reverse
-      case (_,_,Nil) => res.reverse
-      case (as,bs,cs)   => zip3$(as.tail,bs.tail,cs.tail,(as.head,bs.head,cs.head)::res)
+      case (Nil,_,_)  => res.reverse
+      case (_,Nil,_)  => res.reverse
+      case (_,_,Nil)  => res.reverse
+      case (as,bs,cs) => zip3$(as.tail,bs.tail,cs.tail,(as.head,bs.head,cs.head)::res)
     }
     zip3$(la,lb,lc,Nil)
   }
@@ -142,16 +142,18 @@ object Tools {
    * @param la The first list
    * @param lb The second list
    * @param lc The third list
+   * @param ld The fourth list
    * @return The zipped list
    */
-  def zip4 [A,B,C] ( la:List[A], lb:List[B], lc:List[C] ) :List[(A,B,C)] = {
-    def zip4$ ( la:List[A], lb:List[B], lc:List[C], res:List[(A,B,C)] ) : List[(A,B,C)] = (la,lb,lc) match {
-      case (Nil,_,_) => res.reverse
-      case (_,Nil,_) => res.reverse
-      case (_,_,Nil) => res.reverse
-      case (as,bs,cs)   => zip4$(as.tail,bs.tail,cs.tail,(as.head,bs.head,cs.head)::res)
+  def zip4 [A,B,C,D] ( la:List[A], lb:List[B], lc:List[C], ld:List[D] ) :List[(A,B,C,D)] = {
+    def zip4$ ( la:List[A], lb:List[B], lc:List[C], ld:List[D], res:List[(A,B,C,D)] ) : List[(A,B,C,D)] = (la,lb,lc,ld) match {
+      case (Nil,_,_,_)   => res.reverse
+      case (_,Nil,_,_)   => res.reverse
+      case (_,_,Nil,_)   => res.reverse
+      case (_,_,_,Nil)   => res.reverse
+      case (as,bs,cs,ds) => zip4$(as.tail,bs.tail,cs.tail,ds.tail,(as.head,bs.head,cs.head,ds.head)::res)
     }
-    zip4$(la,lb,lc,Nil)
+    zip4$(la,lb,lc,ld,Nil)
   }
 
 

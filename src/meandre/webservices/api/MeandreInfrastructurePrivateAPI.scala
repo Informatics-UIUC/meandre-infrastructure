@@ -4,7 +4,6 @@ import meandre.Tools._
 import meandre.kernel.Implicits._
 import meandre.webservices.api.Templating._
 import meandre.kernel.Configuration
-import com.mongodb.{BasicDBList, BasicDBObject}
 import meandre.state.Repository
 import org.apache.commons.fileupload.disk.DiskFileItemFactory
 import org.apache.commons.fileupload.servlet.ServletFileUpload
@@ -13,6 +12,9 @@ import com.hp.hpl.jena.rdf.model.{Model, ModelFactory}
 import java.io.{ByteArrayInputStream, InputStream, ByteArrayOutputStream, StringReader}
 import meandre.kernel.state.{BundledElement, LocationElement, Store}
 import meandre.kernel.rdf._
+import com.mongodb.{Mongo, BasicDBList, BasicDBObject}
+import meandre.webservices.realm.MongoDBRealm
+import com.mongodb.util.JSON
 
 /**
  * The Meandre infrastructure implementation of the services API
@@ -651,6 +653,185 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
         OKResponse(res, user)
 
     }
+  }
+
+  // ---------------------------------------------------------------------------
+  
+  /** The mongo db connection object */
+  protected val mongoDbRealm = MongoDBRealm(cnf)
+
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/security/valid_roles\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        val roles = new BasicDBList
+        MongoDBRealm.AVAILABLE_ROLES.foreach(roles add _)
+        val res = new BasicDBObject
+        res.put("roles", roles)
+        OKResponse(res, user)
+    }
+  }
+  
+  // ---------------------------------------------------------------------------
+
+  get("""/services/security/user\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        val userPrincipal = request.getUserPrincipal.asInstanceOf[BasicDBObject]
+
+        //
+        // Render Output
+        //
+        val res = new BasicDBObject
+        val screenName = userPrincipal getString "_id"
+        userPrincipal.put("screenname",screenName)
+        userPrincipal removeField "_id"
+        userPrincipal removeField "_ns"
+        userPrincipal removeField "authenticated"
+        userPrincipal.put("password","*******")
+        res.put("user", userPrincipal)
+        OKResponse(res, user)
+    }
+  }
+  
+  // ---------------------------------------------------------------------------
+
+  get("""/services/security/users\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        val userPrincipal = request.getUserPrincipal.asInstanceOf[BasicDBObject]
+        var ps:List[BasicDBObject] = List(userPrincipal)
+
+        if ( request.isUserInRole("admin") ) {
+          val db:BasicDBObject = """{ "_id" : { "$ne" : "%s" } }""" format userPrincipal.getString("_id")
+          ps = ps ++ (mongoDbRealm listUsers db)
+        }
+
+        //
+        // Render Output
+        //
+        val res = new BasicDBObject
+        val users = new BasicDBList
+        ps.foreach(up => {
+          val screenName = up getString "_id"
+          up removeField "_id"
+          up removeField "_ns"
+          up removeField "authenticated"
+          up.put("password","*******")
+          val userObject = new BasicDBObject
+          userObject.put(screenName,up)
+          users add userObject
+        })
+        res.put("users", users)
+        OKResponse(res, user)
+    }
+  }
+
+
+  // ---------------------------------------------------------------------------
+
+  post("""/services/security/add\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    def obj(sn:String,key:String,value:String) = {
+      val o = new BasicDBObject
+      o.put("screen_name",sn)
+      o.put(key,value)
+      o
+    }
+
+    requestFor {
+      user =>
+        if ( !request.isUserInRole("admin") ) {
+          FailResponse("You need to belong to the admin role to create users", new BasicDBObject, user)
+        }
+        else if ( !params.contains("screen_name") || !params.contains("roles") ||
+                  !params.contains("profile") || !params.contains("password") ) {
+          FailResponse("Missing parammeters [screen_name,roles,profile,password] all required", new BasicDBObject, user)
+        }
+        else {
+          val users = zip4(paramsMap("screen_name").toList,paramsMap("roles").toList,paramsMap("profile").toList,paramsMap("password").toList)
+          val succ  = new BasicDBList
+          val fail  = new BasicDBList
+          users.foreach( _ match {
+            case (sn,rls,prf,pswd) =>
+              if ( mongoDbRealm existsUser sn ) fail add obj(sn,"reason","duplicated screen name")
+              else if ( rls.split(",").exists( (a) => !MongoDBRealm.AVAILABLE_ROLES.contains(a)) ) fail add obj(sn,"reason","invalid role")
+              else if ( try { JSON.parse(prf); false} catch { case _ => true} ) fail add obj(sn,"reason","invalid profile")
+              else {
+                mongoDbRealm.addUser(sn,rls.split(",").toList.map(_.trim),JSON.parse(prf).asInstanceOf[BasicDBObject],pswd)
+                succ add obj(sn,"added","OK")
+              }
+          })
+
+          val res = new BasicDBObject
+          if ( fail.isEmpty ) {
+            res.put("added",succ)
+            OKResponse(res, user)
+          }
+          else if ( succ.isEmpty ) {
+            res.put("failed",fail)
+            FailResponse("Failed to create some users",res, user)
+          }
+          else {
+            val (so,sf) = (new BasicDBObject,new BasicDBObject)
+            so.put("users",succ)
+            sf.put("users",fail)
+            PartialFailResponse("Some users could not be created", so, sf,user)
+          }
+        }
+      }
+  }
+
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/security/remove\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    def obj(sn:String,key:String,value:String) = {
+      val o = new BasicDBObject
+      o.put("screen_name",sn)
+      o.put(key,value)
+      o
+    }
+
+    requestFor {
+      user =>
+        if ( !request.isUserInRole("admin") ) {
+          FailResponse("You need to belong to the admin role to remove users", new BasicDBObject, user)
+        }
+        else if ( !params.contains("screen_name") ) {
+          FailResponse("Missing parammeter screen_name", new BasicDBObject, user)
+        }
+        else {
+          val users = paramsMap("screen_name").toList
+          val succ  = new BasicDBList
+          val fail  = new BasicDBList
+          users.foreach( _ match {
+            case sn =>
+              if ( !(mongoDbRealm existsUser sn) ) fail add obj(sn,"reason","unknown screen name")
+              else {
+                mongoDbRealm.removeUser(sn)
+                succ add obj(sn,"removed","OK")
+              }
+          })
+
+          val res = new BasicDBObject
+          if ( fail.isEmpty ) {
+            res.put("added",succ)
+            OKResponse(res, user)
+          }
+          else if ( succ.isEmpty ) {
+            res.put("failed",fail)
+            FailResponse("Failed to remove some users",res, user)
+          }
+          else {
+            val (so,sf) = (new BasicDBObject,new BasicDBObject)
+            so.put("users",succ)
+            sf.put("users",fail)
+            PartialFailResponse("Some users could not be removed", so, sf,user)
+          }
+        }
+      }
   }
 
   // ---------------------------------------------------------------------------

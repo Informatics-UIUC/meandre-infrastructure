@@ -96,7 +96,7 @@ class MeandreServer(val cnf:Configuration, val prefix: String, val staticFolder:
     case s    => s
   }
   protected val sh = new SecurityHandler
-  sh.setUserRealm(new MongoDBRealm(cnf,"Meandre Flow Execution Engine"))
+  sh.setUserRealm(MongoDBRealm(cnf))
   sh.setConstraintMappings(Array(cm))
 
   //

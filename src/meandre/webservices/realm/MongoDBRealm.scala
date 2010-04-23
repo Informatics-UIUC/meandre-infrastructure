@@ -112,12 +112,58 @@ class MongoDBRealm(cnf:Configuration, var realmName:String) extends UserRealm wi
    * cannot connect */
   val adminCnd:BasicDBObject = """{"_id":"admin"}"""
   if (collection.find(adminCnd).count==0) {
-    val bdbo:BasicDBObject = """{ "_id":"admin", "roles":["""+MongoDBRealm.AVAILABLE_ROLES.reduceLeft((a,b)=>'"'+a+"\",\""+b+'"')+"""] }"""
+    val bdbo:BasicDBObject =
+    """{
+         "_id":"admin",
+         "roles":[%s],
+         "profile": {
+            "first name": "Admin",
+            "last name": "Istrator"
+         }
+    }""" format MongoDBRealm.AVAILABLE_ROLES.reduceLeft((a,b)=>'"'+a+"\",\""+b+'"')
+
     bdbo.put("password",computeHash("admin"))
     collection.insert(bdbo)
   }
 
   //--------------------------------------------------------------------------
+
+  /**Add a user to the realm.
+   *
+   * @param screenName The user screen name
+   * @param roles The roles to assign to the user
+   * @param profile The user profile
+   * @param password The user password
+   *
+   */
+  def addUser (screenName:String,roles:List[String],profile:BasicDBObject,password:String) = {
+    val bdbo:BasicDBObject ="""{"_id":"%s"}""" format screenName
+    val rls = new BasicDBList
+    roles.foreach(rls add _)
+    bdbo.put("roles",rls)
+    bdbo.put("profile",profile)
+    bdbo.put("password", computeHash(password))
+    collection insert bdbo
+  }
+
+  /**Removes a user from the realm.
+   *
+   * @param screenName The screen name of the users to remove
+   */
+  def removeUser (screenName:String) = {
+    val bdbo:BasicDBObject ="""{"_id":"%s"}""" format screenName
+    collection remove bdbo
+  }
+
+  /**Check if the user exists in the realm.
+   *
+   * @param screenName The screen name of the users to remove
+   */
+  def existsUser (screenName:String) = {
+    val bdbo:BasicDBObject ="""{"_id":"%s"}""" format screenName
+    (collection find bdbo count) > 0
+  }
+
 
   /**Returns the real name
    *
@@ -242,11 +288,21 @@ class MongoDBRealm(cnf:Configuration, var realmName:String) extends UserRealm wi
   }
 
   /* ------------------------------------------------------------ */
+
   def clearSingleSignOn(userName:String) = _ssoRealm match {
     case null =>
     case _ => _ssoRealm.clearSingleSignOn(userName)
   }
 
+  /* ------------------------------------------------------------ */
+
+  def listUsers ( cnd:BasicDBObject ) = {
+    var users:List[BasicDBObject] = Nil
+    var sortCnd:BasicDBObject = """{"_id":1}"""
+    val cur = collection.find(cnd).sort(sortCnd)
+    while ( cur.hasNext ) users ::= cur.next.asInstanceOf[BasicDBObject]
+    users
+  }
 }
 
 /**
@@ -260,5 +316,7 @@ object MongoDBRealm {
 
   val AVAILABLE_ROLES = Array("admin","user")
 
+  def apply (cnf:Configuration) = new MongoDBRealm(cnf,"Meandre Flow Execution Engine")
+  
   def apply (cnf:Configuration,realmName:String) = new MongoDBRealm(cnf,realmName)
 }
