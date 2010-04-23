@@ -17,7 +17,7 @@ import com.mongodb.{BasicDBList, BasicDBObject}
  *
  */
 
-class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
+class RichBasicDBObject (val self:BasicDBObject)(implicit cnf:Configuration) extends Proxy {
 
   /** The regular expression to match arbitrary urls */
   val urlRegex = "\\w+([_-]\\w+)*://(\\w+([_-]\\w+)*(\\.\\w+([_-]\\w+)*)*/?)*".r
@@ -296,7 +296,7 @@ class RichBasicDBObject (val self:BasicDBObject) extends Proxy {
       sbProcessedRes.append(url match {
         // TODO Add functionality to the mendre specific links
         case u if u.startsWith("meandre://") => """<a href="%sservices/repository/describe.html?uri=%s">%s</a> (<a href="%sservices/repository/describe.rdf?uri=%s">RDF</a>,<a href="%sservices/repository/describe.ttl?uri=%s">TTL</a>,<a href="%sservices/repository/describe.nt?uri=%s">NT</a>) [<a href="%sservices/repository/remove.html?uri=%s">Remove</a>]""".format(prefix,u,u,prefix,u,prefix,u,prefix,u,prefix,u)
-        //case u if u.startsWith("context://localhost") => """<a href="%s://%s:%s%s%s">%s</a>""".format(cnf.protocol,cnf.server,cnf.serverPort,prefix,u.replace("context://localhost",""))
+        case u if u.startsWith("context://localhost") => """<a href="%s://%s:%s%s%s">%s</a>""".format(cnf.protocol,cnf.server,cnf.serverPort,prefix,u.replace("context://localhost/",""),u)
         case u => """<a href="%s">%s</a> [<a href="%sservices/repository/describe.html?uri=%s">Desc?</a>]""".format(url,url,prefix,url)
       })
 
@@ -325,7 +325,7 @@ object Templating {
    * @param bdbo The basic db object to enrich
    * @return The enriched basic db object
    */
-  implicit def basicDBObject2RichBasicDBObject ( bdbo:BasicDBObject ) = new RichBasicDBObject(bdbo)
+  implicit def basicDBObject2RichBasicDBObject ( bdbo:BasicDBObject )(implicit cnf:Configuration) = new RichBasicDBObject(bdbo)
 
 
   /**Provides implicit conversion from a rich basic db object to a
@@ -387,9 +387,9 @@ object Templating {
                         <tr>
                             <td><![endif]-->
                     <ul class="pureCssMenum">
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/locations/list.html")+'"'+""">List</a></li>
                         <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/add_location.html")+'"'+""">Add</a></li>
                         <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/remove_location.html")+'"'+""">Remove</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/locations/list.html")+'"'+""">List</a></li>
                         <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/locations/remove_all.html")+'"'+""">Remove all</a></li>
                     </ul>
                     <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>

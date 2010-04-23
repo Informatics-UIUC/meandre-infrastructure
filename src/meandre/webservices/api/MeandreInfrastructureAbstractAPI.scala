@@ -18,8 +18,10 @@ import meandre.kernel.Configuration
  */
 
 
-class MeandreInfrastructureAbstractAPI(conf:Configuration) extends CrochetServlet {
+class MeandreInfrastructureAbstractAPI(cnf:Configuration) extends CrochetServlet {
 
+  protected implicit val icnf = cnf
+  
   protected val REQUEST_FAIL = "FAIL"
   protected val REQUEST_OK = "OK"
   protected val REQUEST_INCOMPLETE = "INCOMPLETE"
@@ -49,8 +51,8 @@ class MeandreInfrastructureAbstractAPI(conf:Configuration) extends CrochetServle
     res.put("status", REQUEST_OK)
     res.put("success", payload)
     res.put("meandre_user",user)
-    res.put("meandre_host",conf.server)
-    res.put("meandre_port",conf.serverPort)
+    res.put("meandre_host",cnf.server)
+    res.put("meandre_port",cnf.serverPort)
     res
   }
 
@@ -67,8 +69,8 @@ class MeandreInfrastructureAbstractAPI(conf:Configuration) extends CrochetServle
     }""".format(REQUEST_FAIL, msg)
     res.put("failure",payload)
     res.put("meandre_user",user)
-    res.put("meandre_host",conf.server)
-    res.put("meandre_port",conf.serverPort)
+    res.put("meandre_host",cnf.server)
+    res.put("meandre_port",cnf.serverPort)
     res
   }
 
@@ -87,8 +89,8 @@ class MeandreInfrastructureAbstractAPI(conf:Configuration) extends CrochetServle
     res.put("success", successPayload)
     res.put("failure", failurePayload)
     res.put("meandre_user",user)
-    res.put("meandre_host",conf.server)
-    res.put("meandre_port",conf.serverPort)
+    res.put("meandre_host",cnf.server)
+    res.put("meandre_port",cnf.serverPort)
     res
   }
 

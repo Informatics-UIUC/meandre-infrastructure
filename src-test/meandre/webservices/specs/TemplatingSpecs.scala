@@ -8,6 +8,7 @@ import java.io.{PrintWriter, ByteArrayOutputStream}
 import meandre.webservices._
 import meandre.webservices.api.Templating._
 import xml.{Elem, XML}
+import meandre.kernel.Configuration
 
 /**
  * Basic templating specs for a the Templating object
@@ -26,6 +27,7 @@ object TemplatingSpecs extends Specification("The templating specification") {
    * @return The string containing the serialized object
    */
   protected def serialize ( format:String, bdbo:BasicDBObject ) = {
+    implicit val cnf = Configuration()
     val baos = new ByteArrayOutputStream()
     val pw   = new PrintWriter(baos,true)
     bdbo.format(format,pw)
@@ -35,6 +37,7 @@ object TemplatingSpecs extends Specification("The templating specification") {
   "JSON templating" should {
 
     "return the same object it received" in {
+      implicit val cnf = Configuration()
       val response = SpecsData.heterogeneousResponse
       response.asJSON must beEqualTo(response.toString)
     }

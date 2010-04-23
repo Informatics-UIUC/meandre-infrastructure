@@ -15,7 +15,6 @@ import meandre.webservices.api.Templating._
 
 class MeandreInfrastructureRootAPI(cnf: Configuration) extends MeandreInfrastructureAbstractAPI(cnf) {
 
-
     //
     // The basic welcome message
     //

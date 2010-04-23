@@ -645,9 +645,9 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
         // Generate the response
         //
         val res = new BasicDBObject
-        res.put("missing components", missingComponents)
-        res.put("missing contexts", missingContexts)
-        res.put("external contexts", outsiders)
+        if ( !missingComponents.isEmpty ) res.put("missing components", missingComponents)
+        if ( !missingContexts.isEmpty) res.put("missing contexts", missingContexts)
+        if ( !outsiders.isEmpty) res.put("external contexts", outsiders)
         OKResponse(res, user)
 
     }
