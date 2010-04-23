@@ -7,7 +7,7 @@ package meandre.kernel
  * @date Feb 9, 2010 at 6:07:18 PM
  *
  */
-class Configuration (val server:String, val serverPort:Int, val host:String, val port:Int, val auth:Option[(String,String)]) {
+class Configuration (val protocol:String, val server:String, val serverPort:Int, val host:String, val port:Int, val auth:Option[(String,String)]) {
 
   val MEANDRE_REALM_COLLECTION = "meandre.realm"
   
@@ -38,7 +38,7 @@ object Configuration {
   val INFRASTRUCTURE_VERSION = "1.5.0-vcli-alpha"
 
   /** A default configuration */
-  private val cnf = new Configuration("localhost",1714,"localhost",27017,None)
+  private val cnf = new Configuration("http","localhost",1714,"localhost",27017,None)
 
   /**Returns the default infrastructure object
    *
@@ -54,7 +54,7 @@ object Configuration {
    * @param auth The authorization required to access the Meandre database
    * @return A new configuration object for the given information
    */
-  def apply(server:String,serverPort:Int,host:String, port:Int, auth:Option[(String,String)]) = new Configuration(server,serverPort,host,port,auth)
+  def apply(protocol:String,server:String,serverPort:Int,host:String, port:Int, auth:Option[(String,String)]) = new Configuration(protocol,server,serverPort,host,port,auth)
 
 }
 

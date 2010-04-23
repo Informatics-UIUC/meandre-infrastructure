@@ -106,9 +106,13 @@ extends Repository(cnf,userName) {
         }))
 
         // Process and filter uris
+        var originalURIs:List[Pair[String,String]] = Nil
         val processedURIs = uris map ( _ match {
           case s if s.startsWith("http") => Some(s)
-          case s if s.startsWith("context://localhost") => Some(rewriteContextURL(url,s))
+          case s if s.startsWith("context://localhost") =>
+            val ruri = rewriteContextURL(url,s)
+            originalURIs ::= ruri -> s
+            Some(ruri)
           case _ => None
         })
         uris = processedURIs.filter(_.isDefined).map(_.get)
@@ -125,13 +129,16 @@ extends Repository(cnf,userName) {
           }
         })
         val cntxsMap = Map(lstCtxMap:_*)
+        val cntxsNoMD5Map = Map(cntxsMap.toList.map(
+          kv => (kv._1.substring(0,30)+kv._1.substring(63,kv._1.length)) -> kv._1
+        ):_*)
         // Add all the flows blindly
         val addedFlowURIs = flows map (addToRepository(_))
         // Add all the components with proper context rewriting
         val rewrittenComps = comps map ( c => {
           val nc = c.context map ( _ match {
-            case URIContext(uri) if  cntxsMap.contains(uri) =>  URIContext(cntxsMap(uri))
-            case URIContext(uri) if !cntxsMap.contains(uri) =>  URIContext(uri)
+            case URIContext(uri) if  cntxsNoMD5Map.contains(uri) =>  URIContext(cntxsNoMD5Map(uri))
+            case URIContext(uri) if !cntxsNoMD5Map.contains(uri) =>  URIContext(uri)
             case s => s
           })
           c.context = nc

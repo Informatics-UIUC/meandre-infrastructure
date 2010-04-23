@@ -438,6 +438,10 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
   // ---------------------------------------------------------------------------
 
   get("""/services/repository/describe\.(rdf|ttl|nt)""".r, canonicalResponseType, tautologyGuard, public _) {
+
+    def uriRewrite ( uri:String ) =
+      uri.replace("context://localhost","%s://%s:%s".format(cnf.protocol,cnf.server,cnf.serverPort))
+
     requestFor {
       user =>
          val rdfType = elements(0) match {
@@ -449,18 +453,18 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
          val res = new BasicDBObject
          params.contains("uri") match {
            case true  => st.getRDFForURI(params("uri"),elements(0)) match {
-                            case None     => FailResponse(params("uri")+" no a known URI", res, user)
-                            case Some(ba) => res.put(elements(0),new String(ba)) ; OKResponse(res,user)
+                            case None     => FailResponse(params("uri")+" not a known URI", res, user)
+                            case Some(ba) => res.put(elements(0),uriRewrite(new String(ba))) ; OKResponse(res,user)
                          }
            case false => val rdf = new StringBuffer(10000)
                          st.getAllRDF(None,"nt").foldLeft(rdf)((a,b)=>a.append(new String(b)+'\n'))
                          rdfType match {
-                           case "N3" => res.put(elements(0),rdf.toString) ; OKResponse(res,user)
+                           case "N3" => res.put(elements(0),uriRewrite(rdf.toString)) ; OKResponse(res,user)
                            case _    => val model = ModelFactory.createDefaultModel
                                         model.read(new StringReader(rdf.toString),null,"N-TRIPLE")
                                         val baos = new ByteArrayOutputStream
                                         model.write(baos,rdfType)
-                                        res.put(elements(0),baos.toString) ; OKResponse(res,user)
+                                        res.put(elements(0),uriRewrite(baos.toString)) ; OKResponse(res,user)
                          }
          }
     }

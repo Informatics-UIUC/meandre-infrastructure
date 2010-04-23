@@ -32,6 +32,7 @@ class MeandreServer(val cnf:Configuration, val prefix: String, val staticFolder:
     cnf.MEANDRE_CLUSTER_POOL + "@" + cnf.server + ":" + cnf.serverPort,
     cnf.MEANDRE_CLUSTER_POOL,
     """{"server": {
+          "protocol":"""+'"'+cnf.protocol+'"'+""",
           "host":"""+'"'+cnf.server+'"'+""",
           "port":"""+cnf.serverPort+""",
           "prefix":"""+'"'+prefix+'"'+""",

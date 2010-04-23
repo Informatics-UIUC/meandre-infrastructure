@@ -53,7 +53,7 @@ class ContextsPool (val cnf:Configuration) {
     val file = gfs.createFile(is)
     file.setContentType(mimeType)
     file.save
-    file.setFilename("context://localhost/"+file.getMD5+nfn)
+    file.setFilename("context://localhost/resources/%s%s" format (file.getMD5,nfn))
     file.save
     (file.getMD5,file.getFilename)
   }
