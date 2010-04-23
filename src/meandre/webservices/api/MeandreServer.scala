@@ -109,6 +109,13 @@ class MeandreServer(val cnf:Configuration, val prefix: String, val staticFolder:
   //
   contextWS.addServlet(new ServletHolder(new MeandreInfrastructurePublicAPI(cnf)), prefix+"public/services/*")
 
+
+  //
+  // Add the resources services
+  //
+  contextWS.addServlet(new ServletHolder(new MeandreInfrastructureResourcesAPI(cnf)), prefix+"resources/*")
+
+
   //
   // Add the snare web monitor
   //

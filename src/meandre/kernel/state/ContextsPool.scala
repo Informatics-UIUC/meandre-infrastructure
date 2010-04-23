@@ -6,6 +6,8 @@ import com.mongodb.gridfs.GridFS
 import java.io.{OutputStream, InputStream}
 import collection.jcl.{Buffer, IterableWrapper, CollectionWrapper}
 import com.mongodb.{BasicDBObject, Mongo}
+import javax.servlet.http.HttpServletResponse
+import javax.servlet.http.HttpServletResponse._
 
 /**
  * This class implements a simple abstraction to allow a simple
@@ -87,7 +89,7 @@ class ContextsPool (val cnf:Configuration) {
     case t@Left(_) => t
   }
 
-  /**Returns a file if found.
+  /** Writes a file if found to the provided output stream.
    *
    * @param fileName The file name to retrieve
    * @param os The output stream where to dump the data
@@ -96,6 +98,24 @@ class ContextsPool (val cnf:Configuration) {
   def write (fileName:String, os:OutputStream) = safeOp {
     val file = gfs findOne fileName
     if (file!=null) { file writeTo os ; fileName }
+    else throw new Exception("File "+fileName+" not found")
+  }
+
+  /** Writes a file if found to the provided response object.
+   *
+   * @param fileName The file name to retrieve
+   * @param response The response where to dump the data
+   * @return The file name if it succeed
+   */
+  def write (fileName:String, response:HttpServletResponse) = safeOp {
+    val file = gfs findOne fileName
+    if (file!=null) {
+      response.setStatus(SC_OK)
+      response.setContentType(file.getContentType)
+      response.setContentLength(file.getLength.asInstanceOf[Int])
+      file writeTo response.getOutputStream  
+      fileName
+    }
     else throw new Exception("File "+fileName+" not found")
   }
 
