@@ -164,9 +164,31 @@ class MongoDBRealm(cnf:Configuration, var realmName:String) extends UserRealm wi
     (collection find bdbo count) > 0
   }
 
+  /**Add a role to the given user.
+   *
+   * @param screenName The user screen name
+   * @param role The role to add
+   */
+  def addRoleToUser (screenName:String,role:String) = {
+    val cnd:BasicDBObject ="""{"_id":"%s"}""" format screenName
+    val roleCnd:BasicDBObject ="""{"$addToSet" : { "roles" : "%s" }}""" format role
+    collection update (cnd,roleCnd)
+  }
+
+  /**Remove a role to the given user.
+   *
+   * @param screenName The user screen name
+   * @param role The role to remove
+   */
+  def revokeRoleFromUser (screenName:String,role:String) = {
+    val cnd:BasicDBObject ="""{"_id":"%s"}""" format screenName
+    val roleCnd:BasicDBObject ="""{"$pull" : { "roles" : "%s" }}""" format role
+    collection update (cnd,roleCnd)
+  }
+
 
   /**Returns the real name
-   *
+    *
    * @return The realm name
    */
   def getName:String = realmName

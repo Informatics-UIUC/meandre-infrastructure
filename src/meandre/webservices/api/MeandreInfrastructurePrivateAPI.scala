@@ -834,6 +834,130 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
       }
   }
 
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/security/grant_roles\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+   def obj(sn:String,key:String,value:String) = {
+      val o = new BasicDBObject
+      o.put("screen_name",sn)
+      o.put(key,value)
+      o
+    }
+
+   requestFor {
+      user =>
+        if ( !request.isUserInRole("admin") ) {
+          FailResponse("You need to belong to the admin role to grant user roles", new BasicDBObject, user)
+        }
+        else if ( !params.contains("screen_name") || !params.contains("roles") ) {
+          FailResponse("Missing parammeter screen_name or roles", new BasicDBObject, user)
+        }
+        else {
+          val actions = paramsMap("screen_name").toList.zip(paramsMap("roles").toList)
+          val succ = new BasicDBList
+          val fail = new BasicDBList
+          val vr = Set(MongoDBRealm.AVAILABLE_ROLES:_*)
+          actions.foreach(
+            ar => {
+              val (scren_name,roles) = (ar._1,ar._2.split(",").toList.map(_.trim))
+              if ( !mongoDbRealm.existsUser(scren_name) )
+                fail add obj(scren_name,"reason","unknown screen name")
+              else
+                roles.foreach(
+                  r => {
+                    if ( !(vr contains r) )
+                      fail add obj(scren_name,"reason","unknown role %s" format r)
+                    else {
+                      mongoDbRealm.addRoleToUser(scren_name,r)
+                      succ add obj(scren_name,"granted role",r)
+                    }
+                  }
+                )
+            }
+          )
+
+          val res = new BasicDBObject
+          if (fail.isEmpty) {
+            res.put("granted", succ)
+            OKResponse(res, user)
+          }
+          else if (succ.isEmpty) {
+            res.put("failed", fail)
+            FailResponse("Failed to grant roles to users", res, user)
+          }
+          else {
+            val (so, sf) = (new BasicDBObject, new BasicDBObject)
+            so.put("users", succ)
+            sf.put("users", fail)
+            PartialFailResponse("Some roles could not be granted", so, sf, user)
+          }
+        }
+    }
+  }
+
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/security/revoke_roles\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+   def obj(sn:String,key:String,value:String) = {
+      val o = new BasicDBObject
+      o.put("screen_name",sn)
+      o.put(key,value)
+      o
+    }
+
+   requestFor {
+      user =>
+        if ( !request.isUserInRole("admin") ) {
+          FailResponse("You need to belong to the admin role to revoke user roles", new BasicDBObject, user)
+        }
+        else if ( !params.contains("screen_name") || !params.contains("roles") ) {
+          FailResponse("Missing parammeter screen_name or roles", new BasicDBObject, user)
+        }
+        else {
+          val actions = paramsMap("screen_name").toList.zip(paramsMap("roles").toList)
+          val succ = new BasicDBList
+          val fail = new BasicDBList
+          val vr = Set(MongoDBRealm.AVAILABLE_ROLES:_*)
+          actions.foreach(
+            ar => {
+              val (scren_name,roles) = (ar._1,ar._2.split(",").toList.map(_.trim))
+              if ( !mongoDbRealm.existsUser(scren_name) )
+                fail add obj(scren_name,"reason","unknown screen name")
+              else
+                roles.foreach(
+                  r => {
+                    if ( !(vr contains r) )
+                      fail add obj(scren_name,"reason","unknown role %s" format r)
+                    else {
+                      mongoDbRealm.revokeRoleFromUser(scren_name,r)
+                      succ add obj(scren_name,"revoked role",r)
+                    }
+                  }
+                )
+            }
+          )
+
+          val res = new BasicDBObject
+          if (fail.isEmpty) {
+            res.put("revoked", succ)
+            OKResponse(res, user)
+          }
+          else if (succ.isEmpty) {
+            res.put("failed", fail)
+            FailResponse("Failed to revoke roles to users", res, user)
+          }
+          else {
+            val (so, sf) = (new BasicDBObject, new BasicDBObject)
+            so.put("users", succ)
+            sf.put("users", fail)
+            PartialFailResponse("Some roles could not be revoked", so, sf, user)
+          }
+        }
+    }
+  }
+
   // ---------------------------------------------------------------------------
 
 
