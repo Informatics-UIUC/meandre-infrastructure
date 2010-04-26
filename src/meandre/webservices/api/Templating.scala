@@ -483,8 +483,8 @@ object Templating {
                     <tr>
                         <td><![endif]-->
                 <ul class="pureCssMenum">
-                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Summarized</a></li>
-                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Detailed</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/logs/server.html")+'"'+""">Server</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/logs/global.html")+'"'+""">Global</a></li>
                 </ul>
                 <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 
@@ -507,7 +507,6 @@ object Templating {
                     <li class="pureCssMenui"><a class="pureCssMenui" href="#">Log</a></li>
                     <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/snare/MeandreInf/heartbeat")+'"'+""" target="_blank">Status</a></li>
                     <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/snare/MeandreInf/info")+'"'+""" target="_blank">Information</a></li>
-                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Properties</a></li> 
                     <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/server/shutdown_cluster.html")+'"'+""">Shutdown cluster</a></li>
 
                 </ul>

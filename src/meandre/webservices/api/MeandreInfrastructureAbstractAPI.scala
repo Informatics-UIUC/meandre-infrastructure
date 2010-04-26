@@ -34,7 +34,7 @@ class MeandreInfrastructureAbstractAPI(cnf:Configuration) extends CrochetServlet
   protected def safeParseInt(s: String): Int = {
 
     try {
-      Integer.parseInt(params("count"))
+      Integer.parseInt(s)
     }
     catch {
       case _ => 0

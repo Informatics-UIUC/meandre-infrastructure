@@ -15,12 +15,19 @@ class Configuration (val protocol:String, val server:String, val serverPort:Int,
 
   val MEANDRE_PUBLIC_COLLECTION = "meandre.public"
 
+  val MEANDRE_GLOBAL_LOGGER = "meandre.log"
+
   val MEANDRE_CONTEXT_FS_COLLECTION = "meandre.context.fs"
   
   protected var MDBN = "Meandre"
 
   def MEANDRE_DB_NAME = MDBN
   def MEANDRE_DB_NAME_= (name:String) = MDBN=name
+
+  protected var MLL = 2
+
+  def MEANDRE_LOG_LEVEL = MLL
+  def MEANDRE_LOG_LEVEL_= (level:Int) = MLL = if ( level<0 ) 0 else if ( level>5 ) 5 else level
 
   val MEANDRE_CLUSTER_POOL = "MeandreInf"
 

@@ -16,6 +16,7 @@ import com.mongodb.{Mongo, BasicDBList, BasicDBObject}
 import meandre.webservices.realm.MongoDBRealm
 import com.mongodb.util.JSON
 import snare.Snare
+import meandre.webservices.logger.Logger
 
 /**
  * The Meandre infrastructure implementation of the services API
@@ -26,7 +27,7 @@ import snare.Snare
  */
 
 
-class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare) extends MeandreInfrastructureAbstractAPI(cnf) {
+class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Logger) extends MeandreInfrastructureAbstractAPI(cnf) {
 
  
   // ---------------------------------------------------------------------------
@@ -1150,28 +1151,74 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare) extend
   }
 
 
-    // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
-    get("""/services/server/shutdown_cluster\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
-      requestFor {
-        user =>
-          if ( !request.isUserInRole("admin")  ) {
-            FailResponse("You need to belong to the admin role to force the unpublishing of the public repository", new BasicDBObject, user)
-          }
-          else {
-            val msg:BasicDBObject =
-              """{
-                    "msg" : "shutdown",
-                    "type" :"request",
-                    "source" : "%s"
-              }""" format (snareMon.uuid)
-            snareMon.broadcast(msg)
-            val res = new BasicDBObject
-            res.put("shutdown cluster",msg)
-            OKResponse(res, user)
-          }
-      }
+  get("""/services/server/shutdown_cluster\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        if ( !request.isUserInRole("admin")  ) {
+          FailResponse("You need to belong to the admin role to force the unpublishing of the public repository", new BasicDBObject, user)
+        }
+        else {
+          val msg:BasicDBObject =
+            """{
+                  "msg" : "shutdown",
+                  "type" :"request",
+                  "source" : "%s"
+            }""" format (snareMon.uuid)
+          snareMon.broadcast(msg)
+          val res = new BasicDBObject
+          res.put("shutdown cluster",msg)
+          OKResponse(res, user)
+        }
     }
+  }
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/logs/global\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        if ( !request.isUserInRole("admin")  ) {
+          FailResponse("You need to belong to the admin role to force the unpublishing of the public repository", new BasicDBObject, user)
+        }
+        else {
+          val q = "{}"
+          val skip = if (params.contains("offset")) safeParseInt(params("offset")) else 0
+          val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else Math.MAX_INT
+          val res = new BasicDBObject
+          res.put("log",log.getLogEntries(q,skip,limit))
+          OKResponse(res, user)
+        }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/logs/server\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        if ( !request.isUserInRole("admin")  ) {
+          FailResponse("You need to belong to the admin role to force the unpublishing of the public repository", new BasicDBObject, user)
+        }
+        else {
+          val skip = if (params.contains("offset")) safeParseInt(params("offset")) else 0
+          val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else Math.MAX_INT
+          val uuids = params.contains("uuid") match {
+            case false =>
+              "\""+snareMon.uuid.toString+"\""
+            case true  =>
+              val vals = paramsMap("uuid").toList.filter(_!="").foldLeft("")((a,b)=>a+"\""+b+"\",")
+              vals.substring(0,vals.length-1)
+          }
+
+          val q = """{"%s":{"$in":[%s]}}""".format("uuid",uuids)
+          val res = new BasicDBObject
+          res.put("log",log.getLogEntries(q,skip,limit))
+          OKResponse(res, user)
+        }
+    }
+  }
 
   // ---------------------------------------------------------------------------
 

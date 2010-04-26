@@ -8,6 +8,7 @@ import meandre.webservices.api.MeandreInfrastructurePrivateAPI
 import com.mongodb.BasicDBObject
 import meandre.kernel.Implicits._
 import snare.Snare
+import meandre.webservices.logger.Logger
 
 /**
  * The basic specs for the Meandre Infrastructure APIs
@@ -38,7 +39,8 @@ class MeandreInfrastructurePrivateAPISpecs extends Specification("The Meandre In
     "localhost",
     27017,
     ( msg:BasicDBObject ) => {println(msg) ; true} )
-  val api = new MeandreInfrastructurePrivateAPI(Configuration(),snareMon)
+  val cnf = Configuration()
+  val api = new MeandreInfrastructurePrivateAPI(cnf,snareMon,Logger(cnf,snareMon.uuid))
   val client = MeandreInfrastructureAPIClient("http", "localhost", TEST_SERVER_PORT)
   var server:CrochetServer = null
 

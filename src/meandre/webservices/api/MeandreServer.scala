@@ -11,6 +11,7 @@ import snare.Snare
 import com.mongodb.BasicDBObject
 import snare.ui.WebMonitor
 import meandre.kernel.Implicits._
+import meandre.webservices.logger.Logger
 
 /**
  * The Meandre server class
@@ -47,6 +48,9 @@ class MeandreServer(val cnf:Configuration, val prefix: String, val staticFolder:
     cnf.host,
     cnf.port,
     monitorCallback)
+
+  protected val log = Logger(cnf,snareMon.uuid)
+  log.info("Server succesfully initialized")
 
 
   //
@@ -125,7 +129,7 @@ class MeandreServer(val cnf:Configuration, val prefix: String, val staticFolder:
   //
   // Add the services that require registration
   //
-  contextWS.addServlet(new ServletHolder(new MeandreInfrastructurePrivateAPI(cnf,snareMon)), prefix+"services/*")
+  contextWS.addServlet(new ServletHolder(new MeandreInfrastructurePrivateAPI(cnf,snareMon,log)), prefix+"services/*")
 
   //
   // Add the basic welcome page
@@ -146,11 +150,17 @@ class MeandreServer(val cnf:Configuration, val prefix: String, val staticFolder:
     val msg = msgEnvelope.get("msg").asInstanceOf[BasicDBObject]
     val cmd = (msg.getString("msg"),msg.getString("type"))
     cmd match {
-      case ("shutdown","request") => println("Shutting down server %s by request of %s" format (msgEnvelope.getString("_ns"),msg.getString("source")) ) ; stop
-      case _ => println("Received msg: %s\nFrom: %s\nBy: %s" format(msg.toString,msgEnvelope.getString("_id"),msgEnvelope.getString("_ns")) )
+      case ("shutdown","request") =>
+        val sdm = "Shutting down server %s by request of %s" format (msgEnvelope.getString("_ns"),msg.getString("source"))
+        log.severe(sdm)
+        stop
+      case _ =>
+        val sdm = "Received unknown msg: %s\nFrom: %s\nBy: %s" format(msg.toString,msgEnvelope.getString("_id"),msgEnvelope.getString("_ns")) 
+        log.warning(sdm)
     }
     true
   }
+
 }
 
 /**
