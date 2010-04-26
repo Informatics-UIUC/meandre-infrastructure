@@ -771,7 +771,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
           }
           else if ( succ.isEmpty ) {
             res.put("failed",fail)
-            FailResponse("Failed to create some users",res, user)
+            FailResponse("Failed to create users",res, user)
           }
           else {
             val (so,sf) = (new BasicDBObject,new BasicDBObject)
@@ -957,6 +957,61 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
         }
     }
   }
+
+
+  // ---------------------------------------------------------------------------
+
+  post("""/services/security/update\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    def obj(sn:String,key:String,value:String) = {
+      val o = new BasicDBObject
+      o.put("screen_name",sn)
+      o.put(key,value)
+      o
+    }
+
+    requestFor {
+      user =>
+        if (!params.contains("screen_name") || !params.contains("roles") ||
+               !params.contains("profile") || !params.contains("password")) {
+          FailResponse("Missing parammeters [screen_name,roles,profile,password] all required", new BasicDBObject, user)
+        }
+        else if ( user!=request.getRemoteUser && !request.isUserInRole("admin")  ) {
+          FailResponse("You need to belong to the admin role to update other user information", new BasicDBObject, user)
+        }
+        else {
+          val users = zip4(paramsMap("screen_name").toList,paramsMap("roles").toList,paramsMap("profile").toList,paramsMap("password").toList)
+          val succ  = new BasicDBList
+          val fail  = new BasicDBList
+          users.foreach( _ match {
+            case (sn,rls,prf,pswd) =>
+              if ( !(mongoDbRealm existsUser sn) ) fail add obj(sn,"reason","unexistent screen name")
+              else if ( rls.trim.length>0 && rls.split(",").exists( (a) => !MongoDBRealm.AVAILABLE_ROLES.contains(a)) ) fail add obj(sn,"reason","invalid role")
+              else if ( try { if (prf.length>0) {JSON.parse(prf); false} else false} catch { case _ => true} ) fail add obj(sn,"reason","invalid profile")
+              else {
+                mongoDbRealm.updateUser(sn,rls.split(",").toList.map(_.trim),JSON.parse(prf).asInstanceOf[BasicDBObject],pswd)
+                succ add obj(sn,"updated","OK")
+              }
+          })
+
+          val res = new BasicDBObject
+          if ( fail.isEmpty ) {
+            res.put("updated",succ)
+            OKResponse(res, user)
+          }
+          else if ( succ.isEmpty ) {
+            res.put("failed",fail)
+            FailResponse("Failed to update users",res, user)
+          }
+          else {
+            val (so,sf) = (new BasicDBObject,new BasicDBObject)
+            so.put("users",succ)
+            sf.put("users",fail)
+            PartialFailResponse("Some users could not be updated", so, sf,user)
+          }
+        }
+      }
+  }
+
 
   // ---------------------------------------------------------------------------
 

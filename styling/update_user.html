@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>MI - Remove User</title>
+    <title>MI - Update User</title>
     <link rel="stylesheet" type="text/css" href="style.css"> 
 </head>
 <body>
@@ -43,13 +43,16 @@
 <br/>
 <div class="response">
     <!-- Simple document -->
-    <h3 class="response">Remove a user</h3>
+    <h3 class="response">Update a user</h3>
 
    
 
-    <form action="../services/security/remove.html" method="GET">
+    <form action="../services/security/update.html" method="POST">
         <table class="document">
             <tr><td class="dockey">Screen name</td><td class="docvalue"><input type="text" name="screen_name" size="20"/></td></tr>
+            <tr><td class="dockey">Roles</td><td class="docvalue"><input type="text" name="roles" size="30"/> (Valid roles: admin, user. Please separate using ,)</td></tr>
+            <tr><td class="dockey">Profile</td><td class="docvalue"><textarea name="profile" cols="80"></textarea></td></tr>
+            <tr><td class="dockey">Password</td><td class="docvalue"><input type="password" name="password"/></td></tr>
             <tr><td colspan="2"><input type="submit" name="Add"/><input type="reset" name="Clear"></td></tr>
         </table>
     </form>

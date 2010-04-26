@@ -187,6 +187,27 @@ class MongoDBRealm(cnf:Configuration, var realmName:String) extends UserRealm wi
   }
 
 
+  /**Update the information for a given user.
+   *
+   * @param screenName The user screen name
+   * @param roles The roles to assign to the user
+   * @param 
+   * @param role The role to remove
+   */
+  def updateUser (screenName:String,roles:List[String],profile:BasicDBObject,password:String) = {
+    val cnd:BasicDBObject = """{"_id":"%s"}""" format screenName
+    val bdbo = collection findOne cnd
+    if (roles!=null && !roles.isEmpty ) {
+      val rls = new BasicDBList
+      roles.foreach(r => if (r.length>0) rls add r)
+      if ( rls.size>0 ) bdbo.put("roles", rls)
+    }
+    if (profile!=null && profile.size > 0) bdbo.put("profile", profile)
+    if (password!=null && password.length > 0) bdbo.put("password", computeHash(password))
+    collection.update(cnd, bdbo)
+   }
+
+
   /**Returns the real name
     *
    * @return The realm name

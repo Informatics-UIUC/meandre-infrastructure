@@ -517,9 +517,10 @@ object Templating {
                 <tr>
                     <td><![endif]-->
             <ul class="pureCssMenum">
-                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/add_user.html")+'"'+""">Create user</a></li>
-                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/remove_user.html")+'"'+"""">Delete user</a></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/security/users.html")+'"'+"""">List users</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/add_user.html")+'"'+""">Create user</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/update_user.html")+'"'+"""">Update user</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/remove_user.html")+'"'+"""">Delete user</a></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/security/valid_roles.html")+'"'+"""">Valid roles</a></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/grant_roles.html")+'"'+"""">Grant roles</a></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/revoke_roles.html")+'"'+"""">Revoke roles</a></li>
