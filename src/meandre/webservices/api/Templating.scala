@@ -295,9 +295,9 @@ class RichBasicDBObject (val self:BasicDBObject)(implicit cnf:Configuration) ext
       sbProcessedRes.append(pre)
       sbProcessedRes.append(url match {
         // TODO Add functionality to the mendre specific links
-        case u if u.startsWith("meandre://") => """<a href="%sservices/repository/describe.html?uri=%s">%s</a> (<a href="%sservices/repository/describe.rdf?uri=%s">RDF</a>,<a href="%sservices/repository/describe.ttl?uri=%s">TTL</a>,<a href="%sservices/repository/describe.nt?uri=%s">NT</a>) [<a href="%sservices/repository/remove.html?uri=%s">Remove</a>]""".format(prefix,u,u,prefix,u,prefix,u,prefix,u,prefix,u)
+        case u if u.startsWith("meandre://") => """<a href="%sservices/repository/describe.html?uri=%s">%s</a> (<a href="%sservices/repository/describe.rdf?uri=%s">RDF</a>,<a href="%sservices/repository/describe.ttl?uri=%s">TTL</a>,<a href="%sservices/repository/describe.nt?uri=%s">NT</a>) [<a href="%sservices/repository/remove.html?uri=%s">Remove</a>,<a href="%sservices/publish/publish.html?uri=%s">Pub</a>,<a href="%sservices/publish/unpublish.html?uri=%s">Unpub</a>]""".format(prefix,u,u,prefix,u,prefix,u,prefix,u,prefix,u,prefix,u,prefix,u)
         case u if u.startsWith("context://localhost") => """<a href="%s://%s:%s%s%s">%s</a>""".format(cnf.protocol,cnf.server,cnf.serverPort,prefix,u.replace("context://localhost/",""),u)
-        case u => """<a href="%s">%s</a> [<a href="%sservices/repository/describe.html?uri=%s">Desc?</a>]""".format(url,url,prefix,url)
+        case u => """<a href="%s">%s</a> [<a href="%sservices/repository/describe.html?uri=%s">Desc?</a>,<a href="%sservices/publish/publish.html?uri=%s">Pub</a>,<a href="%sservices/publish/unpublish.html?uri=%s">Unpub</a>]""".format(u,u,prefix,u,prefix,u,prefix,u)
       })
 
     }
@@ -431,7 +431,8 @@ object Templating {
 
                 <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/integrity.html")+'"'+""">Integrity</a></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/regenerate.html")+'"'+""">Regenerate</a></li>
-                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/clear.html")+'"'+""">Clear</a></li> 
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/clear.html")+'"'+""">Clear</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/describe.ttl")+'"'+""">Dump</a></li> 
             </ul>
             <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 
@@ -441,20 +442,11 @@ object Templating {
             <tr>
                 <td><![endif]-->
         <ul class="pureCssMenum">
-            <li class="pureCssMenui"><a class="pureCssMenui" href="#">List published</a></li>
-            <li class="pureCssMenui"><a class="pureCssMenui" href="#">Publish all</a></li>
-            <li class="pureCssMenui"><a class="pureCssMenui" href="#">Unpublish all</a></li>
-
-            <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Others</span><![if gt IE 6]></a><![endif]>
-                <!--[if lte IE 6]>
-                <table>
-                    <tr>
-                        <td><![endif]-->
-                <ul class="pureCssMenum">
-                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Published repository</a></li>
-                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Demo repository</a></li>
-                </ul>
-                <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+            <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/publish/list_published.html")+'"'+"""">List published</a></li>
+            <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/publish/publish_all.html")+'"'+"""">Publish all</a></li>
+            <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/publish/unpublish_all.html")+'"'+"""">Unpublish all</a></li>
+            <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/publish/force_unpublish_all.html")+'"'+"""">Force unpublish all</a></li>
+            <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"public/services/repository.ttl")+'"'+"""">Published repository</a></li>
         </ul>
         <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 
@@ -534,8 +526,8 @@ object Templating {
                     <td><![endif]-->
             <ul class="pureCssMenum">
                 <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+pathPrefix+"""public/services/ping.html">Ping</a></li>
-                <li class="pureCssMenui"><a class="pureCssMenui" href="#">Published repository</a></li>
-                <li class="pureCssMenui"><a class="pureCssMenui" href="#">Demo repository</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"public/services/repository.ttl")+'"'+"""">Published repository</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"public/services/demo_repository.ttl")+'"'+"""">Demo repository</a></li>
             </ul>
             <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 

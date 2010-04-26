@@ -13,6 +13,8 @@ class Configuration (val protocol:String, val server:String, val serverPort:Int,
   
   val MEANDRE_USER_COLLECTION_PREFIX = "meandre.user."
 
+  val MEANDRE_PUBLIC_COLLECTION = "meandre.public"
+
   val MEANDRE_CONTEXT_FS_COLLECTION = "meandre.context.fs"
   
   protected var MDBN = "Meandre"

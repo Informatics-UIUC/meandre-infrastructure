@@ -440,10 +440,6 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
   // ---------------------------------------------------------------------------
 
   get("""/services/repository/describe\.(rdf|ttl|nt)""".r, canonicalResponseType, tautologyGuard, public _) {
-
-    def uriRewrite ( uri:String ) =
-      uri.replace("context://localhost","%s://%s:%s".format(cnf.protocol,cnf.server,cnf.serverPort))
-
     requestFor {
       user =>
          val rdfType = elements(0) match {
@@ -1010,6 +1006,110 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
           }
         }
       }
+  }
+
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/publish/publish\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        if (!params.contains("uri"))
+          FailResponse("Missing parammeter uri", new BasicDBObject, user)
+        else {
+          val uris = paramsMap("uri").toList
+          val st = Store(cnf, user, false)
+          val pubUris = st.publishURI(uris,request.isUserInRole("admin"))
+          val succ = new BasicDBList
+          pubUris.foreach(succ add _)
+          val res = new BasicDBObject
+          res.put("published",succ)
+          OKResponse(res, user)
+        }
+    }
+  }
+
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/publish/unpublish\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        if (!params.contains("uri"))
+          FailResponse("Missing parammeter uri", new BasicDBObject, user)
+        else {
+          val uris = paramsMap("uri").toList
+          val st = Store(cnf, user, false)
+          val unpubUris = st.unpublishURI(uris,request.isUserInRole("admin"))
+          val succ = new BasicDBList
+          unpubUris.foreach(succ add _)
+          val res = new BasicDBObject
+          res.put("unpublished",succ)
+          OKResponse(res, user)
+        }
+    }
+  }
+
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/publish/list_published\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        val st = Store(cnf, user, false)
+        val res = new BasicDBObject
+        res.put("published",st.listPublished)
+        OKResponse(res, user)
+    }
+  }
+
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/publish/publish_all\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        val st = Store(cnf, user, false)
+        val uris = st.queryMetadata("{}","""{"%s":"%d"}""".format(K_PUB_DATE,-1),0,Integer.MAX_VALUE).map(_("uri").toString)
+        val pubURIs = new BasicDBList
+        st.publishURI(uris,request.isUserInRole("admin")).foreach(pubURIs add _)
+        val res = new BasicDBObject
+        res.put("published",pubURIs)
+        OKResponse(res, user)
+    }
+  }
+
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/publish/unpublish_all\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        val st = Store(cnf, user, false)
+        st.unpublishAllUserURIs
+        val res = new BasicDBObject
+        res.put("unpublished","all")
+        OKResponse(res, user)
+    }
+  }
+
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/publish/force_unpublish_all\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        if ( !request.isUserInRole("admin")  ) {
+          FailResponse("You need to belong to the admin role to force the unpublishing of the public repository", new BasicDBObject, user)
+        }
+        else {
+          val st = Store(cnf, user, false)
+          st.unpublishPublicRepository
+          val res = new BasicDBObject
+          res.put("unpublished","all")
+          OKResponse(res, user)
+        }
+    }
   }
 
 

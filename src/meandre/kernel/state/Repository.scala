@@ -7,6 +7,7 @@ import com.mongodb.{DBObject, BasicDBList, BasicDBObject, Mongo}
 import java.io.{ByteArrayInputStream, ObjectInputStream, ObjectOutputStream, ByteArrayOutputStream}
 import com.hp.hpl.jena.rdf.model.{ModelFactory, Model}
 import scala.Option
+import java.util.Date
 
 /**
  * Provides access to the user repository.
@@ -250,6 +251,21 @@ class Repository ( val cnf:Configuration, val userName:String ) {
   collection.ensureIndex("{\""+K_TOKENS+"\": 1}")
   collection.ensureIndex("{\""+K_DATE+"\": 1}")
   collection.ensureIndex("{\""+K_NAME+"\": 1}")
+
+  /** The public collection */
+  protected val publicCollection = db getCollection cnf.MEANDRE_PUBLIC_COLLECTION
+
+  /** Test connectivity. Will thrown an exception if cannot connect */
+  //collection.find.count
+
+  /** Ensure index creation */
+  publicCollection.ensureIndex("{\""+K_TYPE+"\": 1}")
+  publicCollection.ensureIndex("{\""+K_MODE+"\": 1}")
+  publicCollection.ensureIndex("{\""+K_TOKENS+"\": 1}")
+  publicCollection.ensureIndex("{\""+K_DATE+"\": 1}")
+  publicCollection.ensureIndex("{\""+K_NAME+"\": 1}")
+  publicCollection.ensureIndex("{\""+K_PUB_AUTHOR+"\": 1}")
+  publicCollection.ensureIndex("{\""+K_PUB_DATE+"\": 1}")
 
   //---------------------------------------------------------------------------
 
@@ -662,10 +678,125 @@ class Repository ( val cnf:Configuration, val userName:String ) {
   }
 
 
+  /**Given a URI returns the bytes of the RDF in the requested flavor for
+   * all components in the public collection.
+   *
+   * @param ctype The type of the requested components/flows
+   * @param flavor The flavor of the requested component (TTL,NT,RDF)
+   * @return An option containing the bytes if found
+   */
+  def getAllPublicRDF ( ctype:Option[String], flavor:String ) = {
+    val key = flavor match {
+      case "ttl" => K_TTL
+      case "nt"  => K_NT
+      case _     => K_RDF
+    }
+    val cnd = ctype match {
+      case Some(V_FLOW)      => """{"%s":"%s"}"""  format (K_TYPE,V_FLOW)
+      case Some(V_COMPONENT) => """{"%s":"%s"}"""  format (K_TYPE,V_COMPONENT)
+      case _                 => "{}"
+    }
+    val fld:BasicDBObject = """{"%s": %d }"""  format (key,1)
+    var res:List[Array[Byte]] = Nil
+    val cur = publicCollection find (cnd,fld)
+    while ( cur.hasNext ) {
+      res ::= cur.next.get(key).asInstanceOf[Array[Byte]]
+    }
+    res
+  }
+
+  /**Given uris it blindly replaces the public version.
+   *
+   * @param uris The URIs to publish
+   * @param overwrite Forces a published component to be republished
+   * @return The list of published URIs
+   */
+  def publishURI(uris:List[RDFURI],overwrite:Boolean) = {
+    var pubURIs:List[BasicDBObject] = Nil
+    uris.foreach(
+      uri => {
+        val id:BasicDBObject = """{"%s":"%s"}""" format (K_ID, uri)
+        collection.findOne(id) match {
+          case null =>
+          case doc =>
+            val cnd = """{"%s":"%s","%s":"%s"}""" format (K_ID, uri,K_PUB_AUTHOR,userName)
+            if ( publicCollection.find(cnd).count==1 ||
+                 publicCollection.find(id).count==0  ||    
+                 overwrite ) {
+              val date = new Date
+              doc.removeField("_ns")
+              doc.put(K_PUB_AUTHOR, userName)
+              doc.put(K_PUB_DATE, date)
+              publicCollection.update(id, doc, true, false)
+              val addedURI = new BasicDBObject
+              addedURI.put("uri",uri)
+              addedURI.put(K_PUB_AUTHOR,userName)
+              addedURI.put(K_PUB_DATE,date)
+              pubURIs ::= addedURI
+            }
+        }
+      }
+    )
+    pubURIs
+  }
+
+  /**Given uris it blindly unpublish them all
+   *
+   * @param uris The URIs to unpublish
+   * @param overwrite Forces to unpublish a URI
+   * @return The list of unpublished URIs
+   */
+  def unpublishURI(uris: List[RDFURI],overwrite:Boolean) = {
+    var unpubURIs:List[RDFURI] = Nil
+    uris.foreach(
+      uri => {
+        val id:BasicDBObject = """{"%s":"%s"}""" format (K_ID, uri)
+        val cnd:BasicDBObject = """{"%s":"%s","%s":"%s"}""" format (K_ID, uri,K_PUB_AUTHOR,userName)
+        if ( publicCollection.find(cnd).count>0 || overwrite ) {
+          publicCollection remove id
+          unpubURIs ::= uri
+        }
+      }
+    )
+    unpubURIs
+  }
+
+
+  /*Unpublish the public repository
+  *
+  */
+  def unpublishPublicRepository = publicCollection.drop
+
+  /**Unpublish all users URIs.
+   *
+   */
+  def unpublishAllUserURIs = {
+    val cnd = """{"%s":"%s"}""" format (K_PUB_AUTHOR, userName)
+    publicCollection remove cnd
+  }
+
+  /**Returns the list of the published components/flows.
+   *
+   * @return The list of published components/flows
+   */
+  def listPublished = {
+    val byDate:BasicDBObject = """{"%s":1}""" format K_PUB_DATE
+    val cur = publicCollection.find.sort(byDate)
+    val pub = new BasicDBList
+    while ( cur.hasNext ) {
+      val doc = cur.next
+      val res = new BasicDBObject
+      res.put("uri",doc get K_ID)
+      res.put(K_PUB_DATE, doc get K_PUB_DATE)
+      res.put(K_PUB_AUTHOR, doc get K_PUB_AUTHOR)
+      pub add res
+    }
+    pub
+  }
 }
 
 /**The companion object for the Repository class.
-  *
+ *
  */
 object Repository {
 

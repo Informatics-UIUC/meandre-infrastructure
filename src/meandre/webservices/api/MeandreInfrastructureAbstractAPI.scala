@@ -190,6 +190,15 @@ class MeandreInfrastructureAbstractAPI(cnf:Configuration) extends CrochetServlet
     res serializeTo elements(0)
   }
 
+  /**Rewrite contect uri to real urls.
+   *
+   * @param The uri to process
+   */
+  def uriRewrite ( uri:String ) =
+    uri.replace("context://localhost","%s://%s:%s".format(cnf.protocol,cnf.server,cnf.serverPort))
+
+
+
   //
   // Internal server error thrown while processing the request
   //

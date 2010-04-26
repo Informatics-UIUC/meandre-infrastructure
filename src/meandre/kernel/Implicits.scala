@@ -43,6 +43,9 @@ object Implicits {
   val K_LOCATION = "location"
   val K_DESCRIPTION = "description"
 
+  val K_PUB_AUTHOR = "owner"
+  val K_PUB_DATE = "published"
+
   val V_COMPONENT = "component"
   val V_FLOW      = "flow"
   val V_COMPUTE   = "compute"
