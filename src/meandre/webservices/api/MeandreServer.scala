@@ -125,7 +125,7 @@ class MeandreServer(val cnf:Configuration, val prefix: String, val staticFolder:
   //
   // Add the services that require registration
   //
-  contextWS.addServlet(new ServletHolder(new MeandreInfrastructurePrivateAPI(cnf)), prefix+"services/*")
+  contextWS.addServlet(new ServletHolder(new MeandreInfrastructurePrivateAPI(cnf,snareMon)), prefix+"services/*")
 
   //
   // Add the basic welcome page
@@ -142,8 +142,13 @@ class MeandreServer(val cnf:Configuration, val prefix: String, val staticFolder:
   //
   // The Snare monitor callback function
   //
-  def monitorCallback ( msg:BasicDBObject ) = {
-    println(msg);
+  def monitorCallback ( msgEnvelope:BasicDBObject ):Boolean = {
+    val msg = msgEnvelope.get("msg").asInstanceOf[BasicDBObject]
+    val cmd = (msg.getString("msg"),msg.getString("type"))
+    cmd match {
+      case ("shutdown","request") => println("Shutting down server %s by request of %s" format (msgEnvelope.getString("_ns"),msg.getString("source")) ) ; stop
+      case _ => println("Received msg: %s\nFrom: %s\nBy: %s" format(msg.toString,msgEnvelope.getString("_id"),msgEnvelope.getString("_ns")) )
+    }
     true
   }
 }

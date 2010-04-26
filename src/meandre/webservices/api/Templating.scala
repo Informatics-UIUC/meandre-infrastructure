@@ -487,6 +487,17 @@ object Templating {
                     <li class="pureCssMenui"><a class="pureCssMenui" href="#">Detailed</a></li>
                 </ul>
                 <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+
+            <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Server</span><![if gt IE 6]></a><![endif]>
+                <!--[if lte IE 6]>
+                <table>
+                    <tr>
+                        <td><![endif]-->
+                <ul class="pureCssMenum">
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/server/shutdown.html")+'"'+""">Shutdown this server</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/shutdown_server.html")+'"'+""">Shutdown other servers</a></li>
+                </ul>
+                <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
             <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Cluster</span><![if gt IE 6]></a><![endif]>
                 <!--[if lte IE 6]>
                 <table>
@@ -496,8 +507,9 @@ object Templating {
                     <li class="pureCssMenui"><a class="pureCssMenui" href="#">Log</a></li>
                     <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/snare/MeandreInf/heartbeat")+'"'+""" target="_blank">Status</a></li>
                     <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/snare/MeandreInf/info")+'"'+""" target="_blank">Information</a></li>
-                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Properties</a></li>
-                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Shutdown server</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Properties</a></li> 
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/server/shutdown_cluster.html")+'"'+""">Shutdown cluster</a></li>
+
                 </ul>
                 <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
         </ul>

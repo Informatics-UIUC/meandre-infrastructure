@@ -7,6 +7,7 @@ import meandre.webservices.client.MeandreInfrastructureAPIClient
 import meandre.webservices.api.MeandreInfrastructurePrivateAPI
 import com.mongodb.BasicDBObject
 import meandre.kernel.Implicits._
+import snare.Snare
 
 /**
  * The basic specs for the Meandre Infrastructure APIs
@@ -18,7 +19,26 @@ import meandre.kernel.Implicits._
 
 class MeandreInfrastructurePrivateAPISpecs extends Specification("The Meandre Infrastructure specification") {
   val TEST_SERVER_PORT = 6969
-  val api = new MeandreInfrastructurePrivateAPI(Configuration())
+  val snareMon = Snare(
+    "test@localhost:" + TEST_SERVER_PORT,
+    "test",
+    """{"server": {
+          "protocol":"http",
+          "host":"localfost",
+          "port":"""+TEST_SERVER_PORT+""",
+          "prefix":"/",
+          "static":"static",
+          "resources":"resources"
+        },
+        "mongodb": {
+          "port":"localhost",
+          "host":"27017"
+        }
+    }""",
+    "localhost",
+    27017,
+    ( msg:BasicDBObject ) => {println(msg) ; true} )
+  val api = new MeandreInfrastructurePrivateAPI(Configuration(),snareMon)
   val client = MeandreInfrastructureAPIClient("http", "localhost", TEST_SERVER_PORT)
   var server:CrochetServer = null
 

@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>MI - Revoke Role from User</title>
+    <title>MI - Shutdown server</title>
     <link rel="stylesheet" type="text/css" href="style.css"> 
 </head>
 <body>
@@ -43,15 +43,19 @@
 <br/>
 <div class="response">
     <!-- Simple document -->
-    <h3 class="response">Revoke roles from user</h3>
+    <h3 class="response">Shutdown servers</h3>
 
    
 
-    <form action="../services/security/revoke_roles.html" method="GET">
+    <form action="../services/server/shutdown.html" method="GET">
         <table class="document">
-            <tr><td class="dockey">Screen name</td><td class="docvalue"><input type="text" name="screen_name" size="20"/></td></tr>
-            <tr><td class="dockey">Roles</td><td class="docvalue"><input type="text" name="roles" size="30"/> (Valid roles: admin, user. Please separate using ,)</td></tr>
-            <tr><td colspan="2"><input type="submit" name="Revoke"/><input type="reset" name="Clear"></td></tr>
+            <tr><td class="dockey">Server UUID</td><td class="docvalue"><input type="text" name="uuid" size="50"/></td></tr>
+            <tr><td class="dockey">Server UUID</td><td class="docvalue"><input type="text" name="uuid" size="50"/></td></tr>
+            <tr><td class="dockey">Server UUID</td><td class="docvalue"><input type="text" name="uuid" size="50"/></td></tr>
+            <tr><td class="dockey">Server UUID</td><td class="docvalue"><input type="text" name="uuid" size="50"/></td></tr>
+            <tr><td class="dockey">Server UUID</td><td class="docvalue"><input type="text" name="uuid" size="50"/></td></tr>
+            <tr><td class="dockey">Server UUID</td><td class="docvalue"><input type="text" name="uuid" size="50"/></td></tr>
+            <tr><td colspan="2"><input type="submit" name="Shutdown"/><input type="reset" name="Clear"></td></tr>
         </table>
     </form>
 

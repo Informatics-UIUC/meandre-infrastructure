@@ -15,6 +15,7 @@ import meandre.kernel.rdf._
 import com.mongodb.{Mongo, BasicDBList, BasicDBObject}
 import meandre.webservices.realm.MongoDBRealm
 import com.mongodb.util.JSON
+import snare.Snare
 
 /**
  * The Meandre infrastructure implementation of the services API
@@ -25,7 +26,7 @@ import com.mongodb.util.JSON
  */
 
 
-class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrastructureAbstractAPI(cnf) {
+class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare) extends MeandreInfrastructureAbstractAPI(cnf) {
 
  
   // ---------------------------------------------------------------------------
@@ -1112,6 +1113,65 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration) extends MeandreInfrast
     }
   }
 
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/server/shutdown\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        if ( !request.isUserInRole("admin")  ) {
+          FailResponse("You need to belong to the admin role to force the unpublishing of the public repository", new BasicDBObject, user)
+        }
+        else {
+          val peers = paramsMap.contains("uuid") match {
+            case false => List(snareMon.uuid.toString)
+            case true  => paramsMap("uuid").toList
+          }
+
+          val resMsg = new BasicDBList
+          peers.filter(_.trim!="").foreach(
+            p => {
+              val msg:BasicDBObject =
+              """{
+                    "msg" : "shutdown",
+                    "type" :"request",
+                    "source" : "%s",
+                    "target" : "%s"
+              }""" format (snareMon.uuid,p)
+              snareMon.notifyPeer(p,msg)
+              resMsg add msg
+            }
+          )
+          val res = new BasicDBObject
+          res.put("shutdown",resMsg)
+          OKResponse(res, user)
+        }
+    }
+  }
+
+
+    // ---------------------------------------------------------------------------
+
+    get("""/services/server/shutdown_cluster\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+      requestFor {
+        user =>
+          if ( !request.isUserInRole("admin")  ) {
+            FailResponse("You need to belong to the admin role to force the unpublishing of the public repository", new BasicDBObject, user)
+          }
+          else {
+            val msg:BasicDBObject =
+              """{
+                    "msg" : "shutdown",
+                    "type" :"request",
+                    "source" : "%s"
+              }""" format (snareMon.uuid)
+            snareMon.broadcast(msg)
+            val res = new BasicDBObject
+            res.put("shutdown cluster",msg)
+            OKResponse(res, user)
+          }
+      }
+    }
 
   // ---------------------------------------------------------------------------
 
