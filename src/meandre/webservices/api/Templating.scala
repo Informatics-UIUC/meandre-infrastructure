@@ -504,7 +504,6 @@ object Templating {
                     <tr>
                         <td><![endif]-->
                 <ul class="pureCssMenum">
-                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Log</a></li>
                     <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/snare/MeandreInf/heartbeat")+'"'+""" target="_blank">Status</a></li>
                     <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/snare/MeandreInf/info")+'"'+""" target="_blank">Information</a></li>
                     <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/server/shutdown_cluster.html")+'"'+""">Shutdown cluster</a></li>

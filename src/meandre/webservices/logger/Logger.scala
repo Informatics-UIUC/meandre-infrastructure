@@ -50,6 +50,9 @@ class Logger (cnf:Configuration,logCollection:String,uuid:UUID) {
 
   var level = cnf.MEANDRE_LOG_LEVEL
 
+  /**The looger actor in charge of pushing the updates into MongoDB.
+   *
+   */
   val logActor = actor {
     loop {
       react {
@@ -58,6 +61,10 @@ class Logger (cnf:Configuration,logCollection:String,uuid:UUID) {
     }
   }
 
+  /**Logs a severe message.
+   *
+   * @param msg The message to log
+   */
   def severe ( msg:String ) =
     if ( LVL_SEVERE<=level ) {
       val logObj = new BasicDBObject
@@ -68,6 +75,10 @@ class Logger (cnf:Configuration,logCollection:String,uuid:UUID) {
       logActor ! logObj
     }
 
+  /**Logs a warning message.
+   *
+   * @param msg The message to log
+   */
   def warning ( msg:String ) =
     if ( LVL_WARNING<=level ) {
       val logObj = new BasicDBObject
@@ -78,6 +89,10 @@ class Logger (cnf:Configuration,logCollection:String,uuid:UUID) {
       logActor ! logObj
     }
 
+  /**Logs a info message.
+   *
+   * @param msg The message to log
+   */
   def info ( msg:String )=
     if ( LVL_INFO<=level ) {
       val logObj = new BasicDBObject
@@ -88,6 +103,10 @@ class Logger (cnf:Configuration,logCollection:String,uuid:UUID) {
       logActor ! logObj
     }
 
+  /**Logs a fine message.
+   *
+   * @param msg The message to log
+   */
   def fine ( msg:String ) =
     if ( LVL_FINE<=level ) {
       val logObj = new BasicDBObject
@@ -98,7 +117,12 @@ class Logger (cnf:Configuration,logCollection:String,uuid:UUID) {
       logActor ! logObj
     }
 
-  def finer ( msg:String ) =
+
+  /**Logs a finer message.
+   *
+   * @param msg The message to log
+   */
+   def finer ( msg:String ) =
     if ( LVL_FINER<=level ) {
       val logObj = new BasicDBObject
       logObj.put(K_LEVEL,"FINER")
@@ -108,7 +132,12 @@ class Logger (cnf:Configuration,logCollection:String,uuid:UUID) {
       logActor ! logObj
     }
 
-  def finest ( msg:String ) =
+
+  /**Logs a finest message.
+   *
+   * @param msg The message to log
+   */
+   def finest ( msg:String ) =
     if ( LVL_FINEST<=level ) {
       val logObj = new BasicDBObject
       logObj.put(K_LEVEL,"FINEST")
@@ -118,8 +147,15 @@ class Logger (cnf:Configuration,logCollection:String,uuid:UUID) {
       logActor ! logObj
     }
 
+  /** The basic sorting condition by time stamps */
   val sortCndTS:BasicDBObject = """{"ts":-1}"""
 
+  /**Returns the log entries that matches the provided criteries
+   *
+   * @param cnd The condition to query the log against
+   * @param skip The number of entries to skip
+   * @param limit The number of entries to retrieve
+   */
   def getLogEntries(cnd:String,skip:Int,limit:Int) = {
     val les = new BasicDBList
     val q:BasicDBObject = cnd

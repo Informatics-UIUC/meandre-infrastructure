@@ -1145,6 +1145,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
           )
           val res = new BasicDBObject
           res.put("shutdown",resMsg)
+          log.severe("Requesting sever immediate shutdown for %s".format(peers.foldLeft("")((a,b)=>a+b+" ")))
           OKResponse(res, user)
         }
     }
@@ -1169,6 +1170,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
           snareMon.broadcast(msg)
           val res = new BasicDBObject
           res.put("shutdown cluster",msg)
+          log.severe("Requesting cluster immediate shutdown")
           OKResponse(res, user)
         }
     }

@@ -46,14 +46,11 @@ object Configuration {
   /** The infrastructure version */
   val INFRASTRUCTURE_VERSION = "1.5.0-vcli-alpha"
 
-  /** A default configuration */
-  private val cnf = new Configuration("http","localhost",1714,"localhost",27017,None)
-
   /**Returns the default infrastructure object
    *
    * @return The Configuration object
    */
-  def apply() = cnf
+  def apply() = new Configuration("http","localhost",1714,"localhost",27017,None)
 
   /**Create a new configuration object for the given information.
    *
