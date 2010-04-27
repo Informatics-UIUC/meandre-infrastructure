@@ -63,89 +63,58 @@ class Logger (cnf:Configuration,logCollection:String,uuid:UUID) {
 
   /**Logs a severe message.
    *
+   * @param lvl The hardcoded logger level
+   * @param lvlName The loger level message
    * @param msg The message to log
    */
-  def severe ( msg:String ) =
-    if ( LVL_SEVERE<=level ) {
+  protected def logMessage (lvl:Int,lvlName:String)( msg:String ) =
+    if ( lvl<=level ) {
       val logObj = new BasicDBObject
-      logObj.put(K_LEVEL,"SEVERE")
+      logObj.put(K_LEVEL,lvlName)
       logObj.put(K_UUID,sUUID)
       logObj.put(K_TS,new Date)
       logObj.put(K_MSG,msg)
       logActor ! logObj
     }
+
+  /**Logs a severe message.
+   *
+   * @param msg The message to log
+   */
+  val severe = logMessage(LVL_SEVERE,"SEVERE") _
 
   /**Logs a warning message.
    *
    * @param msg The message to log
    */
-  def warning ( msg:String ) =
-    if ( LVL_WARNING<=level ) {
-      val logObj = new BasicDBObject
-      logObj.put(K_LEVEL,"WARNING")
-      logObj.put(K_UUID,sUUID)
-      logObj.put(K_TS,new Date)
-      logObj.put(K_MSG,msg)
-      logActor ! logObj
-    }
+  val warning = logMessage(LVL_WARNING,"WARNING") _
 
   /**Logs a info message.
    *
    * @param msg The message to log
    */
-  def info ( msg:String )=
-    if ( LVL_INFO<=level ) {
-      val logObj = new BasicDBObject
-      logObj.put(K_LEVEL,"INFO")
-      logObj.put(K_UUID,sUUID)
-      logObj.put(K_TS,new Date)
-      logObj.put(K_MSG,msg)
-      logActor ! logObj
-    }
+  val info = logMessage(LVL_INFO,"INFO") _
 
   /**Logs a fine message.
    *
    * @param msg The message to log
    */
-  def fine ( msg:String ) =
-    if ( LVL_FINE<=level ) {
-      val logObj = new BasicDBObject
-      logObj.put(K_LEVEL,"FINE")
-      logObj.put(K_UUID,sUUID)
-      logObj.put(K_TS,new Date)
-      logObj.put(K_MSG,msg)
-      logActor ! logObj
-    }
+  val fine = logMessage(LVL_FINE,"FINE") _
 
 
   /**Logs a finer message.
    *
    * @param msg The message to log
    */
-   def finer ( msg:String ) =
-    if ( LVL_FINER<=level ) {
-      val logObj = new BasicDBObject
-      logObj.put(K_LEVEL,"FINER")
-      logObj.put(K_UUID,sUUID)
-      logObj.put(K_TS,new Date)
-      logObj.put(K_MSG,msg)
-      logActor ! logObj
-    }
+   val finer = logMessage(LVL_FINER,"FINER") _
 
 
   /**Logs a finest message.
    *
    * @param msg The message to log
    */
-   def finest ( msg:String ) =
-    if ( LVL_FINEST<=level ) {
-      val logObj = new BasicDBObject
-      logObj.put(K_LEVEL,"FINEST")
-      logObj.put(K_UUID,sUUID)
-      logObj.put(K_TS,new Date)
-      logObj.put(K_MSG,msg)
-      logActor ! logObj
-    }
+   val finest = logMessage(LVL_FINEST,"FINEST") _
+  
 
   /** The basic sorting condition by time stamps */
   val sortCndTS:BasicDBObject = """{"ts":-1}"""
