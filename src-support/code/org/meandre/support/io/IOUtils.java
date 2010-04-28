@@ -46,7 +46,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -86,15 +85,16 @@ public abstract class IOUtils {
      */
     public static String getTextFromReader(Reader reader) throws IOException {
         BufferedReader br = new BufferedReader(reader);
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
+        StringWriter writer = new StringWriter();
 
-        String sLine;
-        while ((sLine = br.readLine()) != null)
-            pw.println(sLine);
+        char[] cbuf = new char[4096];
+        int nRead;
+
+        while ((nRead = br.read(cbuf)) > 0)
+            writer.write(cbuf, 0, nRead);
 
         reader.close();
-        return sw.toString();
+        return writer.toString();
     }
 
 }
