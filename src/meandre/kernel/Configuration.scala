@@ -17,6 +17,10 @@ class Configuration (val protocol:String, val server:String, val serverPort:Int,
 
   val MEANDRE_GLOBAL_LOGGER = "meandre.log"
 
+  val MEANDRE_JOBS = "meandre.jobs"
+
+  val MEANDRE_JOBS_QUEUE = MEANDRE_JOBS+".queue"
+
   val MEANDRE_CONTEXT_FS_COLLECTION = "meandre.context.fs"
   
   protected var MDBN = "Meandre"

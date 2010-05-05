@@ -1222,6 +1222,67 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
     }
   }
 
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/jobs/submit\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        val st = Store(cnf, user, false)
+        val res = new BasicDBObject
+        params.contains("uri") match {
+          case false =>
+            FailResponse("Missing parammeter uri", new BasicDBObject, user)
+          case true =>
+            st.descriptorFor(params("uri")) match {
+              case None =>
+                FailResponse(params("uri") + " not a known URI", new BasicDBObject, user)
+              case Some(desc) =>
+                desc match {
+                  case cmp:ComponentDescriptor =>
+                    FailResponse(params("uri") + " is a component. Only flows are executable", new BasicDBObject, user)
+                  case flow:FlowDescriptor =>
+                    val rdfs = flow.instances.map(
+                         ci => (ci.componentUri,st.getRDFForURI(ci.componentUri,"nt"))
+                      )
+                    rdfs.filter(_._2.isEmpty) match {
+                      case Nil =>
+                        // All components were found
+                        val baos = new ByteArrayOutputStream
+                        rdfs.foreach( uba => { baos write uba._2.get ; baos write "\n".getBytes } )
+                        // Submit a job
+                        val res = new BasicDBObject
+                        res.put("rdf", new String(baos.toByteArray))
+                        OKResponse(res, user)
+                      case _ =>
+                        // Missing components for the flows
+                        val muris = new BasicDBList
+                        rdfs.foreach( _ match {
+                          case (uri,None) => muris add uri
+                          case _ =>
+                        })
+                        val res = new BasicDBObject
+                        res.put("missing",muris)
+                        FailResponse(params("uri") + " flow is missing some required components", res, user)
+                    }
+//                  case _ =>
+//                     FailResponse(params("uri") + " unknow type ", new BasicDBObject, user)
+
+//                // Retrieve flow descriptor too
+//                st.descriptorFor(params("uri"))  match {
+//                  case None => FailResponse(params("uri") + "not a know uir", res, user)
+//                  case Some
+//
+//                }
+//                res.put(elements(0), uriRewrite(new String(ba))); OKResponse(res, user)
+            }
+            }
+        }
+    }
+  }
+
+
+
   // ---------------------------------------------------------------------------
 
 
