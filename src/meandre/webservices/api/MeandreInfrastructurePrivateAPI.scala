@@ -1231,6 +1231,9 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
       user =>
         val st = Store(cnf, user, false)
         val res = new BasicDBObject
+        val replicas = if (params.contains("replicas"))
+                          try { Integer.parseInt(params("replicas"))} catch { case _ => 1 }
+                       else 1
         val wrapper = if (params.contains("wrapper") &&
                           ExecutionWrapper.validExecutionWrapper.contains(params("wrapper")) )
                         params("wrapper")
@@ -1259,28 +1262,55 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
                         rdfs.foreach( uba => { baos write uba._2.get ; baos write "\n".getBytes } )
                         // Submit a job
                         val queue = new JobQueue(cnf)
-                        val job = queue.push(
+                        val jobs = (1 to replicas).toList.map( i => queue.push(
                               baos.toByteArray,
                               user,
                               snareMon.uuid.toString,
                               wrapper,
                               """{"uri":"%s"}""" format params("uri"),
                               cnf.MEANDRE_QUEUE_ATTEMPTS
+                            ))
+                        jobs.exists(_.isEmpty) match {
+                          case true =>
+                            jobs.filter(j => !(j.isEmpty) ) match {
+                              case l if l.length==0 => FailResponse("Could not submit job for "+params("uri"), new BasicDBObject, user)
+                              case l if l.length>0  =>
+                                val listSucc = new BasicDBList
+                                l.foreach(
+                                  j => {
+                                    val msg:BasicDBObject =
+                                    """{
+                                          "msg" : "job",
+                                          "type" :"submitted",
+                                          "jobID" : "%s",
+                                          "source" : "%s"
+                                    }""" format (j.get.getString("jobID"),snareMon.uuid)
+                                    snareMon.broadcast(msg)
+                                    listSucc add j.get
+                                  }
+                                )
+                                val (so,sf) = (new BasicDBObject,new BasicDBObject)
+                                so.put("submitted",listSucc)
+                                PartialFailResponse("Could submit all the requested number of jobs", so, sf,user)
+                              case _ => FailResponse("Unexpected condition while processing submissions for "+params("uri"), new BasicDBObject, user)
+                            }
+                          case false =>
+                            val listSucc = new BasicDBList
+                            jobs.foreach(
+                              j => {
+                                  val msg:BasicDBObject =
+                                  """{
+                                        "msg" : "job",
+                                        "type" :"submitted",
+                                        "jobID" : "%s",
+                                        "source" : "%s"
+                                  }""" format (j.get.getString("jobID"),snareMon.uuid)
+                                  snareMon.broadcast(msg)
+                                  listSucc add j.get
+                              }
                             )
-                        job match {
-                          case None =>
-                            FailResponse("Could not submit job for "+params("uri"), new BasicDBObject, user)
-                          case Some(j) =>
-                            val msg:BasicDBObject =
-                              """{
-                                    "msg" : "job",
-                                    "type" :"submitted",
-                                    "jobID" : "%s",
-                                    "source" : "%s"
-                              }""" format (j.getString("jobID"),snareMon.uuid)
-                            snareMon.broadcast(msg)
                             val res = new BasicDBObject
-                            res.put("job",j)
+                            res.put("submitted",listSucc)
                             OKResponse(res, user)
                         }
                       case _ =>
