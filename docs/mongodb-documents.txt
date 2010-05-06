@@ -87,3 +87,35 @@ Component/flow in the public repository (previous + owner and published entries)
 
 Job documents
 
+{
+	"_id" : "55bfb0999b5fa2ed7a3425bf3a45a05bfb9c5bff",
+	"meta" : {
+		"uri" : "meandre://test.org/some/silly/flow",
+		"params" : {
+
+		}
+	},
+	"owner" : "test_user_1000",
+	"progress" : [
+		{
+			"status" : "Queued",
+			"server" : "8db9e66f-80a5-4d07-ae0a-c53c3f635d53",
+			"ts" : "Thu May 06 2010 09:46:53 GMT-0500 (CDT)"
+		},
+		{
+			"status" : "Preparing",
+			"server" : "8db9e66f-80a5-4d07-ae0a-c53c3f635d53",
+			"ts" : "Thu May 06 2010 09:46:53 GMT-0500 (CDT)"
+		},
+		{
+			"status" : "Running",
+			"server" : "8db9e66f-80a5-4d07-ae0a-c53c3f635d53",
+			"ts" : "Thu May 06 2010 09:46:53 GMT-0500 (CDT)"
+		}
+	],
+	"repo" : BinData type: 2 len: 35,
+	"status" : "Running",
+	"ts" : "Thu May 06 2010 09:46:53 GMT-0500 (CDT)",
+	"wrapper" : "Snowfield"
+}
+
