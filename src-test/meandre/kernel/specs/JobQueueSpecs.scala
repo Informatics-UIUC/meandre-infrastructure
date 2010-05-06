@@ -48,6 +48,8 @@ object JobQueueSpecs extends Specification("The context pool specification") {
       queue.sizeDone must beEqualTo(0)
       queue.sizeAborted must beEqualTo(0)
       queue.sizeKilled must beEqualTo(0)
+
+      queue.jobIDs.length must beEqual(size + REPS)
     }
 
   }
@@ -57,6 +59,7 @@ object JobQueueSpecs extends Specification("The context pool specification") {
 
     queue.size must beEqualTo(REPS)
     queue.sizeQueued must beEqualTo(REPS)
+    queue.jobIDs.length must beEqual(REPS)
 
     (1 to REPS).toList.foreach (
       i => queue grabQueuedJob server  match {
@@ -74,6 +77,8 @@ object JobQueueSpecs extends Specification("The context pool specification") {
 
     queue.sizeQueued must beEqualTo(0)
     queue.sizeRunning must beEqualTo(REPS)
+
+    queue.jobIDs.length must beEqual(REPS)
   }
 
 }

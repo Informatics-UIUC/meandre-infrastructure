@@ -1316,10 +1316,18 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
             case _ => "{}"
           }
         }
-        var cnd = if (params.contains("status"))
-                      """{"status":"%s"}""" format params("status").capitalize
-                  else
-                      "{}"
+        var cndURIs = if ( params.contains("jobID")) {
+                        """ "_id":"%s" """ format params("jobID")
+                      }
+                      else ""
+        var cndStatus = if (params.contains("status")) """ "status":"%s" """ format params("status").capitalize
+                        else ""
+        var cndAdmin =  if (!request.isUserInRole("admin") ) """ "owner":"%s" """ format user
+                        else ""
+        var cnd = "{ %s %s %s }" format (
+                if (cndAdmin.trim.length>0) cndAdmin+"," else "",
+                if (cndURIs.trim.length>0) cndURIs+"," else "",
+                cndStatus )
 
         val jobs = queue.queryQueue(cnd,sortCnd,skip,limit)
         val list = new BasicDBList
@@ -1330,6 +1338,39 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
     }
   }
 
+
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/jobs/ids\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        val queue = new JobQueue(cnf)
+        var sortCnd = "{}"
+        val skip = if (params.contains("offset")) safeParseInt(params("offset")) else 0
+        val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else Math.MAX_INT
+        if (params.contains("order")) {
+          sortCnd = params("order") match {
+            case "ts" => """{"ts":-1}"""
+            case _ => "{}"
+          }
+        }
+        var cndStatus = if (params.contains("status")) """ "status":"%s" """ format params("status").capitalize
+                        else ""
+        var cndAdmin =  if (!request.isUserInRole("admin") ) """ "owner":"%s" """ format user
+                        else ""
+        var cnd = "{ %s %s }" format (if (cndAdmin.trim.length>0) cndAdmin+"," else "", cndStatus )
+
+        val jobs = queue.queryQueue(cnd,sortCnd,skip,limit)
+        val list = new BasicDBList
+        jobs foreach ( j => list add j.get("jobID") )
+        val labeled = new BasicDBObject
+        labeled.put("jobIDs", list)
+        OKResponse(labeled,user)
+    }
+  }
+
+  
 
   // ---------------------------------------------------------------------------
 

@@ -20,7 +20,10 @@ import com.mongodb.{BasicDBList, BasicDBObject}
 class RichBasicDBObject (val self:BasicDBObject)(implicit cnf:Configuration) extends Proxy {
 
   /** The regular expression to match arbitrary urls */
-  val urlRegex = "\\w+([_-]\\w+)*://(\\w+([_-]\\w+)*(\\.\\w+([_-]\\w+)*)*/?)*".r
+  val urlRegex = "(\\w+([_-]\\w+)*://(\\w+([_-]\\w+)*(\\.\\w+([_-]\\w+)*)*/?)*)|(\\s*[0-9a-f]{40}\\s*)".r
+
+  /** The regular expression to grab jobIDs */
+  //val jobIDRegex = """<td class="docvalue">\s*[0-9a-f]{40}\s*</td>""".r
 
 
   /** Given a response document, it formats it according to the provided
@@ -297,7 +300,8 @@ class RichBasicDBObject (val self:BasicDBObject)(implicit cnf:Configuration) ext
         // TODO Add functionality to the mendre specific links
         case u if u.startsWith("meandre://") => """<a href="%sservices/repository/describe.html?uri=%s">%s</a> (<a href="%sservices/repository/describe.rdf?uri=%s">RDF</a>,<a href="%sservices/repository/describe.ttl?uri=%s">TTL</a>,<a href="%sservices/repository/describe.nt?uri=%s">NT</a>) [<a href="%sservices/repository/remove.html?uri=%s">Remove</a>,<a href="%sservices/publish/publish.html?uri=%s">Pub</a>,<a href="%sservices/publish/unpublish.html?uri=%s">Unpub</a>,<a href="%sservices/jobs/submit.html?uri=%s">Submit Job</a>]""".format(prefix,u,u,prefix,u,prefix,u,prefix,u,prefix,u,prefix,u,prefix,u,prefix,u)
         case u if u.startsWith("context://localhost") => """<a href="%s://%s:%s%s%s">%s</a>""".format(cnf.protocol,cnf.server,cnf.serverPort,prefix,u.replace("context://localhost/",""),u)
-        case u => """<a href="%s">%s</a> [<a href="%sservices/repository/describe.html?uri=%s">Desc?</a>,<a href="%sservices/publish/publish.html?uri=%s">Pub</a>,<a href="%sservices/publish/unpublish.html?uri=%s">Unpub</a>,<a href="%sservices/jobs/submit.html?uri=%s">Submit Job</a>]""".format(u,u,prefix,u,prefix,u,prefix,u,prefix,u)
+        case u if u.startsWith("http") => """<a href="%s">%s</a> [<a href="%sservices/repository/describe.html?uri=%s">Desc?</a>,<a href="%sservices/publish/publish.html?uri=%s">Pub</a>,<a href="%sservices/publish/unpublish.html?uri=%s">Unpub</a>,<a href="%sservices/jobs/submit.html?uri=%s">Submit Job</a>]""".format(u,u,prefix,u,prefix,u,prefix,u,prefix,u)
+        case md5 => """ <a href="%sservices/jobs/list.html?jobID=%s">%s</a> [<a href="%sservices/jobs/console.html?jobID=%s">Console</a>,<a href="%sservices/jobs/log.html?jobID=%s">Log</a>,<a href="%sservices/jobs/abort.html?jobID=%s">Abort</a>] """ format (prefix,md5.trim,md5.trim,prefix,md5.trim,prefix,md5.trim,prefix,md5.trim)
       })
 
     }
@@ -472,9 +476,9 @@ object Templating {
                     <tr>
                         <td><![endif]-->
                 <ul class="pureCssMenum">
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/jobs/list.html")+'"'+"""">List Jobs</a></li>
                     <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/jobs/list.html?status=running")+'"'+"""">Running flows</a></li>
-                    <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/jobs/list.html")+'"'+"""">Jobs</a></li>
-                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Job consoles</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/jobs/ids.html")+'"'+"""">Job consoles &amp; logs</a></li>
                 </ul>
                 <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
             <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Logs</span><![if gt IE 6]></a><![endif]>

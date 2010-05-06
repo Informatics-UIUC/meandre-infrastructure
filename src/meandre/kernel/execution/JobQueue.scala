@@ -257,6 +257,27 @@ class JobQueue(val cnf: Configuration) {
     }
   }
 
+  /**Returns the list of job ids.
+   *
+   * @param offset The number of jobs to skip
+   * @param limit The maximun number of jobs to return
+   * @return The list of IDS
+   */
+  def jobIDs(offset:Int,limit:Int) : List[String] = {
+    var res:List[String] = Nil
+    val cur = queue.find("{}","""{"_id":1}""").sort("""{"ts":1}""").skip(offset).limit(limit)
+    while ( cur.hasNext ) res ::= cur.next.get("_id").toString
+    res
+  }
+
+  /**Returns the list of all job ids.
+    *
+    * @param offset The number of jobs to skip
+    * @param limit The maximun number of jobs to return
+    * @return The list of IDS
+    */
+  def jobIDs : List[String] = jobIDs(0,Integer.MAX_VALUE)
+
   /**Returns the size of the global queue.
     *
    * @return The size of the total queue
