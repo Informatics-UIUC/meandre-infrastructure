@@ -3,7 +3,7 @@ package meandre.kernel.execution
 import java.io.{File, OutputStream, InputStream}
 
 /**
- * The basic trait that all wrappers have to implement
+ * The basic class that all wrappers have to implement
  *
  * @author Xavier Llora
  * @date May 4, 2010 at 9:41:22 AM
@@ -50,4 +50,20 @@ abstract class ExecutionWrapper {
    */
   def fireWrapper(repo: String) : (Process, InputStream, InputStream)
 
+}
+
+
+/**
+ * The basic trait that all wrappers have to implement
+ *
+ * @author Xavier Llora
+ * @date May 4, 2010 at 9:41:22 AM
+ *
+ */
+
+object ExecutionWrapper {
+
+  val validExecutionWrapper = Set("1.4.x","Snowfield")
+
+  val defaultExecutionWrapper = "Snowfield"
 }

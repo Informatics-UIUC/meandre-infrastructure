@@ -44,8 +44,8 @@ class JobQueue(val cnf: Configuration) {
   //
   queue.ensureIDIndex
   queue.ensureIndex("""{"status":1}""")
-  queue.ensureIndex("""{"status":1,"ts":1}""")
-  queue.ensureIndex("""{"ts":1}""")
+  queue.ensureIndex("""{"status":1,"ts":-1}""")
+  queue.ensureIndex("""{"ts":-1}""")
 
   //
   // The digest generator
@@ -118,6 +118,10 @@ class JobQueue(val cnf: Configuration) {
               rnd.nextFloat.toString.getBytes
             )))
       queue insert job
+      job.put("jobID",job.get("_id"))
+      job remove "_id"
+      job remove "_ns"
+      job remove "repo"
       Some(job)
     }
     catch {
@@ -170,7 +174,14 @@ class JobQueue(val cnf: Configuration) {
     //println(cmd)
     val res = db command cmd
     if ( res.containsField("errmsg") ) None
-    else Some(res.get("value").asInstanceOf[BasicDBObject])
+    else {
+      val j = res.get("value").asInstanceOf[BasicDBObject]
+      j.put("jobID",j.get("_id"))
+      j remove "_id"
+      j remove "_ns"
+      j remove "repo"
+      Some(j)
+    }
   }
 
   /**Given a job, it atomically transitions to the new status or
@@ -217,7 +228,14 @@ class JobQueue(val cnf: Configuration) {
     //println(cmd)
     val res = db command cmd
     if ( res.containsField("errmsg") ) None
-    else Some(res.get("value").asInstanceOf[BasicDBObject])
+    else {
+      val j = res.get("value").asInstanceOf[BasicDBObject]
+      j.put("jobID",j.get("_id"))
+      j remove "_id"
+      j remove "_ns"
+      j remove "repo"
+      Some(j)
+    }
   }
 
   /**Given a job ID, returns all the information associated to the job.
@@ -229,7 +247,14 @@ class JobQueue(val cnf: Configuration) {
     val jobID:BasicDBObject = """{"_id":"%s"}""" format id
     val cur = queue find jobID
     if ( cur.size!=1 ) None
-    else Some(cur.next.asInstanceOf[BasicDBObject])
+    else {
+      val j = cur.next.asInstanceOf[BasicDBObject]
+      j.put("jobID",j.get("_id"))
+      j remove "_id"
+      j remove "_ns"
+      j remove "repo"
+      Some(j)
+    }
   }
 
   /**Returns the size of the global queue.
@@ -288,8 +313,27 @@ class JobQueue(val cnf: Configuration) {
    */
   def sizeKilled = countJobsOnStatus(Killed())
 
-
-
+  /**Query the jobs in the queue.
+   *
+   * @param cnd The condition to query against the queue
+   * @param srt The sort condition
+   * @param skip The number of entries to skip
+   * @param limit The number of entries to return
+   * @return The list of jobs retrieved
+   */
+  def queryQueue(query:BasicDBObject,srt:BasicDBObject,skip:Int,limit:Int) = {
+    var res:List[BasicDBObject] = Nil
+    val cur = queue.find(query).sort(srt).skip(skip).limit(limit)
+    while ( cur.hasNext ) {
+      val j = cur.next.asInstanceOf[BasicDBObject]
+      j.put("jobID",j.get("_id"))
+      j remove "_id"
+      j remove "_ns"
+      j remove "repo"
+      res ::= j
+    }
+    res
+  }
   
 }
 

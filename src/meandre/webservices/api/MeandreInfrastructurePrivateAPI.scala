@@ -17,6 +17,7 @@ import meandre.webservices.realm.MongoDBRealm
 import com.mongodb.util.JSON
 import snare.Snare
 import meandre.webservices.logger.Logger
+import meandre.kernel.execution.{ExecutionWrapper, JobQueue}
 
 /**
  * The Meandre infrastructure implementation of the services API
@@ -1230,6 +1231,12 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
       user =>
         val st = Store(cnf, user, false)
         val res = new BasicDBObject
+        val wrapper = if (params.contains("wrapper") &&
+                          ExecutionWrapper.validExecutionWrapper.contains(params("wrapper")) )
+                        params("wrapper")
+                      else
+                        ExecutionWrapper.defaultExecutionWrapper
+        
         params.contains("uri") match {
           case false =>
             FailResponse("Missing parammeter uri", new BasicDBObject, user)
@@ -1251,9 +1258,31 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
                         val baos = new ByteArrayOutputStream
                         rdfs.foreach( uba => { baos write uba._2.get ; baos write "\n".getBytes } )
                         // Submit a job
-                        val res = new BasicDBObject
-                        res.put("rdf", new String(baos.toByteArray))
-                        OKResponse(res, user)
+                        val queue = new JobQueue(cnf)
+                        val job = queue.push(
+                              baos.toByteArray,
+                              user,
+                              snareMon.uuid.toString,
+                              wrapper,
+                              """{"uri":"%s"}""" format params("uri"),
+                              cnf.MEANDRE_QUEUE_ATTEMPTS
+                            )
+                        job match {
+                          case None =>
+                            FailResponse("Could not submit job for "+params("uri"), new BasicDBObject, user)
+                          case Some(j) =>
+                            val msg:BasicDBObject =
+                              """{
+                                    "msg" : "job",
+                                    "type" :"submitted",
+                                    "jobID" : "%s",
+                                    "source" : "%s"
+                              }""" format (j.getString("jobID"),snareMon.uuid)
+                            snareMon.broadcast(msg)
+                            val res = new BasicDBObject
+                            res.put("job",j)
+                            OKResponse(res, user)
+                        }
                       case _ =>
                         // Missing components for the flows
                         val muris = new BasicDBList
@@ -1265,22 +1294,41 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
                         res.put("missing",muris)
                         FailResponse(params("uri") + " flow is missing some required components", res, user)
                     }
-//                  case _ =>
-//                     FailResponse(params("uri") + " unknow type ", new BasicDBObject, user)
-
-//                // Retrieve flow descriptor too
-//                st.descriptorFor(params("uri"))  match {
-//                  case None => FailResponse(params("uri") + "not a know uir", res, user)
-//                  case Some
-//
-//                }
-//                res.put(elements(0), uriRewrite(new String(ba))); OKResponse(res, user)
-            }
+              }
             }
         }
     }
   }
 
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/jobs/list\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        val queue = new JobQueue(cnf)
+        var sortCnd = "{}"
+        val skip = if (params.contains("offset")) safeParseInt(params("offset")) else 0
+        val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else Math.MAX_INT
+        if (params.contains("order")) {
+          sortCnd = params("order") match {
+            case "ts" => """{"ts":-1}"""
+            case _ => "{}"
+          }
+        }
+        var cnd = if (params.contains("status"))
+                      """{"status":"%s"}""" format params("status").capitalize
+                  else
+                      "{}"
+
+        val jobs = queue.queryQueue(cnd,sortCnd,skip,limit)
+        val list = new BasicDBList
+        jobs foreach ( j => list add j )
+        val labeled = new BasicDBObject
+        labeled.put("jobs", list)
+        OKResponse(labeled,user)
+    }
+  }
 
 
   // ---------------------------------------------------------------------------

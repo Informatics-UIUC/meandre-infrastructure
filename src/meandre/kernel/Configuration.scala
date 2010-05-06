@@ -22,6 +22,8 @@ class Configuration (val protocol:String, val server:String, val serverPort:Int,
   val MEANDRE_JOBS_QUEUE = MEANDRE_JOBS+".queue"
 
   val MEANDRE_CONTEXT_FS_COLLECTION = "meandre.context.fs"
+
+  val MEANDRE_QUEUE_ATTEMPTS = 5
   
   protected var MDBN = "Meandre"
 

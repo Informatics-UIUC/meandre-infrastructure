@@ -295,9 +295,9 @@ class RichBasicDBObject (val self:BasicDBObject)(implicit cnf:Configuration) ext
       sbProcessedRes.append(pre)
       sbProcessedRes.append(url match {
         // TODO Add functionality to the mendre specific links
-        case u if u.startsWith("meandre://") => """<a href="%sservices/repository/describe.html?uri=%s">%s</a> (<a href="%sservices/repository/describe.rdf?uri=%s">RDF</a>,<a href="%sservices/repository/describe.ttl?uri=%s">TTL</a>,<a href="%sservices/repository/describe.nt?uri=%s">NT</a>) [<a href="%sservices/repository/remove.html?uri=%s">Remove</a>,<a href="%sservices/publish/publish.html?uri=%s">Pub</a>,<a href="%sservices/publish/unpublish.html?uri=%s">Unpub</a>]""".format(prefix,u,u,prefix,u,prefix,u,prefix,u,prefix,u,prefix,u,prefix,u)
+        case u if u.startsWith("meandre://") => """<a href="%sservices/repository/describe.html?uri=%s">%s</a> (<a href="%sservices/repository/describe.rdf?uri=%s">RDF</a>,<a href="%sservices/repository/describe.ttl?uri=%s">TTL</a>,<a href="%sservices/repository/describe.nt?uri=%s">NT</a>) [<a href="%sservices/repository/remove.html?uri=%s">Remove</a>,<a href="%sservices/publish/publish.html?uri=%s">Pub</a>,<a href="%sservices/publish/unpublish.html?uri=%s">Unpub</a>,<a href="%sservices/jobs/submit.html?uri=%s">Submit Job</a>]""".format(prefix,u,u,prefix,u,prefix,u,prefix,u,prefix,u,prefix,u,prefix,u,prefix,u)
         case u if u.startsWith("context://localhost") => """<a href="%s://%s:%s%s%s">%s</a>""".format(cnf.protocol,cnf.server,cnf.serverPort,prefix,u.replace("context://localhost/",""),u)
-        case u => """<a href="%s">%s</a> [<a href="%sservices/repository/describe.html?uri=%s">Desc?</a>,<a href="%sservices/publish/publish.html?uri=%s">Pub</a>,<a href="%sservices/publish/unpublish.html?uri=%s">Unpub</a>]""".format(u,u,prefix,u,prefix,u,prefix,u)
+        case u => """<a href="%s">%s</a> [<a href="%sservices/repository/describe.html?uri=%s">Desc?</a>,<a href="%sservices/publish/publish.html?uri=%s">Pub</a>,<a href="%sservices/publish/unpublish.html?uri=%s">Unpub</a>,<a href="%sservices/jobs/submit.html?uri=%s">Submit Job</a>]""".format(u,u,prefix,u,prefix,u,prefix,u,prefix,u)
       })
 
     }
@@ -472,8 +472,8 @@ object Templating {
                     <tr>
                         <td><![endif]-->
                 <ul class="pureCssMenum">
-                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Running flows</a></li>
-                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Job statuses</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/jobs/list.html?status=running")+'"'+"""">Running flows</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/jobs/list.html")+'"'+"""">Jobs</a></li>
                     <li class="pureCssMenui"><a class="pureCssMenui" href="#">Job consoles</a></li>
                 </ul>
                 <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>

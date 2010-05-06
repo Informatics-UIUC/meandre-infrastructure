@@ -63,9 +63,9 @@ object JobQueueSpecs extends Specification("The context pool specification") {
         case None => None must beEqualTo("failure")
         case Some(obj:BasicDBObject) =>
           obj.getString("status") must beEqualTo("Queued") // Returns the object before modification
-          val upObj = queue.transitionJob(obj.getString("_id"),Preparing(),Running(),server).get
+          val upObj = queue.transitionJob(obj.getString("jobID"),Preparing(),Running(),server).get
           upObj.getString("status") must beEqualTo("Preparing") // Returns the object before modification
-          queue job upObj.getString("_id") match {
+          queue job upObj.getString("jobID") match {
             case None => None must beEqualTo("failure")
             case Some(finObj:BasicDBObject) => finObj.getString("status") must beEqualTo("Running")
           }
