@@ -25,6 +25,8 @@ class Configuration (val protocol:String, val server:String, val serverPort:Int,
 
   val MEANDRE_QUEUE_ATTEMPTS = 5
 
+  val MEANDRE_TEXT_BUFFER_PREFIX = "meandre.tmp.buffer"
+
   var EXECUTION_SCALA = "scala"
 
   var EXECUTION_SCRIPT = "execution.scala"
