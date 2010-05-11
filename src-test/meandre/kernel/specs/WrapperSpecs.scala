@@ -24,7 +24,7 @@ object WrapperSpecs extends Specification("The context pool specification") {
       else {
         List("ls")
       }
-      val (p,con,err) = new ArbitraryCodeExecutionWrapper(cmd).fireWrapper("")
+      val (p,con,err) = new ArbitraryCodeExecutionWrapper(cmd).fireWrapper("".getBytes)
       con.available must beGreaterThan(0)
       //println(con.available)
       err.available must beEqualTo(0)

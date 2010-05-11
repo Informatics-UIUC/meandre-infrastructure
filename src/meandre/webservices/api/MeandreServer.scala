@@ -12,6 +12,7 @@ import com.mongodb.BasicDBObject
 import snare.ui.WebMonitor
 import meandre.kernel.Implicits._
 import meandre.webservices.logger.Logger
+import meandre.kernel.execution.{CheckQueue, QueuedJobExecutionActor}
 
 /**
  * The Meandre server class
@@ -144,6 +145,11 @@ class MeandreServer(val cnf:Configuration, val prefix: String, val staticFolder:
   def    go = { start; server.join }
 
   //
+  // The main job execution monitor actor
+  //
+  protected val executionActor = QueuedJobExecutionActor(cnf,snareMon.uuid)
+
+  //
   // The Snare monitor callback function
   //
   def monitorCallback ( msgEnvelope:BasicDBObject ):Boolean = {
@@ -154,17 +160,21 @@ class MeandreServer(val cnf:Configuration, val prefix: String, val staticFolder:
         val sdm = "Shutting down server %s by request of %s" format (msgEnvelope.getString("_ns"),msg.getString("source"))
         log.severe(sdm)
         stop
+
       case ("job","submitted") =>
         val sdm = "Job pending notification after submission of job %s originated on server %s" format (msg.getString("jobID"),msg.getString("source"))
         log.info(sdm)
-        // TODO Fire the execution of jobs
+        executionActor ! CheckQueue()
+
       case _ =>
         val sdm = "Received unknown msg: %s\nFrom: %s\nBy: %s" format(msg.toString,msgEnvelope.getString("_id"),msgEnvelope.getString("_ns")) 
         log.warning(sdm)
+      
     }
     true
   }
 
+  executionActor ! CheckQueue()
 }
 
 /**

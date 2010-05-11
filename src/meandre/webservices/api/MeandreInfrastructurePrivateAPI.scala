@@ -1400,8 +1400,6 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
     }
   }
 
-  
-
   // ---------------------------------------------------------------------------
 
 

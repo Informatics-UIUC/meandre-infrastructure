@@ -9,6 +9,9 @@ import meandre.webservices.api.{MeandreServer}
 
 val TEST_SERVER_PORT = 1714
 val cnf = Configuration()
+cnf.EXECUTION_SCALA = "/usr/local/bin/scala"
+cnf.EXECUTION_SCRIPT = "/Users/xavier/Documents/Workspace - IdeaProjects/Meandre-Infrastructure/scripts/execution.scala"
+cnf.EXECUTION_CLASSPATH = "/Users/xavier/Documents/Workspace - IdeaProjects/Meandre-Infrastructure/out/production/Meandre-Infrastructure"
 val server = MeandreServer(cnf, "/", "/Users/xavier/Documents/Workspace - IdeaProjects/Meandre-Infrastructure/styling", "/Users/xavier/Documents/Workspace - IdeaProjects/Meandre-Infrastructure/docs")
 server.go
 

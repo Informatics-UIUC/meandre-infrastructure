@@ -2,16 +2,17 @@ package meandre.kernel.execution.wrappers
 
 import meandre.kernel.execution.ExecutionWrapper
 import java.io.{ByteArrayInputStream, File, InputStream}
+import meandre.kernel.Configuration
 
 /**
- * A dummy wrapper that executes whatever command was passed to it
+ * A dummy wrapper that echoes the repository that is being passed to it
  *
  * @author Xavier Llora
  * @date May 4, 2010 at 9:43:07 AM
  * 
  */
 
-class ArbitraryCodeExecutionWrapper(command:List[String]) extends ExecutionWrapper {
+class EchoExecutionWrapper(cnf:Configuration) extends ExecutionWrapper {
 
   /**Given a serialized repository fires the wrapper. Returns the process
    * object and the STDOUT and STDERR streams
@@ -21,7 +22,12 @@ class ArbitraryCodeExecutionWrapper(command:List[String]) extends ExecutionWrapp
    *         the STDERR
    *
    */
-  override def fireWrapper(repo: Array[Byte]) : (Process, InputStream, InputStream) =
-    fireProcess(command,new File("."),repo)
+  override def fireWrapper(repo: Array[Byte]) : (Process, InputStream, InputStream) = {
+    fireProcess(
+      List(cnf.EXECUTION_SCALA,"-classpath",cnf.EXECUTION_CLASSPATH,cnf.EXECUTION_SCRIPT),
+      new File("."),
+      repo
+    )
+  }
 
 }

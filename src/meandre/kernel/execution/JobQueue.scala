@@ -19,6 +19,7 @@ case class Queued()    extends JobStatus() { override def toString = "Queued" }
 case class Preparing() extends JobStatus() { override def toString = "Preparing" }
 case class Running()   extends JobStatus() { override def toString = "Running" }
 case class Done()      extends JobStatus() { override def toString = "Done" }
+case class Failed()    extends JobStatus() { override def toString = "Failed" }
 case class Aborted()   extends JobStatus() { override def toString = "Aborted" }
 case class Killed()    extends JobStatus() { override def toString = "Killed" }
 
@@ -140,7 +141,7 @@ class JobQueue(val cnf: Configuration) {
    * @param server The server requesting the modifications
    * @return The id if the status transitioned correctly
    */
-  def grabQueuedJob(server:String) = {
+  def grabQueuedJob(server:String):Option[BasicDBObject] = {
     val cmd : BasicDBObject =
         """
           {
@@ -193,7 +194,7 @@ class JobQueue(val cnf: Configuration) {
    * @param server The server requesting the modifications
    * @return The id if the status transitioned correctly
    */
-  def transitionJob(id:String,currentStatus:JobStatus, newStatus:JobStatus, server:String) = {
+  def transitionJob(id:String,currentStatus:JobStatus, newStatus:JobStatus, server:String) : Option[BasicDBObject] = {
     val cmd : BasicDBObject =
         """
           {
@@ -254,6 +255,20 @@ class JobQueue(val cnf: Configuration) {
       j remove "_ns"
       j remove "repo"
       Some(j)
+    }
+  }
+
+  /**Given a job ID, returns the repository associated to it.
+   *
+   * @param id The ID of the job to retrieve
+   * @returns None if the job does not exist, or the byte array containing the repository
+   */
+  def jobRepository ( id:String ) = {
+    val jobID:BasicDBObject  = """{"_id":"%s"}""" format id
+    val fields:BasicDBObject = """{"repo":1}"""
+    queue.findOne(jobID,fields) match {
+      case null => None
+      case job  => Some(job.get("repo").asInstanceOf[Array[Byte]]) 
     }
   }
 

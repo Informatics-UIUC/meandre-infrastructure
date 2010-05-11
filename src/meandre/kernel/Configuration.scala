@@ -24,6 +24,12 @@ class Configuration (val protocol:String, val server:String, val serverPort:Int,
   val MEANDRE_CONTEXT_FS_COLLECTION = "meandre.context.fs"
 
   val MEANDRE_QUEUE_ATTEMPTS = 5
+
+  var EXECUTION_SCALA = "scala"
+
+  var EXECUTION_SCRIPT = "execution.scala"
+
+  var EXECUTION_CLASSPATH = "."
   
   protected var MDBN = "Meandre"
 
@@ -50,7 +56,7 @@ class Configuration (val protocol:String, val server:String, val serverPort:Int,
 object Configuration {
 
   /** The infrastructure version */
-  val INFRASTRUCTURE_VERSION = "1.5.0-vcli-alpha"
+  val INFRASTRUCTURE_VERSION = "2.0.0-vcli-alpha"
 
   /**Returns the default infrastructure object
    *

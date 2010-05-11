@@ -1,6 +1,8 @@
 package meandre.kernel.execution
 
 import java.io.{File, OutputStream, InputStream}
+import meandre.kernel.execution.wrappers.EchoExecutionWrapper
+import meandre.kernel.Configuration
 
 /**
  * The basic class that all wrappers have to implement
@@ -24,19 +26,16 @@ abstract class ExecutionWrapper {
    *         the STDERR
    *
    */
-  protected def fireProcess(command: List[String], dir: File, is: InputStream) = {
-    val pb = new ProcessBuilder(java.util.Arrays.asList(command.toArray: _*))
+  protected def fireProcess(command: List[String], dir: File, repo:Array[Byte]) = {
+    val pb = new ProcessBuilder(java.util.Arrays.asList(command.toArray:_*))
     //
     // TODO Environment manipulation
     //
     pb directory dir
     val p = pb.start
     val pos = p.getOutputStream
-    var b = is.read
-    while (b >= 0) {
-      pos write b
-      b = is.read
-    }
+    pos write repo
+    pos.close
     (p, p.getInputStream, p.getErrorStream)
   }
 
@@ -48,7 +47,7 @@ abstract class ExecutionWrapper {
    *         the STDERR
    *
    */
-  def fireWrapper(repo: String) : (Process, InputStream, InputStream)
+  def fireWrapper(repo:Array[Byte]) : (Process, InputStream, InputStream)
 
 }
 
@@ -64,6 +63,16 @@ abstract class ExecutionWrapper {
 object ExecutionWrapper {
 
   val validExecutionWrapper = Set("1.4.x","Snowfield")
+  
 
   val defaultExecutionWrapper = "Snowfield"
+
+  def apply(cnf:Configuration,engine:String) =
+    //
+    // TODO hardcoded execution engines
+    // TODO do the proper arrangement for the execution engines
+    //
+    engine match {
+      case _ => new EchoExecutionWrapper(cnf)
+    }
 }
