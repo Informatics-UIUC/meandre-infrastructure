@@ -7,6 +7,9 @@ import com.mongodb.{BasicDBList, BasicDBObject, Mongo}
 import java.security.MessageDigest
 import java.util.Random
 import java.math.BigInteger
+import com.mongodb.gridfs.GridFS
+import meandre.kernel.state.PersistentTextBuffer
+import java.io.{ByteArrayInputStream, OutputStream}
 
 //
 // Basic job statuses
@@ -39,6 +42,8 @@ class JobQueue(val cnf: Configuration) {
   val mongo = new Mongo
   val db = mongo getDB cnf.MEANDRE_DB_NAME
   val queue = db getCollection cnf.MEANDRE_JOBS_QUEUE
+  val consoles = new GridFS(db,cnf.MEANDRE_JOBS_CONSOLE)
+  val logs = new GridFS(db,cnf.MEANDRE_JOBS_LOG)
 
   //
   // Ensure indexes are available
@@ -47,6 +52,7 @@ class JobQueue(val cnf: Configuration) {
   queue.ensureIndex("""{"status":1}""")
   queue.ensureIndex("""{"status":1,"ts":-1}""")
   queue.ensureIndex("""{"ts":-1}""")
+  queue.ensureIndex("""{"server":1,"status":1}""")
 
   //
   // The digest generator
@@ -134,6 +140,54 @@ class JobQueue(val cnf: Configuration) {
     }
   }
 
+  /**Given a starting server it updates all the jobs that may have been lefts
+   * hanging after a crash.
+   *
+   * @param server The server to update
+   */
+  def updateStartingServer(server:String) = {
+    val cnd : BasicDBObject =
+        """
+          {
+            "server":"%s",
+            "status" : { "$in" : ["Preparing","Running"] }
+          }
+        """ format server
+    val updateCnd : BasicDBObject  =
+        """
+          {
+            "$set": { "status" : "Killed", "server" : "%s" },
+            "$push" : {
+              "progress" : {
+                "status" : "Killed",
+                "server" : "%s"
+              }
+            }
+          }
+        """ format (server,server)
+    queue.update(cnd,updateCnd,false,true)
+  }
+
+  /**Sets the exit process code for a given job.
+   *
+   * @param jobID The job ID status
+   * @param status The exit code status to set
+   */
+  def setExitProcessForJob (jobID:String,status:Int) = {
+    val cnd : BasicDBObject =
+        """
+          {
+            "_id":"%s"
+          }
+        """ format jobID
+    val updateCnd : BasicDBObject  =
+        """
+          {
+            "$set": { "exit_code" : "%d" }
+          }
+        """ format status
+    queue.update(cnd,updateCnd)
+  }
 
   /**Grabs a queued jobs and atomically transitions it to preparing status or
    * or forces a fails.
@@ -170,6 +224,7 @@ class JobQueue(val cnf: Configuration) {
     val update = cmd.get("update").asInstanceOf[BasicDBObject]
     val set = update.get("$set").asInstanceOf[BasicDBObject]
     set.put("ts",ts)
+    set.put("server",server)
     val push = update.get("$push").asInstanceOf[BasicDBObject].get("progress").asInstanceOf[BasicDBObject]
     push.put("ts",ts)
     //println(cmd)
@@ -224,6 +279,7 @@ class JobQueue(val cnf: Configuration) {
     val update = cmd.get("update").asInstanceOf[BasicDBObject]
     val set = update.get("$set").asInstanceOf[BasicDBObject]
     set.put("ts",ts)
+    set.put("server",server)
     val push = update.get("$push").asInstanceOf[BasicDBObject].get("progress").asInstanceOf[BasicDBObject]
     push.put("ts",ts)            
     //println(cmd)
@@ -370,7 +426,59 @@ class JobQueue(val cnf: Configuration) {
     }
     res
   }
-  
+
+  /**Compact job related data, mostly the console and the logs, into a GridFS
+   * system to allow storing large outputs.
+   *
+   * @param jobID The jobID of the job to compact
+   */
+  def compactJobData(jobID:String) = {
+    val ptbCon = new PersistentTextBuffer(cnf,"jobs.%s.console" format jobID)
+    val ptbLog = new PersistentTextBuffer(cnf,"jobs.%s.log" format jobID)
+
+    val fc = consoles.createFile(new ByteArrayInputStream(ptbCon.toString.getBytes),jobID)
+    fc.save
+
+    val fl = logs.createFile(new ByteArrayInputStream(ptbLog.toString.getBytes),jobID)
+    fl.save
+
+    ptbCon.destroy
+    ptbLog.destroy
+  }
+
+  /**Dumps the console for the given jobID
+   *
+   * @param jobID The jobID to use
+   * @param os The output stream where to dump the console
+   */
+  def dumpConsoleFor(jobID:String,os:OutputStream) = {
+    consoles.findOne(jobID) match {
+
+      case null => // The console has not been compacted yet
+        val ptbCon = new PersistentTextBuffer(cnf,"jobs.%s.console" format jobID)
+        os.write(ptbCon.toString.getBytes)
+
+      case file => // The console has already been compacted
+        file writeTo os
+    }
+  }
+
+  /**Dumps the logs for the given jobID
+   *
+   * @param jobID The jobID to use
+   * @param os The output stream where to dump the logs
+   */
+  def dumpLogFor(jobID:String,os:OutputStream) = {
+    logs.findOne(jobID) match {
+
+      case null => // The console has not been compacted yet
+        val ptbLog = new PersistentTextBuffer(cnf,"jobs.%s.log" format jobID)
+        os.write(ptbLog.toString.getBytes)
+
+      case file => // The console has already been compacted
+        file writeTo os
+    }
+  }
 }
 
 

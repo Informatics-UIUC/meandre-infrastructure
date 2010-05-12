@@ -1,14 +1,18 @@
 package meandre.kernel.execution
 
+import scala.concurrent.ops._
 import scala.actors.Actor
 import scala.actors.Actor._
 import com.mongodb.BasicDBObject
 import meandre.kernel.Configuration
 import java.util.UUID
 import meandre.webservices.logger.Logger
+import meandre.kernel.state.PersistentTextBuffer
 
 /** The basic notification messages send to the execution actor */
-case class CheckQueue()
+sealed trait ExecutionMessages
+case class InitQueue()  extends ExecutionMessages
+case class CheckQueue() extends ExecutionMessages
 
 
 /**
@@ -34,6 +38,11 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
   def act() = {
     loop {
       react {
+        case InitQueue() =>
+          log.info("Initializing the execution actor and cleaning the queue")
+          queue.updateStartingServer(uuid.toString)
+          this ! CheckQueue()
+
         case CheckQueue() =>
           log.info("CheckQueue message received")
           //
@@ -47,40 +56,60 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
               if (queue.sizeQueued>0) this ! CheckQueue()
 
             case Some(job) =>
-              
-              queue.transitionJob(job getString "jobID", Preparing(), Running(), uuid.toString) match {
+
+              val jobID = job getString "jobID"
+              queue.transitionJob(jobID, Preparing(), Running(), uuid.toString) match {
                 case None =>
-                  log.warning("Failed to transition job %s to %" format (job getString "jobID",Preparing()))
+                  log.warning("Failed to transition job %s to %" format (jobID,Preparing()))
 
                 case Some(preJob) =>
-                  queue.jobRepository(preJob getString "jobID") match {
+                  queue.jobRepository(jobID) match {
                     case None => // Failed to retrieve the repository
-                      queue.transitionJob(job getString "jobID", Running(), Failed(), uuid.toString)
-                      log.warning("Job %s failed because it has no associated repository" format (job getString "jobID"))
+                      queue.transitionJob(jobID, Running(), Failed(), uuid.toString)
+                      log.warning("Job %s failed because it has no associated repository" format jobID)
                       
                     case Some(repo) => // Ready to fire execution
-                      val ex = ExecutionWrapper(cnf, preJob getString "wrapper")
-                      val (process,console,joblog) = ex.fireWrapper(repo)
 
-                      println("CONSOLE\n--------------")
-                      var c = console.read
-                      while (c>=0) {
-                        System.out.write(c)
-                        c = console.read
-                      }
+                      try {
+                        log.info("Job %s starting execution" format jobID)
 
-                      println("LOG\n--------------")
-                      c = joblog.read
-                      while (c>=0) {
-                        System.err.write(c)
-                        c = joblog.read
+                        val ex = ExecutionWrapper(cnf, preJob getString "wrapper")
+                        val (process,console,joblog) = ex.fireWrapper(repo)
+                        // Capture the console
+                        spawn {
+                          val cptb = new PersistentTextBuffer(cnf,"jobs.%s.console" format jobID)
+                          cptb append console
+                        }
+                        // Capture the logs
+                        spawn {
+                          val lptb = new PersistentTextBuffer(cnf,"jobs.%s.log" format jobID)
+                          lptb append joblog
+                        }
+                        // Clean up after the process
+                        process.waitFor
+                        queue.setExitProcessForJob(jobID,process.exitValue)
+                        process.exitValue match {
+                          case 0 => // Success
+                             queue.transitionJob(jobID, Running(), Done(), uuid.toString)
+                          case _ => // Failed
+                             queue.transitionJob(jobID, Running(), Failed(), uuid.toString)
+                        }
+                        queue compactJobData jobID
+                        log.info("Job %s finished execution successfully" format jobID)
+
                       }
-                      process.waitFor
-                      println("Process exit status: "+process.exitValue)
+                      catch {
+                        case _ =>
+                          val failMsg = "Job %d failed during execution".format(jobID)
+                          log warning failMsg
+                          val ptbLog = new PersistentTextBuffer(cnf,"jobs.%s.log" format jobID)
+                          ptbLog append failMsg
+                          queue.transitionJob(jobID, Running(), Failed(), uuid.toString)
+                          queue compactJobData jobID
+                      }
                   }
               }
-
-
+              if (queue.sizeQueued>0) this ! CheckQueue()
           }
         
         case unknown =>

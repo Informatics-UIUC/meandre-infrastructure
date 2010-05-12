@@ -1,3 +1,4 @@
+import java.io.ByteArrayOutputStream
 import java.util.Date
 import meandre.kernel.Configuration
 
@@ -15,27 +16,38 @@ val FOOTER = "\n----------------------------------------------------------------
 // Signal starting at the log
 //
 log println "[INFO] Started the echo execution process at %s".format(new Date())
+log.flush
 
 //
 // Print the header
 //
-console println HEADER
+console write HEADER.getBytes
+console.flush
 
 //
-// Dump the repository
+// Read the repository
 //
+val baos = new ByteArrayOutputStream(10000)
 var c = in.read
 while (c >= 0) {
-  console write c
+  baos write c
   c = in.read
 }
 
 //
+// Dump the repository
+//
+baos.toByteArray.foreach( b => console write b )
+console.flush
+
+//
 // Print the footer
 //
-console println FOOTER.format(new Date())
+console write FOOTER.format(new Date()).getBytes
+console.flush
 
 //
 // Signal end at the log
 //
 log println "[INFO] Finished the echo execution process at %s".format(new Date())
+log.flush

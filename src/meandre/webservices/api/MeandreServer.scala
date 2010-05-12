@@ -12,7 +12,7 @@ import com.mongodb.BasicDBObject
 import snare.ui.WebMonitor
 import meandre.kernel.Implicits._
 import meandre.webservices.logger.Logger
-import meandre.kernel.execution.{CheckQueue, QueuedJobExecutionActor}
+import meandre.kernel.execution.{InitQueue, CheckQueue, QueuedJobExecutionActor}
 
 /**
  * The Meandre server class
@@ -174,7 +174,7 @@ class MeandreServer(val cnf:Configuration, val prefix: String, val staticFolder:
     true
   }
 
-  executionActor ! CheckQueue()
+  executionActor ! InitQueue()
 }
 
 /**

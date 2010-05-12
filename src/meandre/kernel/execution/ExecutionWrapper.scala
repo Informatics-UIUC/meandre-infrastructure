@@ -34,7 +34,9 @@ abstract class ExecutionWrapper {
     pb directory dir
     val p = pb.start
     val pos = p.getOutputStream
+    pos.flush
     pos write repo
+    pos.flush
     pos.close
     (p, p.getInputStream, p.getErrorStream)
   }

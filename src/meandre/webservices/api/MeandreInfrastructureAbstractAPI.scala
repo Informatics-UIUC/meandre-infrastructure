@@ -190,6 +190,17 @@ class MeandreInfrastructureAbstractAPI(cnf:Configuration) extends CrochetServlet
     res serializeTo elements(0)
   }
 
+  /**This function makes sure that there is a valid remote authenticated user.
+    *
+    * @param The function that needs to be called back if everything goes as planned
+    */
+   def requestForOutput(body: String => String) = {
+     request.getRemoteUser match {
+       case null => "Unable to retrieve user"
+       case user => body(user)
+     }
+   }
+
   /**Rewrite contect uri to real urls.
    *
    * @param The uri to process

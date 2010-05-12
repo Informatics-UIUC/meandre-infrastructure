@@ -19,6 +19,10 @@ class Configuration (val protocol:String, val server:String, val serverPort:Int,
 
   val MEANDRE_JOBS = "meandre.jobs"
 
+  val MEANDRE_JOBS_CONSOLE = MEANDRE_JOBS+".console.fs"
+  
+  val MEANDRE_JOBS_LOG = MEANDRE_JOBS+".log.fs"
+
   val MEANDRE_JOBS_QUEUE = MEANDRE_JOBS+".queue"
 
   val MEANDRE_CONTEXT_FS_COLLECTION = "meandre.context.fs"

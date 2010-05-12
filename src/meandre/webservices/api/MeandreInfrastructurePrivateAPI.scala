@@ -1368,8 +1368,6 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
     }
   }
 
-
-
   // ---------------------------------------------------------------------------
 
   get("""/services/jobs/ids\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
@@ -1397,6 +1395,75 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
         val labeled = new BasicDBObject
         labeled.put("jobIDs", list)
         OKResponse(labeled,user)
+    }
+  }
+
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/jobs/console\.(txt)""".r, "text/plain", tautologyGuard, public _) {
+    requestForOutput {
+      user =>
+        val queue = new JobQueue(cnf)
+        val jobID = if (params.contains("jobID")) params("jobID") else ""
+        val jobs = queue.queryQueue("""{"_id":"%s"}""".format(jobID),"{}",0,Integer.MAX_VALUE)
+        jobs match {
+          case job::Nil =>
+            if (job.getString("owner")==user) {
+              val baos = new ByteArrayOutputStream(10000)
+              queue.dumpConsoleFor(jobID,baos)
+              new String(baos.toByteArray)
+            }
+            else {
+              val msg = "Unauthorized access to job console %s by user %s".format(jobID,user)
+              log.warning(msg)
+              "[WARNING] "+msg
+            }
+
+          case Nil =>
+            val msg = "Unknown job %s".format(jobID)
+            log.warning(msg)
+            "[WARNING] "+msg
+
+          case l =>
+            val msg = "Inconsitent job console for %s. Mutiple consoles %d".format(jobID,l.length)
+            log.warning(msg)
+            "[WARNING] "+msg
+        }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/jobs/log\.(txt)""".r, "text/plain", tautologyGuard, public _) {
+    requestForOutput {
+      user =>
+        val queue = new JobQueue(cnf)
+        val jobID = if (params.contains("jobID")) params("jobID") else ""
+        val jobs = queue.queryQueue("""{"_id":"%s"}""".format(jobID),"{}",0,Integer.MAX_VALUE)
+        jobs match {
+          case job::Nil =>
+            if (job.getString("owner")==user) {
+              val baos = new ByteArrayOutputStream(10000)
+              queue.dumpLogFor(jobID,baos)
+              new String(baos.toByteArray)
+            }
+            else {
+              val msg = "Unauthorized access to job console %s by user %s".format(jobID,user)
+              log.warning(msg)
+              "[WARNING] "+msg
+            }
+
+          case Nil =>
+            val msg = "Unknown job %s".format(jobID)
+            log.warning(msg)
+            "[WARNING] "+msg
+
+          case l =>
+            val msg = "Inconsitent job console for %s. Mutiple consoles %d".format(jobID,l.length)
+            log.warning(msg)
+            "[WARNING] "+msg
+        }
     }
   }
 
