@@ -298,10 +298,10 @@ class RichBasicDBObject (val self:BasicDBObject)(implicit cnf:Configuration) ext
       sbProcessedRes.append(pre)
       sbProcessedRes.append(url match {
         // TODO Add functionality to the mendre specific links
-        case u if u.startsWith("meandre://") => """<a href="%sservices/repository/describe.html?uri=%s">%s</a> (<a href="%sservices/repository/describe.rdf?uri=%s">RDF</a>,<a href="%sservices/repository/describe.ttl?uri=%s">TTL</a>,<a href="%sservices/repository/describe.nt?uri=%s">NT</a>) [<a href="%sservices/repository/remove.html?uri=%s">Remove</a>,<a href="%sservices/publish/publish.html?uri=%s">Pub</a>,<a href="%sservices/publish/unpublish.html?uri=%s">Unpub</a>,<a href="%sservices/jobs/submit.html?uri=%s">Submit Job</a>]""".format(prefix,u,u,prefix,u,prefix,u,prefix,u,prefix,u,prefix,u,prefix,u,prefix,u)
+        case u if u.startsWith("meandre://") => """<a href="%sservices/repository/describe.html?uri=%s">%s</a> (<a href="%sservices/repository/describe.rdf?uri=%s">RDF</a>,<a href="%sservices/repository/describe.ttl?uri=%s">TTL</a>,<a href="%sservices/repository/describe.nt?uri=%s">NT</a>) [<a href="%sservices/repository/remove.html?uri=%s" onclick="return confirm('Are you sure you want to remove %s?');">Remove</a>,<a href="%sservices/publish/publish.html?uri=%s">Pub</a>,<a href="%sservices/publish/unpublish.html?uri=%s">Unpub</a>,<a href="%sservices/jobs/submit.html?uri=%s">Submit Job</a>]""".format(prefix,u,u,prefix,u,prefix,u,prefix,u,prefix,u,u,prefix,u,prefix,u,prefix,u)
         case u if u.startsWith("context://localhost") => """<a href="%s://%s:%s%s%s">%s</a>""".format(cnf.protocol,cnf.server,cnf.serverPort,prefix,u.replace("context://localhost/",""),u)
         case u if u.startsWith("http") => """<a href="%s">%s</a> [<a href="%sservices/repository/describe.html?uri=%s">Desc?</a>,<a href="%sservices/publish/publish.html?uri=%s">Pub</a>,<a href="%sservices/publish/unpublish.html?uri=%s">Unpub</a>,<a href="%sservices/jobs/submit.html?uri=%s">Submit Job</a>]""".format(u,u,prefix,u,prefix,u,prefix,u,prefix,u)
-        case md5 => """ <a href="%sservices/jobs/list.html?jobID=%s">%s</a> [<a href="%sservices/jobs/console.txt?jobID=%s">Console</a>,<a href="%sservices/jobs/log.txt?jobID=%s">Log</a>,<a href="%sservices/jobs/abort.html?jobID=%s">Abort</a>] """ format (prefix,md5.trim,md5.trim,prefix,md5.trim,prefix,md5.trim,prefix,md5.trim)
+        case md5 => """ <a href="%sservices/jobs/list.html?jobID=%s">%s</a> [<a href="%sservices/jobs/console.txt?jobID=%s">Console</a>,<a href="%sservices/jobs/log.txt?jobID=%s">Log</a>,<a href="%sservices/jobs/abort.html?jobID=%s" onclick="return confirm('Are you sure you want to aborth job %s?');">Abort</a>] """ format (prefix,md5.trim,md5.trim,prefix,md5.trim,prefix,md5.trim,prefix,md5.trim,md5.trim)
       })
 
     }
@@ -394,7 +394,7 @@ object Templating {
                         <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/locations/list.html")+'"'+""">List</a></li>
                         <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/add_location.html")+'"'+""">Add</a></li>
                         <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/remove_location.html")+'"'+""">Remove</a></li>
-                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/locations/remove_all.html")+'"'+""">Remove all</a></li>
+                        <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/locations/remove_all.html")+'"'+""" onclick="return confirm('Are you sure you want to remove all locations from the repository?');">Remove all</a></li>
                     </ul>
                     <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
                 <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Components</span><![if gt IE 6]></a><![endif]>
@@ -434,9 +434,9 @@ object Templating {
                     <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 
                 <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/integrity.html")+'"'+""">Integrity</a></li>
-                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/regenerate.html")+'"'+""">Regenerate</a></li>
-                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/clear.html")+'"'+""">Clear</a></li>
-                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/describe.ttl")+'"'+""">Dump</a></li> 
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/describe.ttl")+'"'+""">Dump</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/regenerate.html")+'"'+""" onclick="return confirm('Are you sure you want to regenerate the repository?');">Regenerate</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/repository/clear.html")+'"'+""" onclick="return confirm('Are you sure you want to remove all the components, flows, and locations from the repository?');">Clear &amp; Reset</a></li>
             </ul>
             <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
 
@@ -447,9 +447,9 @@ object Templating {
                 <td><![endif]-->
         <ul class="pureCssMenum">
             <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/publish/list_published.html")+'"'+"""">List published</a></li>
-            <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/publish/publish_all.html")+'"'+"""">Publish all</a></li>
-            <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/publish/unpublish_all.html")+'"'+"""">Unpublish all</a></li>
-            <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/publish/force_unpublish_all.html")+'"'+"""">Force unpublish all</a></li>
+            <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/publish/publish_all.html")+'"'+"""" onclick="return confirm('Are you sure you want to publishing all components and flows?');">Publish all</a></li>
+            <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/publish/unpublish_all.html")+'"'+"""" onclick="return confirm('Are you sure you want to unpublishing all published components and flows?');">Unpublish all</a></li>
+            <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/publish/force_unpublish_all.html")+'"'+"""" onclick="return confirm('Are you sure you want to force unpublishing all published components and flows?');">Force unpublish all</a></li>
             <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"public/services/repository.ttl")+'"'+"""">Published repository</a></li>
         </ul>
         <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
@@ -489,7 +489,7 @@ object Templating {
                     <tr>
                         <td><![endif]-->
                 <ul class="pureCssMenum">
-                    <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/server/shutdown.html")+'"'+""">Shutdown this server</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/server/shutdown.html")+'"'+""" onclick="return confirm('Are you sure you want to shutdown this server?');">Shutdown this server</a></li>
                     <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"static/shutdown_server.html")+'"'+""">Shutdown other servers</a></li>
                 </ul>
                 <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
@@ -501,7 +501,7 @@ object Templating {
                 <ul class="pureCssMenum">
                     <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/snare/MeandreInf/heartbeat")+'"'+""" target="_blank">Status</a></li>
                     <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/snare/MeandreInf/info")+'"'+""" target="_blank">Information</a></li>
-                    <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/server/shutdown_cluster.html")+'"'+""">Shutdown cluster</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/server/shutdown_cluster.html")+'"'+""" onclick="return confirm('Are you sure you want to shutdown this cluster?');">Shutdown cluster</a></li>
 
                 </ul>
                 <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>

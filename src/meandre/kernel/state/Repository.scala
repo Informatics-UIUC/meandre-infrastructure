@@ -251,6 +251,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
   collection.ensureIndex("{\""+K_TOKENS+"\": 1}")
   collection.ensureIndex("{\""+K_DATE+"\": 1}")
   collection.ensureIndex("{\""+K_NAME+"\": 1}")
+  collection.ensureIndex("{\""+K_PUB_DATE+"\": 1}")
 
   /** The public collection */
   protected val publicCollection = db getCollection cnf.MEANDRE_PUBLIC_COLLECTION
@@ -381,6 +382,8 @@ class Repository ( val cnf:Configuration, val userName:String ) {
       val bdbo = cur.next.asInstanceOf[BasicDBObject]
       val bdbl = (bdbo get K_TAGS).asInstanceOf[BasicDBList]
       val tagList = List[String]() ++ (0 until bdbl.size).toList.map(bdbl.get(_).toString)
+      val tags = new BasicDBList
+      tagList.foreach(t => tags add t)
       if ( bdbo.containsField(K_LOCATION) )
         res ::= Map (
             "uri"     -> bdbo.getString(K_ID),
@@ -388,7 +391,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
             "date"    -> bdbo.get(K_DATE),
             "creator" -> bdbo.get(K_CREATOR),
             "rights"  -> bdbo.get(K_RIGHTS),
-            "tags"    -> tagList,
+            "tags"    -> tags,
             "desc"    -> bdbo.getString(K_DESC),
             "type"    -> bdbo.getString(K_TYPE),
             "location"-> bdbo.get(K_LOCATION).asInstanceOf[BasicDBObject].getString(K_LOCATION)
@@ -400,7 +403,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
             "date"    -> bdbo.get(K_DATE),
             "creator" -> bdbo.get(K_CREATOR),
             "rights"  -> bdbo.get(K_RIGHTS),
-            "tags"    -> tagList,
+            "tags"    -> tags,
             "desc"    -> bdbo.getString(K_DESC),
             "type"    -> bdbo.getString(K_TYPE)
           )
