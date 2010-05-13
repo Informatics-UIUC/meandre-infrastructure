@@ -479,6 +479,7 @@ object Templating {
                     <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/jobs/list.html")+'"'+"""">List Jobs</a></li>
                     <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/jobs/list.html?status=running")+'"'+"""">Running flows</a></li>
                     <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/jobs/ids.html")+'"'+"""">Job consoles &amp; logs</a></li>
+                    <li class="pureCssMenui"><a class="pureCssMenui" href="""+'"'+(pathPrefix+"services/jobs/clean.html")+'"'+"""">Mop failed jobs</a></li>
                 </ul>
                 <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
             <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Logs</span><![if gt IE 6]></a><![endif]>

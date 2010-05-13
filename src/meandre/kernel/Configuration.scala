@@ -33,7 +33,7 @@ class Configuration (val protocol:String, val server:String, val serverPort:Int,
 
   var EXECUTION_SCALA = "scala"
 
-  var EXECUTION_SCRIPT = "execution.scala"
+  var EXECUTION_SCRIPT = "execution_%s.scala"
 
   var EXECUTION_CLASSPATH = "."
   

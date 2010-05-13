@@ -64,15 +64,14 @@ abstract class ExecutionWrapper {
 
 object ExecutionWrapper {
 
-  val validExecutionWrapper = Set("1.4.x","Snowfield")
+  val validExecutionWrapper = Set("1.4.x","Snowfield","custom","echo")
   
 
-  val defaultExecutionWrapper = "Snowfield"
+  val defaultExecutionWrapper = "echo"
 
   def apply(cnf:Configuration,engine:String) =
     //
-    // TODO hardcoded execution engines
-    // TODO do the proper arrangement for the execution engines
+    // TODO Add the missing 3 execution engines
     //
     engine match {
       case _ => new EchoExecutionWrapper(cnf)

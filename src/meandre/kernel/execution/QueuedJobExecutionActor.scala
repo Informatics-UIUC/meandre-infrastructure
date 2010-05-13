@@ -81,7 +81,7 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
     loop {
       react {
         case InitQueue() =>
-          log.info("Initializing the execution actor and cleaning the queue")
+          log.info("Cleaning the queue and requesting to check the queue")
           queue.updateStartingServer(uuid.toString)
           this ! CheckQueue()
 
@@ -120,14 +120,26 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
                         killerActor ! RegisterJob(uuid.toString,jobID,process)
                         // Capture the console
                         val consoleDone = future {
-                          val cptb = new PersistentTextBuffer(cnf,"jobs.%s.console" format jobID)
-                          cptb append console
+                          try {
+                            val cptb = new PersistentTextBuffer(cnf,"jobs.%s.console" format jobID)
+                            cptb append console
+                          }
+                          catch {
+                            case s =>
+                              log.warning("Console reading for job %s failed because of %s".format(jobID,s.getMessage))
+                          }
                           1
                         }
                         // Capture the logs
                         val jobLogDone = future {
-                          val lptb = new PersistentTextBuffer(cnf,"jobs.%s.log" format jobID)
-                          lptb append joblog
+                          try {
+                            val lptb = new PersistentTextBuffer(cnf,"jobs.%s.log" format jobID)
+                            lptb append joblog
+                          }
+                          catch {
+                            case s =>
+                              log.warning("Log reading for job %s failed because of %s".format(jobID,s.getMessage))
+                          }
                           1
                         }
                         // Wait for graceful ending
@@ -138,11 +150,15 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
                         process.exitValue match {
                           case 0 => // Success
                              queue.transitionJob(jobID, Running(), Done(), uuid.toString)
+                             log.info("Job %s finished execution successfully" format jobID)
+                          case 143 => // Killed
+                             queue.transitionJob(jobID, Running(), Killed(), uuid.toString)
+                             log.info("Job %s was explicitly killed" format jobID)
                           case _ => // Failed
                              queue.transitionJob(jobID, Running(), Failed(), uuid.toString)
+                             log.info("Job %s failed during execution" format jobID)
                         }
                         queue compactJobData jobID
-                        log.info("Job %s finished execution successfully" format jobID)
                         killerActor ! UnregisterCurrentJob()
                       }
                       catch {
@@ -166,6 +182,12 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
       }
     }
   }
+
+  /**Backdoor to kill a job
+   *
+   * @param jobID The jobID to kill (in case it is being run in this server
+   */
+  def killJob(jobID:String) = killerActor ! KillJob(uuid.toString,jobID)
 
   /** Get the actor running */
   start

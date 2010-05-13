@@ -42,6 +42,8 @@ while (c >= 0) {
 console write baos.toByteArray
 console.flush
 
+Thread.sleep(10000)
+
 //
 // Print the footer
 //

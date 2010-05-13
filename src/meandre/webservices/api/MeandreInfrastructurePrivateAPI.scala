@@ -1467,6 +1467,67 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
     }
   }
 
+
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/jobs/clean\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        if ( !request.isUserInRole("admin")  ) {
+          FailResponse("You need to belong to the admin role to force the unpublishing of the public repository", new BasicDBObject, user)
+        }
+        else {
+          val msg:BasicDBObject = """{
+            "msg" : "job",
+            "type" :"clean",
+            "source" : "%s",
+            "target" : "%s"
+          }""" format (snareMon.uuid,snareMon.uuid)
+          snareMon.broadcast(msg)
+          val resp = new BasicDBObject
+          resp.put("notification",msg)
+          OKResponse(resp,user)
+        }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/jobs/kill\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        if ( !params.contains("jobID")  ) {
+          FailResponse("Job ID required on a kill request", new BasicDBObject, user)
+        }
+        else {
+          val resMsg = new BasicDBList
+          paramsMap("jobID").foreach(
+            job => {
+              val msg:BasicDBObject =
+              """{
+                    "msg" : "job",
+                    "type" :"kill",
+                    "source" : "%s",
+                    "target" : "%s"
+              }""" format (snareMon.uuid,job)
+              snareMon.broadcast(msg)
+              resMsg add msg
+            }
+          )
+          val res = new BasicDBObject
+          res.put("kill",resMsg)
+          log.severe(
+            "Requesting job kill termination for [%s] by %s".format(
+              paramsMap("jobID").foldLeft(" ")((a,b)=>a+b+" "),
+              snareMon.uuid
+            )
+          )
+          OKResponse(res, user)
+        }
+    }
+  }
+
   // ---------------------------------------------------------------------------
 
 

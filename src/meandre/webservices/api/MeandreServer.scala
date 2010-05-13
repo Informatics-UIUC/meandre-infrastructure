@@ -166,6 +166,16 @@ class MeandreServer(val cnf:Configuration, val prefix: String, val staticFolder:
         log.info(sdm)
         executionActor ! CheckQueue()
 
+      case ("job","clean") =>
+        val sdm = "Request to clean unstable jobs originated on server %s" format msg.getString("source")
+        log.info(sdm)
+        executionActor ! InitQueue()
+
+      case ("job","kill") =>
+        val sdm = "Request to kill job %s originated on server %s" format (msg.getString("target"),msg.getString("source"))
+        log.info(sdm)
+        executionActor.killJob(msg.getString("target"))
+
       case _ =>
         val sdm = "Received unknown msg: %s\nFrom: %s\nBy: %s" format(msg.toString,msgEnvelope.getString("_id"),msgEnvelope.getString("_ns")) 
         log.warning(sdm)
