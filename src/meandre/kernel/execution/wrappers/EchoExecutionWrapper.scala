@@ -24,7 +24,7 @@ class EchoExecutionWrapper(cnf:Configuration) extends ExecutionWrapper {
    */
   override def fireWrapper(repo: Array[Byte]) : (Process, InputStream, InputStream) = {
     fireProcess(
-      List(cnf.EXECUTION_SCALA,"-classpath",cnf.EXECUTION_CLASSPATH,cnf.EXECUTION_SCRIPT.format("echo")),
+      List(cnf.EXECUTION_SCALA,"-classpath",cnf.EXECUTION_CLASSPATH,cnf.EXECUTION_SCRIPT.format("echo"),(cnf.serverPort+1).toString),
       new File("."),
       repo
     )

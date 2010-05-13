@@ -460,16 +460,6 @@ object Templating {
             <tr>
                 <td><![endif]-->
         <ul class="pureCssMenum">
-            <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Execution</span><![if gt IE 6]></a><![endif]>
-                <!--[if lte IE 6]>
-                <table>
-                    <tr>
-                        <td><![endif]-->
-                <ul class="pureCssMenum">
-                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Run a flow</a></li>
-                    <li class="pureCssMenui"><a class="pureCssMenui" href="#">Run a repository</a></li>
-                </ul>
-                <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
             <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Jobs</span><![if gt IE 6]></a><![endif]>
                 <!--[if lte IE 6]>
                 <table>
