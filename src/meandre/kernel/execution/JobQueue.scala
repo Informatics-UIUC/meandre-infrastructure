@@ -146,6 +146,9 @@ class JobQueue(val cnf: Configuration) {
    * @param server The server to update
    */
   def updateStartingServer(server:String) = {
+    //
+    // TODO Compact outputs of dead jobs
+    //
     val cnd : BasicDBObject =
         """
           {
@@ -153,6 +156,20 @@ class JobQueue(val cnf: Configuration) {
             "status" : { "$in" : ["Preparing","Running"] }
           }
         """ format server
+
+    //
+    // Compact left behind jobs
+    //
+    val fields:BasicDBObject = """{"_id":1}"""
+    val cur = queue.find(cnd,fields)
+    while (cur.hasNext) {
+      val jobID = cur.next.get("_id").toString
+      compactJobData(jobID)
+    }
+
+    //
+    // Update the status to Killed
+    //
     val updateCnd : BasicDBObject  =
         """
           {

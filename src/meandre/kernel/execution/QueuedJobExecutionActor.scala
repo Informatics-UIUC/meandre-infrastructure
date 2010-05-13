@@ -14,6 +14,45 @@ sealed trait ExecutionMessages
 case class InitQueue()  extends ExecutionMessages
 case class CheckQueue() extends ExecutionMessages
 
+/** The killing actor messages */
+sealed trait KillingActorMessages
+case class RegisterJob(server:String,jobID:String,proc:Process) extends KillingActorMessages
+case class UnregisterCurrentJob() extends KillingActorMessages
+case class KillJob(server:String,jobID:String) extends  KillingActorMessages
+
+/**A simple actor who's job is to kill processes.
+ *
+ * @author Xavier Llora
+ * @date May 13, 2010 at 11:21:45 AM
+ */
+class KillerJobActor() extends Actor {
+  var server: Option[String] = None
+  var jobID: Option[String] = None
+  var proc: Option[Process] = None
+
+  override def act() =
+    loop {
+      react {
+        case RegisterJob(s, j, p) =>
+          server = Some(s)
+          jobID = Some(j)
+          proc = Some(p)
+
+        case UnregisterCurrentJob() =>
+          server = None
+          jobID = None
+          proc = None
+
+        case KillJob(s, j) =>
+          proc match {
+            case Some(p) if (s == server.getOrElse("") && j == jobID.getOrElse("")) =>
+              p.destroy
+              this ! UnregisterCurrentJob()
+            case _ =>
+          }
+      }
+    }
+}
 
 /**
  * This class implements the actor that is in charge of execution jobs
@@ -31,6 +70,9 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
   /** The global job queue */
   protected val queue = JobQueue(cnf)
 
+  /** The killing actor */
+  protected val killerActor = new KillerJobActor()
+  killerActor.start
 
   /** The main actor reactive loop
    *
@@ -75,18 +117,23 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
 
                         val ex = ExecutionWrapper(cnf, preJob getString "wrapper")
                         val (process,console,joblog) = ex.fireWrapper(repo)
+                        killerActor ! RegisterJob(uuid.toString,jobID,process)
                         // Capture the console
-                        spawn {
+                        val consoleDone = future {
                           val cptb = new PersistentTextBuffer(cnf,"jobs.%s.console" format jobID)
                           cptb append console
+                          1
                         }
                         // Capture the logs
-                        spawn {
+                        val jobLogDone = future {
                           val lptb = new PersistentTextBuffer(cnf,"jobs.%s.log" format jobID)
                           lptb append joblog
+                          1
                         }
-                        // Clean up after the process
+                        // Wait for graceful ending
+                        consoleDone() ; jobLogDone()
                         process.waitFor
+                        // Clean up after the process
                         queue.setExitProcessForJob(jobID,process.exitValue)
                         process.exitValue match {
                           case 0 => // Success
@@ -96,16 +143,18 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
                         }
                         queue compactJobData jobID
                         log.info("Job %s finished execution successfully" format jobID)
-
+                        killerActor ! UnregisterCurrentJob()
                       }
                       catch {
-                        case _ =>
-                          val failMsg = "Job %d failed during execution".format(jobID)
+
+                        case e =>
+                          val failMsg = "Job %s failed during execution because %s".format(jobID,e.getMessage)
                           log warning failMsg
                           val ptbLog = new PersistentTextBuffer(cnf,"jobs.%s.log" format jobID)
                           ptbLog append failMsg
                           queue.transitionJob(jobID, Running(), Failed(), uuid.toString)
                           queue compactJobData jobID
+                          killerActor ! UnregisterCurrentJob()
                       }
                   }
               }

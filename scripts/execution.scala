@@ -37,7 +37,9 @@ while (c >= 0) {
 //
 // Dump the repository
 //
-baos.toByteArray.foreach( b => console write b )
+//var cnt = 0
+//(1 to 1000).foreach( b => {println("Byte %10d %d".format(cnt,b));cnt+=1})
+console write baos.toByteArray
 console.flush
 
 //

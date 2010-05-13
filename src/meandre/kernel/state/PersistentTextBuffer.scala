@@ -2,8 +2,8 @@ package meandre.kernel.state
 
 import meandre.kernel.Implicits._
 import meandre.kernel.Configuration
-import com.mongodb.{BasicDBObject, Mongo}
 import java.io.{LineNumberReader, InputStreamReader, InputStream}
+import com.mongodb.{BasicDBList, BasicDBObject, Mongo}
 
 /**
  * The persistent text buffer class acts as a simple persistent text
@@ -17,13 +17,17 @@ import java.io.{LineNumberReader, InputStreamReader, InputStream}
 
 class PersistentTextBuffer(cnf:Configuration,id:String) {
 
-  protected val KEY = "t"
+  protected val KEY  = "_id"
+  protected val TEXT = "t"
 
   val mongo = new Mongo
   val db = mongo getDB cnf.MEANDRE_DB_NAME
   val collection = db getCollection cnf.MEANDRE_TEXT_BUFFER_PREFIX+"."+id
 
-  val sortCnd:BasicDBObject = """{"_id":1}"""
+  val sortCnd:BasicDBObject = """{"%s":1}""" format KEY
+
+  collection ensureIndex sortCnd 
+
 
 
   /**Given a text entry, it stores it in the the temporary persistent buffer.
@@ -32,9 +36,9 @@ class PersistentTextBuffer(cnf:Configuration,id:String) {
    * @return The object itself to facilitate concatenations
    */
   def append(text:String):PersistentTextBuffer = {
-    val obj = new BasicDBObject
-    obj.put(KEY,text)
-    collection.save(obj)
+    val obj:BasicDBObject="""{"%s":%d}""" format (KEY,System.currentTimeMillis)
+    val upd:BasicDBObject = """{ "$push" : { "%s" : "%s" } }""" format (TEXT,text.replace("\"","\\\"  "))
+    collection.update(obj,upd,true,false)
     this
   }
 
@@ -61,7 +65,10 @@ class PersistentTextBuffer(cnf:Configuration,id:String) {
   override def toString = {
     val sb = new StringBuffer
     var cur = collection.find.sort(sortCnd)
-    while ( cur.hasNext ) sb append cur.next.get(KEY).toString+"\n"
+    while ( cur.hasNext ) {
+      val arr = cur.next.get(TEXT).asInstanceOf[BasicDBList]
+      (0 until arr.size).foreach(i=>sb append arr.get(i).toString+"\n")
+    }
     sb.toString
   }
 
@@ -71,11 +78,12 @@ class PersistentTextBuffer(cnf:Configuration,id:String) {
   def destroy = collection.drop
 
 
-  /**Returns the number of appends in the collections.
+  /**Returns the number of appends in the collections. This is an approximate number
+   * due to the aggregation of appends by timestamp.
    *
-   * @return The number of appends done
+   * @return The appoximate number of appends done
    */
-  def numberOfAppends = collection.find.count
+  def approximateNumberOfAppends = collection.find.count
 }
 
 
