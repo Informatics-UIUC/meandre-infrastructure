@@ -19,7 +19,7 @@ import org.python.util.PythonInterpreter;
 /** This class provides a unified base servlet dispatcher shared by all the
  * servlets. It takes care of proper routing requests to methods and return
  * formats.
- * 
+ *
  * @author Xavier Llor&agrave;
  *
  */
@@ -27,7 +27,7 @@ public abstract class ServletConfigurableDispatcher extends HttpServlet {
 
 	/** A default serail ID */
 	private static final long serialVersionUID = 1L;
-	
+
 	/** A random number generator */
 	private static Random rnd;
 
@@ -42,7 +42,7 @@ public abstract class ServletConfigurableDispatcher extends HttpServlet {
 		                             new String[] {""});
 		rnd = new Random();
 	}
-	
+
 	/** The Jython interpreter that will use this executable component. */
 	protected PythonInterpreter pi = null;
 
@@ -52,37 +52,38 @@ public abstract class ServletConfigurableDispatcher extends HttpServlet {
 	public ServletConfigurableDispatcher ( ) {
 		pi = null;
 	}
-	
+
 	/** Initialize the servlet. Creates an instance of the python interpreter.
-	 * 
+	 *
 	 */
-	public void init() throws ServletException {
+	@Override
+    public void init() throws ServletException {
 		super.init();
 		initPythonInterpreter();
 	}
-    
+
 	/** Initialize the servlet with the given servlet configuration object.
 	 * Creates and instance of the python interpreter.
-	 * 
+	 *
 	 * @param config The servlet configuration object to use
 	 */
 //	public void init(ServletConfig config) throws ServletException {
 //		super.init(config);
 //		initPythonInterpreter();
 //	}
-	
+
 	private void initPythonInterpreter () {
 		// Setup the interpreter
 		pi = new PythonInterpreter();
 		// Run the initialization script
-		String pyResourceName = 
+		String pyResourceName =
 		    ServletConfigurableDispatcher.class.getSimpleName()+".py";
-		InputStream pyResourceStream = 
+		InputStream pyResourceStream =
 		    ServletConfigurableDispatcher.class.getResourceAsStream(pyResourceName);
 		//check if we could find the initialization python script using the classloader
 		if(pyResourceStream == null){
 		    throw new NullPointerException(
-		            "Could not find the init script \'" + pyResourceName + 
+		            "Could not find the init script \'" + pyResourceName +
 		            "\' via the classloader. Make sure it is in your classpath.");
 		}
 		//run the script
@@ -93,15 +94,16 @@ public abstract class ServletConfigurableDispatcher extends HttpServlet {
         //check if we could find the dispatcher python script using the classloader
         if(pyResourceStream == null){
             throw new NullPointerException(
-                    "Could not find the init script \'" + pyResourceName + 
+                    "Could not find the init script \'" + pyResourceName +
                     "\' via the classloader. Make sure it is in your classpath.");
-        }		
+        }
 		process(pyResourceStream);
 	}
-	
+
 	/** Destroys the servlet and releases the Python interpreter after cleaning it up.
-	 * 
+	 *
 	 */
+    @Override
     public void destroy() {
 		pi.cleanup();
 		pi = null;
@@ -115,7 +117,7 @@ public abstract class ServletConfigurableDispatcher extends HttpServlet {
 	protected void process ( String sScript ) {
 		pi.exec(sScript);
 	}
-	
+
 
 	/** Process the given script on an already prepared interpreter.
 	 *
@@ -124,72 +126,79 @@ public abstract class ServletConfigurableDispatcher extends HttpServlet {
 	protected void process ( InputStream is ) {
 		pi.execfile(is);
 	}
-	
+
 	/** Response to a get request.
-	 * 
+	 *
 	 * @param req The request object
 	 * @param resp The response object
 	 */
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)  {
-		dispatch("GET",req,resp);  
+	@Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)  {
+		dispatch("GET",req,resp);
 	}
-	
+
 	/** Response to a post request.
-	 * 
+	 *
 	 * @param req The request object
 	 * @param resp The response object
 	 */
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)  {
-		dispatch("POST",req,resp);	
+	@Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)  {
+		dispatch("POST",req,resp);
 	}
-		
+
 	/** Response to a put request.
-	 * 
+	 *
 	 * @param req The request object
 	 * @param resp The response object
-	 */    
-	protected void doPut(HttpServletRequest req, HttpServletResponse resp)  {
+	 */
+	@Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp)  {
 		dispatch("PUT",req,resp);
 	}
-    
+
 	/** Response to a delete request.
-	 * 
+	 *
 	 * @param req The request object
 	 * @param resp The response object
 	 */
-	protected void doDelete(HttpServletRequest req, HttpServletResponse resp)  {
-		dispatch("DELET",req,resp);
+	@Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp)  {
+		dispatch("DELETE",req,resp);
 	}
-	
+
 	/** Response to a head request.
-	 * 
+	 *
 	 * @param req The request object
 	 * @param resp The response object
 	 */
+    @Override
     protected void doHead(HttpServletRequest req, HttpServletResponse resp)  {
     	dispatch("HEAD",req,resp);
 	}
-	
+
     /** Response to a options request.
-	 * 
+	 *
 	 * @param req The request object
 	 * @param resp The response object
 	 */
+    @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp)  {
     	dispatch("OPTIONS",req,resp);
 	}
-	
+
     /** Response to a trace request.
-	 * 
+	 *
 	 * @param req The request object
 	 * @param resp The response object
 	 */
+    @Override
     protected void doTrace(HttpServletRequest req, HttpServletResponse resp)  {
     	dispatch("TRACE",req,resp);
 	}
-	
+
     /** Dispatch the request.
-     * 
+     *
      * @param method The method of the request
      * @param req The request object
      * @param resp The response
@@ -202,22 +211,22 @@ public abstract class ServletConfigurableDispatcher extends HttpServlet {
 			String[] saPath = saParts[0].split("/");
 			String sTarget = saPath[saPath.length-1];
 			String sExtension = (saParts.length==2 )?saParts[1]:"";
-	    	
+
 			// Create the names
 			String sReq = "req"+lctm+Math.abs(rnd.nextInt());
 			String sRes = "resp"+lctm+Math.abs(rnd.nextInt());
-			
+
 			// Set the objects
 			pi.set(sReq,req);
 			pi.set(sRes,resp);
-			
+
 			// Dispatch the request
 			pi.exec("dispatch('"+method+"',"+sReq+","+sRes+",'"+sTarget+"','"+sExtension+"')");
-			
+
 			// Delete the objects
 			pi.exec("del("+sReq+")");
 			pi.exec("del("+sRes+")");
-			
+
 		} catch (Exception e) {
 			Logger log = WSLoggerFactory.getWSLogger();
 			log.warning("Could not process request "+
@@ -229,7 +238,7 @@ public abstract class ServletConfigurableDispatcher extends HttpServlet {
 				log.warning("Failed to response");
 			}
 		}
-   		
+
 	}
 
 }
