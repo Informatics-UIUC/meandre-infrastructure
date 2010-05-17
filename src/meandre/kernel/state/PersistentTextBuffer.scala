@@ -49,7 +49,7 @@ class PersistentTextBuffer(cnf:Configuration,id:String) {
    * @return The object itself to facilitate concatenations
    */
   def append(is:InputStream):PersistentTextBuffer = {
-    val ir = new LineNumberReader(new InputStreamReader(is))
+    val ir = new LineNumberReader(new InputStreamReader(is),10000)
     var line = ir.readLine
     while ( line!=null ) {
       append(line)

@@ -1,8 +1,8 @@
 package meandre.kernel.execution
 
-import scala.concurrent.ops._
 import scala.actors.Actor
 import scala.actors.Actor._
+import scala.actors.Futures._
 import com.mongodb.BasicDBObject
 import meandre.kernel.Configuration
 import java.util.UUID
@@ -126,6 +126,7 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
                           }
                           catch {
                             case s =>
+                              println(s)
                               log.warning("Console reading for job %s failed because of %s".format(jobID,s.getMessage))
                           }
                           1
@@ -138,13 +139,14 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
                           }
                           catch {
                             case s =>
+                              println(s)
                               log.warning("Log reading for job %s failed because of %s".format(jobID,s.getMessage))
                           }
                           1
                         }
                         // Wait for graceful ending
-                        consoleDone() ; jobLogDone()
                         process.waitFor
+                        consoleDone() ; jobLogDone()
                         // Clean up after the process
                         queue.setExitProcessForJob(jobID,process.exitValue)
                         process.exitValue match {
@@ -158,8 +160,8 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
                              queue.transitionJob(jobID, Running(), Failed(), uuid.toString)
                              log.info("Job %s failed during execution" format jobID)
                         }
-                        queue compactJobData jobID
                         killerActor ! UnregisterCurrentJob()
+                        queue compactJobData jobID
                       }
                       catch {
 

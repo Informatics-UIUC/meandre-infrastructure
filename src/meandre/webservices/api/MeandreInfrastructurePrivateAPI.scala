@@ -1188,7 +1188,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
         else {
           val q = "{}"
           val skip = if (params.contains("offset")) safeParseInt(params("offset")) else 0
-          val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else Math.MAX_INT
+          val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else 250
           val res = new BasicDBObject
           res.put("log",log.getLogEntries(q,skip,limit))
           OKResponse(res, user)
@@ -1206,7 +1206,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
         }
         else {
           val skip = if (params.contains("offset")) safeParseInt(params("offset")) else 0
-          val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else Math.MAX_INT
+          val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else 250
           val uuids = params.contains("uuid") match {
             case false =>
               "\""+snareMon.uuid.toString+"\""
@@ -1337,13 +1337,13 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
     requestFor {
       user =>
         val queue = new JobQueue(cnf)
-        var sortCnd = "{}"
+        var sortCnd = """{"ts":-1}"""
         val skip = if (params.contains("offset")) safeParseInt(params("offset")) else 0
-        val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else Math.MAX_INT
+        val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else 250
         if (params.contains("order")) {
           sortCnd = params("order") match {
-            case "ts" => """{"ts":-1}"""
-            case _ => "{}"
+            case "ts" => """{"ts":1}"""
+            case _ => """{"ts":-1}"""
           }
         }
         var cndURIs = if ( params.contains("jobID")) {

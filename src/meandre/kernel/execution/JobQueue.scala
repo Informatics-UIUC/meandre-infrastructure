@@ -70,7 +70,7 @@ class JobQueue(val cnf: Configuration) {
       md.reset
       ba foreach (md.update _)
       val md5String = (new BigInteger(md.digest)).abs.toString(16)
-      if (md5String.length%2 != 0) "0"+md5String
+      if (md5String.length<40) ("0"*(40-md5String.length))+md5String
       else md5String
     }
     catch {
@@ -223,7 +223,7 @@ class JobQueue(val cnf: Configuration) {
               },
             "sort" :
               {
-                "ts" : -1
+                "ts" : 1
               },
             "update" :
               {
