@@ -321,7 +321,7 @@ public class MeandreServer {
 
 		String sCntx = cnf.getAppContext();
 
-		// Install the WebUI proxy before anyother handler
+		// Install the WebUI proxy before any other handler
 		server.addHandler(new WebUIProxy(cnf));
 
 		//
