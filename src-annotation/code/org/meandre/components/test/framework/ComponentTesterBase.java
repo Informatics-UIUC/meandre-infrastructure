@@ -53,13 +53,13 @@ public class ComponentTesterBase {
 	public final static String NEW_LINE = System.getProperty("line.separator");
 
 	/** The test flows dir location */
-	private String FLOWS_DIR = "."+File.separator+"test"+File.separator+"flows";
+	private String FLOWS_DIR = "test" + File.separator + "flows";
 
 	/** The temporary folder location */
-	private String TEMP_DIR = "."+File.separator+"tmp";
+	private String TEMP_DIR = "tmp";
 
 	/** The temporary folder for descriptors location */
-	private String TEMP_DESC_DIR = "."+File.separator+"tmp"+File.separator+"desc";
+	private String TEMP_DESC_DIR = "tmp" + File.separator + "desc";
 
 	/** Source packages to process */
 	private  String [] SRC_FOLDERS = { "src-tools" };
@@ -112,7 +112,8 @@ public class ComponentTesterBase {
 	private void processJavaFiles(List<File> lst) {
 		System.out.println("\tProcessing "+lst.size()+" files...");
 		CreateComponentDescriptor.setMakeSubs(true);
-		new File(getTempDescriptorFolder()).mkdirs();
+		String tempDescriptorFolder = getTempDescriptorFolder();
+        new File(tempDescriptorFolder).mkdirs();
 		for ( File file:lst ) {
 			String sFile = file.toString();
 			String sClassName = processFileName(sFile);
@@ -120,8 +121,8 @@ public class ComponentTesterBase {
 			try {
 				CreateComponentDescriptor ccd = new CreateComponentDescriptor();
 				ccd.setComponentClassName(sClassName);
-				ccd.setComponentDescriptorFolderName(getTempDescriptorFolder());
-				ccd.setComponentDescriptorFile(new File(getTempDescriptorFolder()));
+				ccd.setComponentDescriptorFolderName(tempDescriptorFolder);
+				ccd.setComponentDescriptorFile(new File(tempDescriptorFolder));
 				ccd.processComponentDescriptor();
 				System.out.println("\t\t done");
 			}
@@ -228,10 +229,18 @@ public class ComponentTesterBase {
 	 */
 	private List<String> getDescriptorFiles () {
 		List<String> lst = new LinkedList<String>();
-		File dir = new File(getTempDescriptorFolder());
+		String tempDescriptorFolder = getTempDescriptorFolder();
+        File dir = new File(tempDescriptorFolder);
 		for ( String sFile:dir.list() ) {
 			File here = new File("");
-			String sRDFFile = here.getAbsolutePath()+getTempDescriptorFolder().substring(1)+File.separator+sFile;
+			String sRDFFile;
+			if (tempDescriptorFolder.startsWith(File.separator))
+			    sRDFFile = tempDescriptorFolder + File.separator + sFile;
+			else {
+			    String sPath = here.getAbsolutePath();
+			    if (!sPath.endsWith(File.separator)) sPath += File.separator;
+			    sRDFFile = sPath+tempDescriptorFolder+File.separator+sFile;
+			}
 			try {
 				URL fileURL = new URL("file:////"+sRDFFile);
 				lst.add(fileURL.toString().replaceAll(" ","%20"));
@@ -390,7 +399,7 @@ public class ComponentTesterBase {
 		List<File> lst = new LinkedList<File>();
 		File dir = new File(FLOWS_DIR);
 		String[] children = dir.list();
-		for (int i=0; i<children.length; i++) {
+		for (int i=0, iMax=children.length; i<iMax; i++) {
 			if ( children[i].toString().endsWith(".zz") )
 				lst.add(new File(children[i]));
 		}
