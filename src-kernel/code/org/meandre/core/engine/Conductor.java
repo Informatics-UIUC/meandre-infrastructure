@@ -582,12 +582,12 @@ public class Conductor {
 
 			// Initializing the java class loader
 			URLClassLoader urlCL=null;
-			if(this.getParentClassloader()==null){
-				urlCL=  URLClassLoader.newInstance(ua);
-			}else{
-				urlCL = URLClassLoader.newInstance(ua, this.getParentClassloader());
-			}
-
+//			if(this.getParentClassloader()==null){
+//				urlCL=  URLClassLoader.newInstance(ua);
+//			}else{
+//				urlCL = URLClassLoader.newInstance(ua, this.getParentClassloader());
+//			}
+			urlCL = URLClassLoader.newInstance(ua, getClass().getClassLoader());
 
 		for ( String sClassName:setURLLocations ) {
 			try {
