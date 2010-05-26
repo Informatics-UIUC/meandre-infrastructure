@@ -296,7 +296,6 @@
 	<target name="dist-build" depends="compile" description="-> creates jars for distribution (no testing performed)">
 
 		<mkdir dir="${dist.dir}/lib"/>
-		<mkdir dir="${dist.dir}/tmp"/>
 
 		<!-- Create core jar -->
 		<jar destfile="${dist.dir}/lib/${app.name}-core-${build.version}.jar">
@@ -456,77 +455,60 @@
 			</fileset>
 		</jar>
 
-		<!-- Preparations to create the release jars -->
-		<copy todir="${dist.dir}/tmp" includeEmptyDirs="no">
-			<fileset dir="${build.dir}">
-				<include name="**"/>
-			</fileset>
-		</copy>
-		<unjar dest="${dist.dir}/tmp" overwrite="true">
-			<fileset dir="${lib.dep.dir}">
-				<include name="**/*.jar"/>
-			</fileset>
-		</unjar>
-		<delete file="${dist.dir}/tmp/META-INF/MANIFEST.MF" />
-		<delete file="${dist.dir}/tmp/LICENSE" />
-
 		<!-- Creating the Meandre server jar distribution -->
-		<jar destfile="${dist.dir}/${app.name}-server-${build.version}.jar" >
+		<jar destfile="${dist.dir}/${app.name}-server-${build.version}.jar">
 			<manifest>
 				<attribute name="Build-Version" value="${build.version}"/>
+				<attribute name="Build-Date" value="${TIMESTAMP}"/>
 				<attribute name="Main-Class" value="org.meandre.webservices.WSInfrastructureBootstrapper"/>
 			</manifest>
-			<fileset dir="${dist.dir}/tmp/">
-				<include name="**"/>
-			</fileset>
-		</jar>
+            <fileset dir="${build.dir}"/>
+        	<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
+        </jar>
 
 		<!-- Creating the Meandre ZigZag compiler jar distribution -->
 		<jar destfile="${dist.dir}/zzc-${build.version}.jar" >
 			<manifest>
 				<attribute name="Build-Version" value="${build.version}"/>
+				<attribute name="Build-Date" value="${TIMESTAMP}"/>
 				<attribute name="Main-Class" value="org.meandre.zigzag.parser.ZigZag"/>
 			</manifest>
-			<fileset dir="${dist.dir}/tmp/">
-				<include name="**"/>
-			</fileset>
+			<fileset dir="${build.dir}"/>
+        	<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
 		</jar>
 
 		<!-- Creating the Meandre RDF-to-ZigZag converter jar distribution -->
 		<jar destfile="${dist.dir}/rdf2zz-${build.version}.jar" >
 			<manifest>
 				<attribute name="Build-Version" value="${build.version}"/>
+				<attribute name="Build-Date" value="${TIMESTAMP}"/>
 				<attribute name="Main-Class" value="org.meandre.zigzag.transformations.RDF2ZZMain"/>
 			</manifest>
-			<fileset dir="${dist.dir}/tmp/">
-				<include name="**"/>
-			</fileset>
+			<fileset dir="${build.dir}"/>
+        	<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
 		</jar>
 
 		<!-- Creating the Meandre mau executor jar distribution -->
 		<jar destfile="${dist.dir}/zzre-${build.version}.jar" >
 			<manifest>
 				<attribute name="Build-Version" value="${build.version}"/>
+				<attribute name="Build-Date" value="${TIMESTAMP}"/>
 				<attribute name="Main-Class" value="org.meandre.mau.MAUExecutor"/>
 			</manifest>
-			<fileset dir="${dist.dir}/tmp/">
-				<include name="**"/>
-			</fileset>
+			<fileset dir="${build.dir}"/>
+        	<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
 		</jar>
 
 		<!-- Creating the Meandre interpreter console jar distribution -->
 		<jar destfile="${dist.dir}/zz-${build.version}.jar" >
 			<manifest>
 				<attribute name="Build-Version" value="${build.version}"/>
+				<attribute name="Build-Date" value="${TIMESTAMP}"/>
 				<attribute name="Main-Class" value="org.meandre.zigzag.console.ZigZagConsole"/>
 			</manifest>
-			<fileset dir="${dist.dir}/tmp/">
-				<include name="**"/>
-			</fileset>
+			<fileset dir="${build.dir}"/>
+        	<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
 		</jar>
-
-		<delete dir="${dist.dir}/tmp"/>
-
 	</target>
 
 	<!-- make source jars -->
