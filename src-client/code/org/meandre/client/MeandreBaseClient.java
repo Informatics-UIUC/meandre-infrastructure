@@ -1,6 +1,7 @@
 package org.meandre.client;
 
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -29,9 +30,9 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 /**
  * The basic framework for making calls to the webservices of a running
- * Meandre Infrastructure instance. MeandreBaseClient takes care of 
+ * Meandre Infrastructure instance. MeandreBaseClient takes care of
  * authorization and basic http communication. Also provides convenience
- * methods for common types of meandre requests, such as GET request that 
+ * methods for common types of meandre requests, such as GET request that
  * returns data in JSON format.
  *
  * @author Peter Groves
@@ -43,19 +44,19 @@ public class MeandreBaseClient{
 
 	/**base url of the server to interact with. */
     private String _serverHost = null;
-	
+
     /**port number the server is listening on.*/
     private int _port;
 
 	/** logger for request/response contents*/
 	private Logger _log;
-	
+
 	/**
 	 * initialize a client that talks to a Meandre server located at the input
 	 * url and port. The default global logger will be used until setLogger()
 	 * is called.
      *
-     * @param serverHost just the hostname, e.g. "localhost", 
+     * @param serverHost just the hostname, e.g. "localhost",
      *      NOT "http://localhost"
      * @param serversPort the port on the serverhost that the server is listening
 	 */
@@ -68,7 +69,7 @@ public class MeandreBaseClient{
 	 * initialize a client that talks to a Meandre server located at the input
 	 * url and port.
      *
-     * @param serverHost just the hostname, e.g. "localhost", 
+     * @param serverHost just the hostname, e.g. "localhost",
      *      NOT "http://localhost"
      * @param serversPort the port on the serverhost that the server is listening
 	 */
@@ -90,7 +91,7 @@ public class MeandreBaseClient{
     /**
      * Change the server and port that this client will communicate with.
      * Note that this does not reset the credentials - the same credentials
-     * used on the old serverHost will be used on the new server until 
+     * used on the old serverHost will be used on the new server until
      * you call setCredentials.
      */
     public void setServerAddress(String serverHost, int serversPort){
@@ -132,7 +133,7 @@ public class MeandreBaseClient{
     /**
      * returns a new http client with this meandre client's credentials.
      * a new one is returned every time b/c executing http methods on
-     * an httpclient blocks, while MeandreBaseClient is expected to 
+     * an httpclient blocks, while MeandreBaseClient is expected to
      * allow multiple requests to be dispatched at asynchronously.
      */
     private HttpClient getHttpClient(){
@@ -140,30 +141,30 @@ public class MeandreBaseClient{
 	    HostConfiguration config = new HostConfiguration();
         config.setHost(_serverHost, _port);
         httpClient.setHostConfiguration(config);
-        
+
         //if credentials are not set, we will assume we don't need authorization
 		if(_credentials != null){
             AuthScope scope = new AuthScope(null, _port, null);
 			httpClient.getState().setCredentials(scope, _credentials);
         }
-		
+
         return httpClient;
     }
 
 
     /** Does an authenticated GET request against the server using the
-	 * input url suffix and params. 
-     * 
+	 * input url suffix and params.
+     *
      * <p>url visited will be:
      * <p>http://<meandre-host>:<port>/<sRestCommand><queryParams(?n1=v1?n2=v2...)>
-	 * 
+	 *
 	 * @param sRestCommand The url suffix
 	 * @param queryParams the http query params to append to the url. Null is
 	 * an acceptable value for this set if no params are needed.
-	 * 
+	 *
 	 * @return The raw content bytes of the server's response
 	 */
-	public byte[] executeGetRequestBytes(String sRestCommand, 
+	public byte[] executeGetRequestBytes(String sRestCommand,
 			Set<NameValuePair> queryParams)
 	        throws TransmissionException{
 
@@ -171,7 +172,7 @@ public class MeandreBaseClient{
 		get.setPath("/" + sRestCommand);
 		get.setDoAuthentication(true);
 		if(queryParams != null){
-		    NameValuePair[] nvp = new NameValuePair[queryParams.size()]; 
+		    NameValuePair[] nvp = new NameValuePair[queryParams.size()];
 		    nvp = queryParams.toArray(nvp);
 		    get.setQueryString(nvp);
 		}
@@ -196,18 +197,18 @@ public class MeandreBaseClient{
      * input url suffix and params. returns an input stream that needs
      * to be consumed, rather than the complete response content all
      * at once. The input stream will remain open for as long as more
-     * data is being downloaded, which is potentially a long time. 
-     * 
+     * data is being downloaded, which is potentially a long time.
+     *
      * <p>url visited will be:
      * <p>http://<meandre-host>:<port>/<sRestCommand><queryParams(?n1=v1?n2=v2...)>
-     * 
+     *
      * @param sRestCommand The url suffix
      * @param queryParams the http query params to append to the url. Null is
      * an acceptable value for this set if no params are needed.
-     * 
+     *
      * @return The raw content bytes of the server's response as a stream
      */
-    public InputStream executeGetRequestStream(String sRestCommand, 
+    public BufferedInputStream executeGetRequestStream(String sRestCommand,
             Set<NameValuePair> queryParams)
             throws TransmissionException{
 
@@ -215,7 +216,7 @@ public class MeandreBaseClient{
         get.setPath("/" + sRestCommand);
         get.setDoAuthentication(true);
         if(queryParams != null){
-            NameValuePair[] nvp = new NameValuePair[queryParams.size()]; 
+            NameValuePair[] nvp = new NameValuePair[queryParams.size()];
             nvp = queryParams.toArray(nvp);
             get.setQueryString(nvp);
         }
@@ -228,35 +229,35 @@ public class MeandreBaseClient{
 		}catch (TransmissionException te){
 			throw te;
         }catch(Exception e){
-            _log.severe("unanticipated exception - GET: " + 
+            _log.severe("unanticipated exception - GET: " +
                     extractMethodsURIString(get));
             throw new TransmissionException(e);
         }
-        return insResponse;
-    }	
-	
-	
+        return new BufferedInputStream(insResponse);
+    }
+
+
 
     /** Does an authenticated POST request against the server with the input
-	 * url suffix, params, and file/data parts. 
-     * 
-	 * 
+	 * url suffix, params, and file/data parts.
+     *
+	 *
 	 * @param sRestCommand The url suffix
 	 * @param queryParams the http query param name-value pairs to append
-	 * @param dataParts the post content parts for a multipart request, usually 
+	 * @param dataParts the post content parts for a multipart request, usually
 	 * 					Files to upload.
 	 *
 	 * @return The raw content bytes of the server's response
 	 */
 
-	public byte[] executePostRequestBytes(String sRestCommand, 
-			Set<NameValuePair> queryParams, Set<Part> dataParts) 
+	public byte[] executePostRequestBytes(String sRestCommand,
+			Set<NameValuePair> queryParams, Set<Part> dataParts)
 			throws TransmissionException{
-	    
+
 	    PostMethod post = new PostMethod();
         post.setPath("/" + sRestCommand);
         post.setDoAuthentication(true);
-        
+
         Set<Part> parts = null;
         if(dataParts == null){
             parts = new HashSet<Part>();
@@ -284,7 +285,7 @@ public class MeandreBaseClient{
 		}catch (TransmissionException te){
 			throw te;
         }catch(Exception e){
-			_log.severe("unanticipated exception - POST: " + 
+			_log.severe("unanticipated exception - POST: " +
 			        extractMethodsURIString(post));
             throw new TransmissionException(e);
         }
@@ -299,7 +300,7 @@ public class MeandreBaseClient{
 	 */
 	public String executeGetRequestString(String sRestCommand,
 			Set<NameValuePair> queryParams) throws TransmissionException {
-	   
+
         byte[] baRetrieved = executeGetRequestBytes(sRestCommand, queryParams);
         String sRetrieved;
 	    try {
@@ -316,9 +317,9 @@ public class MeandreBaseClient{
 	 * performs a GET request and returns the response in json format.
 	 * returns null if the response was an empty string.
      * see <code>executePostRequestBytes</code> for info on params
-	 *  
+	 *
 	 */
-	public JSONTokener executeGetRequestJSON(String sRestCommand, 
+	public JSONTokener executeGetRequestJSON(String sRestCommand,
 			Set<NameValuePair> queryParams) throws TransmissionException {
 
 	    String sRaw = executeGetRequestString(sRestCommand, queryParams);
@@ -331,14 +332,14 @@ public class MeandreBaseClient{
 	}
 	/**
 	 * performs a GET request and returns the response data as an RDF
-	 * Jena Model. The sRestCommand must request the model data in 
+	 * Jena Model. The sRestCommand must request the model data in
 	 * the N-Triple format (*.nt file)
      * see <code>executePos1tRequestBytes</code> for info on params
 	 *
 	 */
 	public Model executeGetRequestModel(String sRestCommand,
 			Set<NameValuePair> queryParams) throws TransmissionException {
-	    
+
 	    byte[] baRetrieved = executeGetRequestBytes(sRestCommand, queryParams);
 	    Model mRetrieved = ModelFactory.createDefaultModel();
 	    try{
@@ -356,14 +357,14 @@ public class MeandreBaseClient{
 	}
 
 	/**
-	 * checks that the method has executed properly and it's response 
+	 * checks that the method has executed properly and it's response
 	 * code indicates a successful operation. throws an exception
 	 * with a description of the failure.
      *
      * currently, any 2XX code is considered OK, and all others are
      * considered failures and result in an Exception.
 	 */
-	protected void verifyResponseOK(HttpMethod method) 
+	protected void verifyResponseOK(HttpMethod method)
 			throws TransmissionException{
         int iStat = method.getStatusCode();
         if( (iStat < 200) || (iStat > 299) ) {
@@ -386,7 +387,7 @@ public class MeandreBaseClient{
             errBuf.append(reason);
 
             _log.severe(errBuf.toString());
-          
+
             method.releaseConnection();
 
 		    throw new TransmissionException(iStat + " " + reason + " " +
@@ -400,7 +401,7 @@ public class MeandreBaseClient{
 	 * is using. Intended for logging: if extracting the URI fails then
 	 * "UNKNOWN_URL" is returned but no indication of failure will be
 	 * given.
-	 * 
+	 *
 	 * @param method an HttpMethod, usually a POST or GET with all it's
 	 * parameters set.
 	 * @return the url the http method visited as a String
