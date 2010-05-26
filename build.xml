@@ -23,7 +23,10 @@
 	<import file="properties.xml"/>
 
 	<target name="init" description="-> creates required folders">
-		<tstamp/>
+                <tstamp>
+                   <format property="TIMESTAMP" pattern="MMM d, yyyy h:mm:ssa Z"/>
+                </tstamp>
+
 		<mkdir dir="${build.dir}"/>
 		<mkdir dir="${dist.dir}"/>
 		<mkdir dir="${test.dir}"/>
