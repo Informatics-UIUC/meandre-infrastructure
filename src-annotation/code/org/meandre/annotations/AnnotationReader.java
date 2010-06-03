@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.meandre.annotations;
 import java.lang.annotation.Annotation;
@@ -11,8 +11,8 @@ import java.util.Map.Entry;
 import org.meandre.core.repository.CorruptedDescriptionException;
 
 /**
- * @author bernie acs 
- * 
+ * @author bernie acs
+ *
  *
  */
 public class AnnotationReader {
@@ -24,7 +24,7 @@ public class AnnotationReader {
 	private java.util.Hashtable<String,Object> componentPropertyKeyValues = null;
 	private java.util.Hashtable<String,Object> componentInputKeyValues = null;
 	private java.util.Hashtable<String,Object> componentOutputKeyValues = null;
-		
+
 	public AnnotationReader() {
 
 	    componentKeyValues = new java.util.Hashtable<String,Object>();
@@ -35,17 +35,24 @@ public class AnnotationReader {
 	}
 
 	public void findAnnotations(String className) throws ClassNotFoundException, CorruptedDescriptionException {
+	    findAnnotations(className, null);
+	}
+
+	public void findAnnotations(String className, ClassLoader classLoader) throws ClassNotFoundException, CorruptedDescriptionException {
 	    java.util.Hashtable<Integer,String> theClassList = new java.util.Hashtable<Integer,String>();
 
+	    if (classLoader == null)
+	        classLoader = getClass().getClassLoader();
+
 	    theClassName = className;
-	    Class<?> classObject = Class.forName(className);
+	    Class<?> classObject = Class.forName(className, false, classLoader);
 	    try{
 
 	        while(true ){
 	            if(debugPrint){
 	                System.out.println("* Caching className : " + classObject.getName() );
 	            }
-	            theClassList.put( Integer.valueOf( theClassList.size()), classObject.getName());					
+	            theClassList.put( Integer.valueOf( theClassList.size()), classObject.getName());
 	            classObject = classObject.getSuperclass();
 	            if(classObject == null) break;
 	        }
@@ -55,7 +62,7 @@ public class AnnotationReader {
 	            theClassName = theClassList.get(Integer.valueOf(i));
 	            if(theClassName==null)break;
 
-	            classObject = Class.forName(theClassName);
+	            classObject = Class.forName(theClassName, false, classLoader);
 	            if(classObject==null)break;
 
 	            if(debugPrint){
@@ -68,7 +75,7 @@ public class AnnotationReader {
 	        e.printStackTrace();
 	    }
 
-	    if(debugPrint){ 
+	    if(debugPrint){
 	        System.out.println("Collected all annotation details; processing ...");
 
 	        GenerateComponentDescriptorRdf comDescRdf = new GenerateComponentDescriptorRdf();
@@ -96,7 +103,7 @@ public class AnnotationReader {
 	    }
 	    for (java.lang.reflect.Field f: fields){
 	        readAnnotation(f);
-	    }			
+	    }
 	}
 
 	public void readAnnotation(AnnotatedElement element)
@@ -107,14 +114,14 @@ public class AnnotationReader {
 	    {
 
 	        Annotation[] classAnnotations = element.getAnnotations();
-	        if(classAnnotations == null) return; 
+	        if(classAnnotations == null) return;
 
 	        for(Annotation annotation : classAnnotations)
 	        {
 	            if(debugPrint)System.out.println("*** Processing : " + annotation.annotationType().getCanonicalName());
 
 	            Method[] methods = null;
-	            Class<?> annotationClass = (Class<?>)annotation.annotationType();
+	            Class<?> annotationClass = annotation.annotationType();
 
 	            try {
 	                methods = (annotationClass).getDeclaredMethods();
@@ -126,7 +133,7 @@ public class AnnotationReader {
 	                // collect details and execute method to derive resultant
 	                Class<?> returnType = m.getReturnType();
 	                String methodName = m.getName();
-	                Object value = (Object)(m.invoke(annotation,(Object[])null));
+	                Object value = (m.invoke(annotation,(Object[])null));
 	                if(value == null)
 	                    value = "";
 	                //
@@ -138,7 +145,7 @@ public class AnnotationReader {
 	                        if(debugPrint)System.out.print(w[i].toString() + ((i<(w.length-1))? " , " : "") );
 	                    }
 	                    if(debugPrint)System.out.println(" }");
-	                    annotationKeyValues.put(methodName, w);							
+	                    annotationKeyValues.put(methodName, w);
 	                } else {
 	                    if(debugPrint)System.out.println(">>>> " + methodName +" = "+ value );
 	                    annotationKeyValues.put(methodName, value);
@@ -174,12 +181,12 @@ public class AnnotationReader {
 	    } else if( annType instanceof ComponentInput){
 	        int s = componentInputKeyValues.size();
 	        replacables(ht,componentPropertyKeyValues);
-	        if(ht.size()>0)			
+	        if(ht.size()>0)
 	            componentInputKeyValues.put( Integer.toString(s++) ,ht.entrySet()) ;
 	    } else if( annType instanceof ComponentOutput){
 	        int s = componentOutputKeyValues.size();
 	        replacables(ht,componentPropertyKeyValues);
-	        if(ht.size()>0)				
+	        if(ht.size()>0)
 	            componentOutputKeyValues.put( Integer.toString(s++) ,ht.entrySet()) ;
 	    } else {
 
@@ -195,7 +202,7 @@ public class AnnotationReader {
 	        java.util.Hashtable<String,Object> oldEntries
 	){
 	    //
-	    // oldEntries look like Integer() stored as String() (KEY) , 
+	    // oldEntries look like Integer() stored as String() (KEY) ,
 	    //		the Value Object is (java.util.Map.Entry<String,Object>)
 	    // 1, collection of entries<?>
 	    //		name = , ...
@@ -213,7 +220,7 @@ public class AnnotationReader {
 	                    boolean removeFlag = false;
 	                    if((oldEntrySet != null) && ( oldEntrySet.size() > 0))
 	                        for(java.util.Map.Entry<String,Object> oldItem : oldEntrySet ){
-	                            if( (oldItem.getKey().equalsIgnoreCase("name")) && 
+	                            if( (oldItem.getKey().equalsIgnoreCase("name")) &&
 	                                    (oldItem.getValue().equals(newItem.getValue()))
 	                            ){
 	                                removeFlag=true;
@@ -233,7 +240,7 @@ public class AnnotationReader {
 			java.util.Hashtable<String, Object> internalCopy = new java.util.Hashtable<String, Object>();
 			java.util.Enumeration<String> e = ht.keys();
 			while( e.hasMoreElements()){
-				internalCopy.put( Integer.toString( internalCopy.size() ) , ht.get(e.nextElement())) ; 
+				internalCopy.put( Integer.toString( internalCopy.size() ) , ht.get(e.nextElement())) ;
 			}
 			ht.clear();
 			ht.putAll(internalCopy);
@@ -242,7 +249,7 @@ public class AnnotationReader {
 	public static void main(String args[]) throws Exception
 	{
 
-	    AnnotationReader ar = new AnnotationReader();			
+	    AnnotationReader ar = new AnnotationReader();
 	    if(args.length>1)
 	        ar.setDebugPrint(Boolean.parseBoolean(args[1]));
 

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.meandre.annotations;
 
@@ -15,7 +15,7 @@ import org.meandre.core.repository.CorruptedDescriptionException;
 
 /**
  * @author bernie acs
- * 
+ *
  *
  */
 public class CreateComponentDescriptor {
@@ -25,33 +25,34 @@ public class CreateComponentDescriptor {
     private static boolean printOnly = false;
     private static boolean makeSubs  = false;
     private static File componentDescriptorFile = null;
+    private static ClassLoader classLoader = null;
 
 	/**
-	 * 
+	 *
 	 */
 	public CreateComponentDescriptor() {
 	}
-    
-	public static String getComponentDescriptorRdf() 
+
+	public static String getComponentDescriptorRdf()
 		throws ClassNotFoundException, CorruptedDescriptionException {
-		
+
 		AnnotationReader ar = new AnnotationReader();
-		ar.findAnnotations(getComponentClassName());
-		
+		ar.findAnnotations(getComponentClassName(), classLoader);
+
 		GenerateComponentDescriptorRdf comDescRdf = new GenerateComponentDescriptorRdf();
 		comDescRdf.setComponentInputKeyValues(ar.getComponentInputKeyValues());
 		comDescRdf.setComponentOutputKeyValues(ar.getComponentOutputKeyValues());
 		comDescRdf.setComponentPropertyKeyValues(ar.getComponentPropertyKeyValues());
 		comDescRdf.setComponentKeyValues(ar.getComponentKeyValues());
-		
+
 		String sRDFDescription = comDescRdf.getRdfDescriptor();
 		return sRDFDescription;
 	}
-	
+
 	private static String getAbsoluteOutputPathFileName(String cdfName, String cClassName, boolean noSubDirs){
         String dirPath = null;
         String clsName = null;
-        
+
         if (cClassName.lastIndexOf(".") == -1) {
             dirPath = cdfName;
             clsName = cdfName;
@@ -59,14 +60,14 @@ public class CreateComponentDescriptor {
         	if(!noSubDirs){
 	            dirPath = cdfName + File.separator +
 	            cClassName.substring(0, (cClassName.lastIndexOf(".")+1) );
-	            
+
 	            dirPath = dirPath.replace('.', File.separatorChar);
 	            if (!(new File(dirPath)).exists()) {
 	                new File(dirPath).mkdirs();
 	            }
-	            
+
 	            // dirPath = dirPath + File.separator;
-	            
+
         	} else {
         		dirPath = cdfName;
         	}
@@ -82,11 +83,11 @@ public class CreateComponentDescriptor {
 
         System.out.println("Descriptor written to: " + dirPath + File.separator +
                            componentDescriptor + ".rdf");
-*/        
-        
+*/
+
         return  dirPath + File.separator + clsName + ".rdf";
 	}
-	
+
     private static void writeToFile(String description, String absoluteFilePath, String encoding) {
         BufferedWriter out = null;
         try {
@@ -125,7 +126,7 @@ public class CreateComponentDescriptor {
                     "Usage: java CreateComponentDescriptor org.foo.Component descriptor_directory [noSubDirectories (true||false)] [printOnly (true||false)]");
             System.exit(0);
         }
-        
+
         String className = args[0];
         String componentDescriptorFolder = args[1];
 
@@ -134,26 +135,26 @@ public class CreateComponentDescriptor {
         if(args.length > 3){
         	setPrintOnly ( Boolean.parseBoolean(args[3]));
         }
-        
+
         //
-        // three arguments setMakeSubs to the desired setting        
+        // three arguments setMakeSubs to the desired setting
         if(args.length > 2){
         	setMakeSubs ( Boolean.parseBoolean(args[2]) );
         }
-   
+
         File cdf = new File(componentDescriptorFolder);
-        
+
         if (!(cdf).exists()) {
             System.out.println("Cannot continue... " +
                                cdf.getAbsolutePath() + " does not exist.");
             System.exit(0);
         }
-        
+
         String classesToDo[] = new String[args.length];
         int ai = 0;
         classesToDo[ai++] = className;
         for(int i=4; i< args.length ; i++){
-        	classesToDo[ai++] = args[i];	
+        	classesToDo[ai++] = args[i];
         }
         for(int i=0; i<ai; i++){
 	        CreateComponentDescriptor ccd = new CreateComponentDescriptor();
@@ -167,23 +168,23 @@ public class CreateComponentDescriptor {
     public void processComponentDescriptor(){
         try {
             if(! isPrintOnly() ){
-            	
+
             	String theDerivedPathFileName = getAbsoluteOutputPathFileName(
             			getComponentDescriptorFile().getAbsolutePath(),
-            			getComponentClassName(), 
-            			isMakeSubs()		
+            			getComponentClassName(),
+            			isMakeSubs()
             	);
-            	
+
 				writeToFile(
-						getComponentDescriptorRdf(), 
-						theDerivedPathFileName, 
-						"UTF8"		
+						getComponentDescriptorRdf(),
+						theDerivedPathFileName,
+						"UTF8"
 				);
-				
+
             } else {
             	System.out.println(getComponentDescriptorRdf());
-            }	
-			
+            }
+
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (CorruptedDescriptionException e) {
@@ -203,8 +204,8 @@ public class CreateComponentDescriptor {
 	 */
 	public void setComponentDescriptorFile(File cdf) {
 		componentDescriptorFile = cdf;
-	}    
-    
+	}
+
 	/**
 	 * @return the componentClassName
 	 */
@@ -235,6 +236,10 @@ public class CreateComponentDescriptor {
 	public void setComponentDescriptorFolderName(
 			String cdf) {
 		componentDescriptorFolderName = cdf;
+	}
+
+	public static void setClassLoader(ClassLoader cl) {
+	    classLoader = cl;
 	}
 
 	/**
