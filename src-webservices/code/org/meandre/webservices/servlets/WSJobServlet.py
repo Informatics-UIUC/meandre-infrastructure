@@ -5,9 +5,9 @@
 __name__ = 'WSJobServlet'
 
 requestMap = {
-    'GET': { 
+    'GET': {
         'list_jobs_statuses': 'job_list_jobs_statuses',
-        'job_console': 'job_job_console'   
+        'job_console': 'job_job_console'
     }
 }
 
@@ -22,13 +22,13 @@ from org.meandre.core.security import Role
 #
 
 def job_list_jobs_statuses ( request, response, format ):
-    '''List the current job statuses in the Meandre Server.''' 
+    '''List the current job statuses in the Meandre Server.'''
     content = []
     remote_user = getMeandreUser(request)
     jiba = meandre_store.getJobInformation()
     for job in jiba.getJobStatuses():
         job_user_id = job.get('user_id')
-        print '<',job_user_id,'>'
+        #print '<',job_user_id,'>'
         if checkUserRole (request,Role.ADMIN) or job_user_id==remote_user :
             map = {}
             for key in job.keySet() :
@@ -36,9 +36,9 @@ def job_list_jobs_statuses ( request, response, format ):
             content.append(map)
     statusOK(response)
     sendTJXContent(response,content,format,remote_user)
-        
+
 def job_job_console ( request, response, format ):
-    '''List the current job statuses in the Meandre Server.''' 
+    '''List the current job statuses in the Meandre Server.'''
     if checkUserRole (request,Role.EXECUTION) :
         params = extractRequestParamaters(request)
         if 'uri' in params :
@@ -59,4 +59,4 @@ def job_job_console ( request, response, format ):
             errorExpectationFail(response)
     else:
         errorForbidden(response)
-        
+
