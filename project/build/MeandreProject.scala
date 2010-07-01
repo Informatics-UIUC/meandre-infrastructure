@@ -1,4 +1,5 @@
 import sbt._
+import Process._
 
 class MeandreProject(info: ProjectInfo) extends ParentProject(info)
 {
@@ -39,6 +40,14 @@ class MeandreProject(info: ProjectInfo) extends ParentProject(info)
 		lazy val scalatest = "org.scalatest" % "scalatest" % "1.0"
 		lazy val specs = "specs" % "specs" % "1.6.1" from "http://code.google.com/p/specs/downloads/detail?name=specs-1.6.1.jar"
 		lazy val scalacheck = "org.scala-tools.testing" % "scalacheck_2.7.7" % "1.6"
+
+    override lazy val mainClass = Some("meandre.apps.DefaultServerApp")
+    // The run task
+//    lazy val runServer = task {
+//      //log.info("Preparing to run the server...")
+//      List("sh","scala","scripts/server.scala")!;
+//      None
+//    } dependsOn(compile) describedAs("Runs one server")
 	}
 }
 
