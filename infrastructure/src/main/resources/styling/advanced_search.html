@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>MI - Advanced Search</title>
+    <link rel="stylesheet" type="text/css" href="style.css"> 
+</head>
+<body>
+
+<div class="header">
+
+    <ul class="pureCssMenu pureCssMenum">
+        <li class="pureCssMenui"><a class="pureCssMenui" href="../">Meandre</a></li>
+
+        <li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Help</span><![if gt IE 6]></a><![endif]>
+            <!--[if lte IE 6]>
+            <table>
+                <tr>
+                    <td><![endif]-->
+            <ul class="pureCssMenum">
+                <li class="pureCssMenui"><a class="pureCssMenui" href="http://seasr.org/meandre/documentation/">Documentation</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="http://dev-tools.seasr.org/confluence/display/MDR/Welcome">Development wiki</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="http://dev-tools.seasr.org/confluence/display/COOK/Quick+recipes+to+make+Meandre+Pies">Cookbook</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="http://dev-tools.seasr.org/jira/secure/Dashboard.jspa">Issue tracking</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="http://dev-tools.seasr.org/fisheye/browse/Meandre-Infrastructure">SVN browser</a></li>
+            </ul>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+
+
+    </ul>
+    <ul style="margin-left:6px; padding:0px;" class="pureCssMenu pureCssMenum">
+        <li class="pureCssMenui">
+          <form style="padding:0; margin:0;" name="sfc" method="get" action="../services/repository/search.html">
+            <input type="text" id="sc" name="q" value="Search..." onclick="document.sfc.sc.value=''"/>
+          </form>
+
+        <li>
+          <a style="margin-right:3px" href="advanced_search.html">Advanced search</a>
+        </li>
+        </li>
+      </ul>
+    
+</div>
+<br/>
+<div class="response">
+    <!-- Simple document -->
+    <h3 class="response">Search</h3>
+
+        <form action="../services/repository/search.html" method="GET">
+            <table class="document">
+                <tr><td class="dockey">Search:</td><td class="docvalue"><input type="text" name="q" size="80"/></td></tr>
+                <tr><td class="dockey">Offset:</td><td class="docvalue"><input type="text" name="offset" value="0" size="10"/></td></tr>
+                <tr><td class="dockey">Limit:</td><td class="docvalue"><input type="text" name="limit" value="100"size="10"/></td></tr>
+                <tr><td class="dockey">Sort by:</td><td class="docvalue"><input type="text" name="order" value="name"size="10"/> (options: name, date)</td></tr>
+                <tr><td colspan="2"><input type="submit" name="Search"/><input type="reset" name="Clear"></td></tr>
+            </table>
+        </form>
+    <br/>
+
+    <h3 class="response">Search components</h3>
+
+    <form action="../services/repository/search_components.html" method="GET">
+        <table class="document">
+            <tr><td class="dockey">Search:</td><td class="docvalue"><input type="text" name="q" size="80"/></td></tr>
+            <tr><td class="dockey">Offset:</td><td class="docvalue"><input type="text" name="offset" value="0" size="10"/></td></tr>
+            <tr><td class="dockey">Limit:</td><td class="docvalue"><input type="text" name="limit" value="100"size="10"/></td></tr>
+            <tr><td class="dockey">Sort by:</td><td class="docvalue"><input type="text" name="order" value="name"size="10"/> (options: name, date)</td></tr>
+            <tr><td colspan="2"><input type="submit" name="Search"/><input type="reset" name="Clear"></td></tr>
+        </table>
+    </form>
+    <br/>
+
+    <h3 class="response">Search flows</h3>
+
+
+    <form action="../services/repository/search_flows.html" method="GET">
+        <table class="document">
+            <tr><td class="dockey">Search:</td><td class="docvalue"><input type="text" name="q" size="80"/></td></tr>
+            <tr><td class="dockey">Offset:</td><td class="docvalue"><input type="text" name="offset" value="0" size="10"/></td></tr>
+            <tr><td class="dockey">Limit:</td><td class="docvalue"><input type="text" name="limit" value="100"size="10"/></td></tr>
+            <tr><td class="dockey">Sort by:</td><td class="docvalue"><input type="text" name="order" value="name"size="10"/> (options: name, date)</td></tr>
+            <tr><td colspan="2"><input type="submit" name="Search"/><input type="reset" name="Clear"></td></tr>
+        </table>
+    </form>
+
+    <br/>
+
+</div>
+
+<div class="footer">
+    <p class="footer">&copy; DITA, NCSA, and UofI, 2007-2010.</p>
+    <p class="footer-date">Tue Feb 23 14:57:01 CST 2010</p>
+</div>
+
+</body>
+</html>

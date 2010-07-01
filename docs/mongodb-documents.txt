@@ -1,0 +1,121 @@
+Global log
+
+{
+	"_id" : ObjectId("4bd6f636fe0483e10d010f0d"),
+	"lvl" : "INFO",
+	"uuid" : "aca97e79-616f-3049-b45b-f07a1f80441c",
+	"ts" : "Tue Apr 27 2010 09:35:35 GMT-0500 (CDT)",
+	"msg" : "Server succesfully initialized"
+}
+
+Realm
+
+{
+	"_id" : "admin",
+	"roles" : [
+		"admin",
+		"user"
+	],
+	"profile" : {
+		"first name" : "Admin",
+		"last name" : "Istrator"
+	},
+	"password" : "d033e22ae348aeb566fc214aec3585c4da997"
+}
+
+Component/flow in user space from a location
+
+{
+	"_id" : "http://seasr.org/flows/clustering/",
+	"name" : "Clustering",
+	"ts" : "Wed Nov 25 2009 15:09:00 GMT-0600 (CST)",
+	"tags" : [
+		"dendrogram",
+		"hierarchical"
+	],
+	"creator" : "admin",
+	"rights" : "University of Illinois/NCSA Open Source License
+
+",
+	"desc" : "This flow loads a delimited data set into a table.
+'file:///myDir/myFile.csv', where the data file is '/myDir/myFile.csv'.",
+	"_bin" : BinData type: 2 len: 11413,
+	"_tokens" : [
+		"Clustering",
+		"'/myDir/myFile.csv'."
+	],
+	"_rdf" : BinData type: 2 len: 31183,
+	"_ttl" : BinData type: 2 len: 23392,
+	"_nt" : BinData type: 2 len: 45189,
+	"_type" : "flow",
+	"location" : {
+		"location" : "http://repository.seasr.org/Meandre/Locations/Latest/Flows/clustering/repository.nt",
+		"description" : "Blah"
+	}
+}
+
+Component/flow in the public repository (previous + owner and published entries)
+
+{
+	"_id" : "meandre://seasr.org/components/data-mining/searchbox",
+	"name" : "SearchBox",
+	"ts" : "Tue Jan 12 2010 22:31:25 GMT-0600 (CST)",
+	"tags" : [
+		"visualization",
+		"search"
+	],
+	"creator" : "Lily Dong",
+	"rights" : "UofINCSA",
+	"desc" : "Present a search box for user to input query.",
+	"_bin" : BinData type: 2 len: 1806,
+	"_tokens" : [
+		"SearchBox",
+		"query."
+	],
+	"_rdf" : BinData type: 2 len: 2447,
+	"_ttl" : BinData type: 2 len: 1665,
+	"_nt" : BinData type: 2 len: 3451,
+	"_type" : "component",
+	"_mode" : "compute",
+	"location" : {
+		"location" : "http://repository.seasr.org/Meandre/Locations/Latest/Components/repository.nt",
+		"description" : "SEASR"
+	},
+	"owner" : "admin",
+	"published" : "Tue Apr 27 2010 10:08:08 GMT-0500 (CDT)"
+}
+
+Job documents
+
+{
+	"_id" : "55bfb0999b5fa2ed7a3425bf3a45a05bfb9c5bff",
+	"meta" : {
+		"uri" : "meandre://test.org/some/silly/flow",
+		"params" : {
+
+		}
+	},
+	"owner" : "test_user_1000",
+	"progress" : [
+		{
+			"status" : "Queued",
+			"server" : "8db9e66f-80a5-4d07-ae0a-c53c3f635d53",
+			"ts" : "Thu May 06 2010 09:46:53 GMT-0500 (CDT)"
+		},
+		{
+			"status" : "Preparing",
+			"server" : "8db9e66f-80a5-4d07-ae0a-c53c3f635d53",
+			"ts" : "Thu May 06 2010 09:46:53 GMT-0500 (CDT)"
+		},
+		{
+			"status" : "Running",
+			"server" : "8db9e66f-80a5-4d07-ae0a-c53c3f635d53",
+			"ts" : "Thu May 06 2010 09:46:53 GMT-0500 (CDT)"
+		}
+	],
+	"repo" : BinData type: 2 len: 35,
+	"status" : "Running",
+	"ts" : "Thu May 06 2010 09:46:53 GMT-0500 (CDT)",
+	"wrapper" : "Snowfield"
+}
+

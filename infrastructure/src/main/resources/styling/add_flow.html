@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>MI - Add Component</title>
+    <link rel="stylesheet" type="text/css" href="style.css"> 
+</head>
+<body>
+
+<div class="header">
+
+    <ul class="pureCssMenu pureCssMenum">
+        <li class="pureCssMenui"><a class="pureCssMenui" href="../">Meandre</a></li>
+
+        <li class="pureCssMenui"><a class="pureCssMenui" href="add_component.html#"><span>Help</span><![if gt IE 6]></a><![endif]>
+            <!--[if lte IE 6]>
+            <table>
+                <tr>
+                    <td><![endif]-->
+            <ul class="pureCssMenum">
+                <li class="pureCssMenui"><a class="pureCssMenui" href="http://seasr.org/meandre/documentation/">Documentation</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="http://dev-tools.seasr.org/confluence/display/MDR/Welcome">Development wiki</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="http://dev-tools.seasr.org/confluence/display/COOK/Quick+recipes+to+make+Meandre+Pies">Cookbook</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="http://dev-tools.seasr.org/jira/secure/Dashboard.jspa">Issue tracking</a></li>
+                <li class="pureCssMenui"><a class="pureCssMenui" href="http://dev-tools.seasr.org/fisheye/browse/Meandre-Infrastructure">SVN browser</a></li>
+            </ul>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+
+
+    </ul>
+    <ul style="margin-left:6px; padding:0px;" class="pureCssMenu pureCssMenum">
+        <li class="pureCssMenui">
+          <form style="padding:0; margin:0;" name="sfc" method="get" action="../services/repository/search.html">
+            <input type="text" id="sc" name="q" value="Search..." onclick="document.sfc.sc.value=''"/>
+          </form>
+
+        <li>
+          <a style="margin-right:3px" href="advanced_search.html">Advanced search</a>
+        </li>
+        </li>
+      </ul>
+</div>
+<br/>
+<div class="response">
+    <!-- Simple document -->
+    <h3 class="response">Add a component to the user repository</h3>
+
+   
+
+    <form action="../services/repository/add.html" enctype="multipart/form-data" method="POST">
+        <table class="document">
+            <tr>
+                <td>
+                    <h3>Descriptor:</h3>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="file" name="repository"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="file" name="repository"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="file" name="repository"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Embedded? </label><input type="checkbox" name="embed" value="true"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Overwrite? </label><input type="checkbox" name="overwrite" value="true"/>
+                </td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="submit" class="submit" value="Upload"/>
+                    <input type="reset" class="reset" value="Clear data"/>
+                </td>
+            </tr>         </table>
+    </form>
+
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+
+
+</div>
+
+<div class="footer">
+    <p class="footer">&copy; DITA, NCSA, and UofI, 2007-2010.</p>
+    <p class="footer-date">Tue Feb 23 14:57:01 CST 2010</p>
+</div>
+
+</body>
+</html>

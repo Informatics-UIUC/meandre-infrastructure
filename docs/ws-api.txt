@@ -1,0 +1,70 @@
+h1. Backwards compatibility notes
+* All responses have been unified on their treatment, that means possible incompatibility issues with previous client versions.
+* Also, adhoc *txt* formats have been removed from 1.5 calls
+* The paths for the requests (as well as methods) remain unchanged
+
+h1. Location requests
+
+h2. add
+
+| *Description* | Adds a new location to the Meandre list of current locations used to assemble the repository. Does require authentication.If the location can be added correctly, the call returns the new location information. If the call fails to add a location, it returns a bad request error code. If the location already exists, the call updates the description and returns the new location information |
+| *URL* | {{http://<meandre_host>:<meandre_port>/services/locations/add.<format>}} |
+| *Method* | GET |
+| *Since* | 1.1 vcli (Carquinyoli) |
+| *Role required* | _user_ |
+| *Formats* | json, xml, html |
+| *Parameters* | _location_ (*Required*. The new location URL to add. Location needs to be in a supported RDF dialect) \\  _description_ (*Required*. The URL description) |
+
+{code:title=JSON response example}[
+ {
+  "location" : "http://localhost:1714/public/services/demo_repository.ttl",
+  "description" : "Demo repository"
+ }
+]
+{code}
+{code:title=TXT response example}location = http://localhost:1714/public/services/demo_repository.ttl
+description = Demo repository
+{code}
+{code:xml|title=XML response example}<meandre_response>
+ <meandre_item>
+   <location>http://localhost:1714/public/services/demo_repository.ttl</location>
+   <description>Demo repository</description>
+ </meandre_item>
+</meandre_response>
+{code}
+
+
+h1. Public requests
+
+h2. ping
+
+| *Description* | Given a ping request, returns a response with a *pong* message. |
+| *URL* | {{http://<meandre_host>:<meandre_port>/public/services/ping.<format>}} |
+| *Method* | GET |
+| *Since* | 1.4 vcli (Sara). |
+| *Role required* | {{none}} |
+| *Formats* | json, xml, html |
+| *Parameters* | {{none}} |
+
+{code:title=JSON response example}
+{
+  "status" : "OK" ,
+  "success" : { "message" : "pong"}
+}
+{code}
+{code:title=TXT response example}message = pong
+{code}
+{code:xml|title=XML response example}
+<meandre_response>
+    <meandre_item>
+        <status>OK</status>
+        <success>
+             <meandre_item>
+                 <message>pong</message>
+             </meandre_item>
+        </success>
+    </meandre_item>
+</meandre_response>
+{code}
+
+
