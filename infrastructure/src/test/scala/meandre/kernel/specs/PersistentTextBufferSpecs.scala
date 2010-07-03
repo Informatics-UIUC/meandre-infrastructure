@@ -22,13 +22,14 @@ object PersistentTextBufferSpecs extends Specification("The persisten text buffe
 
     "Store, retrieve, and destroy temporary text" in {
       val ptb = PersistentTextBuffer(cnf,"ptb")
-      (0 to 9).foreach(i=>ptb.append("Line %d" format i))
-      ptb.approximateNumberOfAppends mustBe equalTo(10)
+      (0 to 9).foreach(i=> {ptb.append("Line %d" format i);Thread.sleep(200)} )
+      ptb.approximateNumberOfAppends must beLessThanOrEqualTo(10)
+      ptb.approximateNumberOfAppends must beGreaterThan(0)
       (0 to 9).toList.zip(ptb.toString.split("\n").toList).foreach(
-        (l) => l._2 mustBe equalTo("Line %d" format l._1)
+        (l) => l._2 must beEqualTo("Line %d" format l._1)
       )
       ptb.destroy
-      ptb.approximateNumberOfAppends mustBe equalTo(0)
+      ptb.approximateNumberOfAppends must beEqualTo(0)
     }
   }
 
@@ -37,12 +38,13 @@ object PersistentTextBufferSpecs extends Specification("The persisten text buffe
     val bais = new ByteArrayInputStream("Line 1\nLine 2\nLine 3\n".getBytes)
     val ptb = PersistentTextBuffer(cnf,"ptb")
     ptb append bais
-    ptb.approximateNumberOfAppends mustBe equalTo(3)
+    ptb.approximateNumberOfAppends must beLessThanOrEqualTo(3)
+    ptb.approximateNumberOfAppends must beGreaterThan(0)
     (1 to 3).toList.zip(ptb.toString.split("\n").toList).foreach(
-      (l) => l._2 mustBe equalTo("Line %d" format l._1)
+      (l) => l._2 must beEqualTo("Line %d" format l._1)
     )
     ptb.destroy
-    ptb.approximateNumberOfAppends mustBe equalTo(0)
+    ptb.approximateNumberOfAppends must beEqualTo(0)
   }
 
 }

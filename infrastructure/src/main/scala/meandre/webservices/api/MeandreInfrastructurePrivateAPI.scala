@@ -1342,8 +1342,8 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
         val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else 250
         if (params.contains("order")) {
           sortCnd = params("order") match {
-            case "ts" => """{"ts":1}"""
-            case _ => """{"ts":-1}"""
+            case "ts" => """{"ts":-1}"""
+            case _ => """{"ts":1}"""
           }
         }
         var cndURIs = if ( params.contains("jobID")) {

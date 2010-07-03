@@ -15,6 +15,9 @@ import java.io.File
 object DefaultServerApp {
   def main(args: Array[String]) = {
 
+    //
+    // TODO This needs to be fix to make it Windows friendly and do a better job with the scala home
+    //
     val TEST_SERVER_PORT = 1714
     val cnf = Configuration()
     cnf.EXECUTION_SCALA = "/usr/local/bin/scala"

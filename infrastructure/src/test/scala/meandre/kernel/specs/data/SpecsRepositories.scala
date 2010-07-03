@@ -327,6 +327,6 @@ object SpecsRepositories  {
   val testRepositoryModel = ModelFactory.createDefaultModel
   testRepositoryModel.read(new StringReader(testRepositoryInTTL),null,"TTL")
 
-  val testRemoteLocation = "http://repository.seasr.org/Meandre/Locations/Latest/Flows/hits-summarizer/repository.ttl"
+  val testRemoteLocation = "http://repository.seasr.org/Meandre/Locations/1.4.7/Flows/hits-summarizer/repository.rdf"
 
 }

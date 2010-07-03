@@ -16,7 +16,7 @@ import meandre.kernel.Configuration
  *
  */
 
-class MeandreInfrastructurePublicAPISpecs extends Specification("The Meandre Infrastructure specification") {
+object MeandreInfrastructurePublicAPISpecs extends Specification("The Meandre Infrastructure specification") {
   val TEST_SERVER_PORT = 6969
   val api = new MeandreInfrastructurePublicAPI(Configuration())
   val client = MeandreInfrastructureAPIClient("http", "localhost", TEST_SERVER_PORT)
@@ -43,9 +43,9 @@ class MeandreInfrastructurePublicAPISpecs extends Specification("The Meandre Inf
 
     "return pong" in {
        client.ping match {
-         case Right((200,pong)) => val json:BasicDBObject = pong
-                                   pong.getString("status")  must beEqualTo("OK")
-                                   pong.getString("message") must beEqualTo("pong")
+         case Right((200,pong)) => pong.getString("status")  must beEqualTo("OK")
+                                   val resp = pong.get("success").asInstanceOf[BasicDBObject]
+                                   resp.getString("message") must beEqualTo("pong")
          
          case Left(t) => fail(t.toString)
          case unknown => fail(unknown.toString)
