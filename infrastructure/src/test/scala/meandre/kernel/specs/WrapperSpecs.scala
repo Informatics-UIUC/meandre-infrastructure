@@ -18,12 +18,9 @@ object WrapperSpecs extends Specification("The context pool specification") {
 
     "be able to run arbitrary commands" in {
       val os = System.getProperty("os.name").toLowerCase
-      val cmd = if (os contains "windows" ) {
-        List("dir")
-      }
-      else {
-        List("ls")
-      }
+      //println("----------"+os)
+      val cmd = if (os.indexOf("windows")<0 ) List("ls") else List("dir")
+      //println(cmd)
       val (p,con,err) = new ArbitraryCodeExecutionWrapper(cmd).fireWrapper("".getBytes)
       con.available must beGreaterThan(0)
       //println(con.available)

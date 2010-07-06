@@ -45,7 +45,7 @@ object StoreSpecs extends Specification("The store specification") {
       resSecondAdd foreach ( s => checkAllDefined(s) must beFalse )
       store.size must beEqualTo(cnt+1)
       store.addElements(BundledElement(component,resName,mimeType,isCnt))
-      store.size must beEqualTo(cnt+2)
+      store.size must beGreaterThan(cnt)
       store.removeAll
       store.size must beEqualTo(0)
     }
