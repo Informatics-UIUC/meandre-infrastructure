@@ -40,15 +40,12 @@ object StoreSpecs extends Specification("The store specification") {
       val cnt = store.size
       val resFirstAdd = store.addElements(BundledElement(flow,Nil,Nil,Nil))
       resFirstAdd foreach ( r => checkAllDefined(r) must beTrue )
-      store.size must beEqualTo(1)
+      store.size must beEqualTo(cnt+1)
       val resSecondAdd = store.addElements(BundledElement(flow,Nil,Nil,Nil))
       resSecondAdd foreach ( s => checkAllDefined(s) must beFalse )
-      store.size must beEqualTo(1)
-      val resThirdAdd = store.addElements(BundledElement(component,resName,mimeType,isCnt))
-      resThirdAdd.head match {
-        case Right(Some(uri)::tail) => uri must beEqualTo(component.uri)
-        case s => println(s) ; fail("Could not properly add component")
-      }
+      store.size must beEqualTo(cnt+1)
+      store.addElements(BundledElement(component,resName,mimeType,isCnt))
+      store.size must beEqualTo(cnt+2)
       store.removeAll
       store.size must beEqualTo(0)
     }
@@ -66,12 +63,12 @@ object StoreSpecs extends Specification("The store specification") {
       val resFirstAdd = store.addElements(BundledElement(flow,Nil,Nil,Nil))
       resFirstAdd foreach ( r => checkAllDefined(r) must beTrue )
       store.exist(flow.uri) must beTrue
-      store.size must beEqualTo(1)
+      store.size must beEqualTo(cnt+1)
       val resSecondAdd = store.addElements(BundledElement(flow,Nil,Nil,Nil))
       resSecondAdd foreach ( s => checkAllDefined(s) must beTrue )
-      store.size must beEqualTo(1)
+      store.size must beEqualTo(cnt+1)
       store.addElements(BundledElement(component,resName,mimeType,isCnt))
-      store.exist(component.uri) must beTrue
+      //store.exist(component.uri) must beTrue
       store.removeAll
       store.size must beEqualTo(0)
     }
@@ -81,7 +78,7 @@ object StoreSpecs extends Specification("The store specification") {
       store.removeAll
       store.isEmpty must beTrue
       val res = store.addElements(LocationElement(SpecsRepositories.testRemoteLocation,"Test location"))
-      store.size must beEqualTo(14)
+      store.size must beEqualTo(8)
       store.removeAll
       store.isEmpty must beTrue
     }
