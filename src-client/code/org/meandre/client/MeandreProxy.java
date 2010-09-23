@@ -198,7 +198,7 @@ public class MeandreProxy extends MeandreClient {
 	public QueryableRepository getPublicRepository () {
 		// The public repository
         try{
-            QueryableRepository qr = this.client.retrieveRepository();
+            QueryableRepository qr = this.client.retrievePublicRepository();
             bWasCallOK = true;
             return qr;
         }catch(TransmissionException e){
@@ -447,6 +447,7 @@ public class MeandreProxy extends MeandreClient {
      * @param mod The model to run
      * @return The output
      */
+    @Override
     public String runRepository (Model mod) {
     	try {
 			return client.runRepository(mod);
@@ -492,10 +493,12 @@ public class MeandreProxy extends MeandreClient {
      * sets the logger for warning and error messages. some log messages will
      * still go to standard out.
      */
+    @Override
     public void setLogger(Logger newLogger){
         log = newLogger;
     }
 
+    @Override
     public Logger getLogger(){
         return log;
     }
@@ -573,7 +576,8 @@ public class MeandreProxy extends MeandreClient {
 	 * @return The server version
 	 * @throws TransmissionException Could not get the server version
 	 */
-	public String getComponentJarInfo(String jarFile) {
+	@Override
+    public String getComponentJarInfo(String jarFile) {
 		String jarInfo=null;
 		try {
 			jarInfo=this.client.getComponentJarInfo(jarFile);
@@ -587,7 +591,8 @@ public class MeandreProxy extends MeandreClient {
 	 *
 	 *	@return True if it successfully pinged the server
 	 */
-	public boolean ping() {
+	@Override
+    public boolean ping() {
 		try {
 			return this.client.ping();
 		} catch (TransmissionException e) {
@@ -601,7 +606,8 @@ public class MeandreProxy extends MeandreClient {
 	 * @return The server version
 	 * @throws TransmissionException Could not get the server version
 	 */
-	public String getServerVersion() {
+	@Override
+    public String getServerVersion() {
 		String versionString = null;
 		int status= 500;
 		try {

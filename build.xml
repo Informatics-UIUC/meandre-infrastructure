@@ -502,6 +502,17 @@
         	<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
 		</jar>
 
+        <!-- Creating the standalone executor jar distribution -->
+        <jar destfile="${dist.dir}/executor-${build.version}.jar" >
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+                <attribute name="Build-Date" value="${TIMESTAMP}"/>
+                <attribute name="Main-Class" value="org.meandre.core.engine.execution.SaraExecutor"/>
+            </manifest>
+            <fileset dir="${build.dir}"/>
+            <zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
+        </jar>
+            	
 		<!-- Creating the Meandre interpreter console jar distribution -->
 		<jar destfile="${dist.dir}/zz-${build.version}.jar" >
 			<manifest>

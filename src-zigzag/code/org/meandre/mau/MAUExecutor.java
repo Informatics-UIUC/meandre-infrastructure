@@ -72,7 +72,7 @@ public class MAUExecutor {
 	protected StatisticsProbeImpl spi;
 
 	/** The filename to execute */
-	private String sFileName;
+	private final String sFileName;
 
 	/** The parent class loader */
 	private ClassLoader parentClassloader;
@@ -97,6 +97,7 @@ public class MAUExecutor {
 		}
 		else  {
 			MAUExecutor mau = new MAUExecutor(sArgs[0]);
+			mau.setParentClassloader(MAUExecutor.class.getClassLoader());
 			if ( sArgs.length==2 )
 				mau.setWebUIPortNumber(Integer.parseInt(sArgs[1]));
 			mau.run();
@@ -325,7 +326,7 @@ public class MAUExecutor {
 
 	 }
 
-	private HashSet<String> setProcessedJars = new HashSet<String>();
+	private final HashSet<String> setProcessedJars = new HashSet<String>();
 
 	/** Process the model contained on the MAU file and rearrenge the contexts URIs.
 	 *

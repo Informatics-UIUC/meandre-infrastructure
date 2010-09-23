@@ -565,7 +565,7 @@ public class Conductor {
         if (!sPublishedResourcesDir.endsWith("/")) sPublishedResourcesDir += "/";
 
 		URL [] ua = new URL[setURLContext.size()];
-		for ( String sURL:setURLContext )
+		for ( String sURL:setURLContext ) {
 			try {
 				if (sURL.endsWith("/") )
 					ua[iCnt++] = new URL(sURL);
@@ -579,21 +579,17 @@ public class Conductor {
 			} catch (Exception e) {
 				throw new CorruptedDescriptionException("Context URL "+sURL+" is not a valid URL");
 			}
+		}
 
-			// Initializing the java class loader
-			URLClassLoader urlCL=null;
-//			if(this.getParentClassloader()==null){
-//				urlCL=  URLClassLoader.newInstance(ua);
-//			}else{
-//				urlCL = URLClassLoader.newInstance(ua, this.getParentClassloader());
-//			}
-			urlCL = URLClassLoader.newInstance(ua, getClass().getClassLoader());
+		// Initializing the java class loader
+		URLClassLoader urlCL = (getParentClassloader() == null) ?
+		        URLClassLoader.newInstance(ua) : URLClassLoader.newInstance(ua, getParentClassloader());
 
 		for ( String sClassName:setURLLocations ) {
 			try {
 				if ( htMapResourceToRunnable.get(htMapNameToResource.get(sClassName)).equals("java") ) {
 					log.fine("Loading java component "+sClassName);
-					Class clazz = Class.forName(sClassName, true, urlCL);
+					Class<?> clazz = Class.forName(sClassName, true, urlCL);
 					htMapNameToClass.put(sClassName,clazz);
 				}
 			}
