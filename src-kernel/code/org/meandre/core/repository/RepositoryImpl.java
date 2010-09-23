@@ -208,7 +208,7 @@ public class RepositoryImpl implements QueryableRepository {
 		//larqBuilder.indexStatements(model.listStatements());
 
 		// Finish indexing
-		larqBuilder.closeForWriting();
+		larqBuilder.closeWriter();
 
 		// -- Create the access index
 		this.index = larqBuilder.getIndex() ;

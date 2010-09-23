@@ -105,7 +105,7 @@ public class SecurityStore implements SecurityManager {
 	private IndexLARQ _index = null;
 
 	/** The parent store */
-	private Store _store;
+	private final Store _store;
 
     /** Create a security store for accounting and authentication.
      *
@@ -459,7 +459,7 @@ public class SecurityStore implements SecurityManager {
     	   // Create an index based on existing statements
     	   _larqBuilder.indexStatements(_model.listStatements());
     	   // Finish indexing
-    	   _larqBuilder.closeForWriting();
+    	   _larqBuilder.closeWriter();
     	   // Create the access index  
     	   _index = _larqBuilder.getIndex() ;
     	   // Make globally available
