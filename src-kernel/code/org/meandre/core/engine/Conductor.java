@@ -573,7 +573,7 @@ public class Conductor {
 				    URI ctxUri = new URI(sURL);
 				    if (ctxUri.getScheme().equals("context"))
 				        sURL = sPublishedResourcesDir + "contexts" + ctxUri.getPath();
-					ua[iCnt++] = new URL("jar:"+sURL+"!/");
+					ua[iCnt++] = new URL(sURL);
 				}
 
 			} catch (Exception e) {
@@ -593,17 +593,21 @@ public class Conductor {
 					htMapNameToClass.put(sClassName,clazz);
 				}
 			}
+			catch (NoClassDefFoundError e) {
+			    log.severe("Class " + e.getMessage() + " could not be found");
+                throw e;
+			}
 			catch (java.lang.LinkageError e){
 				log.warning("Class "+sClassName+" appearing multiple times. Discarding the copies.");
-				log.warning("Having multiple copies of class"+sClassName+" can cause erratic behavior if they do not align!");
+				log.warning("Having multiple copies of class "+sClassName+" can cause erratic behavior if they do not align!");
 			}
 			catch (ClassNotFoundException e) {
 				log.severe("Class "+sClassName+" could not be loaded");
 				throw new CorruptedDescriptionException(e);
 			}
 		}
+		
 		return urlCL;
-
 	}
 
 

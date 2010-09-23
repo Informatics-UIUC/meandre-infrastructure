@@ -104,6 +104,7 @@ public class SaraExecutor {
             log.println();
             log.println(cde);
             log.flush();
+            return;
         }
         catch (ConductorException ce) {
             log.println("----------------------------------------------------------------------------");
@@ -119,18 +120,19 @@ public class SaraExecutor {
         catch (NoClassDefFoundError te) {
             log.println("----------------------------------------------------------------------------");
             log.print("Missing class definition: ");
-            log.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
+            log.println(te.getMessage());
             log.println("----------------------------------------------------------------------------");
             log.println();
-            log.println("Reason for aborting the execution:");
+            log.println("Exception details:");
             log.println();
             log.println(te);
             log.flush();
+            return;
         }
         catch (Throwable t) {
-            executor.requestAbort();
+            if (executor != null) executor.requestAbort();
             log.println("----------------------------------------------------------------------------");
-            log.print("Unknow execption at: ");
+            log.print("Unknown exception at: ");
             log.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
             log.println("----------------------------------------------------------------------------");
             log.println();

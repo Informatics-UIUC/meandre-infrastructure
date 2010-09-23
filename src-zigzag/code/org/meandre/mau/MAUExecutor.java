@@ -248,48 +248,50 @@ public class MAUExecutor {
 			ps.flush();
 
 		}
-		catch ( CorruptedDescriptionException cde ) {
-			ps.println("Preparation could not be completed correctly!\n");
-			ps.println("----------------------------------------------------------------------------");
-			ps.println();
-			ps.println("Reason for aborting the preparation:");
-			ps.println();
-			ps.println(cde);
-			ps.flush();
-		}
-		catch ( ConductorException ce ) {
-			ps.println("----------------------------------------------------------------------------");
-			ps.print("Execution aborted at: ");
-			ps.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
-			ps.println("----------------------------------------------------------------------------");
-			ps.println();
-			ps.println("Reason for aborting the execution:");
-			ps.println();
-			ps.println(ce);
-			ps.flush();
-		}
-		catch ( NoClassDefFoundError te ) {
-			ps.println("----------------------------------------------------------------------------");
-			ps.print("Missing class definition: ");
-			ps.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
-			ps.println("----------------------------------------------------------------------------");
-			ps.println();
-			ps.println("Reason for aborting the execution:");
-			ps.println();
-			ps.println(te);
-			ps.flush();
-		}
-		catch ( Throwable t ) {
-			exec.requestAbort();
-			ps.println("----------------------------------------------------------------------------");
-			ps.print("Unknow execption at: ");
-			ps.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
-			ps.println("----------------------------------------------------------------------------");
-			ps.println();
-			t.printStackTrace(ps);
-			ps.println();
-			ps.flush();
-		}
+		catch (CorruptedDescriptionException cde) {
+            ps.println("Preparation could not be completed correctly!\n");
+            ps.println("----------------------------------------------------------------------------");
+            ps.println();
+            ps.println("Reason for aborting the preparation:");
+            ps.println();
+            ps.println(cde);
+            ps.flush();
+            return;
+        }
+        catch (ConductorException ce) {
+            ps.println("----------------------------------------------------------------------------");
+            ps.print("Execution aborted at: ");
+            ps.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
+            ps.println("----------------------------------------------------------------------------");
+            ps.println();
+            ps.println("Reason for aborting the execution:");
+            ps.println();
+            ps.println(ce);
+            ps.flush();
+        }
+        catch (NoClassDefFoundError te) {
+            ps.println("----------------------------------------------------------------------------");
+            ps.print("Missing class definition: ");
+            ps.println(te.getMessage());
+            ps.println("----------------------------------------------------------------------------");
+            ps.println();
+            ps.println("Exception details:");
+            ps.println();
+            ps.println(te);
+            ps.flush();
+            return;
+        }
+        catch (Throwable t) {
+            if (exec != null) exec.requestAbort();
+            ps.println("----------------------------------------------------------------------------");
+            ps.print("Unknown exception at: ");
+            ps.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
+            ps.println("----------------------------------------------------------------------------");
+            ps.println();
+            t.printStackTrace(ps);
+            ps.println();
+            ps.flush();
+        }
 
 		printStatistics();
 
