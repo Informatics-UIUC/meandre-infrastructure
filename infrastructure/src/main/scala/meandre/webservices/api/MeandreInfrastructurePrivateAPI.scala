@@ -30,7 +30,7 @@ import meandre.kernel.execution.{ExecutionWrapper, JobQueue}
 
 class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Logger) extends MeandreInfrastructureAbstractAPI(cnf) {
 
- 
+
   // ---------------------------------------------------------------------------
 
   get("""/services/locations/add\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
@@ -163,7 +163,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
         val st = Store(cnf, user, false)
         var cnd = "{}"
         val skip = if (params.contains("offset")) safeParseInt(params("offset")) else 0
-        val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else Math.MAX_INT            
+        val limit = if (params.contains("limit")) safeParseInt(params("limit"))  else Math.MAX_INT
         if (params.contains("order")) {
           cnd = params("order") match {
             case "name" => """{"%s":-1}""".format(K_NAME)
@@ -655,7 +655,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
   }
 
   // ---------------------------------------------------------------------------
-  
+
   /** The mongo db connection object */
   protected val mongoDbRealm = MongoDBRealm(cnf)
 
@@ -672,7 +672,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
         OKResponse(res, user)
     }
   }
-  
+
   // ---------------------------------------------------------------------------
 
   get("""/services/security/user\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
@@ -694,7 +694,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
         OKResponse(res, user)
     }
   }
-  
+
   // ---------------------------------------------------------------------------
 
   get("""/services/security/users\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
@@ -1239,7 +1239,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
                         params("wrapper")
                       else
                         ExecutionWrapper.defaultExecutionWrapper
-        
+
         params.contains("uri") match {
           case false =>
             FailResponse("Missing parammeter uri", new BasicDBObject, user)
@@ -1259,7 +1259,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
                       case Nil =>
                         // All components were found
                         val baos = new ByteArrayOutputStream
-                        rdfs.foreach( uba => { baos write uba._2.get ; baos write "\n".getBytes } )
+                        rdfs.foreach( uba => { baos write uriRewrite(new String(uba._2.get)).getBytes ; baos write "\n".getBytes } )
                         // Submit a job
                         val queue = new JobQueue(cnf)
                         val jobs = (1 to replicas).toList.map( i => queue.push(
