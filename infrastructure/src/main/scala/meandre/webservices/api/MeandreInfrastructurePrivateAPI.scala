@@ -1259,6 +1259,8 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
                       case Nil =>
                         // All components were found
                         val baos = new ByteArrayOutputStream
+                        // Write the flow and components RDF
+                        baos write st.getRDFForURI(flow.uri,"nt").get
                         rdfs.foreach( uba => { baos write uriRewrite(new String(uba._2.get)).getBytes ; baos write "\n".getBytes } )
                         // Submit a job
                         val queue = new JobQueue(cnf)
