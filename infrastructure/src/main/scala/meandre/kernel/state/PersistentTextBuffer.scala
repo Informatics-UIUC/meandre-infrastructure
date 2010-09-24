@@ -12,7 +12,7 @@ import com.mongodb.{BasicDBList, BasicDBObject, Mongo}
  *
  * @author Xavier Llora
  * @date May 11, 2010 at 12:06:25 PM
- * 
+ *
  */
 
 class PersistentTextBuffer(cnf:Configuration,id:String) {
@@ -26,7 +26,7 @@ class PersistentTextBuffer(cnf:Configuration,id:String) {
 
   val sortCnd:BasicDBObject = """{"%s":1}""" format KEY
 
-  collection ensureIndex sortCnd 
+  collection ensureIndex sortCnd
 
 
 
@@ -37,7 +37,7 @@ class PersistentTextBuffer(cnf:Configuration,id:String) {
    */
   def append(text:String):PersistentTextBuffer = {
     val obj:BasicDBObject="""{"%s":%d}""" format (KEY,System.currentTimeMillis)
-    val upd:BasicDBObject = """{ "$push" : { "%s" : "%s" } }""" format (TEXT,text.replace("\"","\\\"  "))
+    val upd:BasicDBObject = """{ "$push" : { "%s" : "%s" } }""" format (TEXT,text.replace("\"","\\\""))
     collection.update(obj,upd,true,false)
     this
   }
