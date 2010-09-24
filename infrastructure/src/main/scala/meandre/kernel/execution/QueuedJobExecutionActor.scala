@@ -60,7 +60,7 @@ class KillerJobActor() extends Actor {
  *
  * @author Xavier Llora
  * @date May 10, 2010 at 9:36:17 AM
- * 
+ *
  */
 class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
 
@@ -88,7 +88,7 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
         case CheckQueue() =>
           log.info("CheckQueue message received")
           //
-          // Try to grab a job if available (basic ongoing thoughts) 
+          // Try to grab a job if available (basic ongoing thoughts)
           //  - Run if able to grab
           //  - If fail and queued jobs send notification to self
           //  - If fail and no queued jobs, do nothing
@@ -109,7 +109,7 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
                     case None => // Failed to retrieve the repository
                       queue.transitionJob(jobID, Running(), Failed(), uuid.toString)
                       log.warning("Job %s failed because it has no associated repository" format jobID)
-                      
+
                     case Some(repo) => // Ready to fire execution
 
                       try {
@@ -178,7 +178,7 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
               }
               if (queue.sizeQueued>0) this ! CheckQueue()
           }
-        
+
         case unknown =>
           log.warning("Unknow message %s passed to the %s" format (unknown.toString,this.getClass.getName))
       }
@@ -206,5 +206,5 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
 object QueuedJobExecutionActor {
 
   def apply(cnf:Configuration,uuid:UUID) = new QueuedJobExecutionActor(cnf,uuid)
-  
+
 }

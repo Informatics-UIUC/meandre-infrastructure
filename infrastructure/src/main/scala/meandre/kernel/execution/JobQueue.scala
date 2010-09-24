@@ -27,7 +27,7 @@ case class Aborted()   extends JobStatus() { override def toString = "Aborted" }
 case class Killed()    extends JobStatus() { override def toString = "Killed" }
 
 /**
- * Provides the basic facilities to manage a unified job queue for 
+ * Provides the basic facilities to manage a unified job queue for
  * a Meandre cluster.
  *
  * @author Xavier Llora
@@ -298,7 +298,7 @@ class JobQueue(val cnf: Configuration) {
     set.put("ts",ts)
     set.put("server",server)
     val push = update.get("$push").asInstanceOf[BasicDBObject].get("progress").asInstanceOf[BasicDBObject]
-    push.put("ts",ts)            
+    push.put("ts",ts)
     //println(cmd)
     val res = db command cmd
     if ( res.containsField("errmsg") ) None
@@ -341,7 +341,7 @@ class JobQueue(val cnf: Configuration) {
     val fields:BasicDBObject = """{"repo":1}"""
     queue.findOne(jobID,fields) match {
       case null => None
-      case job  => Some(job.get("repo").asInstanceOf[Array[Byte]]) 
+      case job  => Some(job.get("repo").asInstanceOf[Array[Byte]])
     }
   }
 
