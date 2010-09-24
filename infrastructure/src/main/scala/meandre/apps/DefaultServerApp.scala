@@ -21,9 +21,9 @@ object DefaultServerApp {
     val TEST_SERVER_PORT = 1714
     val cnf = Configuration()
     cnf.EXECUTION_SCALA = "scala"
-    cnf.EXECUTION_SCRIPT = "scripts/execution_%s.scala"
-    cnf.EXECUTION_CLASSPATH = "infrastructure/target/scala_2.7.7/classes"
-    val server = MeandreServer(cnf, "/", "infrastructure/src/main/resources/styling", "docs")
+    cnf.EXECUTION_SCRIPT =  "scripts%1$sexecution_%%s.scala" format File.separator
+    cnf.EXECUTION_CLASSPATH = "infrastructure%1$starget%1$sscala_2.7.7%1sclasses" format File.separator
+    val server = MeandreServer(cnf, File.separator, "infrastructure%1$ssrc%1$smain%1$sresources%1$sstyling" format File.separator, "docs")
     server.go
 
   }
