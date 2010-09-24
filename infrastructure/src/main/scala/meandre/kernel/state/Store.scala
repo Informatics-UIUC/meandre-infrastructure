@@ -81,7 +81,7 @@ extends Repository(cnf,userName) {
     replicate (0, xs.length) {i => results(i) = f(xs(i))}
     results.toList
   }
-  
+
   //---------------------------------------------------------------------------
 
   /**Attempts to add all the provided elements to the userName repository.
@@ -106,30 +106,31 @@ extends Repository(cnf,userName) {
         }))
 
         // Process and filter uris
-        var originalURIs:List[Pair[String,String]] = Nil
+        //var originalURIs:List[Pair[String,String]] = Nil
         val processedURIs = uris map ( _ match {
           case s if s.startsWith("http") => Some(s)
           case s if s.startsWith("context://localhost") =>
             val ruri = rewriteContextURL(url,s)
-            originalURIs ::= ruri -> s
+            //originalURIs ::= ruri -> s
             Some(ruri)
           case _ => None
         })
         uris = processedURIs.filter(_.isDefined).map(_.get)
 
         // Pull and store the remote contexts
-        var lstCtxMap:List[Pair[String,String]] = Nil
+        var ctxUriMap:Map[String,String] = Map()
+        var uriCtxMap:Map[String,String] = Map()
         Set(uris:_*) foreach ( uri => {
           val fileName = uri.split("/").reverse.first
           // TODO Will need to check if MD5 exist to avoid pulling existing jars
           val (contentType,contentEncoding,is) = getInputStreamForURL(uri)
           contextsPool.update(fileName,contentType,is) match {
               case Left(t)  => throw t
-              case Right(s:Pair[String,String]) => lstCtxMap ::= s._2 -> uri
+              case Right(s:Pair[String,String]) => ctxUriMap += s._2 -> uri ; uriCtxMap += uri -> s._2
           }
         })
-        val cntxsMap = Map(lstCtxMap:_*)
-        val cntxsNoMD5Map = Map(cntxsMap.toList.map(
+
+        val cntxsNoMD5Map = Map(ctxUriMap.toList.map(
           kv => (kv._1.substring(0,30)+kv._1.substring(63,kv._1.length)) -> kv._1
         ):_*)
         // Add all the flows blindly
@@ -137,8 +138,8 @@ extends Repository(cnf,userName) {
         // Add all the components with proper context rewriting
         val rewrittenComps = comps map ( c => {
           val nc = c.context map ( _ match {
-            case URIContext(uri) if  cntxsNoMD5Map.contains(uri) =>  URIContext(cntxsNoMD5Map(uri))
-            case URIContext(uri) if !cntxsNoMD5Map.contains(uri) =>  URIContext(uri)
+            case URIContext(uri) if cntxsNoMD5Map.contains(uri) =>  URIContext(cntxsNoMD5Map(uri))
+            case URIContext(uri) if uriCtxMap.contains(uri) =>  URIContext(uriCtxMap(uri))
             case s => s
           })
           c.context = nc
@@ -155,7 +156,7 @@ extends Repository(cnf,userName) {
                              li.put(K_DESCRIPTION,description)
                              doc.put(K_LOCATION,li)
                              collection.update(wrapURI(uri),doc,false,false)
-          case None => 
+          case None =>
         })
 
         // Return the list of uris added
