@@ -10,7 +10,7 @@ package meandre.kernel
 class Configuration (val protocol:String, val server:String, val serverPort:Int, val host:String, val port:Int, val auth:Option[(String,String)]) {
 
   val MEANDRE_REALM_COLLECTION = "meandre.realm"
-  
+
   val MEANDRE_USER_COLLECTION_PREFIX = "meandre.user."
 
   val MEANDRE_PUBLIC_COLLECTION = "meandre.public"
@@ -20,7 +20,7 @@ class Configuration (val protocol:String, val server:String, val serverPort:Int,
   val MEANDRE_JOBS = "meandre.jobs"
 
   val MEANDRE_JOBS_CONSOLE = MEANDRE_JOBS+".console.fs"
-  
+
   val MEANDRE_JOBS_LOG = MEANDRE_JOBS+".log.fs"
 
   val MEANDRE_JOBS_QUEUE = MEANDRE_JOBS+".queue"
@@ -33,10 +33,15 @@ class Configuration (val protocol:String, val server:String, val serverPort:Int,
 
   var EXECUTION_SCALA = "scala"
 
+  var EXECUTION_JAVA = "java"
+  var EXECUTION_JAVA_ARGS = "-Xmx1024m"
+
+  var EXECUTOR_14X = "lib/executor-1.4.8.jar"
+
   var EXECUTION_SCRIPT = "execution_%s.scala"
 
   var EXECUTION_CLASSPATH = "."
-  
+
   protected var MDBN = "Meandre"
 
   def MEANDRE_DB_NAME = MDBN
