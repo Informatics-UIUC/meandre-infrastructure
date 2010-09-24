@@ -10,41 +10,41 @@ import java.net.URL
 import java.io.{InputStreamReader, StringReader}
 import com.mongodb.BasicDBObject
 
-/** The base class of the context hierarchy 
- * 
+/** The base class of the context hierarchy
+ *
  * @author Xavier Llora
  */
-abstract sealed class Context ()                                  
+abstract sealed class Context ()
 /** A representation of a context indicating a resource
- * 
+ *
  * @author Xavier Llora
  */
 case class URIContext ( uri: String ) extends Context
-/** A container for an embeded context 
- * 
+/** A container for an embeded context
+ *
  * @author Xavier Llora
  */
 case class EmbeddedContext ( payload: String ) extends Context
 
-/** Contains the basic property information 
- * 
+/** Contains the basic property information
+ *
  * @author Xavier Llora
  */
 case class Property ( val key: String, val value: String, val other: Map[String,String] )
-/** A property that also allows to include a the property description 
- * 
+/** A property that also allows to include a the property description
+ *
  * @author Xavier Llora
  */
-case class PropertyDescription ( 
-		override val key: String, 
-		override val value: String, 
+case class PropertyDescription (
+		override val key: String,
+		override val value: String,
 		val description:Option[String],
 		override val other: Map[String,String]
 ) extends Property(key,value,other)
 
-/** A component port definition. Instances of this class are used for describing 
+/** A component port definition. Instances of this class are used for describing
  *  both input and output ports for components.
- * 
+ *
  * @author Xavier Llora
  */
 case class Port (
@@ -53,9 +53,9 @@ case class Port (
 		description: Option[String]
 )
 
-/** A container for all the shared description for meandre components (executable and  
- *  floww components). 
- * 
+/** A container for all the shared description for meandre components (executable and
+ *  floww components).
+ *
  * @author Xavier Llora
  */
 case class CommonDescription (
@@ -67,24 +67,24 @@ case class CommonDescription (
 		tags: List[String]
 )
 
-/** The base class for the possible firing polices 
- * 
+/** The base class for the possible firing polices
+ *
  * @author Xavier Llora
  */
 abstract sealed class FiringPolicy()
-/** The firing policy that indicates that data on all ports should be present 
- * 
+/** The firing policy that indicates that data on all ports should be present
+ *
  * @author Xavier Llora
  */
 case class FiringAll() extends FiringPolicy
-/** The firing policy that indicates that data on at least one port should be present 
- * 
+/** The firing policy that indicates that data on at least one port should be present
+ *
  * @author Xavier Llora
  */
 case class FiringAny() extends FiringPolicy
 
-/** A simple representation of the connection between an input and an output port 
- * 
+/** A simple representation of the connection between an input and an output port
+ *
  * @author Xavier Llora
  */
 case class ConnectorDescription (
@@ -93,10 +93,10 @@ case class ConnectorDescription (
 		targetInstanceDataPort: String,
 		sourceInstance: String,
 		targetInstance: String
-) 
+)
 
-/** Instances of this class describe the instances that define a flow. 
- * 
+/** Instances of this class describe the instances that define a flow.
+ *
  * @author Xavier Llora
  */
 case class ComponentInstanceDescription (
@@ -122,19 +122,19 @@ case class ComputeMode() extends ModeDescription()
  */
 case class WebUIMode() extends ModeDescription()
 /** The base class for all the possible descriptors (including components and flows).
- *  This class contains the basic information that defines a descriptor, the uri, 
+ *  This class contains the basic information that defines a descriptor, the uri,
  *  the common description, and the properties.
- * 
+ *
  * @author Xavier Llora
  */
 abstract sealed case class Descriptor(
 		uri: String,
 		description: CommonDescription,
 		properties: Map[String,PropertyDescription]
-) 
+)
 
 /** The component descriptor contains all the related information for a component.
- * 
+ *
  * @author Xavier Llora
  */
 case class ComponentDescriptor (
@@ -152,7 +152,7 @@ case class ComponentDescriptor (
 )
 extends Descriptor(uri,description,properties)
 /** The component descriptor contains all the related information for a component.
- * 
+ *
  * @author Xavier Llora
  */
 case class FlowDescriptor (
@@ -166,7 +166,7 @@ extends Descriptor(uri,description,properties)
 
 /** This singlecton object acts as a simple factory to turn
  *  serialized RDF models into usable Scala objects.
- * 
+ *
  * @author Xavier Llora
  */
 object DescriptorsFactory  {
@@ -196,7 +196,7 @@ object DescriptorsFactory  {
 		} catch  {
 			case _ => try { model.read(new InputStreamReader(getInputStreamForURL(url)),null,"TURTLE") }
                   catch {
-                  		case s => try { model.read(new InputStreamReader(getInputStreamForURL(url)),null,"N-TRIPLE") } 
+                  		case s => try { model.read(new InputStreamReader(getInputStreamForURL(url)),null,"N-TRIPLE") }
                   				  finally { model }
                   }
                   finally { model }
@@ -227,7 +227,7 @@ object DescriptorsFactory  {
 
 
   /** Safely gets the given property for the passed resource in the given model.
-	 * 
+	 *
 	 * @param uri The resource to poke
      * @param prop The property to get
      * @param model The model to use
@@ -240,7 +240,7 @@ object DescriptorsFactory  {
 		  case s:Literal => Some(s.getString)
 		}
 	}
- 
+
 	/** Returns all the objects linked to a resource given a certain property in a model.
 	 *
 	 * @param uri The resource to poke
@@ -254,9 +254,9 @@ object DescriptorsFactory  {
 		while ( objs.hasNext ) res ::= objs.nextNode
 		res
 	}
- 
+
 	/** Returns all the staments that have the given subject.
-     * 
+     *
      * @param uri The uri of the targeted subject
      * @return The list of statement for the given subject
      */
@@ -266,11 +266,11 @@ object DescriptorsFactory  {
 		while ( objs.hasNext ) res ::= objs.nextStatement
 		res
 	}
- 
+
 	/** Converts a list of RDFNodes to strings, regardless if they are resources or literals
-	 * 
+	 *
 	 * @param lst The list of RDFNodes to convert
-	 * @return A list containing the stringfied version of the RDFNodes 
+	 * @return A list containing the stringfied version of the RDFNodes
 	 */
 	protected def rdfNodesToString ( lst: List[RDFNode] ) : List[String] = {
 		lst.map((s) =>  s match {
@@ -280,7 +280,7 @@ object DescriptorsFactory  {
 	}
 
 	/** Get a property value throwing an execption if not available.
-	 * 	
+	 *
 	 * @param uri The resource to poke
      * @param prop The property to get
      * @param model The model to use
@@ -289,15 +289,15 @@ object DescriptorsFactory  {
 	protected def mustGet ( uri: Resource, prop: JProperty, model: Model ) : String = {
 		safeGet(uri,prop,model) match {
 		  case None => throw new Exception("The property "+prop+" is required")
-		  case Some(s) => s 
+		  case Some(s) => s
 		}
 	}
- 
+
 	/** The main data formater */
 	protected val dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
- 
+
 	/** Converts a String into a Data object */
-	protected def stringToDate ( string:String ) : Date =  dateFormater.parse(string)	
+	protected def stringToDate ( string:String ) : Date =  dateFormater.parse(string)
 
 	/** Gets the common description for a given URI in a model.
 	 *
@@ -316,20 +316,20 @@ object DescriptorsFactory  {
 		)
 	}
 
-	
-	/** Gets the common description for a given URI in a model.
+
+	/** Gets the properties for a given URI in a model.
 	 *
 	 * @param uri The resource to poke
      * @param model The model to use
      * @return The properties for the given URI in the given model
 	 */
 	protected def getProperties ( uri:Resource, model:Model )  = {
-	  
-		def getPairs ( node:Resource ) = 
-		  for (stm<-getStatementWithSubject(node)  ) 
+
+		def getPairs ( node:Resource ) =
+		  for (stm<-getStatementWithSubject(node)  )
 			  yield if (stm.getObject.isLiteral) stm.getPredicate.toString ->  stm.getLiteral.getString
                     else stm.getPredicate.toString -> stm.getObject.toString
-	  
+
         val lm = for { node <- getMultivalueProperty ( uri, MeandreRepositoryVocabulary.property_set, model ) if node.isResource }
 	  	  		  yield node match {
 	  	  		    	case node:Resource => Map(getPairs(node):_*)
@@ -339,9 +339,9 @@ object DescriptorsFactory  {
     		  		 m.get(MeandreRepositoryVocabulary.value.toString).getOrElse("unknow"),
     		  		 m.get(DC_11.description.toString),
     		  		 m - MeandreRepositoryVocabulary.key.toString
-    		  		   - MeandreRepositoryVocabulary.value.toString 
-    		  		   - DC_11.description.toString 
-    		  		   - RDF.`type`.toString))      
+    		  		   - MeandreRepositoryVocabulary.value.toString
+    		  		   - DC_11.description.toString
+    		  		   - RDF.`type`.toString))
     }
 
 	/** Gets the data port information description for the requested type in a given model.
@@ -352,8 +352,8 @@ object DescriptorsFactory  {
      * @param model The model to use
      * @return The data port information for the given URI in the given model
 	 */
-	protected def getDataPortForType ( uri:Resource, portType: JProperty, model: Model ) = 
-		for ( propURI <- getMultivalueProperty(uri,portType,model ) if propURI.isResource ) 
+	protected def getDataPortForType ( uri:Resource, portType: JProperty, model: Model ) =
+		for ( propURI <- getMultivalueProperty(uri,portType,model ) if propURI.isResource )
 			yield propURI match {
 			  case portURI:Resource => Port(
 					  portURI.toString,
@@ -361,7 +361,7 @@ object DescriptorsFactory  {
 					  safeGet(portURI,DC_11.description,model)
 			  	)
 		}
- 
+
 	/** Given model retrieves all the relevant information for each of
 	 *  the contained components.
 	 *
@@ -417,7 +417,7 @@ object DescriptorsFactory  {
 	def buildComponentDescriptors ( model: Model ) = buildComponentDescriptorsModel(model)
 
 	/** Given a flow URI and a model it retrieves all the described connectors.
-	 * 
+	 *
 	 * @param uri The flow uri
 	 * @param model The model to use
 	 * @return The list of connector descriptions retrieved from the repository
@@ -425,7 +425,7 @@ object DescriptorsFactory  {
 	protected def getConnectors ( uri:Resource, model:Model ) = {
 	  for ( conURI <- getMultivalueProperty(
 			  				uri.getProperty(MeandreRepositoryVocabulary.connectors).getResource(),
-			  				MeandreRepositoryVocabulary.data_connector, model ) 
+			  				MeandreRepositoryVocabulary.data_connector, model )
 	  		if conURI.isResource )
 		  yield conURI match {
 			  case conURI:Resource => ConnectorDescription(
@@ -437,46 +437,46 @@ object DescriptorsFactory  {
 			  	)
 		}
 	}
-   
+
 	/** Given an instance URI and a model it retrieves all the related Meandre properties
-	 *  assigned to it. 
+	 *  assigned to it.
 	 *
-	 * @param uri The uri of the instance 
+	 * @param uri The uri of the instance
 	 * @param model The model to explore
-	 * @return A list containing the properties found for the instance 
+	 * @return A list containing the properties found for the instance
 	 */
 	protected def getInstanceProperties ( uri:Resource, model:Model )  = {
-	  
-	  def getPairs ( node:Resource ) = 
-		  for (stm<-getStatementWithSubject(node)  ) 
+
+	  def getPairs ( node:Resource ) =
+		  for (stm<-getStatementWithSubject(node)  )
 			  yield if (stm.getObject.isLiteral) stm.getPredicate.toString ->  stm.getLiteral.getString
                     else stm.getPredicate.toString -> stm.getObject.toString
-	  
+
       val lm = for { node <- getMultivalueProperty ( uri, MeandreRepositoryVocabulary.property_set, model ) if node.isResource }
 	  	  		  yield node match {
 	  	  		    	case node:Resource => Map(getPairs(node):_*)
 	  	  		  }
-          
+
       lm.map( (m:Map[String,String]) => Property (
     		  		 m.get(MeandreRepositoryVocabulary.key.toString).getOrElse("unknow"),
     		  		 m.get(MeandreRepositoryVocabulary.value.toString).getOrElse("unknow"),
     		  		 m - MeandreRepositoryVocabulary.key.toString
-    		  		   - MeandreRepositoryVocabulary.value.toString 
+    		  		   - MeandreRepositoryVocabulary.value.toString
     		  		   - RDF.`type`.toString
       ))
-      
+
     }
- 
+
 	/** Given a flow URI and a model returns all the instance associated to the flow.
-	 * 
+	 *
 	 * @param uri The flow URI
 	 * @param model The model to use
-	 * @return A list of component instance descroptions 
+	 * @return A list of component instance descroptions
 	 */
  	protected def getInstances ( uri:Resource, model:Model ) = {
 	  for ( insURI <- getMultivalueProperty(
 			  				uri.getProperty(MeandreRepositoryVocabulary.components_instances).getResource(),
-			  				MeandreRepositoryVocabulary.executable_component_instance, model ) 
+			  				MeandreRepositoryVocabulary.executable_component_instance, model )
 	  		if insURI.isResource )
 		  yield insURI match {
 			  case insURI:Resource => ComponentInstanceDescription(
@@ -488,8 +488,8 @@ object DescriptorsFactory  {
 			  	)
 		}
 	}
-   
-	
+
+
 	/** Given model retrieves all the relevant information for each of
 	 *  the contained flows.
 	 *
@@ -519,7 +519,7 @@ object DescriptorsFactory  {
      * @return The list of component descriptors stored in the model
    */
   def buildFlowDescriptors ( url: String ) = buildFlowDescriptorsModel(readModelFromURL(url))
-	
+
 	/** Given a Jena model retrieves all the relevant information for flows in the
    *  serialized RDF pointed to.
    *
@@ -530,9 +530,9 @@ object DescriptorsFactory  {
 
   /** Given a URL returns a list of all the descriptors found, regardless
 	 *  if they describe components or flows
-	 * 
+	 *
 	 * @param url The url containing the serialized RDF model
-	 * @return The list of descriptors found 
+	 * @return The list of descriptors found
 	 */
 	def buildDescriptors ( url:String ) : List[Descriptor] = {
 		val model = readModelFromURL(url)
@@ -551,17 +551,17 @@ object DescriptorsFactory  {
 
   /** Given a URL returns a list of all the descriptors found, regardless
 	 *  if they describe components or flows
-	 * 
+	 *
 	 * @param url The url containing the serialized RDF model
-	 * @return The list of descriptors found 
+	 * @return The list of descriptors found
 	 */
 	def apply ( url:String ) : List[Descriptor] = buildDescriptors(url)
- 
+
 	/** Given a Jena RDF model returns a list of all the descriptors found, regardless
 	 *  if they describe components or flows
-	 * 
+	 *
 	 * @param model The Jena RDF model
-	 * @return The list of descriptors found 
+	 * @return The list of descriptors found
 	 */
 	def apply ( model:Model ) : List[Descriptor] = buildDescriptors(model)
 
