@@ -16,14 +16,14 @@ import meandre.kernel.rdf.{MeandreRepositoryVocabulary=>MRV}
  *
  * @author Xavier Llora
  * @date Jan 27, 2010 at 10:31:38 PM
- * 
+ *
  */
 object Implicits {
 
 
   //----------------------------------------------------------------------
 
-  
+
   val K_ID       = "_id"
   val K_TOKENS   = "_tokens"
   val K_TYPE     = "_type"
@@ -190,7 +190,7 @@ object Implicits {
           ecid.properties.foreach ( (kv) => {
              resIns.addProperty(MRV.property_set,
                                 model.createResource(sConID+(if (sConID.endsWith("/")) "" else "/")+"property/"+kv._1).addProperty(MRV.key, model.createTypedLiteral(kv._1,XSDDatatype.XSDstring))
-                                                                               .addProperty(MRV.value, model.createTypedLiteral(kv._2,XSDDatatype.XSDstring))
+                                                                               .addProperty(MRV.value, model.createTypedLiteral(kv._2.value,XSDDatatype.XSDstring))
                                                                                .addProperty(RDF.`type`, MRV.property)
              )
           })
@@ -226,7 +226,7 @@ object Implicits {
             .addProperty(DC_11.creator, model.createTypedLiteral(comp.description.creator.getOrElse("Unknown!"),XSDDatatype.XSDstring))
             .addProperty(DC_11.date, model.createTypedLiteral(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(comp.description.creationDate), XSDDatatype.XSDdateTime))
             .addProperty(RDF.`type`, MRV.executable_component)
-            
+
             .addProperty(DC_11.format,model.createTypedLiteral(comp.format,XSDDatatype.XSDstring))
             .addProperty(MRV.runnable,model.createTypedLiteral(comp.runnable,XSDDatatype.XSDstring))
             .addProperty(MRV.firing_policy,model.createTypedLiteral(comp.firingPolicy match {
