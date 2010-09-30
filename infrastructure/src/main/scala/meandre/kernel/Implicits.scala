@@ -249,7 +249,6 @@ object Implicits {
                         .addProperty(MRV.value,model.createTypedLiteral(sValue,XSDDatatype.XSDstring))
                         .addProperty(DC_11.description,model.createTypedLiteral(sDesc,XSDDatatype.XSDstring))
 
-
       propDesc.other.foreach ( (kvop) => {
         val othersKey = kvop._1
         val othersVal = kvop._2
@@ -264,8 +263,9 @@ object Implicits {
           case Some(res) => prop.addProperty(model.createProperty(othersKey),res)
           case None      => prop.addProperty(model.createProperty(othersKey),model.createTypedLiteral(othersVal,XSDDatatype.XSDstring))
         }
-        res.addProperty(MRV.property_set,prop)
       })
+
+      res.addProperty(MRV.property_set, prop)
     })
 
     // Adding tags
