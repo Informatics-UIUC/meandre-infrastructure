@@ -20,7 +20,7 @@ import com.mongodb.{BasicDBList, BasicDBObject}
 class RichBasicDBObject (val self:BasicDBObject)(implicit cnf:Configuration) extends Proxy {
 
   /** The regular expression to match arbitrary urls */
-  val urlRegex = "(\\w+([_-]\\w+)*://(\\w+([_-]\\w+)*(\\.\\w+([_-]\\w+)*)*/?)*)|(\\s*[0-9a-f]{40}\\s*)".r
+  val urlRegex = "(?:\\w+(?:[\\+\\.-]\\w+)*://(?:\\w+(?:[_-]*\\w+)*(?:\\.\\w+(?:[_-]*\\w+)*)*/?)*)|(?:\\s*[0-9a-f]{40}\\s*)".r
 
   /** The regular expression to grab jobIDs */
   //val jobIDRegex = """<td class="docvalue">\s*[0-9a-f]{40}\s*</td>""".r
@@ -235,7 +235,7 @@ class RichBasicDBObject (val self:BasicDBObject)(implicit cnf:Configuration) ext
 
 
     def transformDocument( d:BasicDBObject ) = d.get("status") match {
-      
+
       // The document respesents a successful request
       case "OK" => sbRes.append(<h3 class="response">Response status <span class="response-success">OK</span></h3>)
                    if (d.containsField("success")) sbRes.append(transformObjectOrArray(d.get("success")))
@@ -297,7 +297,7 @@ class RichBasicDBObject (val self:BasicDBObject)(implicit cnf:Configuration) ext
 
       sbProcessedRes.append(pre)
       sbProcessedRes.append(url match {
-        // TODO Add functionality to the mendre specific links
+        // TODO Add functionality to the meandre specific links
         case u if u.startsWith("meandre://") => """<a href="%sservices/repository/describe.html?uri=%s">%s</a> (<a href="%sservices/repository/describe.rdf?uri=%s">RDF</a>,<a href="%sservices/repository/describe.ttl?uri=%s">TTL</a>,<a href="%sservices/repository/describe.nt?uri=%s">NT</a>) [<a href="%sservices/repository/remove.html?uri=%s" onclick="return confirm('Are you sure you want to remove %s?');">Remove</a>,<a href="%sservices/publish/publish.html?uri=%s">Pub</a>,<a href="%sservices/publish/unpublish.html?uri=%s">Unpub</a>,<a href="%sservices/jobs/submit.html?uri=%s">Submit Job</a>]""".format(prefix,u,u,prefix,u,prefix,u,prefix,u,prefix,u,u,prefix,u,prefix,u,prefix,u)
         case u if u.startsWith("context://localhost") => """<a href="%s://%s:%s%s%s">%s</a>""".format(cnf.protocol,cnf.server,cnf.serverPort,prefix,u.replace("context://localhost/",""),u)
         case u if u.startsWith("http") => """<a href="%s">%s</a> [<a href="%sservices/repository/describe.html?uri=%s">Desc?</a>,<a href="%sservices/publish/publish.html?uri=%s">Pub</a>,<a href="%sservices/publish/unpublish.html?uri=%s">Unpub</a>,<a href="%sservices/jobs/submit.html?uri=%s">Submit Job</a>]""".format(u,u,prefix,u,prefix,u,prefix,u,prefix,u)
@@ -318,7 +318,7 @@ class RichBasicDBObject (val self:BasicDBObject)(implicit cnf:Configuration) ext
  *
  * @author Xavier Llora
  * @date Feb 24, 2010 at 2:10:34 PM
- * 
+ *
  */
 
 object Templating {
@@ -359,7 +359,7 @@ object Templating {
   def htmlHeader ( title:String, pathPrefix:String ) = """
     <head>
       <title>MI - """+title+"""</title>
-      <link rel="stylesheet" type="text/css" href="""+'"'+pathPrefix+"""static/style.css" /> 
+      <link rel="stylesheet" type="text/css" href="""+'"'+pathPrefix+"""static/style.css" />
     </head>
   """
 
@@ -551,7 +551,7 @@ object Templating {
             </ul>
             <!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
       </ul>
-      
+
       <ul style="margin-left:6px; padding:0px;" class="pureCssMenu pureCssMenum">
         <li class="pureCssMenui">
           <form style="padding:0; margin:0;" name="sfc" method="get" action="/services/repository/search.html">
