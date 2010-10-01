@@ -26,6 +26,11 @@ import org.meandre.webui.WebUI;
 
 import com.hp.hpl.jena.rdf.model.Resource;
 
+/**
+ * Executor that can be used with Meandre 2.0.x (based on MAUExecutor)
+ * 
+ * @author Boris Capitanu
+ */
 
 public class SaraExecutor {
     
@@ -151,27 +156,36 @@ public class SaraExecutor {
             ps.println();
             ps.println("Flow execution statistics");
             ps.println();
-            ps.println("Flow unique execution ID : "+jsonStats.get("flow_unique_id"));
-            ps.println("Flow state               : "+jsonStats.get("flow_state"));
-            ps.println("Started at               : "+jsonStats.get("started_at"));
-            ps.println("Last update              : "+jsonStats.get("latest_probe_at"));
-            ps.println("Total run time (ms)      : "+jsonStats.get("runtime"));
+            if (jsonStats.has("flow_unique_id"))  ps.println("Flow unique execution ID : " + jsonStats.get("flow_unique_id"));
+            if (jsonStats.has("flow_state"))      ps.println("Flow state               : " + jsonStats.get("flow_state"));
+            if (jsonStats.has("started_at"))      ps.println("Started at               : " + jsonStats.get("started_at"));
+            if (jsonStats.has("latest_probe_at")) ps.println("Last update              : " + jsonStats.get("latest_probe_at"));
+            if (jsonStats.has("runtime"))         ps.println("Total run time (ms)      : " + jsonStats.get("runtime"));
             ps.println();
             ps.flush();
 
-            JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
-            for ( int i=0,iMax=jaEXIS.length() ; i<iMax ; i++ ) {
-                JSONObject joEXIS = (JSONObject) jaEXIS.get(i);
-                ps.println("\tExecutable components instance ID          : "+joEXIS.get("executable_component_instance_id"));
-                ps.println("\tExecutable components state                : "+joEXIS.get("executable_component_state"));
-                ps.println("\tTimes the executable components fired      : "+joEXIS.get("times_fired"));
-                ps.println("\tAccumulated executable components run time : "+joEXIS.get("accumulated_runtime"));
-                ps.println("\tPieces of data pulled                      : "+joEXIS.get("pieces_of_data_in"));
-                ps.println("\tPieces of data pushed                      : "+joEXIS.get("pieces_of_data_out"));
-                ps.println("\tNumber of properties read                  : "+joEXIS.get("number_of_read_properties"));
-                ps.println();
+            if (jsonStats.has("executable_components_statistics")) {
+                JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
+                for (int i = 0, iMax = jaEXIS.length(); i < iMax; i++) {
+                    JSONObject joEXIS = (JSONObject) jaEXIS.get(i);
+                    if (joEXIS.has("executable_component_instance_id"))
+                        ps.println("\tExecutable components instance ID          : " + joEXIS.get("executable_component_instance_id"));
+                    if (joEXIS.has("executable_component_state"))
+                        ps.println("\tExecutable components state                : " + joEXIS.get("executable_component_state"));
+                    if (joEXIS.has("times_fired"))
+                        ps.println("\tTimes the executable components fired      : " + joEXIS.get("times_fired"));
+                    if (joEXIS.has("accumulated_runtime"))
+                        ps.println("\tAccumulated executable components run time : " + joEXIS.get("accumulated_runtime"));
+                    if (joEXIS.has("pieces_of_data_in"))
+                        ps.println("\tPieces of data pulled                      : " + joEXIS.get("pieces_of_data_in"));
+                    if (joEXIS.has("pieces_of_data_out"))
+                        ps.println("\tPieces of data pushed                      : " + joEXIS.get("pieces_of_data_out"));
+                    if (joEXIS.has("number_of_read_properties"))
+                        ps.println("\tNumber of properties read                  : " + joEXIS.get("number_of_read_properties"));
+                    ps.println();
+                }
+                ps.flush();
             }
-            ps.flush();
         }
         catch ( Exception e ) {
             KernelLoggerFactory.getCoreLogger().warning("This exception should have never been thrown\n"+e);
