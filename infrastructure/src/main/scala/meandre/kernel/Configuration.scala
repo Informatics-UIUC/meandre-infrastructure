@@ -36,7 +36,7 @@ class Configuration (val protocol:String, val server:String, val serverPort:Int,
   var EXECUTION_JAVA = "java"
   var EXECUTION_JAVA_ARGS = "-Xmx1024m"
 
-  var EXECUTOR_14X = "lib/executor-1.4.8.jar"
+  var EXECUTOR_14X = "lib/executor-1.4.9.jar"
 
   var EXECUTION_SCRIPT = "execution_%s.scala"
 
