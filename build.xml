@@ -45,7 +45,6 @@
 			<include name="${ws.src}/**/*.java"/>
 			<include name="${store.src}/**/*.java"/>
 			<include name="${coordinator.src}/**/*.java"/>
-			<include name="${client.src}/**/*.java"/>
 			<include name="${annotation.src}/**/*.java"/>
 			<include name="${executables.src}/**/*.java"/>
 			<include name="${support.src}/**/*.java"/>
@@ -147,7 +146,6 @@
 		<javac srcdir="${plugins.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
 		<javac srcdir="${ws.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
 		<javac srcdir="${store.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${client.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
 		<javac srcdir="${coordinator.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
 		<javac srcdir="${executables.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
 	    <javac srcdir="${support.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
@@ -229,9 +227,6 @@
 					<include name="**/*.java"/>
 					<exclude name="**/SecurityManagerProctor.java"/>
 				</fileset>
-				<fileset dir="${client.test}">
-					<include name="**/*.java"/>
-				</fileset>
 				<fileset dir="${coordinator.test}">
 					<include name="**/*.java"/>
 				</fileset>
@@ -277,7 +272,6 @@
 				<include name="${ws.src}/**"/>
 				<include name="${store.src}/**"/>
 				<include name="${terracotta.src}/**"/>
-				<include name="${client.src}/**"/>
 				<include name="${annotation.src}/**"/>
 				<include name="${coordinator.src}/**"/>
 				<include name="${executables.src}/**"/>
@@ -396,6 +390,24 @@
 				<include name="**/webui/**/*.py"/>
 			</fileset>
 		</jar>
+		
+		<!-- Create repository API jar -->
+		<jar destfile="${dist.dir}/lib/${app.name}-repository-api-${build.version}.jar">
+			<manifest>
+				<attribute name="Build-Version" value="${build.version}"/>
+			</manifest>
+			<fileset dir="${build.dir}" includes="org/meandre/core/repository/**"/>
+			<fileset dir="${kernel.src}" includes="org/meandre/core/repository/**"/>
+		</jar>
+
+        <!-- Create security jar -->
+        <jar destfile="${dist.dir}/lib/${app.name}-security-${build.version}.jar">
+            <manifest>
+                <attribute name="Build-Version" value="${build.version}"/>
+            </manifest>
+            <fileset dir="${build.dir}" includes="org/meandre/core/security/**"/>
+            <fileset dir="${kernel.src}" includes="org/meandre/core/security/**"/>
+        </jar>
 
 		<!-- Create store jar -->
 		<jar destfile="${dist.dir}/lib/${app.name}-store-${build.version}.jar">
@@ -406,18 +418,6 @@
 				<include name="**/store/**/*.class"/>
 				<include name="**/store/**/*.properties"/>
 				<include name="**/store/**/*.xml"/>
-			</fileset>
-		</jar>
-
-		<!-- Create client jar -->
-		<jar destfile="${dist.dir}/lib/${app.name}-client-${build.version}.jar">
-			<manifest>
-				<attribute name="Build-Version" value="${build.version}"/>
-			</manifest>
-			<fileset dir="${build.dir}">
-				<include name="**/client/**/*.class"/>
-				<include name="**/client/**/*.properties"/>
-				<include name="**/client/**/*.xml"/>
 			</fileset>
 		</jar>
 
@@ -561,9 +561,6 @@
 			<fileset dir="${terracotta.src}">
 				<include name="**/*"/>
 			</fileset>
-			<fileset dir="${client.src}">
-				<include name="**/*"/>
-			</fileset>
 			<fileset dir="${executables.src}">
 				<include name="**/*"/>
 			</fileset>
@@ -652,15 +649,6 @@
 			</fileset>
 		</jar>
 
-		<!-- Create jar -->
-		<jar destfile="${dist.dir}/src-jars/meandre-client-${build.version}-src.jar">
-			<manifest>
-				<attribute name="Build-Version" value="${build.version}"/>
-			</manifest>
-			<fileset dir="${client.src}">
-				<include name="**/*"/>
-			</fileset>
-		</jar>
         <!-- Create executables src jar -->
 		<jar destfile="${dist.dir}/src-jars/meandre-executables-${build.version}-src.jar">
 			<manifest>

@@ -28,7 +28,6 @@
     <property name="plugins.src" value="src-plugins/code"/>
     <property name="ws.src" value="src-webservices/code"/>
     <property name="store.src" value="src-store/code"/>
-    <property name="client.src" value="src-client/code"/>
     <property name="annotation.src" value="src-annotation/code"/>
     <property name="coordinator.src" value="src-coordinator/code"/>
     <property name="executables.src" value="src-executables/code"/>
@@ -41,7 +40,6 @@
     <property name="plugins.test" value="src-plugins/test"/>
     <property name="ws.test" value="src-webservices/test"/>
     <property name="store.test" value="src-store/test"/>
-    <property name="client.test" value="src-client/test"/>
     <property name="coordinator.test" value="src-coordinator/test"/>
     <property name="executables.test" value="src-executables/test"/>
 	<property name="support.test" value="src-support/test"/>
@@ -60,8 +58,6 @@
         <fileset dir="${ws.test}" includes="*"/>
         <fileset dir="${store.src}" includes="*"/>
         <fileset dir="${store.test}" includes="*"/>
-        <fileset dir="${client.src}" includes="*"/>
-        <fileset dir="${client.test}" includes="*"/>
         <fileset dir="${coordinator.src}" includes="*"/>
         <fileset dir="${coordinator.test}" includes="*"/>
         <fileset dir="${executables.src}" includes="*"/>
