@@ -480,17 +480,6 @@
         	<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
 		</jar>
 
-		<!-- Creating the Meandre RDF-to-ZigZag converter jar distribution -->
-		<jar destfile="${dist.dir}/rdf2zz-${build.version}.jar" >
-			<manifest>
-				<attribute name="Build-Version" value="${build.version}"/>
-				<attribute name="Build-Date" value="${TIMESTAMP}"/>
-				<attribute name="Main-Class" value="org.meandre.zigzag.transformations.RDF2ZZMain"/>
-			</manifest>
-			<fileset dir="${build.dir}"/>
-        	<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
-		</jar>
-
 		<!-- Creating the Meandre mau executor jar distribution -->
 		<jar destfile="${dist.dir}/zzre-${build.version}.jar" >
 			<manifest>
