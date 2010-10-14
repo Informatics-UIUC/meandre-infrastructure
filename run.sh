@@ -22,6 +22,16 @@ function buildClasspath() {
   MEANDRE2_CLASSPATH=`echo $MEANDRE2_CLASSPATH | cut -c2-`
 }
 
+# Check whether SCALA and SBT are available
+if [ "x`which $SCALA`" == "x" ]; then
+	echo "$SCALA not found or not in the PATH"
+	exit 4
+fi
+
+if [ "x`which $SBT`" == "x" ]; then
+	echo "$SBT not found or not in the PATH"
+	exit 5
+fi
 
 LOG_FOLDER=`dirname $MEANDRE2_LOG`
 
