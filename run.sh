@@ -72,4 +72,4 @@ buildClasspath
 
 $SCALA -classpath $MEANDRE2_CLASSPATH $MEANDRE2_STARTUP_SCRIPT 1>>$MEANDRE2_LOG 2>&1 &
 
-echo The Meandre 2.0 server is now starting... you can access it at http://$(hostname):1714
+echo The Meandre 2.0 server is now starting... you can access it at http://$(hostname -f):1714

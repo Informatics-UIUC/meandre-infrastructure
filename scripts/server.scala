@@ -7,7 +7,7 @@ import meandre.webservices.api.{MeandreServer}
 import scala.concurrent.ops.spawn
 
 val SERVER_PORT = 1714
-val LOCAL_HOST_NAME = java.net.InetAddress.getLocalHost().getHostName()
+val LOCAL_HOST_NAME = java.net.InetAddress.getLocalHost.getCanonicalHostName
 
 val (cnf1, cnf2, cnf3) = (
         Configuration("http", LOCAL_HOST_NAME, SERVER_PORT, LOCAL_HOST_NAME, 27017, None),
