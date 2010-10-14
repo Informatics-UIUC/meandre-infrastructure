@@ -13,7 +13,7 @@ MEANDRE2_JAR=$MEANDRE2_HOME/infrastructure/target/scala_2.7.7/infrastructure_2.7
 MEANDRE2_DEPS_DIR=$MEANDRE2_HOME/infrastructure/lib_managed/scala_2.7.7/compile
 
 function buildClasspath() {
-  for dep in $MEANDRE2_DEPS/*.jar
+  for dep in $MEANDRE2_DEPS_DIR/*.jar
     do
       MEANDRE2_CLASSPATH=$MEANDRE2_CLASSPATH:$dep
     done
@@ -22,8 +22,20 @@ function buildClasspath() {
   MEANDRE2_CLASSPATH=`echo $MEANDRE2_CLASSPATH | cut -c2-`
 }
 
+
+LOG_FOLDER=`dirname $MEANDRE2_LOG`
+
+if [ ! -d $LOG_FOLDER ]; then
+  echo "Creating log folder $LOG_FOLDER"
+  mkdir -p $LOG_FOLDER
+  if [ ! $? -eq 0 ]; then
+    echo "Cannot create log folder - check whether you have proper permissions."
+    exit 3
+  fi
+fi
+
 if [ ! -d $MEANDRE2_DEPS_DIR ]; then
-  printf "Dependency files are missing... running 'sbt update' to retrieve them...\n"
+  printf "Dependency files are missing... running 'sbt update' to retrieve them..."
   $SBT update 1>>$MEANDRE2_LOG 2>&1 
   if [ $? -eq 0 ]; then
     echo "done"
@@ -35,7 +47,7 @@ if [ ! -d $MEANDRE2_DEPS_DIR ]; then
 fi
 
 if [ ! -f $MEANDRE2_JAR ]; then
-  echo "The Meandre 2.0 package is missing... running 'sbt package' to build it...\n"
+  printf "The Meandre 2.0 package is missing... running 'sbt package' to build it..."
   $SBT package 1>>$MEANDRE2_LOG 2>&1
   if [ $? -eq 0 ]; then
     echo "done"
