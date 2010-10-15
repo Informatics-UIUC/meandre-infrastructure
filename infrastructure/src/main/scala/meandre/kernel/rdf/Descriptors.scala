@@ -383,8 +383,8 @@ object DescriptorsFactory  {
 					mustGet(uri,MeandreRepositoryVocabulary.resource_location,model),
 					safeGet(uri,MeandreRepositoryVocabulary.mode,model) match {
             case None => ComputeMode()
-            case Some(s:Resource) if s==MeandreRepositoryVocabulary.mode_compute => ComputeMode()
-            case Some(s:Resource) if s==MeandreRepositoryVocabulary.mode_webui => WebUIMode()
+            case Some(s:String) if s==MeandreRepositoryVocabulary.mode_compute.toString => ComputeMode()
+            case Some(s:String) if s==MeandreRepositoryVocabulary.mode_webui.toString => WebUIMode()
             case _ => ComputeMode()
           },
           getMultivalueProperty(uri,MeandreRepositoryVocabulary.execution_context,model).map(
