@@ -2,7 +2,6 @@ package meandre.webservices.specs
 
 import org.specs.Specification
 import crochet.CrochetServer
-import meandre.webservices.client.MeandreInfrastructureAPIClient
 import meandre.kernel.Implicits._
 import com.mongodb.BasicDBObject
 import meandre.webservices.api.MeandreInfrastructurePublicAPI
@@ -19,7 +18,7 @@ import meandre.kernel.Configuration
 object MeandreInfrastructurePublicAPISpecs extends Specification("The Meandre Infrastructure specification") {
   val TEST_SERVER_PORT = 6969
   val api = new MeandreInfrastructurePublicAPI(Configuration())
-  val client = MeandreInfrastructureAPIClient("http", "localhost", TEST_SERVER_PORT)
+  //val client = MeandreInfrastructureAPIClient("http", "localhost", TEST_SERVER_PORT)
   var server:CrochetServer = null
 
 
@@ -39,18 +38,18 @@ object MeandreInfrastructurePublicAPISpecs extends Specification("The Meandre In
     server = null
   }
 
-  "Ping services " should {
-
-    "return pong" in {
-       client.ping match {
-         case Right((200,pong)) => pong.getString("status")  must beEqualTo("OK")
-                                   val resp = pong.get("success").asInstanceOf[BasicDBObject]
-                                   resp.getString("message") must beEqualTo("pong")
-         
-         case Left(t) => fail(t.toString)
-         case unknown => fail(unknown.toString)
-       }
-    }
+//  "Ping services " should {
+//
+//    "return pong" in {
+//       client.ping match {
+//         case Right((200,pong)) => pong.getString("status")  must beEqualTo("OK")
+//                                   val resp = pong.get("success").asInstanceOf[BasicDBObject]
+//                                   resp.getString("message") must beEqualTo("pong")
+//
+//         case Left(t) => fail(t.toString)
+//         case unknown => fail(unknown.toString)
+//       }
+//    }
 
 
   }

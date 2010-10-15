@@ -3,7 +3,6 @@ package meandre.webservices.specs
 import org.specs.Specification
 import crochet.CrochetServer
 import meandre.kernel.Configuration
-import meandre.webservices.client.MeandreInfrastructureAPIClient
 import meandre.webservices.api.MeandreInfrastructurePrivateAPI
 import com.mongodb.BasicDBObject
 import meandre.kernel.Implicits._
@@ -41,7 +40,7 @@ object MeandreInfrastructurePrivateAPISpecs extends Specification("The Meandre I
     ( msg:BasicDBObject ) => {println(msg) ; true} )
   val cnf = Configuration()
   val api = new MeandreInfrastructurePrivateAPI(cnf,snareMon,Logger(cnf,snareMon.uuid))
-  val client = MeandreInfrastructureAPIClient("http", "localhost", TEST_SERVER_PORT)
+  //val client = MeandreInfrastructureAPIClient("http", "localhost", TEST_SERVER_PORT)
   var server:CrochetServer = null
 
 
@@ -74,7 +73,7 @@ object MeandreInfrastructurePrivateAPISpecs extends Specification("The Meandre I
     "have some tests written " in {
 
       true must beTrue
-      
+
     }
   }
 }
