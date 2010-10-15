@@ -48,7 +48,6 @@ class JobQueue(val cnf: Configuration) {
   //
   // Ensure indexes are available
   //
-  queue.ensureIDIndex
   queue.ensureIndex("""{"status":1}""")
   queue.ensureIndex("""{"status":1,"ts":-1}""")
   queue.ensureIndex("""{"ts":-1}""")

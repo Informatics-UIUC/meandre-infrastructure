@@ -260,8 +260,8 @@ extends Repository(cnf,userName) {
     *
    */
   override def removeAll = {
-    super.removeAll
     contextsPool.removeAll
+    super.removeAll
   }
 
 }
