@@ -24,7 +24,7 @@ class MeandreProject(info: ProjectInfo) extends ParentProject(info)
 		lazy val snare = "snare" % "snare" % "0.4.1" from "http://github.com/downloads/xllora/Snare/snare-0.4.1.jar"
 	
 		// Mongo
-		lazy val mongo = "mongo" % "mongo" % "1.2" from "http://github.com/downloads/mongodb/mongo-java-driver/mongo-1.2.jar"
+		lazy val mongo = "mongo" % "mongo" % "2.2" from "http://github.com/downloads/mongodb/mongo-java-driver/mongo-2.2.jar"
 	
 		// Commons
 		lazy val comUpload = "commons-fileupload" % "commons-fileupload" % "1.2"
