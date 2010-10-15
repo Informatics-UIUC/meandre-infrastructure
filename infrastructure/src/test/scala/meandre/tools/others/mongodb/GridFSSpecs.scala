@@ -12,7 +12,7 @@ import com.mongodb.{BasicDBObject, Mongo}
  *
  * @author Xavier Llora
  * @date Feb 15, 2010 at 9:31:20 PM
- * 
+ *
  */
 
 object GridFSSpecs extends Specification {
@@ -21,11 +21,11 @@ object GridFSSpecs extends Specification {
   //
   val cnf = Configuration()
   cnf.MEANDRE_DB_NAME = "Meandre_Test"
-  val mongo = new Mongo
+  val mongo = new Mongo(cnf.host, cnf.port)
   val    db = mongo getDB cnf.MEANDRE_DB_NAME
   val   gfs = new GridFS(db)
   val TEST_CONTENT = new URL("http://www.gutenberg.org/files/20417/20417.txt")
-  
+
   "A GridFS store " should {
 
     "be able to crete files and delete files " in {
@@ -43,6 +43,6 @@ object GridFSSpecs extends Specification {
       gfs.remove("/test/1.zip")
       gfs.getFileList.length must beEqualTo(numFiles)
     }
-    
+
   }
 }

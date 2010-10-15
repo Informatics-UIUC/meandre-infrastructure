@@ -39,7 +39,7 @@ class JobQueue(val cnf: Configuration) {
   //
   // Basic collection gathering
   //
-  val mongo = new Mongo
+  val mongo = new Mongo(cnf.host, cnf.port)
   val db = mongo getDB cnf.MEANDRE_DB_NAME
   val queue = db getCollection cnf.MEANDRE_JOBS_QUEUE
   val consoles = new GridFS(db,cnf.MEANDRE_JOBS_CONSOLE)

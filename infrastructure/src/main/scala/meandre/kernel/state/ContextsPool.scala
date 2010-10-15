@@ -16,12 +16,12 @@ import javax.servlet.http.HttpServletResponse._
  *
  * @author Xavier Llora
  * @date Feb 15, 2010 at 11:23:14 PM
- * 
+ *
  */
 
 class ContextsPool (val cnf:Configuration) {
 
-  val mongo = new Mongo
+  val mongo = new Mongo(cnf.host, cnf.port)
   val    db = mongo getDB cnf.MEANDRE_DB_NAME
   val   gfs = new GridFS(db,cnf.MEANDRE_CONTEXT_FS_COLLECTION)
   val colFS = db getCollection cnf.MEANDRE_CONTEXT_FS_COLLECTION+".files"
@@ -131,7 +131,7 @@ class ContextsPool (val cnf:Configuration) {
       response.setStatus(SC_OK)
       response.setContentType(file.getContentType)
       response.setContentLength(file.getLength.asInstanceOf[Int])
-      file writeTo response.getOutputStream  
+      file writeTo response.getOutputStream
       fileName
     }
     else throw new Exception("File "+fileName+" not found")
@@ -143,7 +143,7 @@ class ContextsPool (val cnf:Configuration) {
    * @return True if exist
    */
   def containsContext ( fileName:String ) = safeOp {
-    !gfs.find(fileName).isEmpty 
+    !gfs.find(fileName).isEmpty
   }
 }
 

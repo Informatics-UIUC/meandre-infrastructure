@@ -20,7 +20,7 @@ class PersistentTextBuffer(cnf:Configuration,id:String) {
   protected val KEY  = "_id"
   protected val TEXT = "t"
 
-  val mongo = new Mongo
+  val mongo = new Mongo(cnf.host, cnf.port)
   val db = mongo getDB cnf.MEANDRE_DB_NAME
   val collection = db getCollection cnf.MEANDRE_TEXT_BUFFER_PREFIX+"."+id
 
