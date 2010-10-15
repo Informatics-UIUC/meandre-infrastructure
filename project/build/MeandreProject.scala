@@ -38,7 +38,7 @@ class MeandreProject(info: ProjectInfo) extends ParentProject(info)
 	
 		// Testing facilities
 		lazy val scalatest = "org.scalatest" % "scalatest" % "1.0"
-		lazy val specs = "specs" % "specs" % "1.6.1" from "http://code.google.com/p/specs/downloads/detail?name=specs-1.6.1.jar"
+		lazy val specs = "specs" % "specs" % "1.6.1" from "http://specs.googlecode.com/files/specs-1.6.1.jar"
 		lazy val scalacheck = "org.scala-tools.testing" % "scalacheck_2.7.7" % "1.6"
 
     override lazy val mainClass = Some("meandre.apps.DefaultServerApp")
