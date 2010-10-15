@@ -6,7 +6,7 @@ import meandre.kernel.Configuration
 import meandre.webservices.api.{MeandreServer}
 import scala.concurrent.ops.spawn
 
-val SERVER_PORT = 1714
+val SERVER_PORT = Integer parseInt args(0)
 val LOCAL_HOST_NAME = java.net.InetAddress.getLocalHost.getCanonicalHostName
 
 val (cnf1, cnf2, cnf3) = (

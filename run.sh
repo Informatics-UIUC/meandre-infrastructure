@@ -4,8 +4,9 @@ SCALA=scala
 SBT=sbt
 
 MEANDRE2_HOME=`dirname $0`
-MEANDRE2_LOG=$MEANDRE2_HOME/log/meandre.log
+MEANDRE2_PORT=1714
 MEANDRE2_STARTUP_SCRIPT=$MEANDRE2_HOME/scripts/server.scala
+MEANDRE2_LOG=$MEANDRE2_HOME/log/meandre.log
 
 # DO NOT MODIFY BELOW THIS LINE
 
@@ -70,6 +71,6 @@ fi
 
 buildClasspath
 
-$SCALA -classpath $MEANDRE2_CLASSPATH $MEANDRE2_STARTUP_SCRIPT 1>>$MEANDRE2_LOG 2>&1 &
+$SCALA -classpath $MEANDRE2_CLASSPATH $MEANDRE2_STARTUP_SCRIPT $MEANDRE2_PORT 1>>$MEANDRE2_LOG 2>&1 &
 
-echo The Meandre 2.0 server is now starting... you can access it at http://$(hostname -f):1714
+echo The Meandre 2.0 server is now starting... you can access it at http://$(hostname -f):$MEANDRE2_PORT
