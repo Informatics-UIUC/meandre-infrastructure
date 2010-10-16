@@ -50,8 +50,6 @@ object MeandreInfrastructurePublicAPISpecs extends Specification("The Meandre In
 //         case unknown => fail(unknown.toString)
 //       }
 //    }
-
-
-  }
+//  }
 
 }
