@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse._
 
 class ContextsPool (val cnf:Configuration) {
 
-  val mongo = new Mongo(cnf.host, cnf.port)
+  val mongo = cnf.mongo
   val    db = mongo getDB cnf.MEANDRE_DB_NAME
   val   gfs = new GridFS(db,cnf.MEANDRE_CONTEXT_FS_COLLECTION)
   val colFS = db getCollection cnf.MEANDRE_CONTEXT_FS_COLLECTION+".files"

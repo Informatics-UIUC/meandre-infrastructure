@@ -21,7 +21,7 @@ object GridFSSpecs extends Specification {
   //
   val cnf = Configuration()
   cnf.MEANDRE_DB_NAME = "Meandre_Test"
-  val mongo = new Mongo(cnf.host, cnf.port)
+  val mongo = cnf.mongo
   val    db = mongo getDB cnf.MEANDRE_DB_NAME
   val   gfs = new GridFS(db)
   val TEST_CONTENT = new URL("http://www.gutenberg.org/files/20417/20417.txt")

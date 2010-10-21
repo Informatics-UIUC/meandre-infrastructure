@@ -8,11 +8,12 @@ import org.mortbay.jetty.servlet.{ServletHolder, DefaultServlet, Context}
 import meandre.webservices.realm.MongoDBRealm
 import org.mortbay.jetty.security.{SecurityHandler, ConstraintMapping, Constraint}
 import snare.Snare
-import com.mongodb.BasicDBObject
 import snare.ui.WebMonitor
 import meandre.kernel.Implicits._
 import meandre.webservices.logger.Logger
 import meandre.kernel.execution.{InitQueue, CheckQueue, QueuedJobExecutionActor}
+import com.mongodb.{Mongo, BasicDBObject}
+import meandre.kernel.state.MongoPool
 
 /**
  * The Meandre server class
@@ -49,6 +50,11 @@ class MeandreServer(val cnf:Configuration, val prefix: String, val staticFolder:
     cnf.host,
     cnf.port,
     monitorCallback)
+
+  // The Mongo object associated with this server
+//  private val mongo = new Mongo(cnf.host, cnf.port)
+//  MongoPool inject (mongo, snareMon.uuid.toString)
+
 
   protected val log = Logger(cnf,snareMon.uuid)
   log.info("Server succesfully initialized")
@@ -177,9 +183,9 @@ class MeandreServer(val cnf:Configuration, val prefix: String, val staticFolder:
         executionActor.killJob(msg.getString("target"))
 
       case _ =>
-        val sdm = "Received unknown msg: %s\nFrom: %s\nBy: %s" format(msg.toString,msgEnvelope.getString("_id"),msgEnvelope.getString("_ns")) 
+        val sdm = "Received unknown msg: %s\nFrom: %s\nBy: %s" format(msg.toString,msgEnvelope.getString("_id"),msgEnvelope.getString("_ns"))
         log.warning(sdm)
-      
+
     }
     true
   }

@@ -12,7 +12,7 @@ import com.mongodb.{BasicDBList, DBObject, BasicDBObject, Mongo}
  *
  * @author Xavier Llora
  * @date Apr 26, 2010 at 3:11:37 PM
- * 
+ *
  */
 class Logger (cnf:Configuration,logCollection:String,uuid:UUID) {
 
@@ -31,7 +31,7 @@ class Logger (cnf:Configuration,logCollection:String,uuid:UUID) {
   val LVL_SEVERE  = 0
 
   /** The mongo db connection object */
-  private val mongo = new Mongo(cnf.host,cnf.port)
+  private val mongo = cnf.mongo
 
   /** The Meandre database */
   private val db = mongo getDB cnf.MEANDRE_DB_NAME
@@ -114,7 +114,7 @@ class Logger (cnf:Configuration,logCollection:String,uuid:UUID) {
    * @param msg The message to log
    */
    val finest = logMessage(LVL_FINEST,"FINEST") _
-  
+
 
   /** The basic sorting condition by time stamps */
   val sortCndTS:BasicDBObject = """{"ts":-1}"""
@@ -136,7 +136,7 @@ class Logger (cnf:Configuration,logCollection:String,uuid:UUID) {
       r.put(K_MSG,d.getString(K_MSG))
       les add r
     }
-    les 
+    les
   }
 
 }

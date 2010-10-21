@@ -30,7 +30,7 @@ object JobQueueSpecs extends Specification("The context pool specification") {
   "A job queue " should {
 
     doFirst {
-      (new Mongo(cnf.host, cnf.port)).dropDatabase(cnf.MEANDRE_DB_NAME)
+      cnf.mongo.dropDatabase(cnf.MEANDRE_DB_NAME)
     }
 
     "Be able to insert jobs at will" in {

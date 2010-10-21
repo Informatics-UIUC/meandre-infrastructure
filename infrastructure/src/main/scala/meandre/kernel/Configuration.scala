@@ -1,5 +1,7 @@
 package meandre.kernel
 
+import com.mongodb.Mongo
+
 /**
  * The basic configuration container for the Meandre Infrastructure
  *
@@ -53,6 +55,8 @@ class Configuration (val protocol:String, val server:String, val serverPort:Int,
   def MEANDRE_LOG_LEVEL_= (level:Int) = MLL = if ( level<0 ) 0 else if ( level>5 ) 5 else level
 
   val MEANDRE_CLUSTER_POOL = "MeandreInf"
+
+  val mongo = new Mongo(host, port)
 
 }
 

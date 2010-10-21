@@ -14,7 +14,7 @@ import java.util.Date
  *
  * @author Xavier Llora
  * @date Feb 9, 2010 at 3:38:36 PM
- * 
+ *
  */
 class Repository ( val cnf:Configuration, val userName:String ) {
 
@@ -230,13 +230,13 @@ class Repository ( val cnf:Configuration, val userName:String ) {
   private val USER_COLLECTION_NAME = cnf.MEANDRE_USER_COLLECTION_PREFIX+userName.replaceAll("""\s""","_")
 
   /** The mongo db connection object */
-  private val mongo = new Mongo(cnf.host,cnf.port)
+  private val mongo = cnf.mongo
 
   /** The Meandre database */
   private val db = mongo getDB cnf.MEANDRE_DB_NAME
   cnf.auth match {
     case Some((user,password)) => db.authenticate(user,password.toCharArray)
-    case None => 
+    case None =>
   }
 
   /** The user collection */
@@ -573,7 +573,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
       val tags = cursor.next.get(K_TAGS).asInstanceOf[BasicDBList]
       (0 until tags.size).toList.foreach( i => {
         val key = tags.get(i).toString
-        if (map contains key) map(key) += 1 
+        if (map contains key) map(key) += 1
         else                  map(key)  = 1
       })
     }
@@ -724,7 +724,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
           case doc =>
             val cnd = """{"%s":"%s","%s":"%s"}""" format (K_ID, uri,K_PUB_AUTHOR,userName)
             if ( publicCollection.find(cnd).count==1 ||
-                 publicCollection.find(id).count==0  ||    
+                 publicCollection.find(id).count==0  ||
                  overwrite ) {
               val date = new Date
               doc.removeField("_ns")
@@ -818,5 +818,5 @@ object Repository {
    *
    */
   def unapply ( repo:Repository ) : Option[(Configuration,String)] = Some((repo.cnf,repo.userName))
-  
+
 }

@@ -15,13 +15,13 @@ import com.mongodb.{DBObject, BasicDBList, BasicDBObject, Mongo}
  *
  * @author Xavier Llora
  * @date Mar 1, 2010 at 10:51:15 PM
- * 
+ *
  */
 
 class MongoDBRealm(cnf:Configuration, var realmName:String) extends UserRealm with SSORealm {
 
   val __SSO = "org.mortbay.http.SSO"
-  
+
   private var _ssoRealm:SSORealm = null
 
   //--------------------------------------------------------------------------
@@ -36,7 +36,7 @@ class MongoDBRealm(cnf:Configuration, var realmName:String) extends UserRealm wi
   }
 
   def hashCredentials ( o:Object ) = computeHash(o.toString)
- 
+
   implicit def basicMongoDBObject2Principal (bdbo:BasicDBObject ) : Principal = {
     val principal = new MongoDBPrincipal(bdbo.getString("_id"))
     principal.putAll(bdbo.asInstanceOf[DBObject])
@@ -96,7 +96,7 @@ class MongoDBRealm(cnf:Configuration, var realmName:String) extends UserRealm wi
   //--------------------------------------------------------------------------
 
   /** The mongo db connection object */
-  private val mongo = new Mongo(cnf.host,cnf.port)
+  private val mongo = cnf.mongo
 
   /** The Meandre database */
   private val db = mongo getDB cnf.MEANDRE_DB_NAME
@@ -191,7 +191,7 @@ class MongoDBRealm(cnf:Configuration, var realmName:String) extends UserRealm wi
    *
    * @param screenName The user screen name
    * @param roles The roles to assign to the user
-   * @param 
+   * @param
    * @param role The role to remove
    */
   def updateUser (screenName:String,roles:List[String],profile:BasicDBObject,password:String) = {
@@ -360,6 +360,6 @@ object MongoDBRealm {
   val AVAILABLE_ROLES = Array("admin","user")
 
   def apply (cnf:Configuration) = new MongoDBRealm(cnf,"Meandre Flow Execution Engine")
-  
+
   def apply (cnf:Configuration,realmName:String) = new MongoDBRealm(cnf,realmName)
 }
