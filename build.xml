@@ -8,9 +8,12 @@
 		</or>
 	</condition>
 
-	<!-- Check whether Ant 1.7 is being used -->
+	<!-- Check whether Ant 1.7+ is being used -->
 	<condition property="using.ant.1.7">
-		<contains string="${ant.version}" substring="1.7"/>
+		<or>
+			<contains string="${ant.version}" substring="1.7"/>
+			<contains string="${ant.version}" substring="1.8"/>
+		</or>
 	</condition>
 
 	<!-- Make sure we're running under the correct environment -->
@@ -23,9 +26,9 @@
 	<import file="properties.xml"/>
 
 	<target name="init" description="-> creates required folders">
-                <tstamp>
-                   <format property="TIMESTAMP" pattern="MMM d, yyyy h:mm:ssa Z"/>
-                </tstamp>
+		<tstamp>
+			<format property="TIMESTAMP" pattern="MMM d, yyyy h:mm:ssa Z"/>
+		</tstamp>
 
 		<mkdir dir="${build.dir}"/>
 		<mkdir dir="${dist.dir}"/>
@@ -37,7 +40,7 @@
 	<target name="compile" depends="init" description="-> compiles source code">
 		<javac srcdir="${basedir}" destdir="${build.dir}/" debug="${compile.debug}"
                deprecation="${compile.deprecation}" optimize="${compile.optimize}"
-               classpathref="meandre.core.classpath">
+               classpathref="meandre.core.classpath" includeantruntime="false">
 			<include name="${kernel.src}/**/*.java"/>
 			<include name="${zigzag.src}/**/*.java"/>
 			<include name="${plugins.src}/**/*.java"/>
@@ -148,7 +151,7 @@
 		<javac srcdir="${store.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
 		<javac srcdir="${coordinator.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
 		<javac srcdir="${executables.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-	    <javac srcdir="${support.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${support.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
 	</target>
 
 	<!-- clean -->
@@ -234,7 +237,7 @@
 					<include name="**/*.java"/>
 				</fileset>
 				<fileset dir="${support.test}">
-				    <include name="**/*.java"/>
+					<include name="**/*.java"/>
 				</fileset>
 			</batchtest>
 		</junit>
@@ -299,11 +302,19 @@
 			<manifest>
 				<attribute name="Build-Version" value="${build.version}"/>
 			</manifest>
-			<fileset dir="${build.dir}">
-				<include name="**/*.class"/>
-				<include name="**/*.properties"/>
-				<include name="**/*.xml"/>
-			</fileset>
+			<fileset dir="${build.dir}"/>
+			
+			<!-- include sources -->
+			<fileset dir="${kernel.src}"/>
+			<fileset dir="${zigzag.src}" />
+			<fileset dir="${plugins.src}" />
+			<fileset dir="${demo.src}" />
+			<fileset dir="${ws.src}" />
+			<fileset dir="${store.src}" />
+			<fileset dir="${coordinator.src}" />
+			<fileset dir="${annotation.src}" />
+			<fileset dir="${executables.src}" />
+			<fileset dir="${support.src}" />
 		</jar>
 
 		<!-- Create kernel jar -->
@@ -312,19 +323,16 @@
 				<attribute name="Build-Version" value="${build.version}"/>
 			</manifest>
 			<fileset dir="${build.dir}">
-				<include name="**/configuration/**/*.class"/>
-				<include name="**/configuration/**/*.properties"/>
-				<include name="**/configuration/**/*.xml"/>
-				<include name="**/core/**/*.class"/>
-				<include name="**/core/**/*.properties"/>
-				<include name="**/core/**/*.xml"/>
-				<include name="**/webui/**/*.class"/>
-				<include name="**/webui/**/*.properties"/>
-				<include name="**/webui/**/*.xml"/>
-
-				<exclude name="**/store/**/*.class"/>
-				<exclude name="**/store/**/*.properties"/>
-				<exclude name="**/store/**/*.xml"/>
+				<include name="org/meandre/core/**"/>
+				<include name="org/meandre/configuration/**"/>
+				<include name="org/meandre/webui/**"/>
+			</fileset>
+			
+			<!-- include sources -->
+			<fileset dir="${kernel.src}">
+				<include name="org/meandre/core/**"/>
+				<include name="org/meandre/configuration/**"/>
+				<include name="org/meandre/webui/**"/>
 			</fileset>
 		</jar>
 
@@ -390,24 +398,6 @@
 				<include name="**/webui/**/*.py"/>
 			</fileset>
 		</jar>
-		
-		<!-- Create repository API jar -->
-		<jar destfile="${dist.dir}/lib/${app.name}-repository-api-${build.version}.jar">
-			<manifest>
-				<attribute name="Build-Version" value="${build.version}"/>
-			</manifest>
-			<fileset dir="${build.dir}" includes="org/meandre/core/repository/**"/>
-			<fileset dir="${kernel.src}" includes="org/meandre/core/repository/**"/>
-		</jar>
-
-        <!-- Create security jar -->
-        <jar destfile="${dist.dir}/lib/${app.name}-security-${build.version}.jar">
-            <manifest>
-                <attribute name="Build-Version" value="${build.version}"/>
-            </manifest>
-            <fileset dir="${build.dir}" includes="org/meandre/core/security/**"/>
-            <fileset dir="${kernel.src}" includes="org/meandre/core/security/**"/>
-        </jar>
 
 		<!-- Create store jar -->
 		<jar destfile="${dist.dir}/lib/${app.name}-store-${build.version}.jar">
@@ -426,12 +416,8 @@
 			<manifest>
 				<attribute name="Build-Version" value="${build.version}"/>
 			</manifest>
-			<fileset dir="${build.dir}">
-				<include name="**/annotations/**/*.class"/>
-				<include name="**/annotations/**/*.properties"/>
-				<include name="**/annotations/**/*.xml"/>
-                                <include name="org/meandre/components/test/framework/**/*.class"/>
-			</fileset>
+			<fileset dir="${build.dir}" includes="org/meandre/annotations/**"/>
+			<fileset dir="${annotation.src}" includes="org/meandre/annotations/**"/>
 		</jar>
 
 		<!-- Create coordinator jar -->
@@ -465,9 +451,9 @@
 				<attribute name="Build-Date" value="${TIMESTAMP}"/>
 				<attribute name="Main-Class" value="org.meandre.webservices.WSInfrastructureBootstrapper"/>
 			</manifest>
-            <fileset dir="${build.dir}"/>
-        	<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
-        </jar>
+			<fileset dir="${build.dir}"/>
+			<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
+		</jar>
 
 		<!-- Creating the Meandre ZigZag compiler jar distribution -->
 		<jar destfile="${dist.dir}/zzc-${build.version}.jar" >
@@ -477,7 +463,7 @@
 				<attribute name="Main-Class" value="org.meandre.zigzag.parser.ZigZag"/>
 			</manifest>
 			<fileset dir="${build.dir}"/>
-        	<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
+			<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
 		</jar>
 
 		<!-- Creating the Meandre mau executor jar distribution -->
@@ -488,20 +474,20 @@
 				<attribute name="Main-Class" value="org.meandre.mau.MAUExecutor"/>
 			</manifest>
 			<fileset dir="${build.dir}"/>
-        	<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
+			<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
 		</jar>
 
-        <!-- Creating the standalone executor jar distribution -->
-        <jar destfile="${dist.dir}/executor-${build.version}.jar" >
-            <manifest>
-                <attribute name="Build-Version" value="${build.version}"/>
-                <attribute name="Build-Date" value="${TIMESTAMP}"/>
-                <attribute name="Main-Class" value="org.meandre.core.engine.execution.SaraExecutor"/>
-            </manifest>
-            <fileset dir="${build.dir}"/>
-            <zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
-        </jar>
-            	
+		<!-- Creating the standalone executor jar distribution -->
+		<jar destfile="${dist.dir}/executor-${build.version}.jar" >
+			<manifest>
+				<attribute name="Build-Version" value="${build.version}"/>
+				<attribute name="Build-Date" value="${TIMESTAMP}"/>
+				<attribute name="Main-Class" value="org.meandre.core.engine.execution.SaraExecutor"/>
+			</manifest>
+			<fileset dir="${build.dir}"/>
+			<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
+		</jar>
+
 		<!-- Creating the Meandre interpreter console jar distribution -->
 		<jar destfile="${dist.dir}/zz-${build.version}.jar" >
 			<manifest>
@@ -510,7 +496,7 @@
 				<attribute name="Main-Class" value="org.meandre.zigzag.console.ZigZagConsole"/>
 			</manifest>
 			<fileset dir="${build.dir}"/>
-        	<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
+			<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
 		</jar>
 	</target>
 
@@ -554,7 +540,7 @@
 				<include name="**/*"/>
 			</fileset>
 			<fileset dir="${support.src}">
-			    <include name="**/*"/>
+				<include name="**/*"/>
 			</fileset>
 		</jar>
 
@@ -608,7 +594,7 @@
 			</fileset>
 		</jar>
 
-		<!-- Create jar -->
+		<!-- Create WS jar -->
 		<jar destfile="${dist.dir}/src-jars/meandre-ws-${build.version}-src.jar">
 			<manifest>
 				<attribute name="Build-Version" value="${build.version}" />
@@ -618,7 +604,7 @@
 			</fileset>
 		</jar>
 
-		<!-- Create jar -->
+		<!-- Create store jar -->
 		<jar destfile="${dist.dir}/src-jars/meandre-store-${build.version}-src.jar">
 			<manifest>
 				<attribute name="Build-Version" value="${build.version}" />
@@ -628,7 +614,7 @@
 			</fileset>
 		</jar>
 
-		<!-- Create jar -->
+		<!-- Create terracotta jar -->
 		<jar destfile="${dist.dir}/src-jars/meandre-terracotta-${build.version}-src.jar">
 			<manifest>
 				<attribute name="Build-Version" value="${build.version}"/>
@@ -638,7 +624,7 @@
 			</fileset>
 		</jar>
 
-        <!-- Create executables src jar -->
+		<!-- Create executables src jar -->
 		<jar destfile="${dist.dir}/src-jars/meandre-executables-${build.version}-src.jar">
 			<manifest>
 				<attribute name="Build-Version" value="${build.version}"/>
