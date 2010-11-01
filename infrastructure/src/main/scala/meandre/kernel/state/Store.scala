@@ -76,11 +76,7 @@ extends Repository(cnf,userName) {
    * @param xs The sequence
    * @return The array
    */
-  def parMap[A, B](xs: List[A], f: A => B): List[B] = {
-    val results = new Array[B](xs.length)
-    replicate (0, xs.length) {i => results(i) = f(xs(i))}
-    results.toList
-  }
+  def parMap[A,B](xs: List[A], f: A => B ): List[B] = { xs.map(i => future { f(i) }).map(_ ()) }  
 
   //---------------------------------------------------------------------------
 
