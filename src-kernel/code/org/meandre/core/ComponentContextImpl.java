@@ -73,7 +73,7 @@ implements ComponentContext {
 	private WebUI webui = null;
 
 	/** The webui fragments tracking system */
-	private Hashtable<WebUIFragmentCallback,WebUIFragment> htWebUIframent = new Hashtable<WebUIFragmentCallback,WebUIFragment>();
+	private final Hashtable<WebUIFragmentCallback,WebUIFragment> htWebUIframent = new Hashtable<WebUIFragmentCallback,WebUIFragment>();
 
 	/** The input logic name mapping */
 	private Hashtable<String, String> htInputLogicNameMap = null;
@@ -85,11 +85,11 @@ implements ComponentContext {
 	private Hashtable<String, String> htInputLogicNameMapReverse = null;
 
 	/** The array of available input names */
-	private String[] saInputNames;
+	private final String[] saInputNames;
 
 	/** MrProbe thread */
 	private MrProbe thdMrProbe = null;
-	
+
 	/** The wrapped component parent */
 	private WrappedComponent wcParent = null;
 
@@ -98,7 +98,7 @@ implements ComponentContext {
 
 	/** The output console for the flow */
 	private PrintStream console = null;
-	
+
 	/** Create a component context with the given input and output active buffers
 	 * for a given wrapped component.
 	 *
@@ -176,7 +176,7 @@ implements ComponentContext {
 
 		try {
 			 webui = WebUIFactory.getWebUI(sFlowUniqueExecutionID,wcParent.getMrProper(),
-					 thdMrProbe,cnf, 
+					 thdMrProbe,cnf,
 					 PortScroller.getInstance(cnf).nextAvailablePort(sFlowUniqueExecutionID));
 		} catch (WebUIException e) {
 			log.warning("WebUI could not be retrieved: "+e.getMessage());
@@ -184,23 +184,23 @@ implements ComponentContext {
 	}
 
 	/** Returns the path to the public resources directory.
-	 * 
+	 *
 	 * @return Path to public resources directory.
 	 */
 	public String getPublicResourcesDirectory () {
 		return ccCnf.getPublicResourcesDirectory();
 	}
-	
+
 
 	/** Returns the path to the run directory.
-	 * 
+	 *
 	 * @return Path to public resources directory.
 	 */
 	public String getRunDirectory () {
 		return ccCnf.getRunResourcesDirectory();
 	}
 
-	
+
 	/** The name of the available inputs.
 	 *
 	 * @return The array containing the names
@@ -241,7 +241,7 @@ implements ComponentContext {
 	public Object getDataComponentFromInput ( String sInputBuffer ) throws ComponentContextException {
 		if ( !setInputs.contains(sInputBuffer) )
 			throw new ComponentContextException("The requested input "+sInputBuffer+" does not exist.");
-		
+
 		Object obj = dp.getInput(htInputLogicNameMap.get(sInputBuffer));
 		thdMrProbe.probeWrappedComponentPullData(wcParent, sInputBuffer, obj);
 		return obj;
@@ -257,7 +257,7 @@ implements ComponentContext {
 		thdMrProbe.probeWrappedComponentPushData(wcParent, sOutputBuffer, obj);
 		if ( obj==null )
 			throw new ComponentContextException("Null cannot be pushed to "+sOutputBuffer+" in component instance "+sComponentInstanceID);
-		
+
 		if ( !setOutputs.contains(sOutputBuffer) )
 			throw new ComponentContextException("The requested output "+sOutputBuffer+" does not exist.");
 		try {
@@ -283,7 +283,11 @@ implements ComponentContext {
 		if ( sInputBuffer==null )
 			// Unconnected input
 			return false;
-		else if ( dp.getInput(htInputLogicNameMap.get(sInputBuffer))!=null )
+
+		if ( !setInputs.contains(sInputBuffer) )
+		    throw new ComponentContextException("The requested input "+sInputBuffer+" does not exist.");
+
+		if ( dp.getInput(htInputLogicNameMap.get(sInputBuffer))!=null )
 			return true;
 		else
 			return false;
@@ -380,7 +384,7 @@ implements ComponentContext {
 	 */
 	public URL getWebUIUrl ( boolean bName ) throws ComponentContextException {
 		URL urlRes = null;
-		
+
 		try {
 			String sHost = (bName)?NetworkTools.getLocalHostName():NetworkTools.getLocalHostIP();
 			urlRes = new URL("http://"+sHost+":"+webui.getPort()+ccCnf.getAppContext()+"/");
@@ -390,7 +394,7 @@ implements ComponentContext {
 
 		return urlRes;
 	}
-	
+
 	/** Gets the proxied webUI URL.
 	 *
 	 * @param bName True if the url needs to be build using the name.
@@ -402,7 +406,7 @@ implements ComponentContext {
 	 */
 	public URL getProxyWebUIUrl ( boolean bName ) throws ComponentContextException {
 		URL urlRes = null;
-		
+
 		try {
 			String sHost = (bName)?NetworkTools.getLocalHostName():NetworkTools.getLocalHostIP();
 			urlRes = new URL("http://"+sHost+":"+ccCnf.getBasePort()+ccCnf.getAppContext()+"/webui/"+webui.getPort()+"/");
@@ -414,7 +418,7 @@ implements ComponentContext {
 	}
 
 	/** Given a request it returns the proper path base to use.
-	 * 
+	 *
 	 * @param request The request received
 	 * @return The dynamic URL
 	 * @throws ComponentContextException The URL could not be generated
@@ -426,7 +430,7 @@ implements ComponentContext {
 		} catch (URISyntaxException e) {
 			throw new ComponentContextException(e);
 		}
-		if ( uri.getPath().startsWith(ccCnf.getAppContext()+"/webui/") ) 
+		if ( uri.getPath().startsWith(ccCnf.getAppContext()+"/webui/") )
 			return ccCnf.getAppContext()+"/webui/"+webui.getPort()+"/";
 		else
 			return ccCnf.getAppContext()+"/";
@@ -462,25 +466,25 @@ implements ComponentContext {
 	public String getFlowID() {
 		return this.flowID;
 	}
-	
+
 	/** Request the abortion of the flow.
-	 * 
+	 *
 	 */
 	public void requestFlowAbortion() {
 		wcParent.getMrProper().abort();
 		log.warning("Abort requested by component "+wcParent.getExecutableComponentInstanceID());
 	}
-	
+
 	/** Returns true if the flow has started a termination request.
-	 * 
+	 *
 	 * @return True if the flow is aborting
 	 */
 	public boolean isFlowAborting() {
 		return this.wcParent.isTerminating();
 	}
-	
+
 	/** Returns the reverse name active buffer relation.
-	 * 
+	 *
 	 * @return The reverse map
 	 */
 	public Hashtable<String, String> getInputLogicNameMapReverse() {
@@ -488,16 +492,16 @@ implements ComponentContext {
 	}
 
 	/** Sets Mr Propper.
-	 * 
+	 *
 	 * @param thdMrPropper The Mr Propper to be set.
 	 */
 	public void setMrPropper(MrProper thdMrPropper) {
-		this.webui.setMrPropper(thdMrPropper);	
+		this.webui.setMrPropper(thdMrPropper);
 	}
 
 	/**Returns the plugin or null if there was a failure initing
 	 * the plugin
-	 * 
+	 *
 	 * @param id The plugin id
 	 * @return The Meandre plugin
 	 */
@@ -506,9 +510,9 @@ implements ComponentContext {
 		MeandrePlugin mp=pluginFactory.getPlugin(id);
 		return mp;
 	}
-	
+
 	/** Returns the output console for the flow.
-	 * 
+	 *
 	 * @return The output console
 	 */
 	public PrintStream getOutputConsole() {
