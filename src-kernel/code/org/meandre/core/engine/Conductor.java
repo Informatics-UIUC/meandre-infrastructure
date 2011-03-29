@@ -312,7 +312,17 @@ public class Conductor {
 			htMapOutputTranslation.put(ecid.getExecutableComponentInstance(),htMapOut);
 
 		}
+
+		Set<Resource> instancesWithUnconnectedInputs = new HashSet<Resource>();
+		for (ExecutableComponentInstanceDescription ecid : fd.getExecutableComponentInstances()) {
+		    ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(ecid.getExecutableComponent());
+		    if (ecd.getInputs().size() == 0) continue;  // don't consider as "unconnected" instances with NO input ports; they can still be executed!
+		    instancesWithUnconnectedInputs.add(ecid.getExecutableComponentInstance());
+		}
+
 		for ( ConnectorDescription cd:fd.getConnectorDescriptions() ) {
+		    instancesWithUnconnectedInputs.remove(cd.getTargetInstance());
+
 			String sIDOutSet = cd.getSourceInstance().toString();
 			String  sIDInSet = cd.getTargetInstance().toString();
 			String  sIDIn = cd.getTargetInstance().toString()+URL_SEPARATOR+cd.getTargetInstanceDataPort().toString();
@@ -355,6 +365,10 @@ public class Conductor {
 		log.fine("STEP 7: Create wrapping components and add the wrapping components to the execution set");
 		Set<WrappedComponent> setWC = new HashSet<WrappedComponent>();
 		for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() ) {
+		    // This is to eliminate component instances that aren't connected from being allocated threads to execute in
+		    if (instancesWithUnconnectedInputs.contains(ecid.getExecutableComponentInstance()))
+		        continue;
+
 			Resource resECI = ecid.getExecutableComponentInstance();
 			String sResECI = resECI.toString();
 			String firing = qr.getExecutableComponentDescription(ecid.getExecutableComponent()).getFiringPolicy().toLowerCase();
@@ -606,7 +620,7 @@ public class Conductor {
 				throw new CorruptedDescriptionException(e);
 			}
 		}
-		
+
 		return urlCL;
 	}
 
