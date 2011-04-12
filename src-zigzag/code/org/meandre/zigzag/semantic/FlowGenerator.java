@@ -215,7 +215,7 @@ public class FlowGenerator {
 	 * @param iLine The line where the request was done
 	 * @throws ParseException Invalid component URI
 	 */
-	public void aliasCoponent(String sCompURI, String sAlias, int iLine) throws ParseException {
+	public void aliasComponent(String sCompURI, String sAlias, int iLine) throws ParseException {
 		URI uriComp = Tools.filterURItoURL(sCompURI, iLine);
 
 		Resource resComp = ri.getModel().createResource(Tools.filterURItoURL(sCompURI, iLine).toString());

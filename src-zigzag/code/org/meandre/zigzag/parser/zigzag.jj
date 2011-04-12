@@ -1,14 +1,14 @@
 /**
  * ZigZag javaCC parser definition.
- * 
- * This parser describes the grammer and the basic compilation mechanisms of  
+ *
+ * This parser describes the grammar and the basic compilation mechanisms of
  * Meandre's ZigZag scripting language.
  *
  * @author Xavier Llora
  */
- 
+
 options {
-  JDK_VERSION = "1.5"; 
+  JDK_VERSION = "1.5";
   STATIC = false;
 }
 PARSER_BEGIN(ZigZag)
@@ -23,11 +23,11 @@ import org.meandre.core.logger.KernelLoggerFactory;
 public class ZigZag {
 
   public static String ZIGZAG_VERSION = "1.0.1vcli";
-  
+
   protected String sFileName;
-  
+
   protected FlowGenerator fg;
-  
+
   public void setFileName(String fname){
 	this.sFileName = fname;
   }
@@ -47,33 +47,33 @@ public class ZigZag {
   public FlowGenerator getFlowGenerator(){
    return this.fg;
   }
-  
+
   public static void main(String args[]) throws ParseException,FileNotFoundException, IOException {
-    
+
     // Tone down the logger
 	KernelLoggerFactory.getCoreLogger().setLevel(Level.WARNING);
 	for ( Handler h:KernelLoggerFactory.getCoreLogger().getHandlers() )
 		h.setLevel(Level.WARNING);
-		
+
     if ( args.length<1 ) {
-    	System.err.println("Wrong syntax!!!\nThe compiler requires at least on .zz file");
+    	System.err.println("Wrong syntax!!!\nThe compiler requires at least one .zz file");
     }
     else
     {
     	for ( String sFileName:args) {
 		    FileInputStream fis = new FileInputStream(sFileName);
-		    ZigZag parser = new ZigZag(fis);    
+		    ZigZag parser = new ZigZag(fis);
 		    parser.sFileName = sFileName;
 		    parser.fg = new FlowGenerator();
 		    parser.fg.init(sFileName);
 		    try {
-		    	parser.start(); 
+		    	parser.start();
 		    	System.out.println();
-		    	parser.fg.generateMAU(sFileName); 
+		    	parser.fg.generateMAU(sFileName);
 		    }
 		    catch ( ParseException pe ) {
 		    	throw pe;
-		    } 
+		    }
     	}
     }
   }
@@ -94,7 +94,7 @@ SKIP :
   <"#" (~["\n","\r"])* ["\n","\r"]>
 }
 
-TOKEN : 
+TOKEN :
 {
 	< COMA: "," >
 |	< EQUAL: "=" >
@@ -106,57 +106,57 @@ TOKEN :
 |	< AT: "@" >
 |	< LB: "[" >
 |	< RB: "]" >
-|	< PLUS: "+" > 
+|	< PLUS: "+" >
 |	< EXCL: "!" >
 }
-TOKEN : 
+TOKEN :
 {
 	< IMPORT: "import">
-|   < FROM: "from"> 
-|   < ALIAS: "alias"> 
+|   < FROM: "from">
+|   < ALIAS: "alias">
 |   < AS: "as">
 |   < AUTO: "AUTO">
 |   < NUMBER: ["1"-"9"](["0"-"9"])* >
 }
 TOKEN :
-{ 
-    < SYMBOL: ["a"-"z","A"-"Z"] ( ["a"-"z","A"-"Z","0"-"9","-","_"] )* >
+{
+    < SYMBOL: ( ["_"] )* ( ["a"-"z","A"-"Z"] )+ ( ["a"-"z","A"-"Z","0"-"9","_"] )* >
 |	< URI: "<" (["a"-"z","A"-"Z"])+ "://"(["a"-"z","A"-"Z","0"-"9"," ","-","_",":","/","%","+","&","=",".","@"])+ ">" >
-|	< VALUE: "\"" (~["\""])* "\"" >
+|   < VALUE: "\"" ("\\" "\"" | (~["\""]) )* "\"" >
 }
-void start() : 
+void start() :
 {
 	Token t;
-} 
+}
 {
   	(
-  		cda() 
-	| 	t=<SYMBOL> (ci(t) | cm(t) | ii_call(t) ) 
+  		cda()
+	| 	t=<SYMBOL> (ci(t) | cm(t) | ii_call(t) )
 	|	ii_assigment()
   	)*
   	<EOF>
 }
 
-void cda() : 
+void cda() :
 {
 	Token tRepURI;
 	Token tCompURI;
 	Token tAlias;
-} 
+}
 {
-	( 
+	(
 		<IMPORT>
-		tRepURI=<URI> 
-		{ fg.importRepository(tRepURI.image,jj_input_stream.getBeginLine()-1); }	
+		tRepURI=<URI>
+		{ fg.importRepository(tRepURI.image,jj_input_stream.getBeginLine()-1); }
 	) |
-	( 
+	(
 		<ALIAS>
 		tCompURI=<URI>
 		<AS>
-		tAlias = <SYMBOL> 
-		{ fg.aliasCoponent(tCompURI.image,tAlias.image,jj_input_stream.getBeginLine()-1);}
+		tAlias = <SYMBOL>
+		{ fg.aliasComponent(tCompURI.image,tAlias.image,jj_input_stream.getBeginLine()-1);}
 	) |
-	( 
+	(
 		<FROM>
 		tRepURI=<URI>
 		<IMPORT>
@@ -165,12 +165,12 @@ void cda() :
 		(
 			<AS>
 			tAlias = <SYMBOL>
-			{ fg.aliasCoponent(tCompURI.image,tAlias.image,jj_input_stream.getBeginLine()-1);}
-		)? 
+			{ fg.aliasComponent(tCompURI.image,tAlias.image,jj_input_stream.getBeginLine()-1);}
+		)?
 	)
 }
 
-void ci(Token t) : 
+void ci(Token t) :
 {
 	Token tTmp;
 	Queue<String> qSymbols = new LinkedList<String>();
@@ -178,13 +178,13 @@ void ci(Token t) :
 	qSymbols.offer(t.image);
 }
 {
-	( 
-		<COMA> 
-		tTmp=<SYMBOL> 
+	(
+		<COMA>
+		tTmp=<SYMBOL>
 		{ qSymbols.offer(tTmp.image); }
-	)* 
-	<EQUAL> 
-	tTmp=<SYMBOL> <LP><RP> 
+	)*
+	<EQUAL>
+	tTmp=<SYMBOL> <LP><RP>
 	{ qComponents.offer(tTmp.image); }
 	(
 		<COMA>
@@ -193,8 +193,8 @@ void ci(Token t) :
 	)*
 	{
 		if ( qSymbols.size()!=qComponents.size() )
-			throw new ParseException ( 
-				"Wrong number of elements in assigment, "+
+			throw new ParseException (
+				"Wrong number of elements in assignment, "+
 				qSymbols.size()+" on the left side and "+
 				qComponents.size()+" on the right side on line "+
 				(jj_input_stream.getBeginLine()-1)
@@ -203,7 +203,7 @@ void ci(Token t) :
 	}
 }
 
-void cm(Token t) : 
+void cm(Token t) :
 {
 	Token tIns;
 	Token tProp;
@@ -211,21 +211,21 @@ void cm(Token t) :
 	Queue<String> qLeftProp = new LinkedList<String>();
 	Queue<String> qRightIns = new LinkedList<String>();
 	Queue<String> qRightProp = new LinkedList<String>();
-	
+
 	qLeftIns.offer(t.image);
 }
 {
 	<DOT> tProp=<SYMBOL>
 	{ qLeftProp.offer(tProp.image); }
-	( 
-		<COMA> 
+	(
+		<COMA>
 		tIns=<SYMBOL> <DOT> tProp=<SYMBOL>
 		{ qLeftIns.offer(tIns.image); qLeftProp.offer(tProp.image); }
-	)* 
-	<EQUAL> 
+	)*
+	<EQUAL>
 	(
-		tIns=<VALUE> 
-		{ qRightIns.offer(tIns.image); qRightProp.offer(null); } 
+		tIns=<VALUE>
+		{ qRightIns.offer(tIns.image); qRightProp.offer(null); }
 		|
 		tIns=<SYMBOL> <DOT> tProp=<SYMBOL>
 		{ qRightIns.offer(tIns.image); qRightProp.offer(tProp.image); }
@@ -233,7 +233,7 @@ void cm(Token t) :
 	(
 		<COMA>
 		(
-			tIns = <VALUE> 
+			tIns = <VALUE>
 			{ qRightIns.offer(tIns.image); qRightProp.offer(null); }
 			|
 			tIns=<SYMBOL> <DOT> tProp=<SYMBOL>
@@ -242,18 +242,18 @@ void cm(Token t) :
 	)*
 	{
 		if ( qLeftIns.size()!=qRightIns.size() )
-			throw new ParseException ( 
-				"Wrong number of elements in component modification assigment, "+
+			throw new ParseException (
+				"Wrong number of elements in component modification assignment, "+
 				qLeftIns.size()+" on the left side and "+
 				qRightIns.size()+" on the right side on line "+
 				(jj_input_stream.getBeginLine()-1)
 			);
-			
+
 		fg.setProperties(qLeftIns,qLeftProp,qRightIns,qRightProp,jj_input_stream.getBeginLine()-1);
 	}
 }
 
-void ii_call( Token tCall ) : 
+void ii_call( Token tCall ) :
 {
 	Token tParallel;
 }
@@ -264,7 +264,7 @@ void ii_call( Token tCall ) :
 				<SEMICOLON>
 				port_binding(tCall)
 			)*
-		)*		
+		)*
 	<RP>
 	(
 		<LB><PLUS>(
@@ -281,8 +281,8 @@ void ii_call( Token tCall ) :
 		<RB>
 	)*
 }
- 
-void port_binding( Token tTargetIns ) : 
+
+void port_binding( Token tTargetIns ) :
 {
 	Token tTargetPort;
 	Token tSourceIns;
@@ -293,22 +293,22 @@ void port_binding( Token tTargetIns ) :
 	<COLON>
 	tSourceIns=<SYMBOL> <DOT> tSourcePort=<SYMBOL>
 	{ fg.bindPort(tSourceIns.image,tSourcePort.image,tTargetIns.image,tTargetPort.image,jj_input_stream.getBeginLine()-1); }
-	(	
+	(
 		<COMA>
 		tSourceIns=<SYMBOL> <DOT> tSourcePort=<SYMBOL>
 		{ fg.bindPort(tSourceIns.image,tSourcePort.image,tTargetIns.image,tTargetPort.image,jj_input_stream.getBeginLine()-1); }
 	)*
 }
 
-void ii_assigment() : 
+void ii_assigment() :
 {
 	Token tBinding;
 	Token tTargetIns;
-		
+
 	Queue<String> qLeftIns = new LinkedList<String>();
-	
+
 	int iLeftCount = 1;
-	int iRightCount = 1; 
+	int iRightCount = 1;
 }
 {
 	<AT>tBinding=<SYMBOL>
@@ -319,23 +319,23 @@ void ii_assigment() :
 		{ fg.createBindingPort(tBinding.image,jj_input_stream.getBeginLine()-1); qLeftIns.offer(tBinding.image); iLeftCount++; }
 	)*
 	<EQUAL>
-	tTargetIns = <SYMBOL> 
+	tTargetIns = <SYMBOL>
 	{ fg.bindBindingPort(qLeftIns.poll(),tTargetIns.image,jj_input_stream.getBeginLine()-1); }
 	ii_call(tTargetIns)
 	(
 		<COMA>
-		tTargetIns = <SYMBOL>  
+		tTargetIns = <SYMBOL>
 		{ fg.bindBindingPort(qLeftIns.poll(),tTargetIns.image,jj_input_stream.getBeginLine()-1); }
-		ii_call(tTargetIns)	
+		ii_call(tTargetIns)
 		{ iRightCount++; }
 	)*
 	{
 		if ( iLeftCount!=iRightCount )
-			throw new ParseException ( 
-				"Wrong number of elements in component binding assigment, "+
+			throw new ParseException (
+				"Wrong number of elements in component binding assignment, "+
 				iLeftCount+" on the left side and "+
 				iRightCount+" on the right side on line "+
 				(jj_input_stream.getBeginLine()-1)
 			);
-	}	
+	}
 }

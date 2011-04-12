@@ -33,21 +33,21 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /** This class provides basic auxiliar tools
- * 
- * 
+ *
+ *
  * @author Xavier LLor&agrave;
  *
  */
 public abstract class Tools {
-	
+
 	/** Remove the delimiting characters from the URI.
-	 * 
+	 *
 	 * @param sURI The URI to process
 	 * @param iLine The line to report in case of error
 	 * @return The resulting URL
 	 * @throws ParseException The URI is not a valid repository URL
 	 */
-	public static URI filterURItoURL ( String sURI, int iLine ) 
+	public static URI filterURItoURL ( String sURI, int iLine )
 	throws ParseException {
 		String sURL = sURI.substring(1, sURI.length()-1).trim();
 		try {
@@ -58,17 +58,24 @@ public abstract class Tools {
 	}
 
 	/** Filters the property value by removing the enclosing quotes.
-	 * 
+	 *
 	 * @param sProperty The property value
 	 * @return The filtered property value
-	  @throws ParseException 
+	  @throws ParseException
 	 */
 	public static String filterPropertyValue ( String sProperty ) {
-		return sProperty.substring(1, sProperty.length()-1).trim();
+		String value = sProperty.substring(1, sProperty.length()-1);
+
+		// unescape any escaped backslashes
+		value = value.replaceAll("\\\\\\\\", "\\\\");
+		// unescape any escaped quotes
+		value = value.replaceAll("\\\\\\\"", "\\\"");
+
+		return value;
 	}
-	
+
 	/** Pull the repository checking the 3 different formats.
-	 * 
+	 *
 	 * @param url The URL to pull from
 	 * @param iLine The line where the request was generated
 	 * @return The Model of the pulled repository
@@ -83,9 +90,9 @@ public abstract class Tools {
 		}
 		return mod;
 	}
-	
+
 	/** Create a directory and makes sure is a unique folder.
-	 * 
+	 *
 	 * @param sOutputFolderName The output folder
 	 * @return The file handler
 	 */
@@ -96,10 +103,10 @@ public abstract class Tools {
 			outpuDirectory = new File(sOutputFolderName+"."+System.currentTimeMillis());
 			bCreated = outpuDirectory.mkdir();
 		} while ( !bCreated );
-		
+
 		return outpuDirectory;
 	}
-	
+
 	/** This methods dump the Literal to the file system and creates a URI for the class loader.
 	 *
 	 * @param fd The flow descriptor
@@ -107,14 +114,14 @@ public abstract class Tools {
 	 * @param fileFolderContexts The folder containing the contexts
 	 * @throws ParserException Something went really wrong
 	 */
-	public static void prepareJarsToTheFileSystem(FlowDescription fd, QueryableRepository qr, File fileFolderContexts ) 
+	public static void prepareJarsToTheFileSystem(FlowDescription fd, QueryableRepository qr, File fileFolderContexts )
 	throws ParseException {
-		
+
 		// Create a set of distinct
 		Set<URI> setJars = new HashSet<URI>();
 		for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() ) {
 			ExecutableComponentDescription ecd = qr.getExecutableComponentDescription(ecid.getExecutableComponent());
-			Set<RDFNode> setCntxs = ecd.getContext();	
+			Set<RDFNode> setCntxs = ecd.getContext();
 			for ( RDFNode node:setCntxs ) {
 				if ( node.isLiteral() ) {
 					// Do nothing, the descriptor will carry the jar over
@@ -124,18 +131,18 @@ public abstract class Tools {
 						// Pull the URL and dump it to the local file
 						Resource res = (Resource)node;
 						URI uri = new URI(res.getURI().replaceAll(" ", "%20"));
-						if ( uri.toString().endsWith(".jar")) 
-							setJars.add(uri);						
+						if ( uri.toString().endsWith(".jar"))
+							setJars.add(uri);
 					} catch (URISyntaxException e) {
 						throw new ParseException(e.toString());
 					}
 				}
-				else 
+				else
 					throw new ParseException("Unknow context type: "+node);
 			}
-					
+
 		}
-		
+
 		// Write them to the file output
 		for ( URI uri:setJars ) {
 			try {
@@ -154,17 +161,17 @@ public abstract class Tools {
 				throw new ParseException(e.toString());
 			}
 		}
-		
+
 	}
 
 	/** Creates a Jar file (MAU file) for the provided directory.
-	 * 
+	 *
 	 * @param fileJar The output jar file
 	 * @param fileDirectory The directory to process
 	 * @throws IOException There was an IO problem
 	 */
 	public static void generateJarFromDirectory(File fileJar, File fileDirectory) throws IOException {
-		
+
 		Collection<File> files = Tools.getCollectionOfFiles(fileDirectory);
 
 		byte buffer[] = new byte[8192];
@@ -179,7 +186,7 @@ public abstract class Tools {
 				JarEntry jarAdd = new JarEntry(f.toString().substring(1).replace('\\','/'));
 				jarAdd.setTime(fReal.lastModified());
 				out.putNextEntry(jarAdd);
-				
+
 				// Write file to archive
 				FileInputStream in = new FileInputStream(fReal);
 				while (true) {
@@ -199,24 +206,24 @@ public abstract class Tools {
 		    new File(fileDirectory+File.separator+"contexts").delete();
 		    new File(fileDirectory+File.separator+"plugins").delete();
 		    fileDirectory.delete();
-		    
+
 		} catch (FileNotFoundException e) {
 			throw e;
 		} catch (IOException e) {
 			throw e;
 		}
 
-		
+
 	}
 
 	/** Returns a collection of file for the given folder.
-	 * 
+	 *
 	 * @param fileDirectory The directory to process
 	 * @return The collection of files
 	 */
 	private static Collection<File> getCollectionOfFiles(File fileDirectory) {
 		LinkedList<File> res = new LinkedList<File>();
-		
+
 		if ( fileDirectory.isDirectory() ) {
 			Queue<File> queuePending = new LinkedList<File>();
 			queuePending.add(fileDirectory);
@@ -234,7 +241,7 @@ public abstract class Tools {
 				}
 			}
 		}
-		
+
 		return res;
 	}
 
