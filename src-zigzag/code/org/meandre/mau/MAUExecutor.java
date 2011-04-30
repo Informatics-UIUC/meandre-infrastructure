@@ -1,6 +1,7 @@
 package org.meandre.mau;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -44,6 +45,13 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.martiansoftware.jsap.FlaggedOption;
+import com.martiansoftware.jsap.JSAP;
+import com.martiansoftware.jsap.JSAPException;
+import com.martiansoftware.jsap.JSAPResult;
+import com.martiansoftware.jsap.Parameter;
+import com.martiansoftware.jsap.SimpleJSAP;
+import com.martiansoftware.jsap.UnflaggedOption;
 
 /**
  * This class runs Meandre's MAU files.
@@ -54,7 +62,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 public class MAUExecutor {
 
 	/** The current version of the MAU executor */
-	private static final String ZMAU_VERSION = "1.0.1vcli";
+	private static final String ZMAU_VERSION = "1.0.2vcli";
 
 	/** The run temp dir */
 	private static final String MAU_RUN_DIR = "run";
@@ -80,31 +88,40 @@ public class MAUExecutor {
 	/** The port number to use */
 	private int iPort;
 
+	private String config;
+
 	/** The main method that runs the the MAU file.
 	 *
 	 * @param sArgs The command line arguments
 	 * @throws FileNotFoundException The file could not be found
 	 */
-	public static void main(String sArgs[]) throws FileNotFoundException {
+	public static void main(String sArgs[]) throws Exception {
 		// Tone down the logger
 		KernelLoggerFactory.getCoreLogger().setLevel(Level.WARNING);
 		for ( Handler h:KernelLoggerFactory.getCoreLogger().getHandlers() )
 			h.setLevel(Level.WARNING);
 
-		if ( sArgs.length<1 || sArgs.length>2 ) {
-			System.err.println("Wrong syntax!!!\nThe MAU executor requires one .mau file and " +
-					"an optional port number for the WebUI");
-		}
-		else  {
-			MAUExecutor mau = new MAUExecutor(sArgs[0]);
-			mau.setParentClassloader(MAUExecutor.class.getClassLoader());
-			if ( sArgs.length==2 )
-				mau.setWebUIPortNumber(Integer.parseInt(sArgs[1]));
-			mau.run();
-		}
+        // Parse command line arguments
+        JSAPResult jsapResult = parseArguments(sArgs);
+
+        // Extract the argument values
+        String mauFile = jsapResult.getString("mau");
+        int port = jsapResult.getInt("port");
+        String config = jsapResult.contains("config") ? jsapResult.getString("config") : null;
+
+        MAUExecutor mau = new MAUExecutor(mauFile);
+        mau.setParentClassloader(MAUExecutor.class.getClassLoader());
+        mau.setWebUIPortNumber(port);
+        if (config != null)
+            mau.setConfigFile(config);
+        mau.run();
 	}
 
-	/** Creates a new MAU execution object for the given filename.
+	private void setConfigFile(String config) {
+        this.config = config;
+    }
+
+    /** Creates a new MAU execution object for the given filename.
 	 *
 	 * @param sFileName The file name
 	 */
@@ -169,10 +186,9 @@ public class MAUExecutor {
 	 *
 	 * @throws FileNotFoundException The file could not be found
 	 */
-	public void run () throws FileNotFoundException {
-
+	public void run () throws Exception {
 		ps.println("Meandre MAU Executor [" + MAUExecutor.ZMAU_VERSION + "/" + Constants.MEANDRE_VERSION + "]");
-		ps.println("All rights reserved by DITA, NCSA, UofI (2007-2009)");
+		ps.println("All rights reserved by DITA, NCSA, UofI (2007-2011)");
 		ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		ps.println();
 		ps.flush();
@@ -189,14 +205,20 @@ public class MAUExecutor {
 
 		Resource resURI = qr.getAvailableFlows().iterator().next();
 		ps.println("Preparing flow: "+resURI);
-		Properties props = new Properties();
-		props.setProperty(CoreConfiguration.MEANDRE_BASE_PORT, ""+(iPort-1));
-		props.setProperty(CoreConfiguration.MEANDRE_HOME_DIRECTORY, ".");
-		props.setProperty(CoreConfiguration.MEANDRE_PRIVATE_RUN_DIRECTORY, fTmp.toString());
-		props.setProperty(CoreConfiguration.MEANDRE_PUBLIC_RESOURCE_DIRECTORY, fTmpPR.toString());
-		props.setProperty(CoreConfiguration.MEANDRE_CORE_CONFIG_FILE, "meandre-config-core.xml");
-		CoreConfiguration cnf = new CoreConfiguration(props);
 
+	    Properties props = new Properties();
+		if (config != null) {
+		    props.loadFromXML(new FileInputStream(config));
+	        props.setProperty(CoreConfiguration.MEANDRE_CORE_CONFIG_FILE, config);
+		} else {
+    		props.setProperty(CoreConfiguration.MEANDRE_CORE_CONFIG_FILE, "meandre-config-core.xml");
+		}
+        props.setProperty(CoreConfiguration.MEANDRE_BASE_PORT, ""+(iPort-1));
+        props.setProperty(CoreConfiguration.MEANDRE_HOME_DIRECTORY, ".");
+        props.setProperty(CoreConfiguration.MEANDRE_PRIVATE_RUN_DIRECTORY, fTmp.toString());
+        props.setProperty(CoreConfiguration.MEANDRE_PUBLIC_RESOURCE_DIRECTORY, fTmpPR.toString());
+
+		CoreConfiguration cnf = new CoreConfiguration(props);
 		Conductor conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 
 		exec =null;
@@ -465,4 +487,33 @@ public class MAUExecutor {
 		this.parentClassloader = parentClassloader;
 	}
 
+    /**
+     * Parses the command line arguments
+     *
+     * @param args The command line arguments
+     * @return The JSAPResult object containing the parsed arguments
+     */
+    private static JSAPResult parseArguments(String[] args) throws JSAPException {
+        JSAPResult result = null;
+
+        String generalHelp = "Runs a MAU file";
+
+        SimpleJSAP jsap =
+            new SimpleJSAP(MAUExecutor.class.getSimpleName(),
+                    generalHelp,
+                    new Parameter[] {
+                    new UnflaggedOption("mau", JSAP.STRING_PARSER, true, "The MAU file to run"),
+                    new FlaggedOption("port", JSAP.INTEGER_PARSER,
+                            "1715", JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+                            "port", "The port number to bind to"),
+                    new FlaggedOption("config", JSAP.STRING_PARSER,
+                            JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+                            "config", "The configuration file to use")});
+
+        result = jsap.parse(args);
+        if (jsap.messagePrinted())
+            System.exit(-1);
+
+        return result;
+    }
 }
