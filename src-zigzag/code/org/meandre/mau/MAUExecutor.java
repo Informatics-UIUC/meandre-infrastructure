@@ -219,6 +219,8 @@ public class MAUExecutor {
         props.setProperty(CoreConfiguration.MEANDRE_PUBLIC_RESOURCE_DIRECTORY, fTmpPR.toString());
 
 		CoreConfiguration cnf = new CoreConfiguration(props);
+		cnf.initializeLogging();
+
 		Conductor conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 
 		exec =null;
