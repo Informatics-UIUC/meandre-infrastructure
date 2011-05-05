@@ -81,6 +81,9 @@ public class Conductor {
 	/** The core configuration object */
 	private final CoreConfiguration cnf;
 
+	private static final Random RANDOM = new Random();
+
+
 	private ClassLoader parentClassloader;
 
 	/** Initialize a conductor with a set of valid URLs.
@@ -111,7 +114,7 @@ public class Conductor {
 	 */
 	public Executor buildExecutor(QueryableRepository qr, Resource res, PrintStream console )
 	throws CorruptedDescriptionException, ConductorException {
-		String sFlowUniqueExecutionID = res.toString()+NetworkTools.getNumericIPValue()+"/"+System.currentTimeMillis()+"/"+(Math.abs(new Random().nextInt()))+"/";
+		String sFlowUniqueExecutionID = res.toString()+NetworkTools.getNumericIPValue()+"/"+System.currentTimeMillis()+"/"+(Math.abs(RANDOM.nextInt()))+"/";
 		return buildExecutor(qr,res,console,sFlowUniqueExecutionID);
 	}
 
@@ -146,7 +149,7 @@ public class Conductor {
 	 */
 	public Executor buildExecutor(QueryableRepository qr, Resource res, MrProbe thdMrProbe, PrintStream console)
 	throws CorruptedDescriptionException, ConductorException {
-		String sFlowUniqueExecutionID = res.toString()+NetworkTools.getNumericIPValue()+"/"+System.currentTimeMillis()+"/"+(Math.abs(new Random().nextInt()))+"/";
+		String sFlowUniqueExecutionID = res.toString()+NetworkTools.getNumericIPValue()+"/"+System.currentTimeMillis()+"/"+(Math.abs(RANDOM.nextInt()))+"/";
 		return buildExecutor(qr,res,thdMrProbe,console,sFlowUniqueExecutionID);
 	}
 	/** Creates an execution object for the given flow description.

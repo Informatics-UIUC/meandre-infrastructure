@@ -213,8 +213,8 @@ public abstract class ServletConfigurableDispatcher extends HttpServlet {
 			String sExtension = (saParts.length==2 )?saParts[1]:"";
 
 			// Create the names
-			String sReq = "req"+lctm+Math.abs(rnd.nextInt());
-			String sRes = "resp"+lctm+Math.abs(rnd.nextInt());
+			String sReq = "req"+Long.toString(lctm)+Integer.toString(Math.abs(rnd.nextInt()));
+			String sRes = "resp"+Long.toString(lctm)+Integer.toString(Math.abs(rnd.nextInt()));
 
 			// Set the objects
 			pi.set(sReq,req);

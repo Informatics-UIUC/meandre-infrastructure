@@ -42,6 +42,8 @@ import com.hp.hpl.jena.rdf.model.Resource;
  */
 public class InteractiveExecution {
 
+	private static final Random RANDOM = new Random();
+
 	/** Executes the requested flow in verbose mode.
 	 *
 	 * @param qr The query repository to use
@@ -381,7 +383,7 @@ public class InteractiveExecution {
 	public static String createUniqueExecutionFlowID ( String resFlow, int iPort ) {
 		return resFlow + NetworkTools.getNumericIPValue()
 				+ Integer.toHexString(iPort).toUpperCase() + "/" + System.currentTimeMillis()
-				+ "/" + (Math.abs(new Random().nextInt())) + "/";
+				+ "/" + (Math.abs(RANDOM.nextInt())) + "/";
 	}
 
 	/** Instantiates the required probes to use during the flow execution.
