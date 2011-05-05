@@ -38,7 +38,7 @@
 
 	<!-- compile -->
 	<target name="compile" depends="init" description="-> compiles source code">
-		<javac srcdir="${basedir}" destdir="${build.dir}/" debug="${compile.debug}"
+		<javac srcdir="${basedir}" destdir="${build.dir}/" debug="${compile.debug}" target="1.5"
                deprecation="${compile.deprecation}" optimize="${compile.optimize}"
                classpathref="meandre.core.classpath" includeantruntime="false">
 			<include name="${kernel.src}/**/*.java"/>
@@ -143,15 +143,15 @@
 
 	<!-- compile-tests -->
 	<target name="compile-tests" depends="compile" description="-> compiles test code">
-		<javac srcdir="${kernel.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${zigzag.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${demo.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${plugins.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${ws.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${store.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${coordinator.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${executables.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${support.test}" destdir="${test.dir}" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${kernel.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${zigzag.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${demo.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${plugins.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${ws.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${store.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${coordinator.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${executables.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${support.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
 	</target>
 
 	<!-- clean -->
@@ -303,7 +303,7 @@
 				<attribute name="Build-Version" value="${build.version}"/>
 			</manifest>
 			<fileset dir="${build.dir}"/>
-			
+
 			<!-- include sources -->
 			<fileset dir="${kernel.src}"/>
 			<fileset dir="${zigzag.src}" />
@@ -327,7 +327,7 @@
 				<include name="org/meandre/configuration/**"/>
 				<include name="org/meandre/webui/**"/>
 			</fileset>
-			
+
 			<!-- include sources -->
 			<fileset dir="${kernel.src}">
 				<include name="org/meandre/core/**"/>
