@@ -5,7 +5,7 @@
 __name__ = 'WSLogsServlet'
 
 requestMap = {
-    'GET': { 
+    'GET': {
         'webservices': 'log_webservices',
         'kernel': 'log_kernel',
         'coordinator': 'log_coordinator',
@@ -19,7 +19,6 @@ requestMap = {
 #
 
 from java.io import File
-from org.meandre.core.utils import Constants
 
 #
 # Constants
@@ -53,7 +52,7 @@ def __read_log ( log_file, offset ):
 
 def __dump_log ( request, response, format, log ):
     '''Dumps the requested log'''
-    
+
     if checkUserRole (request,Role.ADMIN) :
         params = extractRequestParamaters(request)
         offset = 0
@@ -64,23 +63,23 @@ def __dump_log ( request, response, format, log ):
         sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
-    
+
 def log_webservices ( request, response, format ):
     '''Returns the webservices log'''
-    __dump_log ( request, response, format, __base_ws_logger )    
-        
+    __dump_log ( request, response, format, __base_ws_logger )
+
 def log_kernel ( request, response, format ):
     '''Returns the kernel log'''
     __dump_log ( request, response, format, __base_kr_logger )
-        
+
 def log_coordinator ( request, response, format ):
     '''Returns the coordinator log'''
     __dump_log ( request, response, format, __base_co_logger )
-        
+
 def log_plugins ( request, response, format ):
     '''Returns the plugins log'''
     __dump_log ( request, response, format, __base_pg_logger )
-    
+
 def log_probes ( request, response, format ):
     '''Returns the probes log'''
     __dump_log ( request, response, format, __base_pr_logger )
