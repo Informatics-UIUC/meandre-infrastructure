@@ -36,8 +36,8 @@ import org.meandre.core.repository.CorruptedDescriptionException;
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
-import org.meandre.core.utils.Constants;
 import org.meandre.core.utils.ModelIO;
+import org.meandre.core.utils.Version;
 import org.meandre.webui.PortScroller;
 import org.meandre.webui.WebUI;
 
@@ -187,7 +187,7 @@ public class MAUExecutor {
 	 * @throws FileNotFoundException The file could not be found
 	 */
 	public void run () throws Exception {
-		ps.println("Meandre MAU Executor [" + MAUExecutor.ZMAU_VERSION + "/" + Constants.MEANDRE_VERSION + "]");
+		ps.println("Meandre MAU Executor [" + MAUExecutor.ZMAU_VERSION + "/" + Version.getFullVersion() + "]");
 		ps.println("All rights reserved by DITA, NCSA, UofI (2007-2011)");
 		ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		ps.println();

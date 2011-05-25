@@ -17,7 +17,7 @@ import javax.servlet.Servlet;
 
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.logger.PluginsLoggerFactory;
-import org.meandre.core.utils.Constants;
+import org.meandre.core.utils.Version;
 import org.meandre.plugins.tools.JarToolServlet;
 import org.meandre.plugins.vfs.VFSServlet;
 import org.mortbay.jetty.Server;
@@ -101,7 +101,7 @@ public class PluginFactory {
 			FileOutputStream fos;
 			try {
 				fos = new FileOutputStream(sConfigFilePath);
-				PluginFactory.propPluginFactoryConfig.storeToXML(fos, "Meandre default plugins configuration file ("+Constants.MEANDRE_VERSION+")");
+				PluginFactory.propPluginFactoryConfig.storeToXML(fos, "Meandre default plugins configuration file ("+Version.getVersion()+")");
 			    fos.close();
 			} catch (Exception eWrite) {
 				pf.log.warning("Meandre plugins configuration file "+
@@ -146,8 +146,8 @@ public class PluginFactory {
 		if ( file.mkdirs() ) {
 			try {
 				PrintStream ps = new PrintStream(new FileOutputStream(file.getAbsolutePath()+File.separator+"readme.txt"));
-				ps.println("Meandre Execution Engine version "+Constants.MEANDRE_VERSION);
-				ps.println("All rights reserved by DITA, NCSA, UofI (2007-2009)");
+				ps.println("Meandre Execution Engine version "+Version.getFullVersion());
+				ps.println("All rights reserved by DITA, NCSA, UofI (2007-2011)");
 				ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 				ps.println();
 				ps.println("This directory contains all the publicly available implementations for the Meandre components.");

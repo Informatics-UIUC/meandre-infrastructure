@@ -1,44 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Meandre-Infrastructure" basedir="." default="dist">
-	<!-- Check whether Java 1.5+ is being used -->
-	<condition property="using.java.1.5">
-		<or>
-			<equals arg1="${ant.java.version}" arg2="1.5"/>
-			<equals arg1="${ant.java.version}" arg2="1.6"/>
-		</or>
-	</condition>
+    <import file="common.xml" />
 
-	<!-- Check whether Ant 1.7+ is being used -->
-	<condition property="using.ant.1.7">
-		<or>
-			<contains string="${ant.version}" substring="1.7"/>
-			<contains string="${ant.version}" substring="1.8"/>
-		</or>
-	</condition>
+    <svn failonerror="false">
+        <wcVersion path="${basedir}" prefix="svn.root."/>
+    </svn>
 
-	<!-- Make sure we're running under the correct environment -->
-	<fail message="This project requires Ant 1.7, and you have Ant ${ant.version}. Please update your Ant version."
-    	  unless="using.ant.1.7"/>
-	<fail message="This project requires Java 5 or greater. Please set JAVA_HOME to point to the proper JDK location."
-          unless="using.java.1.5"/>
+    <condition property="svn_revision" value="${svn.root.revision.max-with-flags}" else="custom">
+        <isset property="svn.root.revision.max-with-flags"/>
+    </condition>
 
 	<!-- import properties (app settings, classpath, jar file locations) -->
 	<import file="properties.xml"/>
 
-	<target name="init" description="-> creates required folders">
+	<target name="init">
 		<tstamp>
-			<format property="TIMESTAMP" pattern="MMM d, yyyy h:mm:ssa Z"/>
+			<format property="TIMESTAMP" pattern="MMM d, yyyy h:mm:ssa Z" />
 		</tstamp>
+	</target>
 
-		<mkdir dir="${build.dir}"/>
-		<mkdir dir="${dist.dir}"/>
-		<mkdir dir="${test.dir}"/>
-		<mkdir dir="${doc.dir}"/>
+	<!-- prepare -->
+	<target name="prepare" depends="init" description="-> performs necessary preparation tasks for the build">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<mkdir dir="${test.dir}" />
+		<mkdir dir="${doc.dir}" />
+
+		<copy file="${version.template}" toFile="${version.file}" overwrite="true">
+			<filterset>
+				<filter token="VERSION" value="${build.version}" />
+                <filter token="CODENAME" value="${build.codename}" />
+				<filter token="REVISION" value="${svn_revision}" />
+			</filterset>
+		</copy>
 	</target>
 
 	<!-- compile -->
-	<target name="compile" depends="init" description="-> compiles source code">
-		<javac srcdir="${basedir}" destdir="${build.dir}/" debug="${compile.debug}" target="1.5"
+	<target name="compile" depends="prepare" description="-> compiles source code">
+		<javac srcdir="${basedir}" destdir="${build.dir}/" debug="${compile.debug}" target="${compile.target}"
                deprecation="${compile.deprecation}" optimize="${compile.optimize}"
                classpathref="meandre.core.classpath" includeantruntime="false">
 			<include name="${kernel.src}/**/*.java"/>
@@ -143,15 +142,15 @@
 
 	<!-- compile-tests -->
 	<target name="compile-tests" depends="compile" description="-> compiles test code">
-		<javac srcdir="${kernel.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${zigzag.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${demo.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${plugins.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${ws.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${store.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${coordinator.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${executables.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${support.test}" destdir="${test.dir}" target="1.5" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${kernel.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${zigzag.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${demo.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${plugins.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${ws.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${store.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${coordinator.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${executables.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${support.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
 	</target>
 
 	<!-- clean -->
@@ -256,7 +255,7 @@
 	</target>
 
 	<!--- Documentation (Javadocs) -->
-	<target name="javadoc" depends="init"
+	<target name="javadoc" depends="prepare"
             description="-> generates the documentation (ignore all warnings)">
 		<javadoc
                 classpathref="meandre.test.classpath"

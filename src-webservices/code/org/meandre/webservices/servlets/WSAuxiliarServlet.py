@@ -27,6 +27,7 @@ from java.io import ByteArrayOutputStream
 from org.meandre.webservices.tools import ServletConfigurableDispatcher
 from org.meandre.core.repository import ExecutableComponentInstanceDescription
 from org.meandre.core.repository import RepositoryImpl
+import cgi
 
 __header = """
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
@@ -349,15 +350,15 @@ def __render_flow ( flow_desc, edit, qr ):
                         else :
                             html += '<tr><td style="text-align: right;">'+key+' = </td><td>'+val+'</td></tr>'
                     else:
-                        html += '<input type="hidden" name="flow_uri" value="'+flow_desc.getFlowComponent().toString().replace('"', '&quot;')+'" />'
-                        html += '<input type="hidden" name="flow_component_instance" value="'+ecid.getExecutableComponentInstance().toString().replace('"', '&quot;')+'" />'
-                        html += '<input type="hidden" name="property_name" value="'+key.replace('"', '&quot;')+'" />'
+                        html += '<input type="hidden" name="flow_uri" value="'+cgi.escape(flow_desc.getFlowComponent().toString(), True)+'" />'
+                        html += '<input type="hidden" name="flow_component_instance" value="'+cgi.escape(ecid.getExecutableComponentInstance().toString(), True)+'" />'
+                        html += '<input type="hidden" name="property_name" value="'+cgi.escape(key, True)+'" />'
                         val = ecid.getProperties().getValue(key)
                         html += '<tr><td style="text-align: right;">'+key+' = </td><td>'
                         if val is None :
-                            html += '<input type="text" name="property_value" value="'+ecd.getProperties().getValue(key).replace('"', '&quot;')+'" size="60" />'
+                            html += '<input type="text" name="property_value" value="'+cgi.escape(ecd.getProperties().getValue(key), True)+'" size="60" />'
                         else :
-                            html += '<input type="text" name="property_value" value="'+val.replace('"', '&quot;')+'" size="60" />'
+                            html += '<input type="text" name="property_value" value="'+cgi.escape(val, True)+'" size="60" />'
                         html += '</td></tr>'
             html += '</table>'
             html += '</td></tr>'

@@ -24,8 +24,8 @@ import org.meandre.core.services.coordinator.CoordinatorServiceCallBack;
 import org.meandre.core.services.coordinator.backend.CoordinatorBackendAdapter;
 import org.meandre.core.services.coordinator.backend.CoordinatorBackendAdapterException;
 import org.meandre.core.store.Store;
-import org.meandre.core.utils.Constants;
 import org.meandre.core.utils.FileUtil;
+import org.meandre.core.utils.Version;
 import org.meandre.plugins.PluginFactory;
 import org.meandre.webservices.logger.WSLoggerFactory;
 import org.meandre.webservices.servlets.WSAboutServlet;
@@ -222,7 +222,7 @@ public class MeandreServer {
 	 * @throws Exception Jetty could not be started or joined
 	 */
 	public void start (boolean bJoin) throws Exception {
-		log.info("Starting Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+")");
+		log.info("Starting Meandre Server "+Version.getFullVersion());
 
 		server = new Server(cnf.getBasePort());
 
@@ -258,7 +258,7 @@ public class MeandreServer {
 	 */
 	public void join () throws InterruptedException {
 		String sCntx = cnf.getAppContext();
-		log.info("Joining Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+") on context <"+((sCntx.length()==0)?"/":sCntx)+">");
+		log.info("Joining Meandre Server "+ Version.getFullVersion() +" on context <"+((sCntx.length()==0)?"/":sCntx)+">");
 		server.join();
 
 	}
@@ -268,7 +268,7 @@ public class MeandreServer {
 	 *
 	 */
 	public void stop () throws Exception {
-		log.info("Stoping Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+")");
+		log.info("Stoping Meandre Server "+Version.getFullVersion());
 		bStop  = true;
 		baToStore.close();
 		store.getJobInformation().close();
@@ -283,7 +283,7 @@ public class MeandreServer {
 	 */
 	public void delayedStop (final int iDelay) throws Exception {
 
-		log.info("Stoping Meandre Server "+Constants.MEANDRE_VERSION+" ("+Constants.MEANDRE_RELEASE_TAG+")");
+		log.info("Stoping Meandre Server "+ Version.getFullVersion());
 		bStop  = true;
 		baToStore.close();
 		store.getJobInformation().close();
@@ -439,7 +439,7 @@ public class MeandreServer {
 			baToStore.linkToService(store.getConnectionToDB(),cnf.getBasePort(), new CoordinatorServiceCallBack() {
 
 				public String getDescription() {
-					return "Meandre Server "+Constants.MEANDRE_VERSION;
+					return "Meandre Server "+Version.getFullVersion();
 				}
 
 				public boolean ping(String sIP,int iPort) {

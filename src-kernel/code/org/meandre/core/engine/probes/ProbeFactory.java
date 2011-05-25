@@ -13,7 +13,7 @@ import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.engine.Probe;
 import org.meandre.core.engine.ProbeException;
 import org.meandre.core.logger.ProbesLoggerFactory;
-import org.meandre.core.utils.Constants;
+import org.meandre.core.utils.Version;
 
 /**This class provides a basic factory for managing probes.
 *
@@ -29,14 +29,14 @@ public class ProbeFactory {
 	private final String sConfigFile = "meandre-config-probes.xml";
 
 	/** The probe logger */
-	private Logger log = ProbesLoggerFactory.getProbesLogger();
+	private final Logger log = ProbesLoggerFactory.getProbesLogger();
 
 	/** The probe factory store */
 	private static Properties propProbeFactoryConfig;
 
 	/** The core configuration object */
-	private CoreConfiguration cnf;
-	
+	private final CoreConfiguration cnf;
+
 	/** Creates an uninitialized plugin factory and avoids other to instantiate it.
 	 *
 	 */
@@ -82,7 +82,7 @@ public class ProbeFactory {
 			FileOutputStream fos;
 			try {
 				fos = new FileOutputStream(sConfigFilePath);
-				ProbeFactory.propProbeFactoryConfig.storeToXML(fos, "Meandre default probes configuration file ("+Constants.MEANDRE_VERSION+")");
+				ProbeFactory.propProbeFactoryConfig.storeToXML(fos, "Meandre default probes configuration file ("+Version.getVersion()+")");
 			    fos.close();
 			} catch (Exception eWrite) {
 				pf.log.warning("Meandre plugins configuration file "+
@@ -99,7 +99,7 @@ public class ProbeFactory {
 		probeFactoryList.put(cnf, pf);
 		return pf;
 	}
-	
+
 	/** Initialize the default properties. .
 	 *
 	 * @param pf  The probe factory being initialized
@@ -110,7 +110,7 @@ public class ProbeFactory {
 		ProbeFactory.propProbeFactoryConfig.setProperty("statistics", StatisticsProbeImpl.class.getName());
 		ProbeFactory.propProbeFactoryConfig.setProperty("console", ToPrintStreamProbeImpl.class.getName());
 	}
-	
+
 
 	/** Return a new instance of the requested probe
 	 *
@@ -133,7 +133,7 @@ public class ProbeFactory {
 			t.printStackTrace(ps);
 			log.warning(baos.toString());
 			throw new ProbeException(t);
-		}		
+		}
 	}
 
 	/** Returns the properties of the probes factory.

@@ -25,7 +25,7 @@ import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.system.components.MapExecutableComponent;
 import org.meandre.core.system.components.ReduceExecutableComponent;
-import org.meandre.core.utils.Constants;
+import org.meandre.core.utils.Version;
 import org.meandre.zigzag.parser.ParseException;
 import org.meandre.zigzag.parser.ZigZag;
 
@@ -101,8 +101,8 @@ public class FlowGenerator {
 	 */
 	public void init (String sName) {
 		// Print the welcome information
-		ps.println("Meandre ZigZag scripting language compiler ["+ZigZag.ZIGZAG_VERSION+"/"+Constants.MEANDRE_VERSION+"]");
-		ps.println("All rights reserved by DITA, NCSA, UofI (2007-2009)");
+		ps.println("Meandre ZigZag scripting language compiler ["+ZigZag.ZIGZAG_VERSION+"/"+Version.getFullVersion()+"]");
+		ps.println("All rights reserved by DITA, NCSA, UofI (2007-2011)");
 		ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		ps.println();
 		ps.flush();
