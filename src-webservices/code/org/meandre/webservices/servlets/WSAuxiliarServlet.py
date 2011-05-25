@@ -5,7 +5,7 @@
 __name__ = 'WSAuxiliarServlet'
 
 requestMap = {
-    'GET': { 
+    'GET': {
         'add_to_repository': 'auxiliar_add_to_repository',
         'create_user': 'auxiliar_create_user',
         'roles_map': 'auxiliar_roles_map',
@@ -42,26 +42,26 @@ __header = """
                             text-decoration: none;
                             font-style: italic;
                         }
-                        
+
                         a:hover {
                             color: #cc6000;
                             text-decoration: underline;
                             font-style: italic;
                         }
-                        
-                        
+
+
                         body {
-                           color: #444; 
-                           background: white; 
-                           font-family: Helvetica, Arial, Verdana; 
-                           font-size: 11px; 
-                        }   
-                        
+                           color: #444;
+                           background: white;
+                           font-family: Helvetica, Arial, Verdana;
+                           font-size: 11px;
+                        }
+
                         form {
                             margin-top:15px;
                             margin-left:15px;
-                        } 
-                    
+                        }
+
                         #main table {
                             width: 100%% ;
                             margin-left:auto;
@@ -70,13 +70,13 @@ __header = """
                             border-collapse: separate;
                             font-size: 12px;
                         }
-                        
+
                         #main th {
                             color: white;
                             background: orange;
-                        }    
-                        
-                        #main th,td {    
+                        }
+
+                        #main th,td {
                             border: 0px solid gray;
                             padding-left:6px;
                             padding-top:3px;
@@ -89,9 +89,9 @@ __header = """
              <body>
              <div id="main">
              <img src="%s/public/resources/system/logo-meandre.gif" /><br/>
-    """  
-            
-    
+    """
+
+
 __footer = """
              </div>
              <br/>
@@ -113,17 +113,17 @@ __add_to_repository_form = """
                         <tr>
                             <td>
                                 <input type="file" name="repository" />
-                            </td> 
+                            </td>
                         </tr>
                         <tr>
                             <td>
                                 <input type="file" name="repository" />
-                            </td> 
+                            </td>
                         </tr>
                         <tr>
                             <td>
                                 <input type="file" name="repository" />
-                            </td> 
+                            </td>
                         </tr>
                         <tr>
                             <td>
@@ -133,32 +133,32 @@ __add_to_repository_form = """
                         <tr>
                             <td >
                                 <input type="file" name="context" />
-                            </td> 
+                            </td>
                         </tr>
                         <tr>
                             <td >
                                 <input type="file" name="context" />
-                            </td> 
+                            </td>
                         </tr>
                         <tr>
                             <td >
                                 <input type="file" name="context" />
-                            </td> 
+                            </td>
                         </tr>
                         <tr>
                             <td >
                                 <input type="file" name="context" />
-                            </td> 
+                            </td>
                         </tr>
                         <tr>
                             <td >
                                 <input type="file" name="context" />
-                            </td> 
+                            </td>
                         </tr>
                         <tr>
                             <td >
                                 <input type="file" name="context" />
-                            </td> 
+                            </td>
                         </tr>
                         <tr>
                             <td>
@@ -176,12 +176,12 @@ __add_to_repository_form = """
                                 <input type="reset" class="reset" value="Clear data" />
                             </td>
                         </tr>
-                    </tbody>                
+                    </tbody>
                 </table>
             </fieldset>
         </form>
     """
-    
+
 __add_user_form = """
         <form method="get" action="%s/services/security/create_users.html" >
             <fieldset>
@@ -214,7 +214,7 @@ __run_repository_form = """
                         <tr>
                             <td>
                                 <input type="file" name="repository" />
-                            </td> 
+                            </td>
                         </tr>
                         <tr>
                             <td>
@@ -222,7 +222,7 @@ __run_repository_form = """
                                 <input type="reset" class="reset" value="Clear data" />
                             </td>
                         </tr>
-                    </tbody>                
+                    </tbody>
                 </table>
             </fieldset>
         </form>
@@ -232,7 +232,7 @@ __run_repository_form = """
 #
 
 def auxiliar_add_to_repository ( request, response, format ):
-    '''Generates for to upload to a repository.''' 
+    '''Generates for to upload to a repository.'''
     if checkUserRole (request,Role.REPOSITORY) :
         if format=='html' :
             statusOK(response)
@@ -247,7 +247,7 @@ def auxiliar_add_to_repository ( request, response, format ):
 
 
 def auxiliar_create_user ( request, response, format ):
-    '''Generates for to add a user for this server.''' 
+    '''Generates for to add a user for this server.'''
     if checkUserRole (request,Role.ADMIN) :
         if format=='html' :
             statusOK(response)
@@ -259,9 +259,9 @@ def auxiliar_create_user ( request, response, format ):
             errorNotFound(response)
     else:
         errorForbidden(response)
-        
+
 def auxiliar_roles_map ( request, response, format ):
-    '''Generates map of the current users and roles.''' 
+    '''Generates map of the current users and roles.'''
     if checkUserRole (request,Role.ADMIN) :
         if format=='html' :
             statusOK(response)
@@ -289,10 +289,10 @@ def auxiliar_roles_map ( request, response, format ):
             errorNotFound(response)
     else:
         errorForbidden(response)
-        
+
 
 def auxiliar_execute_repository ( request, response, format ):
-    '''Generates for to upload to a repository.''' 
+    '''Generates for to upload to a repository.'''
     if checkUserRole (request,Role.EXECUTION) :
         if format=='html' :
             statusOK(response)
@@ -325,10 +325,10 @@ def __render_descriptor_download ( uri ):
         html += ('<a href="%s/services/repository/describe.nt?uri=' % (meandre_config.appContext))+uri+'" target="_blank" title="Get N-TRIPLE">N-TRIPLE</a>)'
         html += '</td></tr>'
         return html
-    
+
 def __render_flow ( flow_desc, edit, qr ):
         '''Given a flow description it renders the info in html'''
-        
+
         def render_component_instance ( ecid ):
             '''Renders a component instance'''
             html  = '<tr><th valign="top"><strong>URI</strong>:</th><td>'+ecid.getExecutableComponentInstance().toString()+'</td></tr>'
@@ -349,29 +349,29 @@ def __render_flow ( flow_desc, edit, qr ):
                         else :
                             html += '<tr><td style="text-align: right;">'+key+' = </td><td>'+val+'</td></tr>'
                     else:
-                        html += '<input type="hidden" name="flow_uri" value="'+flow_desc.getFlowComponent().toString()+'" />'
-                        html += '<input type="hidden" name="flow_component_instance" value="'+ecid.getExecutableComponentInstance().toString()+'" />'
-                        html += '<input type="hidden" name="property_name" value="'+key+'" />'
+                        html += '<input type="hidden" name="flow_uri" value="'+flow_desc.getFlowComponent().toString().replace('"', '&quot;')+'" />'
+                        html += '<input type="hidden" name="flow_component_instance" value="'+ecid.getExecutableComponentInstance().toString().replace('"', '&quot;')+'" />'
+                        html += '<input type="hidden" name="property_name" value="'+key.replace('"', '&quot;')+'" />'
                         val = ecid.getProperties().getValue(key)
                         html += '<tr><td style="text-align: right;">'+key+' = </td><td>'
                         if val is None :
-                            html += '<input type="text" name="property_value" value="'+ecd.getProperties().getValue(key)+'" size="60" />'
+                            html += '<input type="text" name="property_value" value="'+ecd.getProperties().getValue(key).replace('"', '&quot;')+'" size="60" />'
                         else :
-                            html += '<input type="text" name="property_value" value="'+val+'" size="60" />'
+                            html += '<input type="text" name="property_value" value="'+val.replace('"', '&quot;')+'" size="60" />'
                         html += '</td></tr>'
-            html += '</table>' 
-            html += '</td></tr>'            
+            html += '</table>'
+            html += '</td></tr>'
             return html
-        
+
         def render_component_instance_connector ( cd ):
             '''Renders a connector'''
             html  = '<tr><th valign="top"><strong>URI</strong>:</th><td>'+cd.getConnector().toString()+'</td></tr>'
             html += '<tr><th valign="top"><strong>Source</strong>:</th><td>'+cd.getSourceInstance().toString()+'</td></tr>'
             html += '<tr><th valign="top"><strong>Source port</strong>:</th><td>'+cd.getSourceInstanceDataPort().toString()+'</td></tr>'
             html += '<tr><th valign="top"><strong>Target</strong>:</th><td>'+cd.getTargetInstance().toString()+'</td></tr>'
-            html += '<tr><th valign="top"><strong>Target port</strong>:</th><td>'+cd.getTargetInstanceDataPort().toString()+'</td></tr>'  
+            html += '<tr><th valign="top"><strong>Target port</strong>:</th><td>'+cd.getTargetInstanceDataPort().toString()+'</td></tr>'
             return html
-        
+
         html = ''
         if edit is True:
             html += '<form method="POST" action="%s/services/auxiliar/run_tuned_flow.txt">' % (meandre_config.appContext)
@@ -396,9 +396,9 @@ def __render_flow ( flow_desc, edit, qr ):
         else:
             html += '</table>'
         return html
-           
+
 def auxiliar_tune_flow ( request, response, format ):
-    '''Generates for to upload to a repository.''' 
+    '''Generates for to upload to a repository.'''
     if checkUserRole (request,Role.EXECUTION) :
         if format=='html' :
             params = extractRequestParamaters(request)
@@ -408,8 +408,8 @@ def auxiliar_tune_flow ( request, response, format ):
                 flow_desc = qr.getFlowDescription(content.createResource(flow_uri))
                 body = '<br><center>No flow description found for flow uri <code>'+flow_uri+'</code></center>'
                 if flow_desc is not None:
-                    body  = '<br/><table>'        
-                    body += __render_flow(flow_desc,True,qr)  
+                    body  = '<br/><table>'
+                    body += __render_flow(flow_desc,True,qr)
                     body += '</table>'
                 statusOK(response)
                 contentAppHTML(response)
@@ -439,7 +439,7 @@ def auxiliar_run_tuned_flow ( request, response, format ):
                 ecid.getProperties().add(key,value)
                 flow_desc.removeExecutableComponentInstance(model.createResource(ecidr))
                 flow_desc.addExecutableComponentInstance(ecid)
-                print ecid.getProperties()   
+                print ecid.getProperties()
             model.add(flow_desc.getModel())
             for ecid in flow_desc.getExecutableComponentInstances() :
                 ecd = qr.getExecutableComponentDescription(ecid.getExecutableComponent())
@@ -449,21 +449,21 @@ def auxiliar_run_tuned_flow ( request, response, format ):
             rd.forward(request, response)
     else:
         errorForbidden(response)
-        
-    
+
+
 def auxiliar_show ( request, response, format ):
-    '''Renders a flow or a component information.''' 
+    '''Renders a flow or a component information.'''
 
     def render_component ( comp_desc ):
         '''Given a component description it renders the info in html'''
-        
+
         def render_component_data_port ( dpd ):
             '''Renders a component data port'''
             html  = '<tr><th valign="top"><strong>URI</strong>:</th><td>'+dpd.getResource().toString()+'</td></tr>'
             html += '<tr><th valign="top"><strong>Name</strong>:</th><td>'+dpd.getName()+'</td></tr>'
             html += '<tr><th valign="top"><strong>Description</strong>:</th><td>'+dpd.getDescription()+'</td></tr>'
             return html
-         
+
         def render_property ( prop ):
             '''Renders a component property'''
             html = ''
@@ -480,7 +480,7 @@ def auxiliar_show ( request, response, format ):
                     html += '</td></tr>'
                 html += '</table><br/>'
             return html
-            
+
         html  = '<br/><table>'
         html += __render_basic_metadata(comp_desc)
         html += __render_descriptor_download(comp_desc.getExecutableComponentAsString())
@@ -490,7 +490,7 @@ def auxiliar_show ( request, response, format ):
         html += '<tr><th valign="top"><strong>Context</strong>:</th><td>'
         for context in comp_desc.getContext() :
             html += context.toString()+'<br/>'
-        html += '</td></tr>' 
+        html += '</td></tr>'
         html += '<tr><th valign="top"><strong>Properties:</strong></th><td>'+render_property(comp_desc.getProperties())+'</td></tr>'
         html += '<tr><th valign="top"><strong>Inputs:</strong></th><td>'
         for dpd in comp_desc.getInputs() :
@@ -500,10 +500,10 @@ def auxiliar_show ( request, response, format ):
         for dpd in comp_desc.getOutputs() :
             html += '<table>'+render_component_data_port(dpd)+'</table><br/>'
         html += '</td></tr>'
-        html += '</table>'  
+        html += '</table>'
         return html
-      
-    
+
+
     if checkUserRole (request,Role.REPOSITORY) or checkUserRole (request,Role.FLOW) or checkUserRole (request,Role.COMPONENT) :
         if format=='html' :
             params = extractRequestParamaters(request)
@@ -530,4 +530,3 @@ def auxiliar_show ( request, response, format ):
 
 
 
-    
