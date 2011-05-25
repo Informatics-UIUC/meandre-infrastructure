@@ -24,8 +24,8 @@ import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.repository.CorruptedDescriptionException;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
-import org.meandre.core.utils.Constants;
 import org.meandre.core.utils.NetworkTools;
+import org.meandre.core.utils.Version;
 import org.meandre.jobs.storage.backend.JobInformationBackendAdapter;
 import org.meandre.jobs.storage.helpers.PersistentPrintStream;
 import org.meandre.webservices.beans.JobDetail;
@@ -73,8 +73,8 @@ public class InteractiveExecution {
 				sFUID
 			);
 
-		pw.println("Meandre Execution Engine version "+Constants.MEANDRE_VERSION);
-		pw.println("All rights reserved by DITA, NCSA, UofI (2007-2009)");
+		pw.println("Meandre Execution Engine version "+Version.getFullVersion());
+		pw.println("All rights reserved by DITA, NCSA, UofI (2007-2011)");
 		pw.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		pw.println();
 

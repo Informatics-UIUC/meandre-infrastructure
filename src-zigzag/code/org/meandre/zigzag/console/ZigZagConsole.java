@@ -27,7 +27,7 @@ import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.PropertiesDescription;
 import org.meandre.core.repository.PropertiesDescriptionDefinition;
 import org.meandre.core.repository.QueryableRepository;
-import org.meandre.core.utils.Constants;
+import org.meandre.core.utils.Version;
 import org.meandre.mau.MAUExecutor;
 import org.meandre.zigzag.parser.ParseException;
 import org.meandre.zigzag.parser.ZigZag;
@@ -119,7 +119,7 @@ public class ZigZagConsole {
 			}
 			catch ( Throwable t ) {
 				System.err.println(t.getMessage());
-			} 
+			}
 
 		}
 
@@ -131,8 +131,8 @@ public class ZigZagConsole {
 	 */
 	protected void printVersion() {
 		System.out.println();
-		System.out.println("Meandre ZigZag scripting language interpreter console ["+ZigZag.ZIGZAG_VERSION+"/"+Constants.MEANDRE_VERSION+"]");
-		System.out.println("All rights reserved by DITA, NCSA, UofI (2007-2009)");
+		System.out.println("Meandre ZigZag scripting language interpreter console ["+ZigZag.ZIGZAG_VERSION+"/"+Version.getFullVersion()+"]");
+		System.out.println("All rights reserved by DITA, NCSA, UofI (2007-2011)");
 		System.out.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		System.out.println();
 	}
@@ -257,7 +257,7 @@ public class ZigZagConsole {
 			}
 			try {
 				mau.run();
-			} 
+			}
 			catch (FileNotFoundException e) {
 				System.out.println("\t The flow could not be executed. "+e.getMessage());
 			}

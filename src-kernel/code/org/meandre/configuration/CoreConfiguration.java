@@ -7,7 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.meandre.core.logger.KernelLoggerFactory;
-import org.meandre.core.utils.Constants;
+import org.meandre.core.utils.Version;
 import org.meandre.webservices.logger.WSLoggerFactory;
 
 /** This class contains basic configuration informations requried by the core.
@@ -131,7 +131,7 @@ public class CoreConfiguration {
                 // Dump properties
 
                 fos = new FileOutputStream(fileCnf);
-                propsCore.storeToXML(fos, "Meandre default configuration file (" + Constants.MEANDRE_VERSION + ")");
+                propsCore.storeToXML(fos, "Meandre default configuration file (" + Version.getVersion() + ")");
                 fos.close();
 
                 // Create the run file

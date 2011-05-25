@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet 
+<xsl:stylesheet
 	version="1.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:fn="http://www.w3.org/2005/xpath-functions">
@@ -9,7 +9,7 @@
 	<xsl:param name="host"></xsl:param>
 	<xsl:param name="port"></xsl:param>
 	<xsl:param name="user"></xsl:param>
-	
+
 	<xsl:template match="/meandre_response">
 		<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 			<head>
@@ -23,32 +23,32 @@
 							color: #aa6000;
 							text-decoration: none;
 						}
-						
+
 						a:hover {
 							color: #cc6000;
 							text-decoration: underline;
 							font-style: italic;
 						}
-						
-						
+
+
 						body {
-						   color: #444; 
-						   background: white; 
-						   font-family: Verdana, Arial, Helvetica ; 
-						   font-size: 11px; 
-						}	
+						   color: #444;
+						   background: white;
+						   font-family: Verdana, Arial, Helvetica ;
+						   font-size: 11px;
+						}
 						#menu {
 							width: 200px;
 						}
-						
+
 						#menu img {
 							width: 95%;
 							margin-left:auto;
 							margin-right: auto;
-							border: 0px none white; 
+							border: 0px none white;
 							margin-bottom: 6px;
-						}	
-						
+						}
+
 						#navigation {
 							margin-top: 10px;
 							background: orange;
@@ -56,7 +56,7 @@
 							padding-left: 0px;
 							margin-left: 0px;
 						}
-						
+
 						#navigation p {
 							padding-left: 6px;
 							padding-top: 0px;
@@ -67,7 +67,7 @@
 							font-weight: bolder;
 							font-size:11px;
 						}
-						
+
 						#navigation ul {
 							background: white;
 							list-style-type : none;
@@ -78,24 +78,24 @@
 							margin-top: 0px;
 							margin-bottom: 0px;
 						}
-						
+
 						#navigation li {
 							margin-left: 10px;
 							padding-left: 0px;
 						}
-						
+
 						#navigation form {
 							margin-top: 1px;
 							margin-bottom: 2px;
 							font-size: 11px;
 						}
-						
+
 						#main {
 							min-width : 440px;
 							margin-right:10px;
-						    font-size: 10px; 
+						    font-size: 10px;
 						}
-						
+
 						#main table {
 							width: 98%;
 							margin-left:auto;
@@ -104,24 +104,24 @@
 							border-collapse: collapse;
 							font-size: 11px;
 						}
-						
+
 						#main th {
 							color: white;
 							background: orange;
-						}	
-						
-						#main th,td {	
+						}
+
+						#main th,td {
 							border: 1px solid gray;
 							padding-left:6px;
 							padding-top:3px;
 							padding-bottom:3px;
 						}
-						
+
 						#separator {
 							border:none;
 							font-size:11px;
 						}
-						
+
 					</style>
 			</head>
 		 	<body>
@@ -149,10 +149,10 @@
 								alert('Only flows are allowed for execution');
 								return false;
 							}
-						} 
+						}
 					]]></script>
 				<table id="separator"><tr><td id="separator" valign="top" style="border:none;" width="200px">
-		 		<div id="menu"> 
+		 		<div id="menu">
 					<img>
 						<xsl:attribute name="src"><xsl:value-of select="$context"/>/public/resources/system/logo-meandre.gif</xsl:attribute>
 					</img>
@@ -168,13 +168,13 @@
 								<form name="sfc" method="get">
 								 	<xsl:attribute name="action"><xsl:value-of select="$context"/>/services/repository/search_components.html</xsl:attribute>
 									<input type="text" id="sc" name="q" value="Search components..." onclick="document.sfc.sc.value=''"/><br/>
-								</form> 
+								</form>
 							</li>
 							<li>
 								<form name="sff"  method="get">
 									<xsl:attribute name="action"><xsl:value-of select="$context"/>/services/repository/search_flows.html</xsl:attribute>
 									<input type="text" id="sf" name="q" value="Search flows..." onclick="document.sff.sf.value=''"/><br/>
-								</form> 
+								</form>
 							</li>
 							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/clear.html</xsl:attribute><xsl:attribute name="onclick">return confirm('Are you sure you want to remove all the components and flow from the repository?');</xsl:attribute>Clear</a></li>
 							<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/regenerate.html</xsl:attribute><xsl:attribute name="onclick">return confirm('Are you sure you want to to regenerate the repository?');</xsl:attribute>Regenerate</a></li>
@@ -211,7 +211,7 @@
 										<input type="text" id="loc" name="location" value="Location..." onclick="document.al.loc.value=''"/><br/>
 										<input type="text" id="desc" name="description" value="Description..." onclick="document.al.desc.value=''"/><br/>
 										<input type="submit" value="Add" />
-									</form> 
+									</form>
 								</ul>
 							</li>
 		 		    	</ul>
@@ -226,19 +226,19 @@
 								<form name="rou"  method="get">
 								 	<xsl:attribute name="action"><xsl:value-of select="$context"/>/services/security/roles_of_user.html</xsl:attribute>
 									<input type="text" id="un" name="user_name" value="User roles..." onclick="document.rou.un.value=''"/><br/>
-								</form> 
+								</form>
 							</li>
 							<li>
 								<form name="u"  method="get">
 							 		<xsl:attribute name="action"><xsl:value-of select="$context"/>/services/security/user.html</xsl:attribute>
 									<input type="text" id="un" name="user_name" value="User info..." onclick="document.u.un.value=''"/><br/>
-								</form> 
+								</form>
 							</li>
 							<li>
 								<form name="rar"  method="get">
 							 		<xsl:attribute name="action"><xsl:value-of select="$context"/>/services/security/revoke_all_roles.html</xsl:attribute>
 									<input type="text" id="un" name="user_name" value="Revoke all roles..." onclick="document.rar.un.value=''"/><br/>
-								</form> 
+								</form>
 							</li>
 		 		    	</ul>
 		 		    	<p>Server Logs</p>
@@ -262,12 +262,12 @@
 			 		    	<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/about/plugins.html</xsl:attribute>Plugins</a></li>
 		 		    	</ul>
 		 		    </div>
-		 		    <br/>All rights reserved by<br/>DITA, NCSA, and UofI, 2007-2009.
-				</div>	
+		 		    <br/>All rights reserved by<br/>DITA, NCSA, and UofI, 2007-2011.
+				</div>
 				</td><td id="separator" valign="top" width="100%">
 				<div id="main">
 					<p style="text-align:right;width: 98%;"><strong><xsl:value-of select="$date"/></strong>. User <strong><xsl:value-of select="$user"/></strong> on host <strong><xsl:value-of select="$host"/></strong> at port <strong><xsl:value-of select="$port"/></strong>.</p>
-					
+
 					<table>
 						<xsl:for-each select="meandre_item">
 							<xsl:if test="position() = 1">
@@ -364,121 +364,121 @@
 			          				</xsl:if>
 			          				<xsl:if test="meandre_role_uri">
 			          					<th>Role URI</th>
-			          				</xsl:if>	
+			          				</xsl:if>
 			          				<xsl:if test="user_name">
 			          					<th>User name</th>
 			          					<th>Actions</th>
-			          				</xsl:if>	
+			          				</xsl:if>
 			          				<xsl:if test="full_name">
 			          					<th>Full name</th>
-			          				</xsl:if>			   
+			          				</xsl:if>
 			          				<xsl:if test="revoked">
 			          					<th>Roles revoked</th>
-			          				</xsl:if>  
+			          				</xsl:if>
 			          				<xsl:if test="granted">
 			          					<th>Roles granted</th>
-			          				</xsl:if>		
+			          				</xsl:if>
 			          				<xsl:if test="id">
 			          					<th>ID</th>
-			          				</xsl:if>		
+			          				</xsl:if>
 			          				<xsl:if test="server_id">
 			          					<th>Server</th>
 			          				</xsl:if>
 			          				<xsl:if test="status">
 			          					<th>Status</th>
-			          				</xsl:if>	
+			          				</xsl:if>
 			          				<xsl:if test="user_id">
 			          					<th>User</th>
-			          				</xsl:if>		
+			          				</xsl:if>
 			          				<xsl:if test="uptime">
 			          					<th>Uptime</th>
-			          				</xsl:if>	
+			          				</xsl:if>
 			          				<xsl:if test="failed_updates">
 			          					<th>Failed updates</th>
-			          				</xsl:if>		
+			          				</xsl:if>
 			          				<xsl:if test="ip">
 			          					<th>IP</th>
-			          				</xsl:if>		
+			          				</xsl:if>
 			          				<xsl:if test="server_name">
 			          					<th>Name</th>
-			          				</xsl:if>		
+			          				</xsl:if>
 			          				<xsl:if test="port">
 			          					<th>Port</th>
-			          				</xsl:if>	
+			          				</xsl:if>
 			          				<xsl:if test="memory_available">
 			          					<th>Memory available</th>
-			          				</xsl:if>		
+			          				</xsl:if>
 			          				<xsl:if test="number_processors">
 			          					<th>Processors</th>
-			          				</xsl:if>		
+			          				</xsl:if>
 			          				<xsl:if test="os_name">
 			          					<th>OS</th>
-			          				</xsl:if>		
+			          				</xsl:if>
 			          				<xsl:if test="os_arch">
 			          					<th>OS arch</th>
-			          				</xsl:if>		
+			          				</xsl:if>
 			          				<xsl:if test="os_version">
 			          					<th>OS version</th>
-			          				</xsl:if>		
+			          				</xsl:if>
 			          				<xsl:if test="java_version">
 			          					<th>Java Version</th>
-			          				</xsl:if>		
+			          				</xsl:if>
 			          				<xsl:if test="java_vm_version">
 			          					<th>Java VM version</th>
-			          				</xsl:if>		
+			          				</xsl:if>
 			          				<xsl:if test="java_vm_vendor">
 			          					<th>Java Vendor</th>
-			          				</xsl:if>	
+			          				</xsl:if>
 			          				<xsl:if test="local_user_name">
 			          					<th>Local user</th>
-			          				</xsl:if>			
+			          				</xsl:if>
 			          				<xsl:if test="user_home">
 			          					<th>User home</th>
-			          				</xsl:if>			          						
+			          				</xsl:if>
 			          				<xsl:if test="server_description">
 			          					<th>Description</th>
-			          				</xsl:if>		
+			          				</xsl:if>
 			          				<xsl:if test="ts">
 			          					<th>Time stamp</th>
-			          				</xsl:if>	  	
+			          				</xsl:if>
 			          				<xsl:if test="previous_updated">
 			          					<th>Last update</th>
 			          				</xsl:if>
 			          				<xsl:if test="free_memory">
 			          					<th>Free memory</th>
-			          				</xsl:if>	
+			          				</xsl:if>
 			          				<xsl:if test="property_key">
 			          					<th>Key</th>
 			          				</xsl:if>
 			          				<xsl:if test="property_value">
 			          					<th>Value</th>
-			          				</xsl:if>		
+			          				</xsl:if>
 			          				<xsl:if test="job_id and not(console)">
 			          					<th>Job ID</th>
-			          				</xsl:if>	
-			          				<xsl:if test="console">	
+			          				</xsl:if>
+			          				<xsl:if test="console">
 			          					<th>Console output</th>
 			          				</xsl:if>
-			          				<xsl:if test="token">	
+			          				<xsl:if test="token">
 			          					<th>Token cleaned</th>
-			          				</xsl:if>	
-			          				<xsl:if test="log">	
+			          				</xsl:if>
+			          				<xsl:if test="log">
 			          					<th>Log</th>
-			          				</xsl:if>			
+			          				</xsl:if>
 		          				</tr>
 		          			</xsl:if>
 				     		<tr>
 				     			<xsl:if test="location">
 				     				<td>
 						     			<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="location"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="location"/></xsl:attribute>
 											<xsl:attribute name="target">_blank</xsl:attribute>
 											<xsl:value-of select="location"/>
 						     			</a>
 						     		</td>
 						     		<td>
 						     			<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/locations/remove.html?location=<xsl:value-of select="location"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/locations/remove.html?location=<xsl:value-of select="location"/></xsl:attribute>
 											remove
 						     			</a>
 				     				</td>
@@ -501,11 +501,11 @@
 		          				<xsl:if test="isServlet">
 		          					<td><xsl:value-of select="isServlet"/></td>
 		          				</xsl:if>
-					     		
+
 					     		<xsl:if test="version">
 		          					<td><xsl:value-of select="version"/></td>
 		          				</xsl:if>
-		          				
+
 		          				<xsl:if test="DB_PASSWD">
 		          					<td><xsl:value-of select="DB_PASSWD"/></td>
 		          				</xsl:if>
@@ -551,36 +551,36 @@
 		          				<xsl:if test="meandre_uri">
 				     				<td>
 						     			<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/auxiliar/show.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/auxiliar/show.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute>
 											<xsl:value-of select="meandre_uri"/>
 						     			</a>
 						     		</td>
 						     		<td>
 						     			<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/execute/flow.txt?statistics=true&amp;uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/execute/flow.txt?statistics=true&amp;uri=<xsl:value-of select="meandre_uri"/></xsl:attribute>
 											<xsl:attribute name="target">_blank</xsl:attribute>
 											<xsl:attribute name="onclick">return checkForFlow()</xsl:attribute>
-											run 
-						     			</a> 
-						     			- 		
+											run
+						     			</a>
+						     			-
 						     			<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/auxiliar/tune_flow.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/auxiliar/tune_flow.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute>
 											<xsl:attribute name="target">_blank</xsl:attribute>
-											tune&amp;run 
-						     			</a> 
-						     			-		     			
+											tune&amp;run
+						     			</a>
+						     			-
 						     			<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/publish/publish.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/publish/publish.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute>
 											publish
 						     			</a>
-						     			-				     			
+						     			-
 						     			<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/publish/unpublish.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/publish/unpublish.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute>
 											unpublish
-						     			</a>	
-						     			-				     			
+						     			</a>
+						     			-
 						     			<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/remove.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/remove.html?uri=<xsl:value-of select="meandre_uri"/></xsl:attribute>
 											remove
 						     			</a>
 				     				</td>
@@ -591,13 +591,13 @@
 						     		</td>
 						     		<td>
 						     			<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/components_by_tag.html?tag=<xsl:value-of select="meandre_tag"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/components_by_tag.html?tag=<xsl:value-of select="meandre_tag"/></xsl:attribute>
 											<xsl:value-of select="meandre_uri"/>
 											show components
-						     			</a> 
+						     			</a>
 						     			-
 						     			<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/flows_by_tag.html?tag=<xsl:value-of select="meandre_tag"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/repository/flows_by_tag.html?tag=<xsl:value-of select="meandre_tag"/></xsl:attribute>
 											show flows
 						     			</a>
 				     				</td>
@@ -606,7 +606,7 @@
 		          					<td><xsl:value-of select="flow_instance_uri"/></td>
 		          					<td>
 		          						<a>
-		          							<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/jobs/job_console.html?uri=<xsl:value-of select="flow_instance_uri"/></xsl:attribute> 
+		          							<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/jobs/job_console.html?uri=<xsl:value-of select="flow_instance_uri"/></xsl:attribute>
 											view output
 		          						</a>
 		          					</td>
@@ -614,65 +614,65 @@
 		          				<xsl:if test="flow_instance_proxy_webui_relative">
 		          					<td>
 		          						<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_proxy_webui_relative"/></xsl:attribute> 
-											<xsl:attribute name="target">_blank</xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_proxy_webui_relative"/></xsl:attribute>
+											<xsl:attribute name="target">_blank</xsl:attribute>
 											<xsl:value-of select="flow_instance_proxy_webui_relative"/>
 						     			</a>
 		          					</td>
-		          				</xsl:if>	
+		          				</xsl:if>
 		          				<xsl:if test="flow_instance_webui_uri">
 		          					<td>
 		          						<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_webui_uri"/></xsl:attribute> 
-											<xsl:attribute name="target">_blank</xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_webui_uri"/></xsl:attribute>
+											<xsl:attribute name="target">_blank</xsl:attribute>
 											<xsl:value-of select="flow_instance_webui_uri"/>
 						     			</a> -
 						     			<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_webui_uri"/>admin/abort.txt</xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_webui_uri"/>admin/abort.txt</xsl:attribute>
 						     				<xsl:attribute name="onclick">return confirm('Are you sure you want to abort the flow execution?');</xsl:attribute>
 											abort
 						     			</a>
 		          					</td>
-		          				</xsl:if>	
+		          				</xsl:if>
 		          				<xsl:if test="flow_instance_proxy_webui_uri">
 		          					<td>
 		          						<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_proxy_webui_uri"/></xsl:attribute> 
-											<xsl:attribute name="target">_blank</xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_proxy_webui_uri"/></xsl:attribute>
+											<xsl:attribute name="target">_blank</xsl:attribute>
 											<xsl:value-of select="flow_instance_proxy_webui_uri"/>
 						     			</a>
 						     			<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_proxy_webui_uri"/>admin/abort.txt</xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="flow_instance_proxy_webui_uri"/>admin/abort.txt</xsl:attribute>
 						     				<xsl:attribute name="onclick">return confirm('Are you sure you want to abort the flow execution?');</xsl:attribute>
 											abort
 						     			</a>
 		          					</td>
-		          				</xsl:if>	
+		          				</xsl:if>
 		          				<xsl:if test="meandre_role_name">
 		          					<td><xsl:value-of select="meandre_role_name"/></td>
 		          				</xsl:if>
 		          				<xsl:if test="meandre_role_uri">
 		          					<td><xsl:value-of select="meandre_role_uri"/></td>
-		          				</xsl:if>	
+		          				</xsl:if>
 		          				<xsl:if test="user_name">
 		          					<td><xsl:value-of select="user_name"/></td>
 		          					<td>
 		          						<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/security/remove_users.html?user_name=<xsl:value-of select="user_name"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/security/remove_users.html?user_name=<xsl:value-of select="user_name"/></xsl:attribute>
 											<xsl:attribute name="onclick">return confirm('Are you sure you want to delete this user?');</xsl:attribute>
 											delete user
 						     			</a>
 		          					</td>
-		          				</xsl:if>	
+		          				</xsl:if>
 		          				<xsl:if test="full_name">
 		          					<td><xsl:value-of select="full_name"/></td>
-		          				</xsl:if>	
+		          				</xsl:if>
 		          				<xsl:if test="revoked">
 		          					<td><xsl:value-of select="revoked"/></td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="granted">
 		          					<td><xsl:value-of select="granted"/></td>
-		          				</xsl:if>	
+		          				</xsl:if>
 		          				<xsl:if test="id">
 		          					<td><xsl:value-of select="id"/></td>
 		          				</xsl:if>
@@ -681,72 +681,72 @@
 		          				</xsl:if>
 		          				<xsl:if test="status">
 		          					<td><xsl:value-of select="status"/></td>
-		          				</xsl:if>	
+		          				</xsl:if>
 		          				<xsl:if test="user_id">
 		          					<td>
 		          						<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/security/user.html?user_name=<xsl:value-of select="user_id"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/security/user.html?user_name=<xsl:value-of select="user_id"/></xsl:attribute>
 											<xsl:value-of select="user_id"/>
 					     				</a>
 				     				</td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="uptime">
 		          					<td><xsl:value-of select="uptime"/></td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="failed_updates">
 		          					<td><xsl:value-of select="failed_updates"/></td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="ip">
 		          					<td><xsl:value-of select="ip"/></td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="server_name">
 		          					<td><xsl:value-of select="server_name"/></td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="port">
 		          					<td><xsl:value-of select="port"/></td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="memory_available">
 		          					<td><xsl:value-of select="memory_available"/></td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="number_processors">
 		          					<td><xsl:value-of select="number_processors"/></td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="os_name">
 		          					<td><xsl:value-of select="os_name"/></td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="os_arch">
 		          					<td><xsl:value-of select="os_arch"/></td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="os_version">
 		          					<td><xsl:value-of select="os_version"/></td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="java_version">
 		          					<td><xsl:value-of select="java_version"/></td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="java_vm_version">
 		          					<td><xsl:value-of select="java_vm_version"/></td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="java_vm_vendor">
 		          					<td><xsl:value-of select="java_vm_vendor"/></td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="local_user_name">
 		          					<td><xsl:value-of select="local_user_name"/></td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="user_home">
 		          					<td><xsl:value-of select="user_home"/></td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="server_description">
 		          					<td><xsl:value-of select="server_description"/></td>
-		          				</xsl:if>		
+		          				</xsl:if>
 		          				<xsl:if test="ts">
 		          					<td><xsl:value-of select="ts"/></td>
-		          				</xsl:if>	
+		          				</xsl:if>
 		          				<xsl:if test="previous_updated">
 		          					<td><xsl:value-of select="previous_updated"/></td>
-		          				</xsl:if>	
+		          				</xsl:if>
 		          				<xsl:if test="free_memory">
 		          					<td><xsl:value-of select="free_memory"/></td>
-		          				</xsl:if>	
+		          				</xsl:if>
 		          				<xsl:if test="property_key">
 		          					<td><xsl:value-of select="property_key"/></td>
 		          				</xsl:if>
@@ -757,27 +757,27 @@
 		          					<td>
 		          						<xsl:value-of select="job_id"/>
 		          						<a>
-						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/jobs/job_console.html?uri=<xsl:value-of select="job_id"/></xsl:attribute> 
+						     				<xsl:attribute name="href"><xsl:value-of select="$context"/>/services/jobs/job_console.html?uri=<xsl:value-of select="job_id"/></xsl:attribute>
 											Console
 						     			</a>
 					     			</td>
-		          				</xsl:if>	
-		          				<xsl:if test="console">	
+		          				</xsl:if>
+		          				<xsl:if test="console">
 		          					<td>
 		          						<pre>
 		          							<xsl:value-of select="console"/>
 		          						</pre>
-		          					</td>	
-		          				</xsl:if>	
+		          					</td>
+		          				</xsl:if>
 		          				<xsl:if test="token">
 		          					<td><xsl:value-of select="token"/></td>
 		          				</xsl:if>
-		          				<xsl:if test="log">	
+		          				<xsl:if test="log">
 		          					<td>
 		          						<pre>
 		          							<xsl:value-of select="log"/>
 		          						</pre>
-		          					</td>	
+		          					</td>
 		          				</xsl:if>
 					     	</tr>
 				     	</xsl:for-each>

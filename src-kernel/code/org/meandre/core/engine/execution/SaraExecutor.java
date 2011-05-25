@@ -19,7 +19,7 @@ import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.repository.CorruptedDescriptionException;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
-import org.meandre.core.utils.Constants;
+import org.meandre.core.utils.Version;
 import org.meandre.support.io.FileUtils;
 import org.meandre.support.rdf.ModelUtils;
 import org.meandre.webui.WebUI;
@@ -28,19 +28,19 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
  * Executor that can be used with Meandre 2.0.x (based on MAUExecutor)
- * 
+ *
  * @author Boris Capitanu
  */
 
 public class SaraExecutor {
-    
+
     private final QueryableRepository qr;
     private final CoreConfiguration cnf;
-    
+
     private Executor executor;
     private StatisticsProbeImpl spi;
-    
-    
+
+
     public SaraExecutor(QueryableRepository qr, CoreConfiguration cnf) {
         this.qr = qr;
         this.cnf = cnf;
@@ -50,22 +50,22 @@ public class SaraExecutor {
         if (console != System.out) System.setOut(console);
         if (log != System.err)     System.setErr(log);
 
-        log.println("Meandre Executor " + Constants.MEANDRE_VERSION);
-        log.println("All rights reserved by DITA, NCSA, UofI (2007-2009)");
+        log.println("Meandre Executor " + Version.getFullVersion());
+        log.println("All rights reserved by DITA, NCSA, UofI (2007-2011)");
         log.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
         log.println();
         log.flush();
-        
+
         Resource resURI = qr.getAvailableFlows().iterator().next();
         log.println("Preparing flow: "+resURI);
-        
+
         Conductor conductor = new Conductor(cnf.getConductorDefaultQueueSize(), cnf);
         conductor.setParentClassloader(getClass().getClassLoader());
 
         try {
             spi = new StatisticsProbeImpl();
             spi.initialize();
-            
+
             MrProbe mrProbe = new MrProbe(KernelLoggerFactory.getCoreLogger(), spi, false, false);
             executor = conductor.buildExecutor(qr, resURI, mrProbe, console);
             mrProbe.setName(executor.getThreadGroupName() + "mr-probe");
@@ -77,12 +77,12 @@ public class SaraExecutor {
             log.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
             log.println("----------------------------------------------------------------------------");
             log.flush();
-            
+
             String token = System.currentTimeMillis() + "";
             WebUI webui = executor.initWebUI(port, token);
             executor.execute(webui);
             console.flush();
-            
+
             log.println("----------------------------------------------------------------------------");
             log.print("Execution finished at: ");
             log.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
@@ -148,7 +148,7 @@ public class SaraExecutor {
 
         printStatistics(log);
     }
-    
+
     private void printStatistics(PrintStream ps) {
         try {
             JSONObject jsonStats = new JSONObject(spi.serializeProbeInformation());
@@ -192,30 +192,30 @@ public class SaraExecutor {
         }
         spi.dispose();
     }
-    
+
     public static void main(String[] args) throws Exception {
         if (args.length != 1) {
             System.err.println("Usage: SaraExecutor <port>");
             System.exit(-1);
         }
-        
+
         int port = Integer.parseInt(args[0]);
-        
+
         File baseDir = File.createTempFile("meandre_exec_", null);
         baseDir.delete();
         File runDir = new File(baseDir, "run");
         if (!runDir.mkdirs())
             throw new IOException("Cannot create necessary temporary folder(s) for flow execution: " + runDir);
-        
+
         File pubResDir = new File(baseDir, "public_resources");
-        
+
         Properties props = new Properties();
         props.setProperty(CoreConfiguration.MEANDRE_BASE_PORT, "" + (port - 1));
         props.setProperty(CoreConfiguration.MEANDRE_HOME_DIRECTORY, baseDir.toString());
         props.setProperty(CoreConfiguration.MEANDRE_PRIVATE_RUN_DIRECTORY, runDir.toString());
         props.setProperty(CoreConfiguration.MEANDRE_PUBLIC_RESOURCE_DIRECTORY, pubResDir.toString());
         props.setProperty(CoreConfiguration.MEANDRE_CORE_CONFIG_FILE, new File(baseDir, "meandre-config-core.xml").toString());
-        
+
         try {
             QueryableRepository qr = new RepositoryImpl(ModelUtils.getModel(System.in, null));
             new SaraExecutor(qr, new CoreConfiguration(props)).run(port, System.out, System.err);

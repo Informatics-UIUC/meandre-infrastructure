@@ -37,9 +37,9 @@ import org.meandre.core.security.SecurityStoreException;
 import org.meandre.core.store.security.SecurityStore;
 import org.meandre.core.store.system.SystemStore;
 import org.meandre.core.store.system.SystemStoreImpl;
-import org.meandre.core.utils.Constants;
 import org.meandre.core.utils.ModelIO;
 import org.meandre.core.utils.NetworkTools;
+import org.meandre.core.utils.Version;
 import org.meandre.core.utils.vocabulary.RepositoryVocabulary;
 import org.meandre.jobs.storage.backend.JobInformationBackendAdapter;
 import org.meandre.plugins.PluginFactory;
@@ -282,7 +282,7 @@ public class Store {
             FileOutputStream fos;
             try {
                 fos = new FileOutputStream(sConfigFileAbs);
-                propStoreConfig.storeToXML(fos, "Meandre default configuration file (" + Constants.MEANDRE_VERSION + ")");
+                propStoreConfig.storeToXML(fos, "Meandre default configuration file (" + Version.getVersion() + ")");
                 fos.close();
             }
             catch (Exception eWrite) {
