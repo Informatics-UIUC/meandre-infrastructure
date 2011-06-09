@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Meandre-Infrastructure" basedir="." default="dist">
-    <import file="common.xml" />
+	<import file="common.xml" />
 
-    <svn failonerror="false">
-        <wcVersion path="${basedir}" prefix="svn.root."/>
-    </svn>
+	<svn failonerror="false">
+		<wcVersion path="${basedir}" prefix="svn.root."/>
+	</svn>
 
-    <condition property="svn_revision" value="${svn.root.revision.max-with-flags}" else="custom">
-        <isset property="svn.root.revision.max-with-flags"/>
-    </condition>
+	<condition property="svn_revision" value="${svn.root.revision.max-with-flags}" else="custom">
+		<isset property="svn.root.revision.max-with-flags"/>
+	</condition>
 
 	<!-- import properties (app settings, classpath, jar file locations) -->
 	<import file="properties.xml"/>
@@ -29,7 +29,7 @@
 		<copy file="${version.template}" toFile="${version.file}" overwrite="true">
 			<filterset>
 				<filter token="VERSION" value="${build.version}" />
-                <filter token="CODENAME" value="${build.codename}" />
+				<filter token="CODENAME" value="${build.codename}" />
 				<filter token="REVISION" value="${svn_revision}" />
 			</filterset>
 		</copy>
@@ -487,8 +487,19 @@
 			<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar"/>
 		</jar>
 
+		<!-- Creating the standalone executor jar distribution -->
+		<jar destfile="${dist.dir}/debug-executor-${build.version}.jar">
+			<manifest>
+				<attribute name="Build-Version" value="${build.version}" />
+				<attribute name="Build-Date" value="${TIMESTAMP}" />
+				<attribute name="Main-Class" value="org.meandre.core.engine.execution.DebuggingExecutor" />
+			</manifest>
+			<fileset dir="${build.dir}" />
+			<zipgroupfileset dir="${lib.dep.dir}" includes="*.jar" />
+		</jar>
+
 		<!-- Creating the Meandre interpreter console jar distribution -->
-		<jar destfile="${dist.dir}/zz-${build.version}.jar" >
+		<jar destfile="${dist.dir}/zz-${build.version}.jar">
 			<manifest>
 				<attribute name="Build-Version" value="${build.version}"/>
 				<attribute name="Build-Date" value="${TIMESTAMP}"/>
