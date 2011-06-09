@@ -46,7 +46,7 @@ public class SaraExecutor {
         this.cnf = cnf;
     }
 
-    private void run(int port, PrintStream console, PrintStream log) throws Exception {
+    protected void run(int port, PrintStream console, PrintStream log) throws Exception {
         if (console != System.out) System.setOut(console);
         if (log != System.err)     System.setErr(log);
 
