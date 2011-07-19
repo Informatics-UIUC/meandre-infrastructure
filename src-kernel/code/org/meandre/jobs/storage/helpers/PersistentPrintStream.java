@@ -300,8 +300,6 @@ public class PersistentPrintStream extends PrintStream {
 
 		@Override
 		public void run() {
-			waitOne();
-
 			do {
 				waitOne();
 
