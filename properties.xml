@@ -29,7 +29,7 @@
 	<property name="support.test" value="src-support/test"/>
 
     <!-- Directory structure of the project -->
-    <property name="build.dir" value="${basedir}/bin"/>
+    <property name="build.dir" value="${basedir}/build"/>
     <property name="dist.dir" value="${basedir}/dist"/>
     <property name="test.dir" value="${basedir}/test"/>
     <property name="doc.dir" value="${basedir}/docs"/>

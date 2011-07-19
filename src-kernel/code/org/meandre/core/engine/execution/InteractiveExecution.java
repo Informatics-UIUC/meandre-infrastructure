@@ -68,10 +68,10 @@ public class InteractiveExecution {
 		boolean bFailSafe = true;
 
 		PersistentPrintStream pw = new PersistentPrintStream(
-				new PrintStream(outStream),
-				jiba,
-				sFUID
-			);
+					outStream,
+					jiba,
+					sFUID
+	    );
 
 		pw.println("Meandre Execution Engine version "+Version.getFullVersion());
 		pw.println("All rights reserved by DITA, NCSA, UofI (2007-2011)");
@@ -270,10 +270,10 @@ public class InteractiveExecution {
 			JobInformationBackendAdapter jiba ) {
 
 		PersistentPrintStream pw = new PersistentPrintStream(
-				new PrintStream(outStream),
+				outStream,
 				jiba,
 				sFUID
-			);
+		);
 
 		// Create the execution
 		FlowDescription fd = qr.getFlowDescription(qr.getModel().createResource(sURI));
@@ -292,7 +292,7 @@ public class InteractiveExecution {
 
 			int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
 
-			pw.flush();
+			//pw.flush();
 
 			WebUI webui = exec.initWebUI(nextPort,sToken);
 			job.setToken(sToken);
