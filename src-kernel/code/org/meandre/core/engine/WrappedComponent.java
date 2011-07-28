@@ -144,7 +144,8 @@ extends Thread {
 	/** Implements the basic machinery to execute the wrapped component
 	 *
 	 */
-	public void run () {
+	@Override
+    public void run () {
 		log.fine("Initializing a the wrapping component "+ec.toString());
 
 		// Initialize the executable component
@@ -191,6 +192,10 @@ extends Thread {
 							}
 							throw new ComponentExecutionException ( ncde );
 						}
+						finally {
+						    // Reset the data proxy
+					        cc.resetDataProxy();
+						}
 						synchronized (baStatusFlags) {
 							baStatusFlags[EXECUTING] = false;
 						}
@@ -198,7 +203,7 @@ extends Thread {
 						//log.finest("Component "+ec.toString()+" executed");
 
 						// Clean the data proxy
-						resetAndUpdateComponentContext();
+						updateComponentContext();
 						//log.finest("Component "+ec.toString()+" context updated");
 					} catch (ComponentExecutionException e) {
 						synchronized (baStatusFlags) {
@@ -317,15 +322,20 @@ extends Thread {
 	 * component content, populating available inputs.
 	 *
 	 */
-	private void resetAndUpdateComponentContext() {
-		// Reset the data proxy
-		cc.resetDataProxy();
-
+	private void updateComponentContext() {
 		// Checking if new elements are available to populate the proxy
 		try {
 			for ( String sInput:htInputs.keySet() ) {
 				Object obj = htInputs.get(sInput).popDataComponent();
 				cc.setDataComponentToInput(sInput,obj);
+				// TODO: This is not efficient, but needed for now to prevent problems with Streaming in the abstracts (SI and ST arriving at same time)
+				if (obj != null) {
+				    try {
+				        semBlocking.acquire();  // consume the ticket associated with this 1 input
+				    } catch (Exception e) {}
+
+				    break;  // Load only 1 data input into the DataProxy even if multiple are available
+				}
 			}
 		}
 		catch (ComponentContextException e) {

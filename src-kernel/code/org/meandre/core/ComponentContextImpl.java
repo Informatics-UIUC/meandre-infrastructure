@@ -6,19 +6,26 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.meandre.annotations.Component.FiringPolicy;
 import org.meandre.configuration.CoreConfiguration;
 import org.meandre.core.engine.ActiveBuffer;
 import org.meandre.core.engine.ActiveBufferException;
 import org.meandre.core.engine.MrProbe;
 import org.meandre.core.engine.MrProper;
 import org.meandre.core.engine.WrappedComponent;
+import org.meandre.core.engine.policies.component.availability.WrappedComponentAllInputsRequired;
 import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.utils.NetworkTools;
 import org.meandre.plugins.MeandrePlugin;
@@ -36,8 +43,7 @@ import org.meandre.webui.WebUIFragmentCallback;
  * @author Xavier Llor&agrave;
  *
  */
-public class ComponentContextImpl
-implements ComponentContext {
+public class ComponentContextImpl implements ComponentContext {
 
 	/** The core root logger */
 	protected static Logger log = KernelLoggerFactory.getCoreLogger();
@@ -63,6 +69,8 @@ implements ComponentContext {
 	/** The array of output buffer names */
 	private String [] saOutputNames = null;
 
+	private final String[] saConnectedOutputNames;
+
 	/** The hash table containing the active buffers */
 	private Hashtable<String,ActiveBuffer> htActiveBufferOuputs = null;
 
@@ -87,6 +95,8 @@ implements ComponentContext {
 	/** The array of available input names */
 	private final String[] saInputNames;
 
+	private final String[] saConnectedInputNames;
+
 	/** MrProbe thread */
 	private MrProbe thdMrProbe = null;
 
@@ -104,8 +114,8 @@ implements ComponentContext {
 	 *
 	 * @param sFlowUniqueID The unique flow execution ID
 	 * @param sComponentInstanceID The unique component ID
-	 * @param setInputs The name of the input active buffers
-	 * @param setOutputs The name of the output active buffers
+	 * @param setABInputs The name of the input active buffers
+	 * @param setABOutputs The name of the output active buffers
 	 * @param htOutputMap The map of the output to the real active buffer name
 	 * @param htOutputLogicNameMap The input logic name map
 	 * @param htInputLogicNameMap The output logic name map
@@ -115,8 +125,8 @@ implements ComponentContext {
 	 * @param console The output console
 	 */
 	public ComponentContextImpl(String sFlowUniqueID,String flowID,
-			String sComponentInstanceID, Set<ActiveBuffer> setInputs,
-			Set<ActiveBuffer> setOutputs,
+			String sComponentInstanceID, Set<ActiveBuffer> setABInputs,
+			Set<ActiveBuffer> setABOutputs,
 			Hashtable<String, String> htOutputMap,
 			Hashtable<String, String> htInputLogicNameMap,
 			Hashtable<String, String> htOutputLogicNameMap,
@@ -138,24 +148,33 @@ implements ComponentContext {
 		this.htInputLogicNameMap = htInputLogicNameMap;
 		this.htOutputLogicNameMap = htOutputLogicNameMap;
 
-		this.dp = new DataProxy(setInputs);
+		this.dp = new DataProxy(setABInputs);
 		this.htActiveBufferOuputs = new Hashtable<String,ActiveBuffer>();
 		this.htProperties = htProperties;
 		// Create the proper input set
 		this.setInputs = htInputLogicNameMap.keySet();
+        this.setOutputs = htOutputLogicNameMap.keySet();
 		//this.saInputNames = new String[setInputs.size()];
 		this.saInputNames = new String[this.setInputs.size()];
 		this.htInputLogicNameMapReverse = new Hashtable<String,String>();
 		int iCnt = 0;
-		if ( setInputs.size()>0 ){
-			for ( String sKey:this.setInputs) {
-				saInputNames[iCnt++] = sKey;
-				this.htInputLogicNameMapReverse.put(htInputLogicNameMap.get(sKey), sKey);
-			}
+		for ( String sKey:this.setInputs) {
+		    saInputNames[iCnt++] = sKey;
+		    this.htInputLogicNameMapReverse.put(htInputLogicNameMap.get(sKey), sKey);
 		}
 
+		Map<String, String> htOutputLogicNameMapReverse = new HashMap<String, String>();
+		for (String sKey : this.setOutputs)
+		    htOutputLogicNameMapReverse.put(htOutputLogicNameMap.get(sKey), sKey);
+
+		int numConnectedInputs = setABInputs.size();
+		this.saConnectedInputNames = new String[numConnectedInputs];
+
+		iCnt = 0;
+		for (ActiveBuffer ab : setABInputs)
+		    this.saConnectedInputNames[iCnt++] = this.htInputLogicNameMapReverse.get(ab.getName());
+
 		// Create the proper output set
-		this.setOutputs    = htOutputLogicNameMap.keySet();
 		this.saOutputNames = new String[htOutputLogicNameMap.size()];
 		iCnt = 0;
 		for ( String sOutputName:htOutputLogicNameMap.keySet() ) {
@@ -163,13 +182,28 @@ implements ComponentContext {
 		}
 
 		// Create a reverse hash table with the maping of output names
-		Hashtable<String,String> htReverse = new Hashtable<String,String>();
-		for ( String sOutputName:htOutputMap.keySet() )
-			htReverse.put(htOutputMap.get(sOutputName), sOutputName);
+		Map<String,List<String>> htReverse = new HashMap<String,List<String>>();
+		for ( String sOutputName:htOutputMap.keySet() ) {
+			final String logicName = htOutputMap.get(sOutputName);
+			List<String> names = htReverse.get(logicName);
+			if (names == null) {
+			    names = new ArrayList<String>();
+			    htReverse.put(logicName, names);
+			}
+            names.add(sOutputName);
+		}
+
+		Set<String> setConnectedOutputNames = new HashSet<String>();
+		for (ActiveBuffer ab : setABOutputs) {
+		    for (String outName : htReverse.get(ab.getName()))
+                setConnectedOutputNames.add(htOutputLogicNameMapReverse.get(outName));
+		}
+		this.saConnectedOutputNames = new String[setConnectedOutputNames.size()];
+        setConnectedOutputNames.toArray(this.saConnectedOutputNames);
 
 		for ( String sOut:htOutputMap.keySet() ) {
 			String sIn = htOutputMap.get(sOut);
-			for ( ActiveBuffer ab:setOutputs)
+			for ( ActiveBuffer ab:setABOutputs)
 				if ( ab.getName().equals(sIn))
 					this.htActiveBufferOuputs.put(sOut,ab);
 		}
@@ -187,7 +221,8 @@ implements ComponentContext {
 	 *
 	 * @return Path to public resources directory.
 	 */
-	public String getPublicResourcesDirectory () {
+	@Override
+    public String getPublicResourcesDirectory () {
 		return ccCnf.getPublicResourcesDirectory();
 	}
 
@@ -196,7 +231,8 @@ implements ComponentContext {
 	 *
 	 * @return Path to public resources directory.
 	 */
-	public String getRunDirectory () {
+	@Override
+    public String getRunDirectory () {
 		return ccCnf.getRunResourcesDirectory();
 	}
 
@@ -205,7 +241,8 @@ implements ComponentContext {
 	 *
 	 * @return The array containing the names
 	 */
-	public String [] getInputNames () {
+	@Override
+    public String [] getInputNames () {
 
 		return saInputNames;
 	}
@@ -214,7 +251,8 @@ implements ComponentContext {
 	 *
 	 * @return The array containing the names
 	 */
-	public String [] getOutputNames () {
+	@Override
+    public String [] getOutputNames () {
 		return saOutputNames;
 	}
 
@@ -238,7 +276,8 @@ implements ComponentContext {
 	 * @return The data component
 	 * @throws ComponentContextException Violation of the component context detected
 	 */
-	public Object getDataComponentFromInput ( String sInputBuffer ) throws ComponentContextException {
+	@Override
+    public Object getDataComponentFromInput ( String sInputBuffer ) throws ComponentContextException {
 		if ( !setInputs.contains(sInputBuffer) )
 			throw new ComponentContextException("The requested input "+sInputBuffer+" does not exist.");
 
@@ -253,7 +292,8 @@ implements ComponentContext {
 	 * @param obj The object to push
 	 * @throws ComponentContextException Violation of the component context detected
 	 */
-	public void pushDataComponentToOutput ( String sOutputBuffer, Object obj ) throws ComponentContextException {
+	@Override
+    public void pushDataComponentToOutput ( String sOutputBuffer, Object obj ) throws ComponentContextException {
 		thdMrProbe.probeWrappedComponentPushData(wcParent, sOutputBuffer, obj);
 		if ( obj==null )
 			throw new ComponentContextException("Null cannot be pushed to "+sOutputBuffer+" in component instance "+sComponentInstanceID);
@@ -279,7 +319,8 @@ implements ComponentContext {
 	 * @return The name of the input
 	 * @throws ComponentContextException A violation of the component context is detected
 	 */
-	public boolean isInputAvailable ( String sInputBuffer ) throws ComponentContextException {
+	@Override
+    public boolean isInputAvailable ( String sInputBuffer ) throws ComponentContextException {
 		if ( sInputBuffer==null )
 			// Unconnected input
 			return false;
@@ -307,7 +348,8 @@ implements ComponentContext {
 	 *
 	  * @return The array of property names
 	 */
-	public String[] getPropertyNames( ) {
+	@Override
+    public String[] getPropertyNames( ) {
 		String [] saPropNames = new String[htProperties.keySet().size()];
 		int i=0;
 
@@ -323,7 +365,8 @@ implements ComponentContext {
 	 * @param sKey The property key
 	 * @return The property value (null if property does not exist)
 	 */
-	public String getProperty ( String sKey ) {
+	@Override
+    public String getProperty ( String sKey ) {
 		String sPropertyValue = htProperties.get(sKey);
 		thdMrProbe.probeWrappedComponentGetProperty(wcParent, sKey, sPropertyValue);
 		return sPropertyValue;
@@ -335,7 +378,8 @@ implements ComponentContext {
 	 *
 	 * @param wuiCall The webui call back object
 	 */
-	public void startWebUIFragment ( WebUIFragmentCallback wuiCall ) {
+	@Override
+    public void startWebUIFragment ( WebUIFragmentCallback wuiCall ) {
 		synchronized ( htWebUIframent ) {
 			WebUIFragment wuif = null;
 			try {
@@ -353,7 +397,8 @@ implements ComponentContext {
 	 *
 	 * @param wuiCall The webui call back object
 	 */
-	public void stopWebUIFragment (WebUIFragmentCallback wuiCall) {
+	@Override
+    public void stopWebUIFragment (WebUIFragmentCallback wuiCall) {
 		synchronized ( htWebUIframent ) {
 			WebUIFragment wuif = htWebUIframent.get(wuiCall);
 			if ( wuif!=null )
@@ -364,7 +409,8 @@ implements ComponentContext {
 	/** Stops all the web-based user interface created by this module.
 	 *
 	 */
-	public void stopAllWebUIFragments () {
+	@Override
+    public void stopAllWebUIFragments () {
 		synchronized ( htWebUIframent ) {
 			Enumeration<WebUIFragment> webUIFragments = htWebUIframent.elements();
 			while (webUIFragments.hasMoreElements())
@@ -382,7 +428,8 @@ implements ComponentContext {
 	 *
 	 *
 	 */
-	public URL getWebUIUrl ( boolean bName ) throws ComponentContextException {
+	@Override
+    public URL getWebUIUrl ( boolean bName ) throws ComponentContextException {
 		URL urlRes = null;
 
 		try {
@@ -404,7 +451,8 @@ implements ComponentContext {
 	 *
 	 *
 	 */
-	public URL getProxyWebUIUrl ( boolean bName ) throws ComponentContextException {
+	@Override
+    public URL getProxyWebUIUrl ( boolean bName ) throws ComponentContextException {
 		URL urlRes = null;
 
 		try {
@@ -423,7 +471,8 @@ implements ComponentContext {
 	 * @return The dynamic URL
 	 * @throws ComponentContextException The URL could not be generated
 	 */
-	public String getInitialURLPath ( HttpServletRequest request ) throws ComponentContextException {
+	@Override
+    public String getInitialURLPath ( HttpServletRequest request ) throws ComponentContextException {
 		URI uri;
 		try {
 			uri = new URI(request.getRequestURI());
@@ -440,7 +489,8 @@ implements ComponentContext {
 	 *
 	 * @return The logger object
 	 */
-	public Logger getLogger() {
+	@Override
+    public Logger getLogger() {
 		return log;
 	}
 
@@ -448,7 +498,8 @@ implements ComponentContext {
 	 *
 	 * @return The unique execution instance ID
 	 */
-	public String getExecutionInstanceID () {
+	@Override
+    public String getExecutionInstanceID () {
 		return sComponentInstanceID;
 	}
 
@@ -456,21 +507,24 @@ implements ComponentContext {
 	/**Returns the uniqueID of the flow  instance for the current flow
 	 *	@return The unique flow ID
 	 */
-	public String getFlowExecutionInstanceID() {
+	@Override
+    public String getFlowExecutionInstanceID() {
 		return this.sFlowUniqueExecutionID;
 	}
 
 	/**Returns the flowID of the flow
 	 *
 	 */
-	public String getFlowID() {
+	@Override
+    public String getFlowID() {
 		return this.flowID;
 	}
 
 	/** Request the abortion of the flow.
 	 *
 	 */
-	public void requestFlowAbortion() {
+	@Override
+    public void requestFlowAbortion() {
 		wcParent.getMrProper().abort();
 		log.warning("Abort requested by component "+wcParent.getExecutableComponentInstanceID());
 	}
@@ -479,7 +533,8 @@ implements ComponentContext {
 	 *
 	 * @return True if the flow is aborting
 	 */
-	public boolean isFlowAborting() {
+	@Override
+    public boolean isFlowAborting() {
 		return this.wcParent.isTerminating();
 	}
 
@@ -505,7 +560,8 @@ implements ComponentContext {
 	 * @param id The plugin id
 	 * @return The Meandre plugin
 	 */
-	public MeandrePlugin getPlugin(String id) {
+	@Override
+    public MeandrePlugin getPlugin(String id) {
 		PluginFactory  pluginFactory = PluginFactory.getPluginFactory(ccCnf);
 		MeandrePlugin mp=pluginFactory.getPlugin(id);
 		return mp;
@@ -515,7 +571,23 @@ implements ComponentContext {
 	 *
 	 * @return The output console
 	 */
-	public PrintStream getOutputConsole() {
+	@Override
+    public PrintStream getOutputConsole() {
 		return console;
+	}
+
+	@Override
+    public String[] getConnectedInputs() {
+	    return this.saConnectedInputNames;
+	}
+
+	@Override
+    public String[] getConnectedOutputs() {
+	    return this.saConnectedOutputNames;
+	}
+
+	@Override
+    public FiringPolicy getFiringPolicy() {
+	    return (wcParent instanceof WrappedComponentAllInputsRequired) ? FiringPolicy.all : FiringPolicy.any;
 	}
 }

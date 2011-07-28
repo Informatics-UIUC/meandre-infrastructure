@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.net.URL;
 import java.util.logging.Logger;
 
+import org.meandre.annotations.Component.FiringPolicy;
 import org.meandre.plugins.MeandrePlugin;
 import org.meandre.webui.WebUIFragmentCallback;
 
@@ -93,47 +94,66 @@ public interface ComponentContextProperties {
 	 *
 	 * @return The unique execution instance ID
 	 */
-	
+
 	public String getExecutionInstanceID ();
-	
+
 	/** Returns the unique ID of the running flow.
 	 *
 	 * @return The unique ID of the running flow
 	 */
 	public String getFlowExecutionInstanceID();
-	
+
 	/**Return the flow ID of the flow
 	 *
 	 * @return The flow ID being run
 	 */
 	public String getFlowID();
-	
-	/** Returns the plugin 
-	 * 
+
+	/** Returns the plugin
+	 *
 	 * @param id The plugin id
 	 * @return The meandre plugin
 	 */
 	public MeandrePlugin getPlugin(String id);
-	
+
 	/** Returns the output console for the flow.
-	 * 
+	 *
 	 * @return The output console
 	 */
 	public PrintStream getOutputConsole();
-	
+
 
 	/** Returns the path to the public resources directory.
-	 * 
+	 *
 	 * @return Path to public resources directory.
 	 */
 	public String getPublicResourcesDirectory ();
-	
+
 
 	/** Returns the path to the run directory.
-	 * 
+	 *
 	 * @return Path to public resources directory.
 	 */
 	public String getRunDirectory ();
 
+    /**
+     * Returns the names of the input ports that have inbound connections
+     *
+     * @return The names of the input ports that have inbound connections
+     */
+    public String[] getConnectedInputs();
 
+    /**
+     * Returns the names of the output ports that have outbound connections
+     *
+     * @return The names of the output ports that have outbound connections
+     */
+    public String[] getConnectedOutputs();
+
+    /**
+     * Returns the Firing Policy of the component
+     *
+     * @return The Firing Policy of the component
+     */
+    public FiringPolicy getFiringPolicy();
 }

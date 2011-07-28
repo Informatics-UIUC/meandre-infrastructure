@@ -10,8 +10,7 @@ import org.meandre.plugins.MeandrePlugin;
  * @author Xavier Llor&agrave;
  *
  */
-public interface ComponentContext 
-extends ComponentContextProperties {
+public interface ComponentContext extends ComponentContextProperties {
 
 	/** Returns the current data component on the given active buffer.
 	 *
@@ -36,27 +35,27 @@ extends ComponentContextProperties {
 	public boolean isInputAvailable ( String sInputBuffer ) throws ComponentContextException;
 
 	/** Request the abortion of the flow.
-	 * 
+	 *
 	 */
 	public void requestFlowAbortion();
-	
+
 	/** Returns true if the flow has started a termination request.
-	 * 
+	 *
 	 * @return True if the flow is aborting
 	 */
 	public boolean isFlowAborting();
-	
+
 	/** Returns the MeandrePlugin for a particular id.
-	 * 
+	 *
 	 */
-	public MeandrePlugin getPlugin(String id);
-	
+	@Override
+    public MeandrePlugin getPlugin(String id);
+
 	/** Given a request it returns the proper base URL to use.
-	 * 
+	 *
 	 * @param request The request received
 	 * @return The initial path to use
 	 * @throws ComponentContextException The URL could not be generated
 	 */
 	public String getInitialURLPath ( HttpServletRequest request ) throws ComponentContextException;
-
 }
