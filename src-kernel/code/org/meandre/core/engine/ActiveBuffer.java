@@ -92,8 +92,10 @@ public class ActiveBuffer {
 			semCapacity.acquire();
 			queueBuffer.offer(obj);
 			// Waking up the consumers
-			for ( WrappedComponent wc:wcConsumer )
-				wc.awake(sName);
+			synchronized ( wcConsumer ) {
+    			for ( WrappedComponent wc:wcConsumer )
+    				wc.awake(sName);
+			}
 
 		} catch (InterruptedException e) {
 			throw new ActiveBufferException("Capacity semaphore acquire interrupted",e);
@@ -112,11 +114,13 @@ public class ActiveBuffer {
 			// Queueing the objects
 			while ( !queueObjects.isEmpty() ) {
 				semCapacity.acquire();
-				queueBuffer.offer((WrappedComponent) queueObjects.poll());
+				queueBuffer.offer(queueObjects.poll());
 			}
 			// Waking up the consumers
-			for ( WrappedComponent wc:wcConsumer )
-				wc.awake(sName);
+            synchronized ( wcConsumer ) {
+                for ( WrappedComponent wc:wcConsumer )
+                    wc.awake(sName);
+            }
 
 		} catch (InterruptedException e) {
 			throw new ActiveBufferException("Capacity semaphore acquire interrupted",e);
