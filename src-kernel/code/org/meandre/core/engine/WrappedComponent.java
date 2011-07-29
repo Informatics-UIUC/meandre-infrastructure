@@ -331,7 +331,7 @@ extends Thread {
 				// TODO: This is not efficient, but needed for now to prevent problems with Streaming in the abstracts (SI and ST arriving at same time)
 				if (obj != null) {
 				    try {
-				        semBlocking.acquire();  // consume the ticket associated with this 1 input
+				        semBlocking.tryAcquire();  // consume the ticket associated with this 1 input
 				    } catch (Exception e) {}
 
 				    break;  // Load only 1 data input into the DataProxy even if multiple are available
