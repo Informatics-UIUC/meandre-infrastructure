@@ -57,6 +57,9 @@ public class ComponentContextImpl implements ComponentContext {
 	/** The unique flow execution ID */
 	protected String sComponentInstanceID = null;
 
+	/** The name of this component instance */
+	protected final String sComponentInstanceName;
+
 	/** The data proxy for input and outputs */
 	private DataProxy dp = null;
 
@@ -125,7 +128,7 @@ public class ComponentContextImpl implements ComponentContext {
 	 * @param console The output console
 	 */
 	public ComponentContextImpl(String sFlowUniqueID,String flowID,
-			String sComponentInstanceID, Set<ActiveBuffer> setABInputs,
+			String sComponentInstanceID, String sComponentInstanceName, Set<ActiveBuffer> setABInputs,
 			Set<ActiveBuffer> setABOutputs,
 			Hashtable<String, String> htOutputMap,
 			Hashtable<String, String> htInputLogicNameMap,
@@ -140,6 +143,7 @@ public class ComponentContextImpl implements ComponentContext {
 		this.sFlowUniqueExecutionID = sFlowUniqueID;
 		this.flowID=flowID;
 		this.sComponentInstanceID = sComponentInstanceID;
+		this.sComponentInstanceName = sComponentInstanceName;
 		this.thdMrProbe = thdMrProbe;
 		this.wcParent = wc;
 		this.ccCnf = cnf;
@@ -574,6 +578,11 @@ public class ComponentContextImpl implements ComponentContext {
 	@Override
     public PrintStream getOutputConsole() {
 		return console;
+	}
+
+	@Override
+    public String getInstanceName() {
+	    return this.sComponentInstanceName;
 	}
 
 	@Override

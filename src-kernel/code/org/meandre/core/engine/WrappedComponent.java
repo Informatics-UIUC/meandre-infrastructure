@@ -91,7 +91,7 @@ extends Thread {
 	 * @param cnf The core configuration object
 	 * @throws InterruptedException The semaphore could not be adquired twice
 	 */
-	public WrappedComponent(String sFlowUniqueID, String flowID,String sComponentInstanceID,
+	public WrappedComponent(String sFlowUniqueID, String flowID,String sComponentInstanceID, String sComponentInstanceName,
 			ExecutableComponent ec, Set<ActiveBuffer> setInputs,
 			Set<ActiveBuffer> setOutputs,
 			Hashtable<String, String> htOutputMap,
@@ -106,7 +106,7 @@ extends Thread {
 		// Basic initialization
 		this.ec            = ec;
 		this.semBlocking   = new Semaphore(1,true); // With fairness
-		this.cc            = new ComponentContextImpl(sFlowUniqueID,flowID,sComponentInstanceID, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, htProperties, thdMrProbe, this, cnf, console);
+		this.cc            = new ComponentContextImpl(sFlowUniqueID,flowID,sComponentInstanceID, sComponentInstanceName, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, htProperties, thdMrProbe, this, cnf, console);
 		this.hasNInputs     = htInputLogicNameMap.size();
 		// Setting execution flags
 		this.baStatusFlags = new boolean [4];

@@ -20,15 +20,15 @@ import org.meandre.core.engine.test.TestLoggerFactory;
 
 
 /** This class is used to test the Clojure execution component adapter.
- * 
+ *
  * @author Xavier Llor&agrave;
  *
  */
 public class ClojureExecutableComponentAdapterTest {
 
-	/** Test the constructor and the process facility of the 
+	/** Test the constructor and the process facility of the
 	 * adapter.
-	 * 
+	 *
 	 */
 	@Test
 	public void testClojureExecutableComponentAdapterProcess () {
@@ -41,9 +41,9 @@ public class ClojureExecutableComponentAdapterTest {
 		}
 	}
 
-	/** Test the constructor and the process and initialize facility of the 
+	/** Test the constructor and the process and initialize facility of the
 	 * adapter.
-	 * 
+	 *
 	 */
 	@Test
 	public void testClojureExecutableComponentAdapterInitialize () {
@@ -55,17 +55,17 @@ public class ClojureExecutableComponentAdapterTest {
 			ceca.trapOutputAndErrorStreams();
 			ceca.process("(defn initialize [x] (.(. System out) (println \"Initialize Called\")) )");
 			CoreConfiguration cnf = new CoreConfiguration();
-			
+
 			WrappedComponent wc = new WrappedComponentAllInputsRequired(
-					"http://noting.org/","http://noting.org/",
-					"http://noting.org/", ceca,
+					"http://nothing.org/","http://nothing.org/",
+					"http://nothing.org/", "Nothing", ceca,
 					new HashSet<ActiveBuffer> (), new HashSet<ActiveBuffer> (),
 					new Hashtable<String, String> (),
 					new Hashtable<String, String> (),
 					new Hashtable<String, String> (), null,
 					"nothing", new Hashtable<String, String> (), thdMrProbe, cnf, System.out);
-					
-			ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf, System.out);
+
+			ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf, System.out);
 			ceca.initialize(cc);
 			ceca.untrapOutputAndErrorStreams();
 			assertTrue(ceca.getOutput().toString().indexOf("Initialize Called")>=0);
@@ -75,9 +75,9 @@ public class ClojureExecutableComponentAdapterTest {
 		}
 	}
 
-	/** Test the constructor and the process and initialize facility of the 
+	/** Test the constructor and the process and initialize facility of the
 	 * adapter.
-	 * 
+	 *
 	 */
 	@Test
 	public void testClojureExecutableComponentAdapterExecute () {
@@ -90,23 +90,23 @@ public class ClojureExecutableComponentAdapterTest {
 			ceca.trapOutputAndErrorStreams();
 			ceca.process("(defn initialize [x] (.(. System out) (println \"Initialize Called\")) )");
 			ceca.process("(defn execute [x] (.(. System out) (println (. x (getFlowID)))) )");
-						
+
 			WrappedComponent wc = new WrappedComponentAllInputsRequired(
-					"http://noting.org/","http://noting.org/",
-					"http://noting.org/", ceca,
+					"http://nothing.org/","http://nothing.org/",
+					"http://nothing.org/", "Nothing", ceca,
 					new HashSet<ActiveBuffer> (), new HashSet<ActiveBuffer> (),
 					new Hashtable<String, String> (),
 					new Hashtable<String, String> (),
 					new Hashtable<String, String> (), null,
 					"nothing", new Hashtable<String, String> (), thdMrProbe,cnf, System.out);
-					
-			ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf, System.out);
-			
+
+			ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf, System.out);
+
 			ceca.initialize(cc);
 			ceca.execute(cc);
-			
+
 			ceca.untrapOutputAndErrorStreams();
-			
+
 			assertTrue(ceca.getOutput().toString().indexOf("Initialize Called")>=0);
 			assertTrue(ceca.getOutput().toString().indexOf("Nothing")>=0);
 
@@ -116,11 +116,11 @@ public class ClojureExecutableComponentAdapterTest {
 			fail(e.toString());
 		}
 	}
-	
 
-	/** Test the constructor and the process and initialize facility of the 
+
+	/** Test the constructor and the process and initialize facility of the
 	 * adapter.
-	 * 
+	 *
 	 */
 	@Test
 	public void testClojureExecutableComponentAdapterDispose () {
@@ -134,28 +134,28 @@ public class ClojureExecutableComponentAdapterTest {
 			ceca.process("(defn initialize [x] (.(. System out) (println \"Initialize Called\")) )");
 			ceca.process("(defn execute [x] (.(. System out) (println (. x (getFlowID)))) )");
 			ceca.process("(defn dispose [x] (.(. System out) (println \"Dispose Called\")) )");
-						
+
 			WrappedComponent wc = new WrappedComponentAllInputsRequired(
-					"http://noting.org/","http://noting.org/",
-					"http://noting.org/", ceca,
+					"http://nothing.org/","http://nothing.org/",
+					"http://nothing.org/", "Nothing", ceca,
 					new HashSet<ActiveBuffer> (), new HashSet<ActiveBuffer> (),
 					new Hashtable<String, String> (),
 					new Hashtable<String, String> (),
 					new Hashtable<String, String> (), null,
 					"nothing", new Hashtable<String, String> (), thdMrProbe,cnf, System.out);
-					
-			ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf, System.out);
-			
+
+			ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf, System.out);
+
 			ceca.initialize(cc);
 			ceca.execute(cc);
 			ceca.dispose(cc);
-			
+
 			ceca.untrapOutputAndErrorStreams();
-			
+
 			assertTrue(ceca.getOutput().toString().indexOf("Initialize Called")>=0);
 			assertTrue(ceca.getOutput().toString().indexOf("Nothing")>=0);
 			assertTrue(ceca.getOutput().toString().indexOf("Dispose Called")>=0);
-			
+
 			assertTrue(ceca.getError().size()==0);
 		} catch (Exception e) {
 			e.printStackTrace();

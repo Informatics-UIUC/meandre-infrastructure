@@ -136,6 +136,13 @@ public interface ComponentContextProperties {
 	 */
 	public String getRunDirectory ();
 
+	/**
+	 * Returns the name of this component instance
+	 *
+	 * @return The name of this component instance
+	 */
+	public String getInstanceName();
+
     /**
      * Returns the names of the input ports that have inbound connections
      *

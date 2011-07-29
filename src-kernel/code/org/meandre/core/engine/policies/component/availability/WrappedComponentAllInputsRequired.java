@@ -45,7 +45,7 @@ public class WrappedComponentAllInputsRequired extends WrappedComponent {
 	 * @throws InterruptedException The semaphore could not be adquired twice
 	 */
 	public WrappedComponentAllInputsRequired(String sFlowUniqueID,String flowID,
-			String sComponentInstanceID, ExecutableComponent ec,
+			String sComponentInstanceID, String sComponentInstanceName, ExecutableComponent ec,
 			Set<ActiveBuffer> setInputs, Set<ActiveBuffer> setOutputs,
 			Hashtable<String, String> htOutputMap,
 			Hashtable<String, String> htInputLogicNameMap,
@@ -53,7 +53,7 @@ public class WrappedComponentAllInputsRequired extends WrappedComponent {
 			String sThreadName, Hashtable<String, String> htProperties, MrProbe thdMrProbe,
 			CoreConfiguration cnf, PrintStream console )
 			throws InterruptedException {
-		super(sFlowUniqueID,flowID, sComponentInstanceID, ec, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, tg, sThreadName, htProperties, thdMrProbe, cnf, console);
+		super(sFlowUniqueID,flowID, sComponentInstanceID, sComponentInstanceName, ec, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, tg, sThreadName, htProperties, thdMrProbe, cnf, console);
 
 		this.bFirst = true;
 	}
@@ -62,7 +62,8 @@ public class WrappedComponentAllInputsRequired extends WrappedComponent {
 	 *
 	 * @return A boolean asking if
 	 */
-	protected boolean isExecutable()  {
+	@Override
+    protected boolean isExecutable()  {
 		boolean bRes = true;
 
 		String[] saIN = cc.getInputNames();
