@@ -329,13 +329,8 @@ extends Thread {
 				Object obj = htInputs.get(sInput).popDataComponent();
 				cc.setDataComponentToInput(sInput,obj);
 				// TODO: This is not efficient, but needed for now to prevent problems with Streaming in the abstracts (SI and ST arriving at same time)
-				if (obj != null) {
-				    try {
-				        semBlocking.tryAcquire();  // consume the ticket associated with this 1 input
-				    } catch (Exception e) {}
-
+				if (obj != null)
 				    break;  // Load only 1 data input into the DataProxy even if multiple are available
-				}
 			}
 		}
 		catch (ComponentContextException e) {
