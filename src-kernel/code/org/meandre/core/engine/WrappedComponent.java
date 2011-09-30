@@ -12,6 +12,7 @@ import org.meandre.core.ComponentContextException;
 import org.meandre.core.ComponentContextImpl;
 import org.meandre.core.ComponentExecutionException;
 import org.meandre.core.ExecutableComponent;
+import org.meandre.core.engine.policies.component.availability.WrappedComponentAnyInputRequired;
 import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.utils.ExceptionFormatter;
 
@@ -329,7 +330,7 @@ extends Thread {
 				Object obj = htInputs.get(sInput).popDataComponent();
 				cc.setDataComponentToInput(sInput,obj);
 				// TODO: This is not efficient, but needed for now to prevent problems with Streaming in the abstracts (SI and ST arriving at same time)
-				if (obj != null)
+				if (this instanceof WrappedComponentAnyInputRequired && obj != null)
 				    break;  // Load only 1 data input into the DataProxy even if multiple are available
 			}
 		}
