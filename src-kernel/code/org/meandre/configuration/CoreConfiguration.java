@@ -10,6 +10,8 @@ import org.meandre.core.logger.KernelLoggerFactory;
 import org.meandre.core.utils.Version;
 import org.meandre.webservices.logger.WSLoggerFactory;
 
+import de.schlichtherle.io.FileInputStream;
+
 /** This class contains basic configuration informations requried by the core.
  *
  * @author Xavier Llor&agrave;
@@ -101,15 +103,27 @@ public class CoreConfiguration {
      */
     public CoreConfiguration(int port, String sInstallDir) {
 
+        final File confCore = new File(sInstallDir + File.separator + "meandre-config-core.xml");
+
         propsCore = new Properties();
 
-        propsCore.setProperty(MEANDRE_BASE_PORT, Integer.toString(port));
-        propsCore.setProperty(MEANDRE_PUBLIC_RESOURCE_DIRECTORY, sInstallDir + File.separator + "published_resources");
-        propsCore.setProperty(MEANDRE_PRIVATE_RUN_DIRECTORY, sInstallDir + File.separator + "run");
-        propsCore.setProperty(MEANDRE_CORE_CONFIG_FILE, sInstallDir + File.separator + "meandre-config-core.xml");
-        propsCore.setProperty(MEANDRE_HOME_DIRECTORY, sInstallDir);
-        propsCore.setProperty(MEANDRE_APP_CONTEXT,"");
-        propsCore.setProperty(MEANDRE_CONDUCTOR_DEFAULT_QUEUE_SIZE,Integer.toString(CONDUCTOR_DEFAULT_QUEUE_SIZE));
+        if (confCore.exists()) {
+            try {
+                propsCore.loadFromXML(new FileInputStream(confCore));
+            }
+            catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            propsCore.setProperty(MEANDRE_BASE_PORT, Integer.toString(port));
+            propsCore.setProperty(MEANDRE_PUBLIC_RESOURCE_DIRECTORY, sInstallDir + File.separator + "published_resources");
+            propsCore.setProperty(MEANDRE_PRIVATE_RUN_DIRECTORY, sInstallDir + File.separator + "run");
+            propsCore.setProperty(MEANDRE_CORE_CONFIG_FILE, confCore.toString());
+            propsCore.setProperty(MEANDRE_HOME_DIRECTORY, sInstallDir);
+            propsCore.setProperty(MEANDRE_APP_CONTEXT,"");
+            propsCore.setProperty(MEANDRE_CONDUCTOR_DEFAULT_QUEUE_SIZE,Integer.toString(CONDUCTOR_DEFAULT_QUEUE_SIZE));
+        }
+
         INSTALL_DIR = sInstallDir;
         log = KernelLoggerFactory.getCoreLogger();
 
