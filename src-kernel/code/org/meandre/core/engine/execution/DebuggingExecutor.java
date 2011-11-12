@@ -21,6 +21,8 @@ import com.martiansoftware.jsap.Parameter;
 import com.martiansoftware.jsap.SimpleJSAP;
 import com.martiansoftware.jsap.UnflaggedOption;
 
+import de.schlichtherle.io.FileInputStream;
+
 public class DebuggingExecutor extends SaraExecutor {
 
 	public DebuggingExecutor(QueryableRepository qr, CoreConfiguration cnf) {
@@ -49,12 +51,20 @@ public class DebuggingExecutor extends SaraExecutor {
 
         File pubResDir = new File(baseDir, "public_resources");
 
-        Properties props = new Properties();
+        File confFile = new File(baseDir, "meandre-config-core.xml");
+        if (jsapResult.contains("conf"))
+            confFile = new File(jsapResult.getString("conf"));
+
+        Properties confProps = new Properties();
+        if (confFile.exists())
+            confProps.loadFromXML(new FileInputStream(confFile));
+
+        Properties props = new Properties(confProps);
         props.setProperty(CoreConfiguration.MEANDRE_BASE_PORT, "" + (port - 1));
         props.setProperty(CoreConfiguration.MEANDRE_HOME_DIRECTORY, baseDir.toString());
         props.setProperty(CoreConfiguration.MEANDRE_PRIVATE_RUN_DIRECTORY, runDir.toString());
         props.setProperty(CoreConfiguration.MEANDRE_PUBLIC_RESOURCE_DIRECTORY, pubResDir.toString());
-        props.setProperty(CoreConfiguration.MEANDRE_CORE_CONFIG_FILE, new File(baseDir, "meandre-config-core.xml").toString());
+        props.setProperty(CoreConfiguration.MEANDRE_CORE_CONFIG_FILE, confFile.toString());
 
         try {
             QueryableRepository qr = new RepositoryImpl(master);
@@ -83,7 +93,10 @@ public class DebuggingExecutor extends SaraExecutor {
                     new UnflaggedOption("rdf", JSAP.URL_PARSER, true, "The RDF for the flow and components").setGreedy(true),
                     new FlaggedOption("port", JSAP.INTEGER_PARSER,
                             "1760", JSAP.NOT_REQUIRED, 'p',
-                            JSAP.NO_LONGFLAG, "The port number to run the flow on")
+                            JSAP.NO_LONGFLAG, "The port number to run the flow on"),
+                    new FlaggedOption("conf", JSAP.STRING_PARSER, JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG, "conf",
+                            "The configuration file to use as basis - port, home directory, run directory, and published resources " +
+                            "directory settings in this config file will NOT be honored.")
                     });
 
         result = jsap.parse(args);
