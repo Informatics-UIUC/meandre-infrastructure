@@ -105,24 +105,26 @@ public class CoreConfiguration {
 
         final File confCore = new File(sInstallDir + File.separator + "meandre-config-core.xml");
 
-        propsCore = new Properties();
+        Properties propDefaults = new Properties();
 
         if (confCore.exists()) {
             try {
-                propsCore.loadFromXML(new FileInputStream(confCore));
+                propDefaults.loadFromXML(new FileInputStream(confCore));
             }
             catch (Exception e) {
                 throw new RuntimeException(e);
             }
         } else {
-            propsCore.setProperty(MEANDRE_BASE_PORT, Integer.toString(port));
-            propsCore.setProperty(MEANDRE_PUBLIC_RESOURCE_DIRECTORY, sInstallDir + File.separator + "published_resources");
-            propsCore.setProperty(MEANDRE_PRIVATE_RUN_DIRECTORY, sInstallDir + File.separator + "run");
-            propsCore.setProperty(MEANDRE_CORE_CONFIG_FILE, confCore.toString());
-            propsCore.setProperty(MEANDRE_HOME_DIRECTORY, sInstallDir);
-            propsCore.setProperty(MEANDRE_APP_CONTEXT,"");
-            propsCore.setProperty(MEANDRE_CONDUCTOR_DEFAULT_QUEUE_SIZE,Integer.toString(CONDUCTOR_DEFAULT_QUEUE_SIZE));
+            propDefaults.setProperty(MEANDRE_PUBLIC_RESOURCE_DIRECTORY, sInstallDir + File.separator + "published_resources");
+            propDefaults.setProperty(MEANDRE_PRIVATE_RUN_DIRECTORY, sInstallDir + File.separator + "run");
+            propDefaults.setProperty(MEANDRE_CORE_CONFIG_FILE, confCore.toString());
+            propDefaults.setProperty(MEANDRE_HOME_DIRECTORY, sInstallDir);
+            propDefaults.setProperty(MEANDRE_APP_CONTEXT,"");
+            propDefaults.setProperty(MEANDRE_CONDUCTOR_DEFAULT_QUEUE_SIZE,Integer.toString(CONDUCTOR_DEFAULT_QUEUE_SIZE));
         }
+
+        propsCore = new Properties(propDefaults);
+        propsCore.setProperty(MEANDRE_BASE_PORT, Integer.toString(port));
 
         INSTALL_DIR = sInstallDir;
         log = KernelLoggerFactory.getCoreLogger();
