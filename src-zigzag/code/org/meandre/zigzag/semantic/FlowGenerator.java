@@ -31,6 +31,7 @@ import org.meandre.zigzag.parser.ZigZag;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /** This class stores the parsed flow and does the basic
@@ -145,6 +146,9 @@ public class FlowGenerator {
 	throws ParseException {
 
 		URI uri = Tools.filterURItoURL(sURI, iLine);
+		String parent = uri.toString();
+		parent = parent.substring(0, parent.lastIndexOf("/") + 1);
+        final int skip = "context://localhost/".length();
 
 		if ( !hsRepositoryLocations.contains(uri.toString()) ) {
 			// Only add the location components if not imported before
@@ -160,8 +164,25 @@ public class FlowGenerator {
 			RepositoryImpl riNew = new RepositoryImpl(mod);
 			// Add the components
 			for ( ExecutableComponentDescription ec:riNew.getAvailableExecutableComponentDescriptions() )
-				if ( ri.getExecutableComponentDescription(ec.getExecutableComponent())==null )
+				if ( ri.getExecutableComponentDescription(ec.getExecutableComponent())==null ) {
+				    Set<RDFNode> toAdd = new HashSet<RDFNode>();
+				    Set<RDFNode> toRemove = new HashSet<RDFNode>();
+				    Set<RDFNode> setCntxs = ec.getContext();
+				    // Rewrite the contexts if starts with "context://"
+				    for ( RDFNode node:setCntxs )
+				        if (node.isResource()) {
+				            Resource res = (Resource)node;
+	                        String resUri = res.getURI().replaceAll(" ", "%20");
+	                        if (resUri.startsWith("context://localhost/")) {
+                                String newUri = parent + resUri.substring(skip);
+	                            toAdd.add(mod.createResource(newUri));
+	                            toRemove.add(node);
+	                        }
+				        }
+				    setCntxs.removeAll(toRemove);
+				    setCntxs.addAll(toAdd);
 					modStore.add(ec.getModel());
+				}
 			// Ignoring the flows
 
 			ps.println("Importing repository "+uri);
