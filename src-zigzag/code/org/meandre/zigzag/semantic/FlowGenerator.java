@@ -41,6 +41,8 @@ import com.hp.hpl.jena.rdf.model.Resource;
  */
 public class FlowGenerator {
 
+    private final static int SKIP = "context://localhost/".length();
+
 	/** The default parallelization degree */
 	private final static int AUTO_PARALLELIZATION_DEGREE = Runtime.getRuntime().availableProcessors();
 
@@ -148,7 +150,6 @@ public class FlowGenerator {
 		URI uri = Tools.filterURItoURL(sURI, iLine);
 		String parent = uri.toString();
 		parent = parent.substring(0, parent.lastIndexOf("/") + 1);
-        final int skip = "context://localhost/".length();
 
 		if ( !hsRepositoryLocations.contains(uri.toString()) ) {
 			// Only add the location components if not imported before
@@ -174,7 +175,7 @@ public class FlowGenerator {
 				            Resource res = (Resource)node;
 	                        String resUri = res.getURI().replaceAll(" ", "%20");
 	                        if (resUri.startsWith("context://localhost/")) {
-                                String newUri = parent + resUri.substring(skip);
+                                String newUri = parent + resUri.substring(SKIP);
 	                            toAdd.add(mod.createResource(newUri));
 	                            toRemove.add(node);
 	                        }
@@ -201,6 +202,8 @@ public class FlowGenerator {
 	public void importRepository(String sURI, String sCompURI, int iLine)
 	throws ParseException {
 		URI uri = Tools.filterURItoURL(sURI, iLine);
+        String parent = uri.toString();
+        parent = parent.substring(0, parent.lastIndexOf("/") + 1);
 
 		Model mod;
 		try {
@@ -217,8 +220,25 @@ public class FlowGenerator {
 		FlowDescription fd = riNew.getFlowDescription(resComp);
 		if ( ecd!=null ) {
 			// Check if it is a component
-			if ( ri.getExecutableComponentDescription(resComp)==null )
+			if ( ri.getExecutableComponentDescription(resComp)==null ) {
+			    Set<RDFNode> toAdd = new HashSet<RDFNode>();
+                Set<RDFNode> toRemove = new HashSet<RDFNode>();
+                Set<RDFNode> setCntxs = ecd.getContext();
+                // Rewrite the contexts if starts with "context://"
+                for ( RDFNode node:setCntxs )
+                    if (node.isResource()) {
+                        Resource res = (Resource)node;
+                        String resUri = res.getURI().replaceAll(" ", "%20");
+                        if (resUri.startsWith("context://localhost/")) {
+                            String newUri = parent + resUri.substring(SKIP);
+                            toAdd.add(mod.createResource(newUri));
+                            toRemove.add(node);
+                        }
+                    }
+                setCntxs.removeAll(toRemove);
+                setCntxs.addAll(toAdd);
 				modStore.add(ecd.getModel());
+			}
 		}
 		else if ( fd!=null ) {
 			// Check it it is a flow
