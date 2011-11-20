@@ -110,6 +110,7 @@ public class CoreConfiguration {
         if (confCore.exists()) {
             try {
                 propDefaults.loadFromXML(new FileInputStream(confCore));
+                propDefaults.setProperty(MEANDRE_CORE_CONFIG_FILE, confCore.toString());
             }
             catch (Exception e) {
                 throw new RuntimeException(e);
