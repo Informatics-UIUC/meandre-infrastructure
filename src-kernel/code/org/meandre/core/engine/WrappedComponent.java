@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.meandre.configuration.CoreConfiguration;
@@ -154,19 +155,21 @@ extends Thread {
 			this.ec.initialize(cc);
 			this.thdMrProbe.probeWrappedComponentInitialize(this);
 		} catch (ComponentExecutionException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace(cc.getOutputConsole());
 			synchronized (baStatusFlags) {
 				baStatusFlags[TERMINATION] = true;
 				sAbortMessage = ExceptionFormatter.formatException(e);
 				this.thdMrProbe.probeWrappedComponentAbort(this);
 			}
-			log.severe("Component initialize failed "+e.toString());
 		} catch (ComponentContextException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace(cc.getOutputConsole());
 			synchronized (baStatusFlags) {
 				baStatusFlags[TERMINATION] = true;
 				sAbortMessage = ExceptionFormatter.formatException(e);
 				this.thdMrProbe.probeWrappedComponentAbort(this);
 			}
-			log.severe("Component initialize failed "+e.toString());
 		}
 
 		// Main loop
@@ -207,27 +210,30 @@ extends Thread {
 						updateComponentContext();
 						//log.finest("Component "+ec.toString()+" context updated");
 					} catch (ComponentExecutionException e) {
+                        log.log(Level.SEVERE, e.getMessage(), e);
+                        e.printStackTrace(cc.getOutputConsole());
 						synchronized (baStatusFlags) {
 							baStatusFlags[TERMINATION] = true;
 							sAbortMessage = ExceptionFormatter.formatException(e);
 							this.thdMrProbe.probeWrappedComponentAbort(this);
 						}
-						log.warning(e.getMessage());
 					} catch (ComponentContextException e) {
+                        log.log(Level.SEVERE, e.getMessage(), e);
+                        e.printStackTrace(cc.getOutputConsole());
 						synchronized (baStatusFlags) {
 							baStatusFlags[TERMINATION] = true;
 							sAbortMessage = ExceptionFormatter.formatException(e);
 							this.thdMrProbe.probeWrappedComponentAbort(this);
 						}
-						log.warning(e.getMessage());
 					}
 					catch (Exception e) {
+                        log.log(Level.SEVERE, e.getMessage(), e);
+                        e.printStackTrace(cc.getOutputConsole());
 						synchronized (baStatusFlags) {
 							baStatusFlags[TERMINATION] = true;
 							sAbortMessage = ExceptionFormatter.formatException(e);
 							this.thdMrProbe.probeWrappedComponentAbort(this);
 						}
-						log.warning(e.toString());
 					}
 				}
 				else {
@@ -277,12 +283,13 @@ extends Thread {
 		}
 		catch (Throwable t ) {
 			// This should not have happened
+            log.log(Level.SEVERE, t.getMessage(), t);
+            t.printStackTrace(cc.getOutputConsole());
 			synchronized (baStatusFlags) {
 				baStatusFlags[TERMINATION] = true;
 				sAbortMessage = ExceptionFormatter.formatException(new Exception(t));
 				this.thdMrProbe.probeWrappedComponentAbort(this);
 			}
-			log.severe("Unexpected exception thrown "+t.toString());
 			this.thdMrProbe.probeWrappedComponentAbort(this);
 		}
 
@@ -292,27 +299,30 @@ extends Thread {
 		try {
 			ec.dispose(cc);
 		} catch (ComponentExecutionException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace(cc.getOutputConsole());
 			synchronized (baStatusFlags) {
 				baStatusFlags[TERMINATION] = true;
 				sAbortMessage = ExceptionFormatter.formatException(e);
 				this.thdMrProbe.probeWrappedComponentAbort(this);
 			}
-			log.severe("Component disposed failed "+e.toString());
 		} catch (ComponentContextException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace(cc.getOutputConsole());
 			synchronized (baStatusFlags) {
 				baStatusFlags[TERMINATION] = true;
 				sAbortMessage = ExceptionFormatter.formatException(e);
 				this.thdMrProbe.probeWrappedComponentAbort(this);
 			}
-			log.severe("Component disposed failed "+e.toString());
 		}
 		catch (Throwable t) {
+            log.log(Level.SEVERE, t.getMessage(), t);
+            t.printStackTrace(cc.getOutputConsole());
 			synchronized (baStatusFlags) {
 				baStatusFlags[TERMINATION] = true;
 				sAbortMessage = ExceptionFormatter.formatException(new Exception(t));
 				this.thdMrProbe.probeWrappedComponentAbort(this);
 			}
-			log.severe("Component disposed failed unexpectedly "+t.toString());
 		}
 		this.thdMrProbe.probeWrappedComponentDispose(this);
 	}
