@@ -7,7 +7,7 @@ val console = System.out
 val log = System.err
 
 val HEADER = "Meandre %s Dummy Echo Execution Engine\n".format(Configuration.INFRASTRUCTURE_VERSION) +
-        "Copyright DITA, NCSA, UofI 2007-2010 (%s)\n".format(new Date()) +
+        "Copyright DITA, NCSA, UofI 2007-2012 (%s)\n".format(new Date()) +
         "\n---------------------------------------------------------------------\n\nPROVIDED REPOSITORY\n"
 
 val FOOTER = "\n---------------------------------------------------------------------\n\nFINISHED AT %s\n"

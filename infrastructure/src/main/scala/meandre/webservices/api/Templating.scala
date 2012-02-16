@@ -366,7 +366,7 @@ object Templating {
   /** The html page footer */
   def htmlFooter = """
     <div class="footer">
-        <p class="footer">&copy; DITA, NCSA, and UofI, 2007-2010.</p>
+        <p class="footer">&copy; DITA, NCSA, and UofI, 2007-2012.</p>
         <p class="footer-date">"""+new Date+"""</p>
     </div>
   """

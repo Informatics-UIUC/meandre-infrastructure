@@ -1122,7 +1122,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
     requestFor {
       user =>
         if ( !request.isUserInRole("admin")  ) {
-          FailResponse("You need to belong to the admin role to force the unpublishing of the public repository", new BasicDBObject, user)
+          FailResponse("You need to belong to the admin role to be able to shut down the server", new BasicDBObject, user)
         }
         else {
           val peers = paramsMap.contains("uuid") match {
@@ -1159,7 +1159,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
     requestFor {
       user =>
         if ( !request.isUserInRole("admin")  ) {
-          FailResponse("You need to belong to the admin role to force the unpublishing of the public repository", new BasicDBObject, user)
+          FailResponse("You need to belong to the admin role to force the shutdown of the cluster", new BasicDBObject, user)
         }
         else {
           val msg:BasicDBObject =
@@ -1183,7 +1183,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
     requestFor {
       user =>
         if ( !request.isUserInRole("admin")  ) {
-          FailResponse("You need to belong to the admin role to force the unpublishing of the public repository", new BasicDBObject, user)
+          FailResponse("You need to belong to the admin role to see the global log", new BasicDBObject, user)
         }
         else {
           val q = "{}"
@@ -1202,7 +1202,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
     requestFor {
       user =>
         if ( !request.isUserInRole("admin")  ) {
-          FailResponse("You need to belong to the admin role to force the unpublishing of the public repository", new BasicDBObject, user)
+          FailResponse("You need to belong to the admin role to see the server log", new BasicDBObject, user)
         }
         else {
           val skip = if (params.contains("offset")) safeParseInt(params("offset")) else 0
@@ -1477,7 +1477,7 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
     requestFor {
       user =>
         if ( !request.isUserInRole("admin")  ) {
-          FailResponse("You need to belong to the admin role to force the unpublishing of the public repository", new BasicDBObject, user)
+          FailResponse("You need to belong to the admin role to perform job cleaning", new BasicDBObject, user)
         }
         else {
           val msg:BasicDBObject = """{
