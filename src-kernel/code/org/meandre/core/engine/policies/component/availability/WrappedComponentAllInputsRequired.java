@@ -2,6 +2,7 @@ package org.meandre.core.engine.policies.component.availability;
 
 import java.io.PrintStream;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.Set;
 
 import org.meandre.configuration.CoreConfiguration;
@@ -51,9 +52,9 @@ public class WrappedComponentAllInputsRequired extends WrappedComponent {
 			Hashtable<String, String> htInputLogicNameMap,
 			Hashtable<String, String> htOutputLogicNameMap, ThreadGroup tg,
 			String sThreadName, Hashtable<String, String> htProperties, MrProbe thdMrProbe,
-			CoreConfiguration cnf, PrintStream console )
+			CoreConfiguration cnf, PrintStream console, Properties flowParams)
 			throws InterruptedException {
-		super(sFlowUniqueID,flowID, sComponentInstanceID, sComponentInstanceName, ec, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, tg, sThreadName, htProperties, thdMrProbe, cnf, console);
+		super(sFlowUniqueID,flowID, sComponentInstanceID, sComponentInstanceName, ec, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, tg, sThreadName, htProperties, thdMrProbe, cnf, console, flowParams);
 
 		this.bFirst = true;
 	}

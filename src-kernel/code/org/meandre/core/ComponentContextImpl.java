@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -112,6 +113,10 @@ public class ComponentContextImpl implements ComponentContext {
 	/** The output console for the flow */
 	private PrintStream console = null;
 
+	/** The flow parameters */
+	protected Properties flowParams;
+
+
 	/** Create a component context with the given input and output active buffers
 	 * for a given wrapped component.
 	 *
@@ -137,7 +142,8 @@ public class ComponentContextImpl implements ComponentContext {
 			MrProbe thdMrProbe,
 			WrappedComponent wc,
 			CoreConfiguration cnf,
-			PrintStream console) {
+			PrintStream console,
+			Properties flowParams) {
 
 		// Create the data proxy
 		this.sFlowUniqueExecutionID = sFlowUniqueID;
@@ -148,6 +154,7 @@ public class ComponentContextImpl implements ComponentContext {
 		this.wcParent = wc;
 		this.ccCnf = cnf;
 		this.console = console;
+		this.flowParams = flowParams;
 
 		this.htInputLogicNameMap = htInputLogicNameMap;
 		this.htOutputLogicNameMap = htOutputLogicNameMap;
@@ -598,5 +605,10 @@ public class ComponentContextImpl implements ComponentContext {
 	@Override
     public FiringPolicy getFiringPolicy() {
 	    return (wcParent instanceof WrappedComponentAllInputsRequired) ? FiringPolicy.all : FiringPolicy.any;
+	}
+
+	@Override
+	public Properties getFlowProperties() {
+		return this.flowParams;
 	}
 }

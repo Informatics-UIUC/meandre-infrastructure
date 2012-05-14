@@ -13,6 +13,7 @@ import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.Date;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 
@@ -36,6 +37,12 @@ import org.meandre.zigzag.semantic.FlowGenerator;
 
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.martiansoftware.jsap.FlaggedOption;
+import com.martiansoftware.jsap.JSAP;
+import com.martiansoftware.jsap.JSAPException;
+import com.martiansoftware.jsap.JSAPResult;
+import com.martiansoftware.jsap.Parameter;
+import com.martiansoftware.jsap.SimpleJSAP;
 
 /** The ZigZag interpreter console
  *
@@ -243,6 +250,18 @@ public class ZigZagConsole {
 			bProcessed = true;
 		}
 		else if ( sCmd.equals("run") ) {
+			JSAPResult jsap = null;
+			try {
+				String[] args = new String[saLine.length - 1];
+				for (int i = 0, iMax = saLine.length - 1; i < iMax; i++)
+					args[i] = saLine[i+1];
+
+				jsap = parseArguments(args);
+				if (jsap == null) return true;
+			}
+			catch (JSAPException e) {
+				System.out.println("\t Error parsing parameters for 'run' command. " + e.getMessage());
+			}
 			String sFileName = "run-console-"+System.currentTimeMillis()+".mau";
 			// Save the current flow
 			String [] sa = { "save", "mau", sFileName};
@@ -252,11 +271,22 @@ public class ZigZagConsole {
 			System.out.println();
 			// Run the flow
 			MAUExecutor mau = new MAUExecutor(sFileName);
-			if (saLine.length==2 ) {
-				mau.setWebUIPortNumber(Integer.parseInt(saLine[1]));
-			}
+
 			try {
-				mau.run();
+				if (jsap.contains("port"))
+					mau.setWebUIPortNumber(jsap.getInt("port"));
+
+		        String[] params = jsap.getStringArray("param");
+
+				// Extract the flow parameters
+		        Properties flowParams = new Properties();
+		        for (String param : params) {
+		        	String key = param.substring(0, param.indexOf('='));
+		        	String value = param.substring(key.length() + 1);
+		        	flowParams.put(key, value);
+		        }
+
+				mau.run(flowParams);
 			}
 			catch (FileNotFoundException e) {
 				System.out.println("\t The flow could not be executed. "+e.getMessage());
@@ -302,6 +332,7 @@ public class ZigZagConsole {
 		else {
 			// Create a runnable for the vizualization
 			Runnable run = new Runnable() {
+				@Override
 				public void run() {
 					FlowDrawer.fireViz(fg.getCurrentFlowDescription(true));
 				}
@@ -792,4 +823,34 @@ public class ZigZagConsole {
 		zzc.start(sArgs);
 	}
 
+    /**
+     * Parses the command line arguments
+     *
+     * @param args The command line arguments
+     * @return The JSAPResult object containing the parsed arguments
+     */
+    private static JSAPResult parseArguments(String[] args) throws JSAPException {
+        JSAPResult result = null;
+
+        String generalHelp = "Runs a flow with optional parameters";
+
+        SimpleJSAP jsap =
+            new SimpleJSAP("run",
+            		generalHelp,
+                    new Parameter[] {
+	                    new FlaggedOption("port", JSAP.INTEGER_PARSER,
+	                            JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+	                            "port", "The port number to bind to"),
+	                    new FlaggedOption("param", JSAP.STRING_PARSER,
+	                    		JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+	                    		"param", "The key=value parameter to be passed to the flow")
+	                    		.setAllowMultipleDeclarations(true)
+                    });
+
+        result = jsap.parse(args);
+        if (jsap.messagePrinted())
+            return null;
+
+        return result;
+    }
 }

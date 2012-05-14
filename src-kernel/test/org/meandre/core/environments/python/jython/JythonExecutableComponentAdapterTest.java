@@ -90,9 +90,9 @@ public class JythonExecutableComponentAdapterTest {
 				new Hashtable<String, String> (),
 				new Hashtable<String, String> (),
 				new Hashtable<String, String> (), null,
-				"nothing", new Hashtable<String, String> (), thdMrProbe,cnf, System.out);
+				"nothing", new Hashtable<String, String> (), thdMrProbe,cnf, System.out, null);
 
-		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf, System.out);
+		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf, System.out, null);
 		jeca.initialize(cc);
 		jeca.untrapOutputAndErrorStreams();
 		sRes = jeca.getOutput().toString();
@@ -125,8 +125,8 @@ public class JythonExecutableComponentAdapterTest {
 				new Hashtable<String, String> (),
 				new Hashtable<String, String> (),
 				new Hashtable<String, String> (), null,
-				"nothing", new Hashtable<String, String> (), thdMrProbe,cnf, System.out);
-		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf, System.out);
+				"nothing", new Hashtable<String, String> (), thdMrProbe,cnf, System.out, null);
+		ComponentContext cc = new ComponentContextImpl("Nothing","Nothing","Nothing","Nothing",new HashSet<ActiveBuffer>(),new HashSet<ActiveBuffer>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),new Hashtable<String, String>(),thdMrProbe,wc,cnf, System.out, null);
 		try {
 			jeca.initialize(cc);
 			jeca.execute(cc);

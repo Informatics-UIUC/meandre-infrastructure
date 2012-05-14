@@ -16,6 +16,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.meandre.annotations.CreateComponentDescriptor;
 import org.meandre.configuration.CoreConfiguration;
@@ -327,7 +328,7 @@ public class ComponentTesterBase {
 		MrProbe mrProbe = new MrProbe(KernelLoggerFactory.getCoreLogger(),new NullProbeImpl(),false,false);
 		try {
 			String sFUID = flow.getFlowComponent().toString()+"/"+System.currentTimeMillis();
-			Executor exec = conductor.buildExecutor(ri, flow.getFlowComponent(), mrProbe,System.out,sFUID);
+			Executor exec = conductor.buildExecutor(ri, flow.getFlowComponent(), mrProbe,System.out,sFUID, new Properties());
 			int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
 			WebUI webui = exec.initWebUI(nextPort,sFUID);
 			exec.execute(webui);

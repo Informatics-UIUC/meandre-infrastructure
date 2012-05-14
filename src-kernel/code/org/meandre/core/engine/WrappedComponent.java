@@ -3,6 +3,7 @@ package org.meandre.core.engine;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
@@ -76,6 +77,7 @@ extends Thread {
 	/** MrProbe instance */
 	protected transient MrProbe thdMrProbe;
 
+
 	/** Builds a runnable component wrapper given the abstracted EcecutableComponent.
 	 *
 	 * @param sFlowUniqueID A flow execution unique ID
@@ -101,14 +103,15 @@ extends Thread {
 			Hashtable<String, String> htOutputLogicNameMap, ThreadGroup tg,
 			String sThreadName, Hashtable<String, String> htProperties, MrProbe thdMrProbe,
 			CoreConfiguration cnf,
-			PrintStream console )
+			PrintStream console,
+			Properties flowParams)
 	throws InterruptedException {
 		super(tg,sThreadName);
 
 		// Basic initialization
 		this.ec            = ec;
 		this.semBlocking   = new Semaphore(1,true); // With fairness
-		this.cc            = new ComponentContextImpl(sFlowUniqueID,flowID,sComponentInstanceID, sComponentInstanceName, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, htProperties, thdMrProbe, this, cnf, console);
+		this.cc            = new ComponentContextImpl(sFlowUniqueID,flowID,sComponentInstanceID, sComponentInstanceName, setInputs, setOutputs, htOutputMap, htInputLogicNameMap, htOutputLogicNameMap, htProperties, thdMrProbe, this, cnf, console, flowParams);
 		this.hasNInputs     = htInputLogicNameMap.size();
 		// Setting execution flags
 		this.baStatusFlags = new boolean [4];
@@ -136,7 +139,6 @@ extends Thread {
 			this.htOutputs.put(ab.getName(),ab);
 
 		this.htOutputMap = htOutputMap;
-
 
 		// Waste the only ticket to the blocking semaphore
 		this.semBlocking.acquire();

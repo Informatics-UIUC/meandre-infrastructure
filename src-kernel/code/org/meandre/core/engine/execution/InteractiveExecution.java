@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Properties;
 import java.util.Random;
 
 import org.json.JSONArray;
@@ -96,7 +97,7 @@ public class InteractiveExecution {
                 conductor = new Conductor(cnf.getConductorDefaultQueueSize(), cnf);
                 pa = instantiateProbes(saProbes, cnf);
                 MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(), pa, false, false);
-                exec = conductor.buildExecutor(qr, resURI, mrProbe, pw, sFUID);
+                exec = conductor.buildExecutor(qr, resURI, mrProbe, pw, sFUID, new Properties());
                 mrProbe.setName(exec.getThreadGroupName() + "mr-probe");
                 // pw.flush();
                 int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
@@ -278,7 +279,7 @@ public class InteractiveExecution {
                 conductor = new Conductor(cnf.getConductorDefaultQueueSize(), cnf);
                 probe = new NullProbeImpl();
                 MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(), probe, false, false);
-                exec = conductor.buildExecutor(qr, resURI, mrProbe, pw, sFUID);
+                exec = conductor.buildExecutor(qr, resURI, mrProbe, pw, sFUID, new Properties());
                 mrProbe.setName(exec.getThreadGroupName() + "mr-probe");
 
                 int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());

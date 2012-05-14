@@ -109,12 +109,22 @@ public class MAUExecutor {
         int port = jsapResult.getInt("port");
         String config = jsapResult.contains("config") ? jsapResult.getString("config") : null;
 
+        String[] params = jsapResult.getStringArray("param");
+
         MAUExecutor mau = new MAUExecutor(mauFile);
         mau.setParentClassloader(MAUExecutor.class.getClassLoader());
         mau.setWebUIPortNumber(port);
         if (config != null)
             mau.setConfigFile(config);
-        mau.run();
+
+        Properties flowParams = new Properties();
+        for (String param : params) {
+        	String key = param.substring(0, param.indexOf('='));
+        	String value = param.substring(key.length() + 1);
+        	flowParams.put(key, value);
+        }
+
+        mau.run(flowParams);
 	}
 
 	private void setConfigFile(String config) {
@@ -186,7 +196,7 @@ public class MAUExecutor {
 	 *
 	 * @throws FileNotFoundException The file could not be found
 	 */
-	public void run () throws Exception {
+	public void run (Properties flowParams) throws Exception {
 		ps.println("Meandre MAU Executor [" + MAUExecutor.ZMAU_VERSION + "/" + Version.getFullVersion() + "]");
 		ps.println("All rights reserved by DITA, NCSA, UofI (2007-2011)");
 		ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
@@ -232,7 +242,7 @@ public class MAUExecutor {
 			spi.initialize();
 			MrProbe mrProbe = new MrProbe(KernelLoggerFactory.getCoreLogger(),spi,false,false);
 			conductor.setParentClassloader(this.getParentClassloader());
-			exec = conductor.buildExecutor(qr, resURI, mrProbe, System.out);
+			exec = conductor.buildExecutor(qr, resURI, mrProbe, System.out, flowParams);
 			mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
 
 			ps.flush();
@@ -502,15 +512,20 @@ public class MAUExecutor {
 
         SimpleJSAP jsap =
             new SimpleJSAP(MAUExecutor.class.getSimpleName(),
-                    generalHelp,
+            		generalHelp,
                     new Parameter[] {
-                    new UnflaggedOption("mau", JSAP.STRING_PARSER, true, "The MAU file to run"),
-                    new FlaggedOption("port", JSAP.INTEGER_PARSER,
-                            "1715", JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
-                            "port", "The port number to bind to"),
-                    new FlaggedOption("config", JSAP.STRING_PARSER,
-                            JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
-                            "config", "The configuration file to use")});
+	                    new UnflaggedOption("mau", JSAP.STRING_PARSER, true, "The MAU file to run"),
+	                    new FlaggedOption("port", JSAP.INTEGER_PARSER,
+	                            "1715", JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+	                            "port", "The port number to bind to"),
+	                    new FlaggedOption("config", JSAP.STRING_PARSER,
+	                            JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+	                            "config", "The configuration file to use"),
+	                    new FlaggedOption("param", JSAP.STRING_PARSER,
+	                    		"", JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+	                    		"param", "The key=value parameter to be passed to the flow")
+	                    		.setAllowMultipleDeclarations(true)
+                    });
 
         result = jsap.parse(args);
         if (jsap.messagePrinted())

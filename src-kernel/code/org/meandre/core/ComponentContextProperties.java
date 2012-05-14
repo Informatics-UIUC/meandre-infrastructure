@@ -2,6 +2,7 @@ package org.meandre.core;
 
 import java.io.PrintStream;
 import java.net.URL;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.meandre.annotations.Component.FiringPolicy;
@@ -163,4 +164,11 @@ public interface ComponentContextProperties {
      * @return The Firing Policy of the component
      */
     public FiringPolicy getFiringPolicy();
+
+    /**
+     * Returns the flow properties
+     *
+     * @return The flow properties
+     */
+    public Properties getFlowProperties();
 }

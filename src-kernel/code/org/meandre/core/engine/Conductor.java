@@ -10,6 +10,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -108,14 +109,15 @@ public class Conductor {
 	 * @param qr The queryable repository containing component descriptions
 	 * @param res The resource identifying the flow to prepare for execution
 	 * @param console The output console
+	 * @param flowParams The flow parameters
 	 * @return The executor object
 	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
 	 * @throws ConductorException The conductor could not create an executable flow
 	 */
-	public Executor buildExecutor(QueryableRepository qr, Resource res, PrintStream console )
+	public Executor buildExecutor(QueryableRepository qr, Resource res, PrintStream console, Properties flowParams)
 	throws CorruptedDescriptionException, ConductorException {
 		String sFlowUniqueExecutionID = res.toString()+NetworkTools.getNumericIPValue()+"/"+System.currentTimeMillis()+"/"+(Math.abs(RANDOM.nextInt()))+"/";
-		return buildExecutor(qr,res,console,sFlowUniqueExecutionID);
+		return buildExecutor(qr,res,console,sFlowUniqueExecutionID, flowParams);
 	}
 
 	/** Creates an execution object for the given flow description.
@@ -124,14 +126,15 @@ public class Conductor {
 	 * @param res The resource identifying the flow to prepare for execution
 	 * @param console The output console
 	 * @param sFUID The flow execution ID
+	 * @param flowParams The flow parameters
 	 * @return The executor object
 	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
 	 * @throws ConductorException The counductor could not create an executable flow
 	 */
-	public Executor buildExecutor(QueryableRepository qr, Resource res, PrintStream console, String sFUID )
+	public Executor buildExecutor(QueryableRepository qr, Resource res, PrintStream console, String sFUID, Properties flowParams)
 	throws CorruptedDescriptionException, ConductorException {
 		MrProbe thdMrProbe = new MrProbe(log,new NullProbeImpl(),false,false);
-		Executor exec = buildExecutor(qr, res,thdMrProbe,console,sFUID);
+		Executor exec = buildExecutor(qr, res,thdMrProbe,console,sFUID, flowParams);
 		thdMrProbe.setName(exec.getThreadGroupName()+"mr-probe");
 		exec.initWebUI(PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID()), "XStreamTest");
 		return exec;
@@ -143,14 +146,15 @@ public class Conductor {
 	 * @param res The resource identifying the flow to prepare for execution
 	 * @param thdMrProbe The MrProbe to use
 	 * @param console The output console
+	 * @param flowParams The flow parameters
 	 * @return The executor object
 	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
 	 * @throws ConductorException The conductor could not create an executable flow
 	 */
-	public Executor buildExecutor(QueryableRepository qr, Resource res, MrProbe thdMrProbe, PrintStream console)
+	public Executor buildExecutor(QueryableRepository qr, Resource res, MrProbe thdMrProbe, PrintStream console, Properties flowParams)
 	throws CorruptedDescriptionException, ConductorException {
 		String sFlowUniqueExecutionID = res.toString()+NetworkTools.getNumericIPValue()+"/"+System.currentTimeMillis()+"/"+(Math.abs(RANDOM.nextInt()))+"/";
-		return buildExecutor(qr,res,thdMrProbe,console,sFlowUniqueExecutionID);
+		return buildExecutor(qr,res,thdMrProbe,console,sFlowUniqueExecutionID, flowParams);
 	}
 	/** Creates an execution object for the given flow description.
 	 *
@@ -159,12 +163,13 @@ public class Conductor {
 	 * @param thdMrProbe The MrProbe to use
 	 * @param console The output console
 	 * @param sFUID The flow unique execution ID
+	 * @param flowParams The flow parameters
 	 * @return The executor object
 	 * @throws CorruptedDescriptionException Inconsistencies where found on the flow definition aborting the creation of the Executor
 	 * @throws ConductorException The conductor could not create an executable flow
 	 */
 	@SuppressWarnings("unchecked")
-	public Executor buildExecutor(QueryableRepository qr, Resource res, MrProbe thdMrProbe, PrintStream console,String sFUID)
+	public Executor buildExecutor(QueryableRepository qr, Resource res, MrProbe thdMrProbe, PrintStream console,String sFUID, Properties flowParams)
 	throws CorruptedDescriptionException, ConductorException {
 		// The unique execution flow ID
 		String sFlowUniqueExecutionID = sFUID;
@@ -394,7 +399,8 @@ public class Conductor {
 									htInstaceProperties.get(resECI),
 									thdMrProbe,
 									cnf,
-									console
+									console,
+									flowParams
 								)
 						);
 				else if ( firing.equals("any") )
@@ -415,12 +421,13 @@ public class Conductor {
 									htInstaceProperties.get(resECI),
 									thdMrProbe,
 									cnf,
-									console
+									console,
+									flowParams
 								)
 						);
 			} catch (InterruptedException e) {
 				thdMrProbe.done();
-				throw new ConductorException("Condcuctor could not instantiate the wapping component for instance"+sResECI+"\n"+e);
+				throw new ConductorException("Conductor could not instantiate the wapping component for instance"+sResECI+"\n"+e);
 			}
 
 		}

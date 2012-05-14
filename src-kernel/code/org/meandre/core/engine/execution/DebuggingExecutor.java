@@ -38,6 +38,15 @@ public class DebuggingExecutor extends SaraExecutor {
 
         URL[] rdfUrls = jsapResult.getURLArray("rdf");
         int port = jsapResult.getInt("port");
+        String[] params = jsapResult.getStringArray("param");
+
+        // Extract the flow parameters
+        Properties flowParams = new Properties();
+        for (String param : params) {
+        	String key = param.substring(0, param.indexOf('='));
+        	String value = param.substring(key.length() + 1);
+        	flowParams.put(key, value);
+        }
 
         Model master = ModelFactory.createDefaultModel();
         for (URL rdfUrl : rdfUrls)
@@ -68,7 +77,7 @@ public class DebuggingExecutor extends SaraExecutor {
 
         try {
             QueryableRepository qr = new RepositoryImpl(master);
-            new DebuggingExecutor(qr, new CoreConfiguration(props)).run(port, System.out, System.err);
+            new DebuggingExecutor(qr, new CoreConfiguration(props)).run(port, flowParams, System.out, System.err);
         }
         finally {
             FileUtils.deleteFileOrDirectory(baseDir);
@@ -96,7 +105,11 @@ public class DebuggingExecutor extends SaraExecutor {
                             JSAP.NO_LONGFLAG, "The port number to run the flow on"),
                     new FlaggedOption("conf", JSAP.STRING_PARSER, JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG, "conf",
                             "The configuration file to use as basis - port, home directory, run directory, and published resources " +
-                            "directory settings in this config file will NOT be honored.")
+                            "directory settings in this config file will NOT be honored."),
+                    new FlaggedOption("param", JSAP.STRING_PARSER,
+                    		"", JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+                    		"param", "The key=value parameter to be passed to the flow")
+                    		.setAllowMultipleDeclarations(true)
                     });
 
         result = jsap.parse(args);

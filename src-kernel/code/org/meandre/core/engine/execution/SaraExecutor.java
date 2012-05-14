@@ -25,6 +25,12 @@ import org.meandre.support.rdf.ModelUtils;
 import org.meandre.webui.WebUI;
 
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.martiansoftware.jsap.FlaggedOption;
+import com.martiansoftware.jsap.JSAP;
+import com.martiansoftware.jsap.JSAPException;
+import com.martiansoftware.jsap.JSAPResult;
+import com.martiansoftware.jsap.Parameter;
+import com.martiansoftware.jsap.SimpleJSAP;
 
 /**
  * Executor that can be used with Meandre 2.0.x (based on MAUExecutor)
@@ -46,7 +52,7 @@ public class SaraExecutor {
         this.cnf = cnf;
     }
 
-    protected void run(int port, PrintStream console, PrintStream log) throws Exception {
+    protected void run(int port, Properties flowParams, PrintStream console, PrintStream log) throws Exception {
         if (console != System.out) System.setOut(console);
         if (log != System.err)     System.setErr(log);
 
@@ -67,7 +73,7 @@ public class SaraExecutor {
             spi.initialize();
 
             MrProbe mrProbe = new MrProbe(KernelLoggerFactory.getCoreLogger(), spi, false, false);
-            executor = conductor.buildExecutor(qr, resURI, mrProbe, console);
+            executor = conductor.buildExecutor(qr, resURI, mrProbe, console, flowParams);
             mrProbe.setName(executor.getThreadGroupName() + "mr-probe");
 
             log.flush();
@@ -194,12 +200,20 @@ public class SaraExecutor {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 1) {
-            System.err.println("Usage: SaraExecutor <port>");
-            System.exit(-1);
-        }
+    	// Parse command line arguments
+        JSAPResult jsapResult = parseArguments(args);
 
-        int port = Integer.parseInt(args[0]);
+        // Extract the argument values
+        int port = jsapResult.getInt("port");
+        String[] params = jsapResult.getStringArray("param");
+
+        // Extract the flow parameters
+        Properties flowParams = new Properties();
+        for (String param : params) {
+        	String key = param.substring(0, param.indexOf('='));
+        	String value = param.substring(key.length() + 1);
+        	flowParams.put(key, value);
+        }
 
         File baseDir = File.createTempFile("meandre_exec_", null);
         baseDir.delete();
@@ -218,10 +232,41 @@ public class SaraExecutor {
 
         try {
             QueryableRepository qr = new RepositoryImpl(ModelUtils.getModel(System.in, null));
-            new SaraExecutor(qr, new CoreConfiguration(props)).run(port, System.out, System.err);
+            new SaraExecutor(qr, new CoreConfiguration(props)).run(port, flowParams, System.out, System.err);
         }
         finally {
             FileUtils.deleteFileOrDirectory(baseDir);
         }
+    }
+
+    /**
+     * Parses the command line arguments
+     *
+     * @param args The command line arguments
+     * @return The JSAPResult object containing the parsed arguments
+     */
+    private static JSAPResult parseArguments(String[] args) throws JSAPException {
+        JSAPResult result = null;
+
+        String generalHelp = "Runs a flow in the Meandre 2.x environment using the Meandre 1.4.x execution engine";
+
+        SimpleJSAP jsap =
+            new SimpleJSAP(SaraExecutor.class.getSimpleName(),
+            		generalHelp,
+                    new Parameter[] {
+	                    new FlaggedOption("port", JSAP.INTEGER_PARSER,
+	                            JSAP.NO_DEFAULT, JSAP.REQUIRED, JSAP.NO_SHORTFLAG,
+	                            "port", "The port number to bind to"),
+	                    new FlaggedOption("param", JSAP.STRING_PARSER,
+	                    		"", JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+	                    		"param", "The key=value parameter to be passed to the flow")
+	                    		.setAllowMultipleDeclarations(true)
+                    });
+
+        result = jsap.parse(args);
+        if (jsap.messagePrinted())
+            System.exit(-1);
+
+        return result;
     }
 }

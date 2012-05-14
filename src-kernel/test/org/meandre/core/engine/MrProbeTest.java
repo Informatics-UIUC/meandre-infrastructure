@@ -26,22 +26,22 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 /** This class gathers together the tests related to MrProbe.
- * 
+ *
  * @author Xavier Llor&agrave;
  */
 public class MrProbeTest {
-	
+
 	/** The base URI for the tests */
 	private static final String BASE_TEST_URI = "meandre://test.org/flow/0";
 
 	/** The number of repetitions of the battery of calls */
 	private final int NUMBER_OF_REPETITIONS = 10;
-	
+
 	/** The number of calls in the battery */
 	private final int NUMBER_OF_CALLS = 11;
 
 	/** MrProbe test against the null probe with no serialization.
-	 * 
+	 *
 	 */
 	@Test
 	public void nullProbeMrProperTest () {
@@ -53,9 +53,9 @@ public class MrProbeTest {
 			fail("Unexpected exception: "+e.toString());
 		}
 	}
-	
+
 	/** Runs the battery of test against MrProbe and the print stream probe with no serialization.
-	 * 
+	 *
 	 */
 	@Test
 	public void printStreamMrProbeTest () {
@@ -77,9 +77,9 @@ public class MrProbeTest {
 			fail("Unexpected exception: "+e.toString());
 		}
 	}
-	
+
 	/** Runs a battery of test against the rdf backended probe.
-	 * 
+	 *
 	 */
 	@Test
 	public void meandreMemoryRDFDialectProblemTest () {
@@ -87,14 +87,14 @@ public class MrProbeTest {
 			// Create the probe
 			MeandreRDFDialectProbeImpl mmrdpi = new MeandreRDFDialectProbeImpl();
 			mmrdpi.initialize();
-			
+
 			// Run the probe
 			runMrProbeTestWithProvidedProbe(mmrdpi, false, false);
-			
+
 			// Dump the results
 			String sSerialized = mmrdpi.serializeProbeInformation();
 			Model modProbe = ModelFactory.createDefaultModel();
-			ModelIO.attemptReadModel(modProbe, sSerialized); 
+			ModelIO.attemptReadModel(modProbe, sSerialized);
 			mmrdpi.dispose();
 			assertEquals(581L,modProbe.size());
 		}
@@ -102,9 +102,9 @@ public class MrProbeTest {
 			fail("Unexpected exception: "+e.toString());
 		}
 	}
-	
+
 	/** Runs the Hello World example flow in all possible provenance configurations.
-	 * 
+	 *
 	 */
 	@Test
 	public void meandreHelloWorldProvenanceTest () {
@@ -112,11 +112,11 @@ public class MrProbeTest {
 			Model model = DemoRepositoryGenerator.getTestHelloWorldHetereogenousRepository();
 			QueryableRepository qr = new RepositoryImpl(model);
 			CoreConfiguration cnf = new CoreConfiguration();
-			
+
 			// Basic test running the NullProbeImpl
 			Conductor conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 			ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
-			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), new PrintStream(baosOut));
+			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(), new PrintStream(baosOut), null);
 			runExecutor(exec,baosOut);
 
 			// Basic test running basic provenance to an RDF model
@@ -125,7 +125,7 @@ public class MrProbeTest {
 			rdfModProbe.initialize();
 			MrProbe mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,false,false);
 			conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
-			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProv));
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProv), null);
 			runExecutor(exec,baosOutProv);
 			rdfModProbe.dispose();
 
@@ -135,17 +135,17 @@ public class MrProbeTest {
 			rdfModProbe.initialize();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,true,false);
 			conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
-			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProv2));
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProv2), null);
 			runExecutor(exec,baosOutProv2);
 			rdfModProbe.dispose();
-			
+
 			// Basic test running state storage provenance to an RDF model
 			ByteArrayOutputStream baosOutProvSto = new ByteArrayOutputStream();
 			rdfModProbe = new MeandreRDFDialectProbeImpl();
 			rdfModProbe.initialize();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,false,true);
 			conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
-			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProvSto));
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProvSto), null);
 			runExecutor(exec,baosOutProvSto);
 			rdfModProbe.dispose();
 
@@ -155,7 +155,7 @@ public class MrProbeTest {
 			rdfModProbe.initialize();
 			mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),rdfModProbe,true,true);
 			conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
-			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProvSto3));
+			exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baosOutProvSto3), null);
 			runExecutor(exec,baosOutProvSto3);
 			rdfModProbe.initialize();
 		}
@@ -164,10 +164,10 @@ public class MrProbeTest {
 			fail("This exception should have not been thrown "+e);
 		}
 	}
-	
+
 
 	/** Runs the Hello World example flow with the statics probe.
-	 * 
+	 *
 	 */
 	@Test
 	public void meandreHelloWorldStatisticsTest () {
@@ -180,9 +180,9 @@ public class MrProbeTest {
 			spi.initialize();
 			MrProbe mrProbe = new MrProbe(TestLoggerFactory.getTestLogger(),spi,false,false);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baos));
+			Executor exec = conductor.buildExecutor(qr, qr.getAvailableFlows().iterator().next(),mrProbe, new PrintStream(baos), null);
 			runExecutor(exec,baos);
-			
+
 			// Test the stats are there
 			JSONObject jsonStats = new JSONObject(spi.serializeProbeInformation());
 			assertNotNull(jsonStats.get("flow_unique_id"));
@@ -190,7 +190,7 @@ public class MrProbeTest {
 			assertNotNull(jsonStats.get("started_at"));
 			assertNotNull(jsonStats.get("latest_probe_at"));
 			assertNotNull(jsonStats.get("runtime"));
-			
+
 			JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
 			assertNotNull(jaEXIS);
 			for ( int i=0,iMax=jaEXIS.length() ; i<iMax ; i++ ) {
@@ -212,7 +212,7 @@ public class MrProbeTest {
 	}
 
 	/** Runs an executor for the demo hello world example.
-	 * 
+	 *
 	 * @param exec The executor to use
 	 * @param baosOut The output stream
 	 */
@@ -230,14 +230,14 @@ public class MrProbeTest {
 		assertEquals(0,exec.getAbortMessage().size());
 		System.out.println(baosErr);
 		assertEquals(0,baosErr.size());
-		
+
 		String sResult = "HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C01234567) HELLO WORLD!!! HAPPY MEANDRING!!! (P1,C01234567)  \n";
 		assertTrue(sResult.length()==baosOut.size() || sResult.length()+1==baosOut.size());
 	}
 
 	/** Creates a MrProbe thread for the given probe, runs a battery of probe calls
 	 * on it, and waits for it to die.
-	 * 
+	 *
 	 * @param probe The probe to use
 	 * @param dataSerialization Force data serialization
 	 * @param stateSerialization Force state serialization
@@ -259,7 +259,7 @@ public class MrProbeTest {
 	}
 
 	/** Run a battery of probe calls.
-	 * 
+	 *
 	 * @param mp The MrProbe object to use
 	 */
 	private void runBatteryOfProbeCalls(MrProbe mp) {
@@ -269,7 +269,7 @@ public class MrProbeTest {
 			QueryableRepository qr = new RepositoryImpl(model);
 			CoreConfiguration cnf = new CoreConfiguration();
 			Conductor cnd = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
-			Executor exec = cnd.buildExecutor(qr, qr.getAvailableFlowDescriptions().iterator().next().getFlowComponent(), System.out);
+			Executor exec = cnd.buildExecutor(qr, qr.getAvailableFlowDescriptions().iterator().next().getFlowComponent(), System.out, null);
 			WrappedComponent wc = exec.getWrappedComponents().iterator().next();
 			// Run the tests
 			//String rands=Math.random()+"";
