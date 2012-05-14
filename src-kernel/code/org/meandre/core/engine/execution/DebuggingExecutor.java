@@ -107,7 +107,7 @@ public class DebuggingExecutor extends SaraExecutor {
                             "The configuration file to use as basis - port, home directory, run directory, and published resources " +
                             "directory settings in this config file will NOT be honored."),
                     new FlaggedOption("param", JSAP.STRING_PARSER,
-                    		"", JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+                    		JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
                     		"param", "The key=value parameter to be passed to the flow")
                     		.setAllowMultipleDeclarations(true)
                     });

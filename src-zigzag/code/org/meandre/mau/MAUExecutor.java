@@ -522,7 +522,7 @@ public class MAUExecutor {
 	                            JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
 	                            "config", "The configuration file to use"),
 	                    new FlaggedOption("param", JSAP.STRING_PARSER,
-	                    		"", JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+	                    		JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
 	                    		"param", "The key=value parameter to be passed to the flow")
 	                    		.setAllowMultipleDeclarations(true)
                     });

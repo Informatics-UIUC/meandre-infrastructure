@@ -258,7 +258,7 @@ public class SaraExecutor {
 	                            JSAP.NO_DEFAULT, JSAP.REQUIRED, JSAP.NO_SHORTFLAG,
 	                            "port", "The port number to bind to"),
 	                    new FlaggedOption("param", JSAP.STRING_PARSER,
-	                    		"", JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+	                    		JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
 	                    		"param", "The key=value parameter to be passed to the flow")
 	                    		.setAllowMultipleDeclarations(true)
                     });
