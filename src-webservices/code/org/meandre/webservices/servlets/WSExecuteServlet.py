@@ -5,8 +5,8 @@
 __name__ = 'WSExecuteServlet'
 
 requestMap = {
-    'GET': { 
-        'flow': 'execute_flow',    
+    'GET': {
+        'flow': 'execute_flow',
         'list_running_flows': 'execute_list_running_flows' ,
         'url': 'execute_url',
         'web_component_url': 'execute_web_component_url',
@@ -27,9 +27,11 @@ executionTokenMap = {
 #
 # Required imports
 #
+import urllib2
 
 from java.lang import System
 from java.lang import Boolean
+from java.util import Properties
 
 from org.meandre.core.security import Role
 from org.meandre.core.engine.execution import InteractiveExecution
@@ -47,7 +49,13 @@ def execute_flow ( request, response, format ):
     if checkUserRole (request,Role.EXECUTION) :
         params = extractRequestParamaters(request)
         if 'uri' in params :
-            uris,tokens,stats = params['uri'],[], []
+            uris,tokens,stats = params['uri'],[],[]
+            flowParams = []
+            if 'param' in params:
+                flowParams = params['param']
+            if (len(uris) > 1):
+                errorBadRequest(response)
+                return
             if 'token' not in params:
                 tokens = [str(System.currentTimeMillis()) for i in range(len(uris))]
             else :
@@ -58,8 +66,12 @@ def execute_flow ( request, response, format ):
                 if k!='uri' and k!='token' and params[k][0] == 'true' :
                     names.append(k)
             prob_names = [names for i in range(len(uris))]
+            flowParams = dict([ [ x[:x.index('=')], x[x.index('=')+1:] ] for x in [urllib2.unquote(p) for p in flowParams] ])
+            jFlowParams = Properties()
+            for k,v in flowParams.items():
+                jFlowParams.put(k,v)
             content = []
-            for flow_uri, probs, token in zip(uris,prob_names,tokens): 
+            for flow_uri, probs, token in zip(uris,prob_names,tokens):
                 statusOK(response)
                 response.flushBuffer()
                 qr = meandre_store.getRepositoryStore(getMeandreUser(request))
@@ -69,15 +81,15 @@ def execute_flow ( request, response, format ):
                 if format == 'txt' :
                     fuid = InteractiveExecution.createUniqueExecutionFlowID(flow_uri,meandre_config.getBasePort())
                     jiba.startJob(fuid,getMeandreUser(request))
-                    res = InteractiveExecution.executeVerboseFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,probs,token,job,fuid,jiba)
+                    res = InteractiveExecution.executeVerboseFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,probs,token,job,fuid,jiba,jFlowParams)
                     if res :
                         jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_COMPLETED)
                     else :
                         jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_ABORTED)
-                elif format == 'silent': 
+                elif format == 'silent':
                     fuid = InteractiveExecution.createUniqueExecutionFlowID(flow_uri,meandre_config.getBasePort())
                     jiba.startJob(fuid,getMeandreUser(request))
-                    res = InteractiveExecution.executeSilentFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,token,job,fuid,jiba)
+                    res = InteractiveExecution.executeSilentFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,token,job,fuid,jiba,jFlowParams)
                     if res :
                         jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_COMPLETED)
                     else :
@@ -91,7 +103,7 @@ def execute_flow ( request, response, format ):
     else:
         errorForbidden(response)
 
- 
+
 def execute_list_running_flows ( request, response, format ):
     '''Returns the list of interactive flow currently being run on the Server.'''
     if checkUserRole (request,Role.EXECUTION) :
@@ -113,16 +125,16 @@ def execute_list_running_flows ( request, response, format ):
         sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
- 
+
 def execute_url ( request, response, format ):
-    '''Returns the webUI URL for an interactive flow currently being run on the 
+    '''Returns the webUI URL for an interactive flow currently being run on the
        Server.'''
     if checkUserRole (request,Role.EXECUTION) :
         params = extractRequestParamaters(request)
         if 'uri' in params :
             uris = params['uri']
             content = []
-            for flow_uri in uris: 
+            for flow_uri in uris:
                 webui = WebUIFactory.getExistingWebUI(flow_uri)
                 if webui is not None :
                     content.append( {
@@ -137,17 +149,17 @@ def execute_url ( request, response, format ):
             errorExpectationFail(response)
     else:
         errorForbidden(response)
- 
- 
+
+
 def execute_web_component_url ( request, response, format ):
-    '''Returns the webfragments url for andinteractive flow currently being run on the 
+    '''Returns the webfragments url for andinteractive flow currently being run on the
        Server.'''
     if checkUserRole (request,Role.EXECUTION) :
         params = extractRequestParamaters(request)
         if 'uri' in params :
             uris = params['uri']
             content = []
-            for flow_uri in uris: 
+            for flow_uri in uris:
                 webui = WebUIFactory.getExistingWebUI(flow_uri)
                 if webui is not None :
                     host_url = 'http://'+getHostName()+':'+str(webui.getPort())+'/'
@@ -163,8 +175,8 @@ def execute_web_component_url ( request, response, format ):
             errorExpectationFail(response)
     else:
         errorForbidden(response)
- 
-  
+
+
 def execute_uri_flow ( request, response, format ):
     '''Returns the webUI URL for an interactive flow currently which has been
        assigned to a given token being run on the Server.'''
@@ -173,7 +185,7 @@ def execute_uri_flow ( request, response, format ):
         if 'token' in params :
             tokens = params['token']
             content = []
-            for token in tokens: 
+            for token in tokens:
                 if token in executionTokenMap :
                     job = executionTokenMap[token]
                     if job is not None:
@@ -192,15 +204,15 @@ def execute_uri_flow ( request, response, format ):
                         statusOK(response)
                         sendTJXContent(response,content,format,getMeandreUser(request))
                     else :
-                        errorExpectationFail(response)    
+                        errorExpectationFail(response)
                 else :
-                    errorExpectationFail(response)                 
+                    errorExpectationFail(response)
         else :
             errorExpectationFail(response)
     else:
         errorForbidden(response)
- 
- 
+
+
 def execute_repository ( request, response, format ):
     '''Executes all the flows in the provided repository.'''
     if checkUserRole (request,Role.EXECUTION) :
@@ -210,7 +222,7 @@ def execute_repository ( request, response, format ):
             tokens = [str(System.currentTimeMillis()) for i in range(len(uris))]
             prob_names = [['statistics'] for i in range(len(uris))]
             content = []
-            for flow_uri, probs, token in zip(uris,prob_names,tokens): 
+            for flow_uri, probs, token in zip(uris,prob_names,tokens):
                 statusOK(response)
                 response.flushBuffer()
                 job = JobDetail()
@@ -224,7 +236,7 @@ def execute_repository ( request, response, format ):
                         jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_COMPLETED)
                     else :
                         jiba.updateJobStatus(fuid,JobInformationBackendAdapter.JOB_STATUS_ABORTED)
-                elif format == 'silent': 
+                elif format == 'silent':
                     fuid = InteractiveExecution.createUniqueExecutionFlowID(flow_uri,meandre_config.getBasePort())
                     jiba.startJob(fuid,getMeandreUser(request))
                     res = InteractiveExecution.executeSilentFlowURI(qr,flow_uri,response.getOutputStream(),meandre_config,token,job,fuid,jiba)
@@ -242,7 +254,7 @@ def execute_repository ( request, response, format ):
 
 def execute_clean_uri_flow ( request, response, format ):
     '''Cleans all the tokens left behind after execution.'''
-    
+
     if checkUserRole (request,Role.ADMIN) :
         content = []
         for token in executionTokenMap :
@@ -250,9 +262,8 @@ def execute_clean_uri_flow ( request, response, format ):
            if job.getPort()==-1 :
                del executionTokenMap[token]
                cleaned = { 'token': token }
-               content.append(cleaned)   
+               content.append(cleaned)
         statusOK(response)
         sendTJXContent(response,content,format,getMeandreUser(request))
     else:
         errorForbidden(response)
-    

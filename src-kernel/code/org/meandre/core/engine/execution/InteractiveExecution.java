@@ -37,6 +37,7 @@ import org.meandre.webui.WebUI;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /** This class provide simple execution of a flow on demand.
+ * Typically invoked from the webservices side.
  *
  * @author Xavier Llor&agrave;
  *
@@ -64,7 +65,7 @@ public class InteractiveExecution {
 	public static boolean executeVerboseFlowURI( QueryableRepository qr,
 			String sURI, OutputStream outStream, CoreConfiguration cnf,
 			String [] saProbes , String sToken, JobDetail job, String sFUID,
-			JobInformationBackendAdapter jiba)  {
+			JobInformationBackendAdapter jiba, Properties flowParams)  {
 
 		boolean bFailSafe = true;
 
@@ -97,7 +98,7 @@ public class InteractiveExecution {
                 conductor = new Conductor(cnf.getConductorDefaultQueueSize(), cnf);
                 pa = instantiateProbes(saProbes, cnf);
                 MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(), pa, false, false);
-                exec = conductor.buildExecutor(qr, resURI, mrProbe, pw, sFUID, new Properties());
+                exec = conductor.buildExecutor(qr, resURI, mrProbe, pw, sFUID, flowParams);
                 mrProbe.setName(exec.getThreadGroupName() + "mr-probe");
                 // pw.flush();
                 int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
@@ -262,7 +263,7 @@ public class InteractiveExecution {
 	public static boolean executeSilentFlowURI( QueryableRepository qr,
 			String sURI, OutputStream outStream, CoreConfiguration cnf,
 			String sToken, JobDetail job, String sFUID,
-			JobInformationBackendAdapter jiba ) {
+			JobInformationBackendAdapter jiba, Properties flowParams) {
 
         PersistentPrintStream pw = new PersistentPrintStream(outStream, jiba, sFUID);
 
@@ -279,7 +280,7 @@ public class InteractiveExecution {
                 conductor = new Conductor(cnf.getConductorDefaultQueueSize(), cnf);
                 probe = new NullProbeImpl();
                 MrProbe mrProbe = new MrProbe(WSLoggerFactory.getWSLogger(), probe, false, false);
-                exec = conductor.buildExecutor(qr, resURI, mrProbe, pw, sFUID, new Properties());
+                exec = conductor.buildExecutor(qr, resURI, mrProbe, pw, sFUID, flowParams);
                 mrProbe.setName(exec.getThreadGroupName() + "mr-probe");
 
                 int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
