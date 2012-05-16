@@ -547,8 +547,10 @@ public class FlowGenerator {
        // Add the component descriptions to the model
        ps.print("Assembling MAU repository... ");
        Model mod = fd.getModel();
-       for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() )
-           mod.add(ri.getExecutableComponentDescription(ecid.getExecutableComponent()).getModel());
+       for ( ExecutableComponentInstanceDescription ecid:fd.getExecutableComponentInstances() ) {
+		ExecutableComponentDescription ec = ri.getExecutableComponentDescription(ecid.getExecutableComponent());
+		mod.add(ec.getModel());
+	}
 
        ps.println("done");
 
@@ -641,7 +643,7 @@ public class FlowGenerator {
 		return uriRewrite(fd,sBaseURI);
 	}
 
-	/** Rewrites the URLs to make them happy and convention complaining
+	/** Rewrites the URLs to make them happy and convention compliant
 	 *
 	 * @param fdOrig The flow description to arranges
 	 * @param baseURI The base URI

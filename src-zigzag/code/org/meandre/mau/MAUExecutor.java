@@ -410,7 +410,7 @@ public class MAUExecutor {
 			Set<RDFNode> setNew = new HashSet<RDFNode>();
 			for ( RDFNode rdfNode:ecd.getContext() ) {
 				if ( rdfNode.isResource() &&
-					 rdfNode.toString().endsWith(sJarName) ) {
+					 rdfNode.toString().endsWith("/" + sJarName) ) {
 					try {
 						InputStream is = new URL(sNewURI).openStream();
 						File fo = new File(sPrefix+File.separator+sJarName);
