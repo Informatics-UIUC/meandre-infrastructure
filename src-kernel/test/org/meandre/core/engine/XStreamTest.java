@@ -1,5 +1,9 @@
 package org.meandre.core.engine;
 
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 
 /** This test unit is used to test the XStream serialization library.
  *
@@ -7,6 +11,10 @@ package org.meandre.core.engine;
  *
  */
 public class XStreamTest {
+	@Test
+	public void noTest() {
+		assertTrue(true);
+	}
 //
 //	/** Simple test required for object serialization using XStream library.
 //	 *
