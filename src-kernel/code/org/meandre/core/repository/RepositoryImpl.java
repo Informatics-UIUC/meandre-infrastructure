@@ -106,7 +106,6 @@ public class RepositoryImpl implements QueryableRepository {
 	/** The tag information for flows */
 	protected Hashtable<String,Set<FlowDescription>> htFlowTags = null;
 
-	public RepositoryImpl() {} // used in XStreamTest.java
 
 	/** Creates a new repository given the provided model.
 	 *
