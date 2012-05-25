@@ -37,7 +37,7 @@
 
 	<!-- compile -->
 	<target name="compile" depends="prepare" description="-> compiles source code">
-		<javac srcdir="${basedir}" destdir="${build.dir}/" debug="${compile.debug}" target="${compile.target}"
+		<javac srcdir="${basedir}" destdir="${build.dir}/" debug="${compile.debug}" target="${compile.target}" source="${compile.source}"
                deprecation="${compile.deprecation}" optimize="${compile.optimize}"
                classpathref="meandre.core.classpath" includeantruntime="false">
 			<include name="${kernel.src}/**/*.java"/>
@@ -142,15 +142,15 @@
 
 	<!-- compile-tests -->
 	<target name="compile-tests" depends="compile" description="-> compiles test code">
-		<javac srcdir="${kernel.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${zigzag.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${demo.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${plugins.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${ws.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${store.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${coordinator.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${executables.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
-		<javac srcdir="${support.test}" destdir="${test.dir}" target="${compile.target}" classpathref="meandre.test.classpath"/>
+		<javac srcdir="${kernel.test}" destdir="${test.dir}" source="${compile.source}" target="${compile.target}" classpathref="meandre.test.classpath" includeantruntime="false"/>
+		<javac srcdir="${zigzag.test}" destdir="${test.dir}" source="${compile.source}" target="${compile.target}" classpathref="meandre.test.classpath" includeantruntime="false"/>
+		<javac srcdir="${demo.test}" destdir="${test.dir}" source="${compile.source}" target="${compile.target}" classpathref="meandre.test.classpath" includeantruntime="false"/>
+		<javac srcdir="${plugins.test}" destdir="${test.dir}" source="${compile.source}" target="${compile.target}" classpathref="meandre.test.classpath" includeantruntime="false"/>
+		<javac srcdir="${ws.test}" destdir="${test.dir}" source="${compile.source}" target="${compile.target}" classpathref="meandre.test.classpath" includeantruntime="false"/>
+		<javac srcdir="${store.test}" destdir="${test.dir}" source="${compile.source}" target="${compile.target}" classpathref="meandre.test.classpath" includeantruntime="false"/>
+		<javac srcdir="${coordinator.test}" destdir="${test.dir}" source="${compile.source}" target="${compile.target}" classpathref="meandre.test.classpath" includeantruntime="false"/>
+		<javac srcdir="${executables.test}" destdir="${test.dir}" source="${compile.source}" target="${compile.target}" classpathref="meandre.test.classpath" includeantruntime="false"/>
+		<javac srcdir="${support.test}" destdir="${test.dir}" source="${compile.source}" target="${compile.target}" classpathref="meandre.test.classpath" includeantruntime="false"/>
 	</target>
 
 	<!-- clean -->
