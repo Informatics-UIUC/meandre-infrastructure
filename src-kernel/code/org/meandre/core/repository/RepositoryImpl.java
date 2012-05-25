@@ -106,6 +106,8 @@ public class RepositoryImpl implements QueryableRepository {
 	/** The tag information for flows */
 	protected Hashtable<String,Set<FlowDescription>> htFlowTags = null;
 
+	public RepositoryImpl() {} // used in XStreamTest.java
+
 	/** Creates a new repository given the provided model.
 	 *
 	 * @param mod The model containing the repository information
@@ -132,6 +134,7 @@ public class RepositoryImpl implements QueryableRepository {
 	/** Refreshes the cache of component descriptions available.
 	 *
 	 */
+	@Override
 	public void refreshCache () {
 		// Flushing the cache
 		log.fine("Refreshing cached descriptions");
@@ -221,6 +224,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 *
 	 * @param modNew The new model to use as reprository
 	 */
+	@Override
 	public void refreshCache ( Model modNew ) {
 		this.model = modNew;
 
@@ -231,6 +235,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 *
 	 * @return The model used as reprository
 	 */
+	@Override
 	public Model getModel () {
 		return this.model;
 	}
@@ -298,7 +303,7 @@ public class RepositoryImpl implements QueryableRepository {
 		}
 		return lst;
 	}
-	
+
 	/** Returns the resources matching that particular subject/predicate combination.
 	 *
 	 * @param resSubj The subject resource
@@ -548,7 +553,7 @@ public class RepositoryImpl implements QueryableRepository {
 		Hashtable<String,String> htValues = new Hashtable<String,String>();
 		Hashtable<String,String> htDescriptions = new Hashtable<String,String>();
 		Hashtable<String,Hashtable<String,String>> htOthers = new Hashtable<String,Hashtable<String,String>>();
-		
+
 		for ( Resource resProp:getObjectResourcesFromModel(res, RepositoryVocabulary.property_set, false) ) {
 			//
 			// Original version
@@ -556,7 +561,7 @@ public class RepositoryImpl implements QueryableRepository {
 //			String sKey = getLiteralsFromModel(resProp, RepositoryVocabulary.key, true).iterator().next().getLexicalForm();
 //			htValues.put(sKey,getLiteralsFromModel(resProp, RepositoryVocabulary.value, true).iterator().next().getLexicalForm());
 //			htDescriptions.put(sKey,getLiteralsFromModel(resProp, DC.description, true).iterator().next().getLexicalForm());
-			// 
+			//
 			// Modified to add the other external properties somebody may annotate (to satisfy nema guys
 			//
 			String sKey = getLiteralsFromModel(resProp, RepositoryVocabulary.key, true).iterator().next().getLexicalForm();
@@ -580,8 +585,8 @@ public class RepositoryImpl implements QueryableRepository {
 					htOthers.get(sKey).put(stm.getPredicate().toString(), stm.getObject().toString());
 				}
 			}
-			
-			
+
+
 		}
 		PropertiesDescriptionDefinition pddProperties = new PropertiesDescriptionDefinition(htValues,htDescriptions,htOthers);
 
@@ -1079,10 +1084,11 @@ public class RepositoryImpl implements QueryableRepository {
 	 *
 	 * @return The set of executable components
 	 */
+	@Override
 	public Set<Resource> getAvailableExecutableComponents () {
 		return setComRes;
 	}
-	
+
 
     /**
      * Creates a list of components sorted by either date or name and returns the first N (='limit') values
@@ -1090,7 +1096,8 @@ public class RepositoryImpl implements QueryableRepository {
      * @param limit  The maximum number of values to be returned (or -1 if no limit)
      * @return The list of components
      */
-    public Collection<Resource> getAvailableExecutableComponentsOrderedBy(String sOrder, int limit) {
+    @Override
+	public Collection<Resource> getAvailableExecutableComponentsOrderedBy(String sOrder, int limit) {
         String sOrderBy = "";
         if ( sOrder != null ) {
             if ( sOrder.equals("date") )
@@ -1130,6 +1137,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 *
 	 * @return The set of executable components
 	 */
+	@Override
 	public Set<ExecutableComponentDescription> getAvailableExecutableComponentDescriptions () {
 		Set<ExecutableComponentDescription> setFD = new HashSet<ExecutableComponentDescription>();
 
@@ -1144,6 +1152,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 *
 	 * @return The set of executable component descriptions
 	 */
+	@Override
 	public Map<String,ExecutableComponentDescription> getAvailableExecutableComponentDescriptionsMap () {
 		Map<String,ExecutableComponentDescription> mapECD = new HashMap<String,ExecutableComponentDescription>();
 
@@ -1160,6 +1169,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 * @param sQuery The string to search
 	 * @return The set of executable components
 	 */
+	@Override
 	public Set<Resource> getAvailableExecutableComponents ( String sQuery ) {
 
 		/* Old SPARQL version
@@ -1240,6 +1250,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 * @return The description
 	 * @throws CorruptedDescriptionException Corrupted description found
 	 */
+	@Override
 	public ExecutableComponentDescription getExecutableComponentDescription ( Resource res ) {
 		return htComDescMap.get(res);
 	}
@@ -1250,17 +1261,19 @@ public class RepositoryImpl implements QueryableRepository {
 	 *
 	 * @return The set of resources describing the available flows
 	 */
+	@Override
 	public Set<Resource> getAvailableFlows() {
 		return setFlowRes;
 	}
-	
+
     /**
      * Creates a list of flows sorted by either date or name and returns the first N (='limit') values
      * @param sOrder The sorting order ("date" or "name" for now) - or null if no sorting required
      * @param limit  The maximum number of values to be returned (or -1 if no limit)
      * @return The list of flows
      */
-    public Collection<Resource> getAvailableFlowsOrderedBy(String sOrder, int limit) {
+    @Override
+	public Collection<Resource> getAvailableFlowsOrderedBy(String sOrder, int limit) {
         String sOrderBy = "";
         if ( sOrder != null ) {
             if ( sOrder.equals("date") )
@@ -1300,6 +1313,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 *
 	 * @return The set of flow descriptors describing the available flows
 	 */
+	@Override
 	public Set<FlowDescription> getAvailableFlowDescriptions() {
 		Set<FlowDescription> setFD = new HashSet<FlowDescription>();
 
@@ -1314,6 +1328,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 *
 	 * @return The set of resources describing the available flows
 	 */
+	@Override
 	public Map<String,FlowDescription> getAvailableFlowDescriptionsMap() {
 		Map<String,FlowDescription> mapFD = new HashMap<String,FlowDescription>();
 
@@ -1329,6 +1344,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 * @param sQuery The query string
 	 * @return The set of resources describing the available flows
 	 */
+	@Override
 	public Set<Resource> getAvailableFlows ( String sQuery ) {
 		/* Original SPARQL version
 
@@ -1408,6 +1424,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 * @return The flow description
 	 * @throws CorruptedDescriptionException The desctiption is corrupted
 	 */
+	@Override
 	public FlowDescription getFlowDescription(Resource res) {
 		return htFlowDescMap.get(res);
 	}
@@ -1416,6 +1433,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 *
 	 * @return The set of available tags.
 	 */
+	@Override
 	public Set<String> getTags () {
 		HashSet<String> set = new HashSet<String>();
 
@@ -1429,6 +1447,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 *
 	 * @return The set of available component tags.
 	 */
+	@Override
 	public Set<String> getComponentTags () {
 		return htCompTags.keySet();
 	}
@@ -1437,6 +1456,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 *
 	 * @return The set of available component tags.
 	 */
+	@Override
 	public Map<String,Set<ExecutableComponentDescription>> getComponentTagsMap () {
 		Map<String,Set<ExecutableComponentDescription>> mapRes = new HashMap<String,Set<ExecutableComponentDescription>> ();
 
@@ -1455,6 +1475,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 *
 	 * @return The set of available flow tags.
 	 */
+	@Override
 	public Set<String> getFlowTags (){
 		return htFlowTags.keySet();
 	}
@@ -1463,6 +1484,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 *
 	 * @return The map of available flow tags.
 	 */
+	@Override
 	public Map<String,Set<FlowDescription>> getFlowTagsMap (){
 		Map<String,Set<FlowDescription>> mapRes = new HashMap<String,Set<FlowDescription>> ();
 
@@ -1480,6 +1502,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 * @param sTag The tag
 	 * @return The set of components
 	 */
+	@Override
 	public Set<ExecutableComponentDescription> getComponentsByTag ( String sTag ) {
 		return htCompTags.get(sTag);
 	}
@@ -1489,6 +1512,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 * @param sTag The tag
 	 * @return The set of flows
 	 */
+	@Override
 	public Set<FlowDescription> getFlowsByTag ( String sTag ) {
 		return htFlowTags.get(sTag);
 	}
@@ -1499,6 +1523,6 @@ public class RepositoryImpl implements QueryableRepository {
 		return null;
 	}
 
-	
+
 
 }
