@@ -262,7 +262,7 @@
 			 		    	<li><a><xsl:attribute name="href"><xsl:value-of select="$context"/>/services/about/plugins.html</xsl:attribute>Plugins</a></li>
 		 		    	</ul>
 		 		    </div>
-		 		    <br/>All rights reserved by<br/>DITA, NCSA, and UofI, 2007-2011.
+		 		    <br/>All rights reserved by<br/>DITA, NCSA, and UofI, 2007-2012.
 				</div>
 				</td><td id="separator" valign="top" width="100%">
 				<div id="main">
