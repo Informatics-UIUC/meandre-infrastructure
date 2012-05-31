@@ -73,7 +73,7 @@ public class InteractiveExecution {
 
         try {
             pw.println("Meandre Execution Engine version " + Version.getFullVersion());
-            pw.println("All rights reserved by DITA, NCSA, UofI (2007-2011)");
+            pw.println("All rights reserved by DITA, NCSA, UofI (2007-2012)");
             pw.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
             pw.println();
 

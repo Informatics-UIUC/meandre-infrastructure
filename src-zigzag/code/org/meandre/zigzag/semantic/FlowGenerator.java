@@ -105,7 +105,7 @@ public class FlowGenerator {
 	public void init (String sName) {
 		// Print the welcome information
 		ps.println("Meandre ZigZag scripting language compiler ["+ZigZag.ZIGZAG_VERSION+"/"+Version.getFullVersion()+"]");
-		ps.println("All rights reserved by DITA, NCSA, UofI (2007-2011)");
+		ps.println("All rights reserved by DITA, NCSA, UofI (2007-2012)");
 		ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		ps.println();
 		ps.flush();

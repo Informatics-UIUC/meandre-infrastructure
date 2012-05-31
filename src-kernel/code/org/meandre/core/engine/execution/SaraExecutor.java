@@ -31,6 +31,7 @@ import com.martiansoftware.jsap.JSAPException;
 import com.martiansoftware.jsap.JSAPResult;
 import com.martiansoftware.jsap.Parameter;
 import com.martiansoftware.jsap.SimpleJSAP;
+import com.martiansoftware.jsap.Switch;
 
 /**
  * Executor that can be used with Meandre 2.0.x (based on MAUExecutor)
@@ -52,12 +53,12 @@ public class SaraExecutor {
         this.cnf = cnf;
     }
 
-    protected void run(int port, Properties flowParams, PrintStream console, PrintStream log) throws Exception {
+    protected void run(int port, Properties flowParams, PrintStream console, PrintStream log, boolean quiet) throws Exception {
         if (console != System.out) System.setOut(console);
         if (log != System.err)     System.setErr(log);
 
         log.println("Meandre Executor " + Version.getFullVersion());
-        log.println("All rights reserved by DITA, NCSA, UofI (2007-2011)");
+        log.println("All rights reserved by DITA, NCSA, UofI (2007-2012)");
         log.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
         log.println();
         log.flush();
@@ -152,7 +153,8 @@ public class SaraExecutor {
             log.flush();
         }
 
-        printStatistics(log);
+        if (!quiet)
+        	printStatistics(log);
     }
 
     private void printStatistics(PrintStream ps) {
@@ -206,6 +208,7 @@ public class SaraExecutor {
         // Extract the argument values
         int port = jsapResult.getInt("port");
         String[] params = jsapResult.getStringArray("param");
+        boolean quiet = jsapResult.getBoolean("quiet");
 
         // Extract the flow parameters
         Properties flowParams = new Properties();
@@ -232,7 +235,7 @@ public class SaraExecutor {
 
         try {
             QueryableRepository qr = new RepositoryImpl(ModelUtils.getModel(System.in, null));
-            new SaraExecutor(qr, new CoreConfiguration(props)).run(port, flowParams, System.out, System.err);
+            new SaraExecutor(qr, new CoreConfiguration(props)).run(port, flowParams, System.out, System.err, quiet);
         }
         finally {
             FileUtils.deleteFileOrDirectory(baseDir);
@@ -260,7 +263,9 @@ public class SaraExecutor {
 	                    new FlaggedOption("param", JSAP.STRING_PARSER,
 	                    		JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
 	                    		"param", "The key=value parameter to be passed to the flow")
-	                    		.setAllowMultipleDeclarations(true)
+	                    		.setAllowMultipleDeclarations(true),
+	                    new Switch("quiet", JSAP.NO_SHORTFLAG, "quiet")
+	                    		.setHelp("Do not output flow statistics at end of flow execution")
                     });
 
         result = jsap.parse(args);
