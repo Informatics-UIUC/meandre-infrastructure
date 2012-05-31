@@ -19,6 +19,7 @@ import com.martiansoftware.jsap.JSAPException;
 import com.martiansoftware.jsap.JSAPResult;
 import com.martiansoftware.jsap.Parameter;
 import com.martiansoftware.jsap.SimpleJSAP;
+import com.martiansoftware.jsap.Switch;
 import com.martiansoftware.jsap.UnflaggedOption;
 
 import de.schlichtherle.io.FileInputStream;
@@ -39,6 +40,7 @@ public class DebuggingExecutor extends SaraExecutor {
         URL[] rdfUrls = jsapResult.getURLArray("rdf");
         int port = jsapResult.getInt("port");
         String[] params = jsapResult.getStringArray("param");
+        boolean quiet = jsapResult.getBoolean("quiet");
 
         // Extract the flow parameters
         Properties flowParams = new Properties();
@@ -77,7 +79,7 @@ public class DebuggingExecutor extends SaraExecutor {
 
         try {
             QueryableRepository qr = new RepositoryImpl(master);
-            new DebuggingExecutor(qr, new CoreConfiguration(props)).run(port, flowParams, System.out, System.err);
+            new DebuggingExecutor(qr, new CoreConfiguration(props)).run(port, flowParams, System.out, System.err, quiet);
         }
         finally {
             FileUtils.deleteFileOrDirectory(baseDir);
@@ -109,7 +111,9 @@ public class DebuggingExecutor extends SaraExecutor {
                     new FlaggedOption("param", JSAP.STRING_PARSER,
                     		JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
                     		"param", "The key=value parameter to be passed to the flow")
-                    		.setAllowMultipleDeclarations(true)
+                    		.setAllowMultipleDeclarations(true),
+                    new Switch("quiet", JSAP.NO_SHORTFLAG, "quiet")
+                    		.setHelp("Do not output flow statistics at end of flow execution")
                     });
 
         result = jsap.parse(args);
