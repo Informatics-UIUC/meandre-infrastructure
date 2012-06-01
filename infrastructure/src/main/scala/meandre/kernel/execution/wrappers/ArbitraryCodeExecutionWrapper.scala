@@ -1,7 +1,9 @@
 package meandre.kernel.execution.wrappers
 
 import meandre.kernel.execution.ExecutionWrapper
-import java.io.{ByteArrayInputStream, File, InputStream}
+import java.io.{File, InputStream}
+import com.mongodb.BasicDBObject
+import snare.Snare
 
 /**
  * A dummy wrapper that executes whatever command was passed to it
@@ -24,4 +26,5 @@ class ArbitraryCodeExecutionWrapper(command:List[String]) extends ExecutionWrapp
   override def fireWrapper(repo: Array[Byte]) : (Process, InputStream, InputStream) =
     fireProcess(command,new File("."),repo)
 
+  override def getJobExecutionMeta(jobID:String, snare:Snare) : BasicDBObject = { new BasicDBObject }
 }

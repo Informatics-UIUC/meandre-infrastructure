@@ -41,6 +41,21 @@ class MeandreInfrastructureAbstractAPI(cnf:Configuration) extends CrochetServlet
     }
   }
 
+  /**Tries to convert a String into a long. Returns 0 if fails.
+   *
+   * @param s The string to convert
+   * @return The converted long or 0 if it fails
+   */
+  protected def safeParseLong(s: String): Long = {
+
+    try {
+      java.lang.Long.parseLong(s)
+    }
+    catch {
+      case _ => 0L
+    }
+  }
+
   /**Assembles an OK response.
    *
    * @param payload The response payload

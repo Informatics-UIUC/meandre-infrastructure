@@ -18,6 +18,7 @@ import com.mongodb.util.JSON
 import snare.Snare
 import meandre.webservices.logger.Logger
 import meandre.kernel.execution.{ExecutionWrapper, JobQueue}
+import meandre.kernel.execution.wrappers.SaraExecutionWrapper
 
 /**
  * The Meandre infrastructure implementation of the services API
@@ -1362,6 +1363,12 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
                 cndStatus )
 
         val jobs = queue.queryQueue(cnd,sortCnd,skip,limit)
+        jobs foreach ( j => {
+          val wrapper = j.getString("wrapper")
+          val jid = j.getString("jobID")
+          val execWrapper = ExecutionWrapper(cnf,wrapper)
+          j.put("wrapper_meta", execWrapper.getJobExecutionMeta(jid, snareMon))
+        })
         val list = new BasicDBList
         jobs foreach ( j => list add j )
         val labeled = new BasicDBObject
@@ -1408,13 +1415,14 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
       user =>
         val queue = new JobQueue(cnf)
         val jobID = if (params.contains("jobID")) params("jobID") else ""
+        val since = if (params.contains("since")) safeParseInt(params("since")) else 0
         val jobs = queue.queryQueue("""{"_id":"%s"}""".format(jobID),"{}",0,Integer.MAX_VALUE)
         jobs match {
           case job::Nil =>
             if (job.getString("owner")==user) {
               val baos = new ByteArrayOutputStream(10000)
-              queue.dumpConsoleFor(jobID,baos)
-              new String(baos.toByteArray)
+              queue.dumpConsoleFor(jobID,since,baos)
+              new String(baos.toByteArray, "UTF-8")
             }
             else {
               val msg = "Unauthorized access to job console %s by user %s".format(jobID,user)
@@ -1428,9 +1436,45 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
             "[WARNING] "+msg
 
           case l =>
-            val msg = "Inconsitent job console for %s. Mutiple consoles %d".format(jobID,l.length)
+            val msg = "Inconsistent job console for %s. Found %d consoles.".format(jobID,l.length)
             log.warning(msg)
             "[WARNING] "+msg
+        }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+
+  get("""/services/jobs/console\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        val queue = new JobQueue(cnf)
+        val jobID = if (params.contains("jobID")) params("jobID") else ""
+        val since = if (params.contains("since")) safeParseInt(params("since")) else 0
+        val jobs = queue.queryQueue("""{"_id":"%s"}""".format(jobID),"{}",0,Integer.MAX_VALUE)
+        jobs match {
+          case job::Nil =>
+            if (job.getString("owner")==user) {
+              val consoleData = queue.getConsoleFor(jobID, since)
+              val resp = new BasicDBObject
+              resp.put("console", consoleData)
+              OKResponse(resp, user)
+            }
+            else {
+              val msg = "Unauthorized access to job console %s by user %s".format(jobID,user)
+              log.warning(msg)
+              FailResponse(msg, new BasicDBObject, user)
+            }
+
+          case Nil =>
+            val msg = "Unknown job %s".format(jobID)
+            log.warning(msg)
+            FailResponse(msg, new BasicDBObject, user)
+
+          case l =>
+            val msg = "Inconsistent job console for %s. Found %d consoles.".format(jobID,l.length)
+            log.warning(msg)
+            FailResponse(msg, new BasicDBObject, user)
         }
     }
   }
@@ -1442,16 +1486,17 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
       user =>
         val queue = new JobQueue(cnf)
         val jobID = if (params.contains("jobID")) params("jobID") else ""
+        val since = if (params.contains("since")) safeParseInt(params("since")) else 0
         val jobs = queue.queryQueue("""{"_id":"%s"}""".format(jobID),"{}",0,Integer.MAX_VALUE)
         jobs match {
           case job::Nil =>
             if (job.getString("owner")==user) {
               val baos = new ByteArrayOutputStream(10000)
-              queue.dumpLogFor(jobID,baos)
-              new String(baos.toByteArray)
+              queue.dumpLogFor(jobID,since,baos)
+              new String(baos.toByteArray, "UTF-8")
             }
             else {
-              val msg = "Unauthorized access to job console %s by user %s".format(jobID,user)
+              val msg = "Unauthorized access to job log %s by user %s".format(jobID,user)
               log.warning(msg)
               "[WARNING] "+msg
             }
@@ -1462,16 +1507,50 @@ class MeandreInfrastructurePrivateAPI(cnf: Configuration, snareMon:Snare, log:Lo
             "[WARNING] "+msg
 
           case l =>
-            val msg = "Inconsitent job console for %s. Mutiple consoles %d".format(jobID,l.length)
+            val msg = "Inconsistent job log for %s. Found %d logs.".format(jobID,l.length)
             log.warning(msg)
             "[WARNING] "+msg
         }
     }
   }
 
-
-
   // ---------------------------------------------------------------------------
+
+  get("""/services/jobs/log\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    requestFor {
+      user =>
+        val queue = new JobQueue(cnf)
+        val jobID = if (params.contains("jobID")) params("jobID") else ""
+        val since = if (params.contains("since")) safeParseInt(params("since")) else 0
+        val jobs = queue.queryQueue("""{"_id":"%s"}""".format(jobID),"{}",0,Integer.MAX_VALUE)
+        jobs match {
+          case job::Nil =>
+            if (job.getString("owner")==user) {
+              val logData = queue.getLogFor(jobID, since)
+              val resp = new BasicDBObject
+              resp.put("log", logData)
+              OKResponse(resp, user)
+            }
+            else {
+              val msg = "Unauthorized access to job log %s by user %s".format(jobID,user)
+              log.warning(msg)
+              FailResponse(msg, new BasicDBObject, user)
+            }
+
+          case Nil =>
+            val msg = "Unknown job %s".format(jobID)
+            log.warning(msg)
+            FailResponse(msg, new BasicDBObject, user)
+
+          case l =>
+            val msg = "Inconsistent job log for %s. Found %d logs.".format(jobID,l.length)
+            log.warning(msg)
+            FailResponse(msg, new BasicDBObject, user)
+        }
+    }
+  }
+
+    // ---------------------------------------------------------------------------
 
   get("""/services/jobs/clean\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
     requestFor {

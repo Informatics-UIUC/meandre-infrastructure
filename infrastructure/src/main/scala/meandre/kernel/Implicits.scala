@@ -1,6 +1,5 @@
 package meandre.kernel
 
-import com.mongodb.util.JSON
 import com.hp.hpl.jena.rdf.model.{Resource, ModelFactory, Model}
 import java.text.SimpleDateFormat
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
@@ -10,6 +9,7 @@ import collection.jcl.MutableIterator.Wrapper
 import java.io.ByteArrayOutputStream
 import rdf._
 import meandre.kernel.rdf.{MeandreRepositoryVocabulary=>MRV}
+import com.mongodb.util.JSON
 
 /**
  * A collection of implicit conversion methods
@@ -62,11 +62,11 @@ object Implicits {
   implicit def javaIteratorToScalaIterator[A](it : java.util.Iterator[A]) = new Wrapper(it)
 
 
-  /** Attempts to parse a JSON String into s Basic DB object.
+  /** Attempts to parse a JSON String into a BasicDBObject
    *
    * @param s The JSON string to parse
-   * @return The parsed Basic DB Object
-   * @throws JSONParseException If failed to parse the string
+   * @return The BasicDBObject
+   * @throws JSONParseException If failed to parse the json string
    */
   implicit def string2BasicDBObject(s:String):BasicDBObject = JSON.parse(s).asInstanceOf[BasicDBObject]
 

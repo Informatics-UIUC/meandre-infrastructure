@@ -1,8 +1,10 @@
 package meandre.kernel.execution.wrappers
 
 import meandre.kernel.execution.ExecutionWrapper
-import java.io.{ByteArrayInputStream, File, InputStream}
+import java.io.{File, InputStream}
 import meandre.kernel.Configuration
+import com.mongodb.BasicDBObject
+import snare.Snare
 
 /**
  * A dummy wrapper that echoes the repository that is being passed to it
@@ -30,4 +32,5 @@ class EchoExecutionWrapper(cnf:Configuration) extends ExecutionWrapper {
     )
   }
 
+  override def getJobExecutionMeta(jobID:String, snare:Snare) : BasicDBObject = { new BasicDBObject }
 }

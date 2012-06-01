@@ -3,20 +3,20 @@ package meandre.kernel.execution
 import meandre.kernel.Implicits._
 import meandre.kernel.Configuration
 import java.util.Date
-import com.mongodb.{BasicDBList, BasicDBObject, Mongo}
+import com.mongodb.{BasicDBList, BasicDBObject}
 import java.security.MessageDigest
 import java.util.Random
 import java.math.BigInteger
 import com.mongodb.gridfs.GridFS
 import meandre.kernel.state.PersistentTextBuffer
-import java.io.{ByteArrayInputStream, OutputStream}
+import java.io.{ByteArrayOutputStream, ByteArrayInputStream, OutputStream}
 
 //
 // Basic job statuses
 //
 sealed case class JobStatus()
 //
-// The possible jobe statuses
+// The possible job statuses
 //
 case class Queued()    extends JobStatus() { override def toString = "Queued" }
 case class Preparing() extends JobStatus() { override def toString = "Preparing" }
@@ -61,7 +61,7 @@ class JobQueue(val cnf: Configuration) {
 
   /**Generate a unique md5 from a list of byte arrays.
    *
-   * @param bytes The list of byte arrays
+   * @param ba The list of byte arrays
    * @return The text version of the MD5
    */
   protected def md5 ( ba:List[Array[Byte]] ) = {
@@ -139,7 +139,7 @@ class JobQueue(val cnf: Configuration) {
     }
   }
 
-  /**Given a starting server it updates all the jobs that may have been lefts
+  /**Given a starting server it updates all the jobs that may have been left
    * hanging after a crash.
    *
    * @param server The server to update
@@ -248,11 +248,15 @@ class JobQueue(val cnf: Configuration) {
     if ( res.containsField("errmsg") ) None
     else {
       val j = res.get("value").asInstanceOf[BasicDBObject]
-      j.put("jobID",j.get("_id"))
-      j remove "_id"
-      j remove "_ns"
-      j remove "repo"
-      Some(j)
+      if (j == null)
+        None
+      else {
+        j.put("jobID",j.get("_id"))
+        j remove "_id"
+        j remove "_ns"
+        j remove "repo"
+        Some(j)
+      }
     }
   }
 
@@ -303,18 +307,22 @@ class JobQueue(val cnf: Configuration) {
     if ( res.containsField("errmsg") ) None
     else {
       val j = res.get("value").asInstanceOf[BasicDBObject]
-      j.put("jobID",j.get("_id"))
-      j remove "_id"
-      j remove "_ns"
-      j remove "repo"
-      Some(j)
+      if (j == null)
+        None
+      else {
+        j.put("jobID",j.get("_id"))
+        j remove "_id"
+        j remove "_ns"
+        j remove "repo"
+        Some(j)
+      }
     }
   }
 
   /**Given a job ID, returns all the information associated to the job.
    *
    * @param id The ID of the job to retrieve
-   * @returns None if the job does not exist, or the document containing the Job information
+   * @return None if the job does not exist, or the document containing the Job information
    */
   def job ( id:String ) = {
     val jobID:BasicDBObject = """{"_id":"%s"}""" format id
@@ -333,7 +341,7 @@ class JobQueue(val cnf: Configuration) {
   /**Given a job ID, returns the repository associated to it.
    *
    * @param id The ID of the job to retrieve
-   * @returns None if the job does not exist, or the byte array containing the repository
+   * @return None if the job does not exist, or the byte array containing the repository
    */
   def jobRepository ( id:String ) = {
     val jobID:BasicDBObject  = """{"_id":"%s"}""" format id
@@ -359,8 +367,6 @@ class JobQueue(val cnf: Configuration) {
 
   /**Returns the list of all job ids.
     *
-    * @param offset The number of jobs to skip
-    * @param limit The maximun number of jobs to return
     * @return The list of IDS
     */
   def jobIDs : List[String] = jobIDs(0,Integer.MAX_VALUE)
@@ -423,7 +429,7 @@ class JobQueue(val cnf: Configuration) {
 
   /**Query the jobs in the queue.
    *
-   * @param cnd The condition to query against the queue
+   * @param query The condition to query against the queue
    * @param srt The sort condition
    * @param skip The number of entries to skip
    * @param limit The number of entries to return
@@ -452,10 +458,10 @@ class JobQueue(val cnf: Configuration) {
     val ptbCon = new PersistentTextBuffer(cnf,"jobs.%s.console" format jobID)
     val ptbLog = new PersistentTextBuffer(cnf,"jobs.%s.log" format jobID)
 
-    val fc = consoles.createFile(new ByteArrayInputStream(ptbCon.toString.getBytes),jobID)
+    val fc = consoles.createFile(new ByteArrayInputStream(ptbCon.get(0).toString.getBytes("UTF-8")),jobID)
     fc.save
 
-    val fl = logs.createFile(new ByteArrayInputStream(ptbLog.toString.getBytes),jobID)
+    val fl = logs.createFile(new ByteArrayInputStream(ptbLog.get(0).toString.getBytes("UTF-8")),jobID)
     fl.save
 
     ptbCon.destroy
@@ -465,34 +471,80 @@ class JobQueue(val cnf: Configuration) {
   /**Dumps the console for the given jobID
    *
    * @param jobID The jobID to use
+   * @param since The timestamp to use as starting point in retrieving the console
    * @param os The output stream where to dump the console
    */
-  def dumpConsoleFor(jobID:String,os:OutputStream) = {
+  def dumpConsoleFor(jobID:String,since:Int,os:OutputStream) = {
     consoles.findOne(jobID) match {
 
       case null => // The console has not been compacted yet
         val ptbCon = new PersistentTextBuffer(cnf,"jobs.%s.console" format jobID)
-        os.write(ptbCon.toString.getBytes)
+        os.write(ptbCon.toString(since).getBytes)
 
       case file => // The console has already been compacted
-        file writeTo os
+        val baos = new ByteArrayOutputStream
+        file writeTo baos
+        os.write(PersistentTextBuffer.getText(baos.toString("UTF-8"), since).getBytes("UTF-8"))
+    }
+  }
+
+  /**
+   * Retrieves the console for a given jobID
+   *
+   * @param jobID The jobID
+   * @param since The id to start retrieving console data from (inclusive)
+   * @return The console log data
+   */
+  def getConsoleFor(jobID:String,since:Int):BasicDBList = {
+    consoles.findOne(jobID) match {
+      case null =>
+        val ptbCon = new PersistentTextBuffer(cnf,"jobs.%s.console" format jobID)
+        ptbCon get since
+
+      case file =>
+        val baos = new ByteArrayOutputStream
+        file writeTo baos
+        PersistentTextBuffer.parseAndGetSince(baos.toString("UTF-8"), since)
     }
   }
 
   /**Dumps the logs for the given jobID
    *
    * @param jobID The jobID to use
+   * @param since The timestamp to use as starting point in retrieving the log
    * @param os The output stream where to dump the logs
    */
-  def dumpLogFor(jobID:String,os:OutputStream) = {
+  def dumpLogFor(jobID:String,since:Int,os:OutputStream) = {
     logs.findOne(jobID) match {
 
       case null => // The console has not been compacted yet
         val ptbLog = new PersistentTextBuffer(cnf,"jobs.%s.log" format jobID)
-        os.write(ptbLog.toString.getBytes)
+        os.write(ptbLog.toString(since).getBytes("UTF-8"))
 
       case file => // The console has already been compacted
-        file writeTo os
+        val baos = new ByteArrayOutputStream
+        file writeTo baos
+        os.write(PersistentTextBuffer.getText(baos.toString("UTF-8"), since).getBytes("UTF-8"))
+    }
+  }
+
+  /**
+   * Retrieves the logs for a given jobID
+   *
+   * @param jobID The jobID
+   * @param since The id to start retrieving log data from (inclusive)
+   * @return The log data
+   */
+  def getLogFor(jobID:String,since:Int):BasicDBList = {
+    logs.findOne(jobID) match {
+      case null =>
+        val ptbLog = new PersistentTextBuffer(cnf,"jobs.%s.log" format jobID)
+        ptbLog get since
+
+      case file =>
+        val baos = new ByteArrayOutputStream
+        file writeTo baos
+        PersistentTextBuffer.parseAndGetSince(baos.toString("UTF-8"), since)
     }
   }
 }

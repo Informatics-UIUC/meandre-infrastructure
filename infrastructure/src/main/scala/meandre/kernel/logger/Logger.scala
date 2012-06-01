@@ -50,7 +50,7 @@ class Logger (cnf:Configuration,logCollection:String,uuid:UUID) {
 
   var level = cnf.MEANDRE_LOG_LEVEL
 
-  /**The looger actor in charge of pushing the updates into MongoDB.
+  /**The logger actor in charge of pushing the updates into MongoDB.
    *
    */
   val logActor = actor {
@@ -77,49 +77,29 @@ class Logger (cnf:Configuration,logCollection:String,uuid:UUID) {
       logActor ! logObj
     }
 
-  /**Logs a severe message.
-   *
-   * @param msg The message to log
-   */
+  /**Logs a severe message. */
   val severe = logMessage(LVL_SEVERE,"SEVERE") _
 
-  /**Logs a warning message.
-   *
-   * @param msg The message to log
-   */
+  /**Logs a warning message. */
   val warning = logMessage(LVL_WARNING,"WARNING") _
 
-  /**Logs a info message.
-   *
-   * @param msg The message to log
-   */
+  /**Logs a info message. */
   val info = logMessage(LVL_INFO,"INFO") _
 
-  /**Logs a fine message.
-   *
-   * @param msg The message to log
-   */
+  /**Logs a fine message. */
   val fine = logMessage(LVL_FINE,"FINE") _
 
-
-  /**Logs a finer message.
-   *
-   * @param msg The message to log
-   */
+  /**Logs a finer message. */
    val finer = logMessage(LVL_FINER,"FINER") _
 
-
-  /**Logs a finest message.
-   *
-   * @param msg The message to log
-   */
+  /**Logs a finest message. */
    val finest = logMessage(LVL_FINEST,"FINEST") _
 
 
   /** The basic sorting condition by time stamps */
   val sortCndTS:BasicDBObject = """{"ts":-1}"""
 
-  /**Returns the log entries that matches the provided criteries
+  /**Returns the log entries that matches the provided criteria
    *
    * @param cnd The condition to query the log against
    * @param skip The number of entries to skip

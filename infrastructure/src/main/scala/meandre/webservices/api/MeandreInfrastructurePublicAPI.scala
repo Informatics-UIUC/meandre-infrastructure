@@ -1,13 +1,8 @@
 package meandre.webservices.api
 
 import meandre.kernel.Implicits._
-import crochet.CrochetServlet
-import crochet.net.utils.HttpClient
 import com.mongodb.BasicDBObject
 import meandre.webservices.api.Templating._
-import javax.servlet.http.HttpServletResponse
-import util.parsing.json.JSON
-import meandre.Tools.safeOp
 import meandre.kernel.Configuration
 import java.io.{StringReader, ByteArrayOutputStream}
 import meandre.kernel.state.Store
@@ -36,7 +31,13 @@ class MeandreInfrastructurePublicAPI(cnf: Configuration) extends MeandreInfrastr
     res serializeTo elements(0)
   }
 
-
+  get("""/public/services/version\.(json|xml|html)""".r, canonicalResponseType, tautologyGuard, public _) {
+    val res: BasicDBObject = """{
+         "status":"OK",
+         "success":{"version":"%s"}
+    }""" format Configuration.INFRASTRUCTURE_VERSION
+    res serializeTo elements(0)
+  }
   // ---------------------------------------------------------------------------
 
   get("""/public/services/repository\.(rdf|ttl|nt)""".r, canonicalResponseType, tautologyGuard, public _) {

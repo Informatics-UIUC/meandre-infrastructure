@@ -3,6 +3,8 @@ package meandre.kernel.execution
 import meandre.kernel.Configuration
 import wrappers.{SaraExecutionWrapper, EchoExecutionWrapper}
 import java.io._
+import com.mongodb.BasicDBObject
+import snare.Snare
 
 /**
  * The basic class that all wrappers have to implement
@@ -21,7 +23,7 @@ abstract class ExecutionWrapper {
    *
    * @param command The command to run
    * @param dir The directory to run it from
-   * @param is The input stream to use
+   * @param repo The serialized repository
    * @return A 3-tuple containing the process executing, the STDOUT, and
    *         the STDERR
    *
@@ -50,6 +52,14 @@ abstract class ExecutionWrapper {
    */
   def fireWrapper(repo:Array[Byte]) : (Process, InputStream, InputStream)
 
+  /**
+   * Get any metadata additional metadata for a particular job given the executor used
+   *
+   * @param jobID The job ID
+   * @param snare The snare instance to use for communication
+   * @return The BasicDBObject describing the metadata
+   */
+  def getJobExecutionMeta(jobID:String, snare:Snare): BasicDBObject
 }
 
 

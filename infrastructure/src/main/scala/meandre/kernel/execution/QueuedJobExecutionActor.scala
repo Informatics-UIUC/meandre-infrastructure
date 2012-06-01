@@ -1,8 +1,8 @@
 package meandre.kernel.execution
 
-import scala.actors.Actor
-import scala.actors.Actor._
-import scala.actors.Futures._
+import actors.Actor
+import actors.Actor._
+import actors.Futures._
 import com.mongodb.BasicDBObject
 import meandre.kernel.Configuration
 import java.util.UUID
@@ -30,7 +30,7 @@ class KillerJobActor() extends Actor {
   var jobID: Option[String] = None
   var proc: Option[Process] = None
 
-  override def act() =
+  def act() {
     loop {
       react {
         case RegisterJob(s, j, p) =>
@@ -52,6 +52,7 @@ class KillerJobActor() extends Actor {
           }
       }
     }
+  }
 }
 
 /**
@@ -77,7 +78,7 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
   /** The main actor reactive loop
    *
    */
-  def act() = {
+  def act() {
     loop {
       react {
         case InitQueue() =>
@@ -98,7 +99,6 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
               if (queue.sizeQueued>0) this ! CheckQueue()
 
             case Some(job) =>
-
               val jobID = job getString "jobID"
               queue.transitionJob(jobID, Preparing(), Running(), uuid.toString) match {
                 case None =>
@@ -111,7 +111,6 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
                       log.warning("Job %s failed because it has no associated repository" format jobID)
 
                     case Some(repo) => // Ready to fire execution
-
                       try {
                         log.info("Job %s starting execution" format jobID)
 

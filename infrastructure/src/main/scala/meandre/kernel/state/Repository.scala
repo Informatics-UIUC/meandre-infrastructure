@@ -3,7 +3,7 @@ package meandre.state
 import meandre.kernel.Implicits._
 import meandre.kernel.Configuration
 import meandre.kernel.rdf._
-import com.mongodb.{DBObject, BasicDBList, BasicDBObject, Mongo}
+import com.mongodb.{DBObject, BasicDBList, BasicDBObject}
 import java.io.{ByteArrayInputStream, ObjectInputStream, ObjectOutputStream, ByteArrayOutputStream}
 import com.hp.hpl.jena.rdf.model.{ModelFactory, Model}
 import scala.Option
@@ -24,7 +24,7 @@ class Repository ( val cnf:Configuration, val userName:String ) {
 
   /** Implicit conversion of a descriptor to a Basic DB Object
    *
-   * @param flow The flow descriptor to convert
+   * @param desc The descriptor to convert
    * @return The encapsulating BasicDBObject
    */
    protected implicit def descriptor2BasicDBObject ( desc:Descriptor ) : BasicDBObject = {
@@ -87,7 +87,8 @@ class Repository ( val cnf:Configuration, val userName:String ) {
 
   /**Update the rdf for the given descriptor.
    *
-   * @param desc Updates the raw rdf for the given descriptor
+   * @param uri The uri
+   * @param rdf The raw rdf for the given descriptor
    */
   def updateRDFFor ( uri:String, rdf:String ) : Option[String] = {
     // Serializing the RDF
@@ -318,14 +319,14 @@ class Repository ( val cnf:Configuration, val userName:String ) {
 
   /**Remove the provided descriptor
    *
-   * @param uri The URI to removeLocations
+   * @param desc The descriptor
    */
   def remove (desc:Descriptor) = collection remove wrapURI(desc)
 
   /** Add the given descriptors to the repository. If the descriptor exists it gets
    *  replaced by the new provided instance
    *
-   * @param desc The list of flows to add
+   * @param descs The list of flows to add
    */
   def add ( descs:List[Descriptor] ) : List[Option[String]] = descs.map (
       _ match {
@@ -617,7 +618,6 @@ class Repository ( val cnf:Configuration, val userName:String ) {
   /**Get the metadata of a component.
    *
    * @param uri The uri to update
-   * @param metadata A placeholder for extra metadata storage
    * @return The URI if succeded
    */
   def getMetadata ( uri:RDFURI ) = {
