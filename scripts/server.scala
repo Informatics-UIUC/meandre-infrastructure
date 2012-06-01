@@ -17,7 +17,7 @@ val (cnf1, cnf2, cnf3) = (
 
 cnf1.EXECUTION_SCALA = "scala"
 cnf1.EXECUTION_SCRIPT = "scripts/execution_%s.scala"
-cnf1.EXECUTOR_14X = "lib/executor-1.4.10.jar"
+cnf1.EXECUTOR_14X = "lib/executor-1.4.11.jar"
 cnf1.EXECUTION_JAVA_ARGS = "-Xmx1024m"
 cnf1.EXECUTION_CLASSPATH = "infrastructure/target/scala_2.7.7/infrastructure_2.7.7-2.0.jar"
 
