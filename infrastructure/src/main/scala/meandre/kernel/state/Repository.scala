@@ -3,7 +3,7 @@ package meandre.state
 import meandre.kernel.Implicits._
 import meandre.kernel.Configuration
 import meandre.kernel.rdf._
-import com.mongodb.{DBObject, BasicDBList, BasicDBObject}
+import com.mongodb.{DBObject, BasicDBList, BasicDBObject, Mongo}
 import java.io.{ByteArrayInputStream, ObjectInputStream, ObjectOutputStream, ByteArrayOutputStream}
 import com.hp.hpl.jena.rdf.model.{ModelFactory, Model}
 import scala.Option

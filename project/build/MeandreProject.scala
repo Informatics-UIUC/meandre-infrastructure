@@ -35,6 +35,9 @@ class MeandreProject(info: ProjectInfo) extends ParentProject(info)
 	
 		// Joda Time
 		lazy val joda = "joda-time" % "joda-time" % "1.6"
+
+		// JSON processing with Lift
+		lazy val lift_json = "net.liftweb" % "lift-json" % "2.0"
 	
 		// Testing facilities
 		lazy val scalatest = "org.scalatest" % "scalatest" % "1.0"

@@ -1,8 +1,9 @@
 package meandre.kernel.state
 
+import meandre.kernel.Implicits._
 import meandre.kernel.Configuration
 import java.io.{LineNumberReader, InputStreamReader, InputStream}
-import com.mongodb.{BasicDBList, BasicDBObject}
+import com.mongodb.{BasicDBList, BasicDBObject, Mongo}
 import PersistentTextBuffer._
 import net.liftweb.json.JsonParser
 import net.liftweb.json.JsonAST.{JString, JInt, JField, JObject}

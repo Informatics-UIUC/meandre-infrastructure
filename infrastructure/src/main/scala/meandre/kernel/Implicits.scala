@@ -9,7 +9,7 @@ import collection.jcl.MutableIterator.Wrapper
 import java.io.ByteArrayOutputStream
 import rdf._
 import meandre.kernel.rdf.{MeandreRepositoryVocabulary=>MRV}
-import com.mongodb.util.JSON
+import com.mongodb.util.{JSONParseException, JSON}
 
 /**
  * A collection of implicit conversion methods

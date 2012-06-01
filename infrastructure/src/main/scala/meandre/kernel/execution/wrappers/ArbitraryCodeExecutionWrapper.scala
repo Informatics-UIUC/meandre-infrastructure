@@ -1,7 +1,7 @@
 package meandre.kernel.execution.wrappers
 
 import meandre.kernel.execution.ExecutionWrapper
-import java.io.{File, InputStream}
+import java.io.{ByteArrayInputStream, File, InputStream}
 import com.mongodb.BasicDBObject
 import snare.Snare
 
