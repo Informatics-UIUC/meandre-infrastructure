@@ -2,9 +2,9 @@
 <project name="Meandre-Infrastructure" basedir="." default="dist">
 	<import file="common.xml" />
 
-	<svn failonerror="false">
-		<wcVersion path="${basedir}" prefix="svn.root."/>
-	</svn>
+  	<svn refid="svn.settings">
+    		<wcVersion path="${basedir}" prefix="svn.root."/>
+  	</svn>
 
 	<condition property="svn_revision" value="${svn.root.revision.max-with-flags}" else="custom">
 		<isset property="svn.root.revision.max-with-flags"/>
