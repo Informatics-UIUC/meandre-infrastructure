@@ -148,17 +148,44 @@ class QueuedJobExecutionActor(cnf:Configuration,uuid:UUID) extends Actor {
                         consoleDone() ; jobLogDone()
                         // Clean up after the process
                         queue.setExitProcessForJob(jobID,process.exitValue)
-                        process.exitValue match {
-                          case 0 => // Success
-                             queue.transitionJob(jobID, Running(), Done(), uuid.toString)
-                             log.info("Job %s finished execution successfully" format jobID)
-                          case 143 => // Killed
-                             queue.transitionJob(jobID, Running(), Killed(), uuid.toString)
-                             log.info("Job %s was explicitly killed" format jobID)
-                          case _ => // Failed
-                             queue.transitionJob(jobID, Running(), Failed(), uuid.toString)
-                             log.info("Job %s failed during execution" format jobID)
+                        (System getProperty  "os.name").split(" ")(0) match {
+                          case "Mac" | "Linux" | "Solaris" =>
+                            process.exitValue match {
+                              case 0 => // Success
+                                queue.transitionJob(jobID, Running(), Done(), uuid.toString)
+                                log.info("Job %s finished execution successfully" format jobID)
+                              case 143 => // Killed
+                                queue.transitionJob(jobID, Running(), Killed(), uuid.toString)
+                                log.info("Job %s was killed" format jobID)
+                              case _ => // Failed
+                                queue.transitionJob(jobID, Running(), Failed(), uuid.toString)
+                                log.info("Job %s failed during execution" format jobID)
+                            }
+
+                          case "Windows" =>
+                            process.exitValue match {
+                              case 0 => // Success
+                                queue.transitionJob(jobID, Running(), Done(), uuid.toString)
+                                log.info("Job %s finished execution successfully" format jobID)
+                              case 1 => // Killed
+                                queue.transitionJob(jobID, Running(), Killed(), uuid.toString)
+                                log.info("Job %s was killed" format jobID)
+                              case _ => // Failed
+                                queue.transitionJob(jobID, Running(), Failed(), uuid.toString)
+                                log.info("Job %s failed during execution" format jobID)
+                            }
+
+                          case unknown =>
+                            process.exitValue match {
+                              case 0 => // Assume success
+                                queue.transitionJob(jobID, Running(), Done(), uuid.toString)
+                                log.info("Job %s finished execution successfully" format jobID)
+                              case ev => // Assume failed
+                                log.warning("Unknown OS: %s  - Do not know how to handle process exit code %d; assuming job %s has FAILED" format (unknown, ev, jobID))
+                                queue.transitionJob(jobID, Running(), Failed(), uuid.toString)
+                            }
                         }
+
                         killerActor ! UnregisterCurrentJob()
                         queue compactJobData jobID
                       }
