@@ -18,12 +18,12 @@ val (cnf1, cnf2, cnf3) = (
   Configuration("http", LOCAL_HOST_NAME, SERVER_PORT, DB_HOST_NAME, 27017, None),
   Configuration("http", LOCAL_HOST_NAME, SERVER_PORT + 1000, DB_HOST_NAME, 27017, None),
   Configuration("http", LOCAL_HOST_NAME, SERVER_PORT + 2000, DB_HOST_NAME, 27017, None)
-  )
+)
 
 cnf1.EXECUTION_SCALA = "scala"
 cnf1.EXECUTION_SCRIPT = "scripts/execution_%s.scala"
 cnf1.EXECUTOR_14X = "lib/executor-1.4.11.jar"
-cnf1.EXECUTION_JAVA_ARGS = "-Xmx2g"
+cnf1.EXECUTION_JAVA_ARGS = "-Xmx1g"
 cnf1.EXECUTION_CLASSPATH = "infrastructure/target/scala_2.7.7/infrastructure_2.7.7-2.0.jar"
 
 cnf2.EXECUTION_SCALA = cnf1.EXECUTION_SCALA
