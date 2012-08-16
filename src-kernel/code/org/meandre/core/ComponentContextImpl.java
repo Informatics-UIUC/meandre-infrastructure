@@ -55,7 +55,7 @@ public class ComponentContextImpl implements ComponentContext {
 	/** The flow ID */
 	protected String flowID = null;
 
-	/** The unique flow execution ID */
+	/** The unique component execution ID */
 	protected String sComponentInstanceID = null;
 
 	/** The name of this component instance */
@@ -378,8 +378,16 @@ public class ComponentContextImpl implements ComponentContext {
 	 */
 	@Override
     public String getProperty ( String sKey ) {
-		String sPropertyValue = htProperties.get(sKey);
+    	// Look for a flow level parameter named "all#" + sKey, and if found, use that value
+    	// otherwise look for a flow level property name sComponentInstanceID + "#" + sKey and use that value if found,
+    	// or finally use the component property
+		String sPropertyValue =
+				flowParams.getProperty(sComponentInstanceID + "#" + sKey,
+						flowParams.getProperty("all#" + sKey,
+								htProperties.get(sKey)));
+
 		thdMrProbe.probeWrappedComponentGetProperty(wcParent, sKey, sPropertyValue);
+
 		return sPropertyValue;
 	}
 
