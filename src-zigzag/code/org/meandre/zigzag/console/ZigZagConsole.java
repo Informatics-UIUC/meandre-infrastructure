@@ -277,9 +277,13 @@ public class ZigZagConsole {
 					mau.setWebUIPortNumber(jsap.getInt("port"));
 
 		        String[] params = jsap.getStringArray("param");
+		        String paramFile = jsap.getString("paramFile", null);
 
 				// Extract the flow parameters
 		        Properties flowParams = new Properties();
+		        if (paramFile != null)
+		       		flowParams.load(new FileReader(paramFile));
+
 		        for (String param : params) {
 		        	String key = param.substring(0, param.indexOf('='));
 		        	String value = param.substring(key.length() + 1);
@@ -844,7 +848,10 @@ public class ZigZagConsole {
 	                    new FlaggedOption("param", JSAP.STRING_PARSER,
 	                    		JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
 	                    		"param", "The key=value parameter to be passed to the flow")
-	                    		.setAllowMultipleDeclarations(true)
+	                    		.setAllowMultipleDeclarations(true),
+                		new FlaggedOption("paramFile", JSAP.STRING_PARSER,
+                        		JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+                        		"paramFile", "A Java properties file containing the key=value flow parameters to be set")
                     });
 
         result = jsap.parse(args);

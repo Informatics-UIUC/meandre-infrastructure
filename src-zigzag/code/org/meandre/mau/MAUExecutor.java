@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -110,6 +111,8 @@ public class MAUExecutor {
         String config = jsapResult.contains("config") ? jsapResult.getString("config") : null;
 
         String[] params = jsapResult.getStringArray("param");
+        String paramFile = jsapResult.getString("paramFile", null);
+
 
         MAUExecutor mau = new MAUExecutor(mauFile);
         mau.setParentClassloader(MAUExecutor.class.getClassLoader());
@@ -118,6 +121,16 @@ public class MAUExecutor {
             mau.setConfigFile(config);
 
         Properties flowParams = new Properties();
+        if (paramFile != null) {
+        	try {
+        		flowParams.load(new FileReader(paramFile));
+        	}
+        	catch (FileNotFoundException e) {
+        		System.err.println("Error: File not found " + paramFile);
+        		System.exit(-1);
+        	}
+        }
+
         for (String param : params) {
         	String key = param.substring(0, param.indexOf('='));
         	String value = param.substring(key.length() + 1);
@@ -524,7 +537,10 @@ public class MAUExecutor {
 	                    new FlaggedOption("param", JSAP.STRING_PARSER,
 	                    		JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
 	                    		"param", "The key=value parameter to be passed to the flow")
-	                    		.setAllowMultipleDeclarations(true)
+	                    		.setAllowMultipleDeclarations(true),
+                		new FlaggedOption("paramFile", JSAP.STRING_PARSER,
+                        		JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+                        		"paramFile", "A Java properties file containing the key=value flow parameters to be set")
                     });
 
         result = jsap.parse(args);

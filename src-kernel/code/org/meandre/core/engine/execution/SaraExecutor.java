@@ -1,6 +1,8 @@
 package org.meandre.core.engine.execution;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
@@ -208,10 +210,21 @@ public class SaraExecutor {
         // Extract the argument values
         int port = jsapResult.getInt("port");
         String[] params = jsapResult.getStringArray("param");
+        String paramFile = jsapResult.getString("paramFile", null);
         boolean quiet = jsapResult.getBoolean("quiet");
 
         // Extract the flow parameters
         Properties flowParams = new Properties();
+        if (paramFile != null) {
+        	try {
+        		flowParams.load(new FileReader(paramFile));
+        	}
+        	catch (FileNotFoundException e) {
+        		System.err.println("Error: File not found " + paramFile);
+        		System.exit(-1);
+        	}
+        }
+
         for (String param : params) {
         	String key = param.substring(0, param.indexOf('='));
         	String value = param.substring(key.length() + 1);
@@ -264,6 +277,9 @@ public class SaraExecutor {
 	                    		JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
 	                    		"param", "The key=value parameter to be passed to the flow")
 	                    		.setAllowMultipleDeclarations(true),
+                		new FlaggedOption("paramFile", JSAP.STRING_PARSER,
+                        		JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+                        		"paramFile", "A Java properties file containing the key=value flow parameters to be set"),
 	                    new Switch("quiet", JSAP.NO_SHORTFLAG, "quiet")
 	                    		.setHelp("Do not output flow statistics at end of flow execution")
                     });
