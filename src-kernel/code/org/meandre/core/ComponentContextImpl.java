@@ -381,10 +381,11 @@ public class ComponentContextImpl implements ComponentContext {
     	// Look for a flow level parameter named "all#" + sKey, and if found, use that value
     	// otherwise look for a flow level property name sComponentInstanceID + "#" + sKey and use that value if found,
     	// or finally use the component property
-		String sPropertyValue =
+		String sPropertyValue = (flowParams != null) ?
 				flowParams.getProperty(sComponentInstanceID + "#" + sKey,
 						flowParams.getProperty("all#" + sKey,
-								htProperties.get(sKey)));
+								htProperties.get(sKey))) :
+				htProperties.get(sKey);
 
 		thdMrProbe.probeWrappedComponentGetProperty(wcParent, sKey, sPropertyValue);
 
