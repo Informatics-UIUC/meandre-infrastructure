@@ -81,7 +81,7 @@ public class MAUExecutor {
 	protected StatisticsProbeImpl spi;
 
 	/** The filename to execute */
-	private final String sFileName;
+	private final String sMAUFile;
 
 	/** The parent class loader */
 	private ClassLoader parentClassloader;
@@ -146,11 +146,11 @@ public class MAUExecutor {
 
     /** Creates a new MAU execution object for the given filename.
 	 *
-	 * @param sFileName The file name
+	 * @param sMAUFile The location of the MAU file name
 	 */
-	public MAUExecutor ( String sFileName ) {
+	public MAUExecutor ( String sMAUFile ) {
 		ps = System.out;
-		this.sFileName = sFileName;
+		this.sMAUFile = sMAUFile;
 		this.iPort = 1715;
 	}
 
@@ -215,40 +215,46 @@ public class MAUExecutor {
 		ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
 		ps.println();
 		ps.flush();
+		ps.println("Executing MAU file " + sMAUFile);
 
-		ps.println("Executing MAU file " + sFileName);
-		File fTmp = new File(sFileName+"."+MAU_RUN_DIR);
-		File fTmpPR = new File(sFileName+"."+MAU_PUBLIC_RESOURCES_RUN_DIR);
-		ps.println("Creating temp dir " + fTmp.toString());
-		ps.println("Creating temp dir " + fTmpPR.toString());
-		fTmp.mkdir();
-		ps.println();
-
+		String sMAUFileName = new File(sMAUFile).getName();
 		QueryableRepository qr = processModelFromMAU();
 
 		Resource resURI = qr.getAvailableFlows().iterator().next();
 		ps.println("Preparing flow: "+resURI);
 
+		File fTmp;
+		File fTmpPR;
+
 	    Properties props = new Properties();
 		if (config != null) {
 		    props.loadFromXML(new FileInputStream(config));
 	        props.setProperty(CoreConfiguration.MEANDRE_CORE_CONFIG_FILE, config);
+	        fTmp = new File(props.getProperty(CoreConfiguration.MEANDRE_PRIVATE_RUN_DIRECTORY));
+	        fTmpPR = new File(props.getProperty(CoreConfiguration.MEANDRE_PUBLIC_RESOURCE_DIRECTORY));
 		} else {
+			fTmp = new File(sMAUFileName + "." + MAU_RUN_DIR);
+			fTmpPR = new File(sMAUFileName + "." + MAU_PUBLIC_RESOURCES_RUN_DIR);
     		props.setProperty(CoreConfiguration.MEANDRE_CORE_CONFIG_FILE, "meandre-config-core.xml");
+    		props.setProperty(CoreConfiguration.MEANDRE_BASE_PORT, ""+(iPort-1));
+    		props.setProperty(CoreConfiguration.MEANDRE_HOME_DIRECTORY, ".");
+    		props.setProperty(CoreConfiguration.MEANDRE_PRIVATE_RUN_DIRECTORY, fTmp.toString());
+    		props.setProperty(CoreConfiguration.MEANDRE_PUBLIC_RESOURCE_DIRECTORY, fTmpPR.toString());
 		}
-        props.setProperty(CoreConfiguration.MEANDRE_BASE_PORT, ""+(iPort-1));
-        props.setProperty(CoreConfiguration.MEANDRE_HOME_DIRECTORY, ".");
-        props.setProperty(CoreConfiguration.MEANDRE_PRIVATE_RUN_DIRECTORY, fTmp.toString());
-        props.setProperty(CoreConfiguration.MEANDRE_PUBLIC_RESOURCE_DIRECTORY, fTmpPR.toString());
+
+		ps.println("Creating temp run dir " + fTmp.toString());
+		fTmp.mkdirs();
+		ps.println("Creating temp public resources dir " + fTmpPR.toString());
+		fTmpPR.mkdirs();
+		ps.println();
 
 		CoreConfiguration cnf = new CoreConfiguration(props);
 		cnf.initializeLogging();
 
 		Conductor conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 
-		exec =null;
+		exec = null;
 		spi = null;
-
 
 		try {
 			spi = new StatisticsProbeImpl();
@@ -343,9 +349,9 @@ public class MAUExecutor {
 		printStatistics();
 
 		// Cleaning the tmp run dir
-		ps.println("Cleaning temp dir " + fTmp.toString());
+		ps.println("Cleaning temp run dir " + fTmp.toString());
 		deleteDir(fTmp);
-		ps.println("Cleaning temp dir " + fTmpPR.toString());
+		ps.println("Cleaning temp published resources dir " + fTmpPR.toString());
 		deleteDir(fTmpPR);
 		ps.println();
 
@@ -386,13 +392,13 @@ public class MAUExecutor {
 		try {
 			// Extract the repository description
 			Model mod = ModelFactory.createDefaultModel();
-			File file = new File(sFileName);
+			File file = new File(sMAUFile);
 			URL url = new URL("jar:file:"+file.getAbsolutePath()+"!/repository/repository.ttl");
 			ModelIO.readModelInDialect(mod, url);
 			QueryableRepository qr = new RepositoryImpl(mod);
 
 			// Edit the contexts URI
-			JarFile jar = new JarFile(sFileName);
+			JarFile jar = new JarFile(sMAUFile);
 			Enumeration<JarEntry> iterJE = jar.entries();
 			setProcessedJars.clear();
 			while (iterJE.hasMoreElements()) {
@@ -416,7 +422,7 @@ public class MAUExecutor {
 	 * @param sNewURI The new URI to set
 	 */
 	private void editContextJarURI(QueryableRepository qr, String sJarName, String sNewURI) {
-		String sPrefix = sFileName+"."+MAU_PUBLIC_RESOURCES_RUN_DIR+File.separator+"contexts"+File.separator+"java";
+		String sPrefix = sMAUFile+"."+MAU_PUBLIC_RESOURCES_RUN_DIR+File.separator+"contexts"+File.separator+"java";
 		new File(sPrefix).mkdirs();
 
 		for ( ExecutableComponentDescription ecd:qr.getAvailableExecutableComponentDescriptions() ) {
