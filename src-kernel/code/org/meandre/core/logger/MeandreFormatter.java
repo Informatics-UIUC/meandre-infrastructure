@@ -23,7 +23,7 @@ public class MeandreFormatter extends Formatter {
 	private final static String NEW_LINE = System.getProperty("line.separator");
 
 	/** The date formater */
-	private final static SimpleDateFormat FORMATER = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss.SSS");
+	private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss.SSS");
 
 	/** Should the class be reported */
 	private boolean bClass = true;
@@ -55,7 +55,7 @@ public class MeandreFormatter extends Formatter {
 			  threadName = threadName.substring(threadName.length()-MAX_THREAD_NAME_LENGTH);
 		  }
 
-		  String sTimeStamp = FORMATER.format(new Date(record.getMillis()));
+		  String sTimeStamp = dateFormatter.format(new Date(record.getMillis()));
 
 		  String extra = record.getThrown() != null ? ExceptionFormatter.formatException(record.getThrown()) + NEW_LINE : "";
 
