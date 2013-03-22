@@ -62,45 +62,45 @@ import com.martiansoftware.jsap.UnflaggedOption;
  */
 public class MAUExecutor {
 
-	/** The current version of the MAU executor */
-	private static final String ZMAU_VERSION = "1.0.2vcli";
+    /** The current version of the MAU executor */
+    private static final String ZMAU_VERSION = "1.0.2vcli";
 
-	/** The run temp dir */
-	private static final String MAU_RUN_DIR = "run";
+    /** The run temp dir */
+    private static final String MAU_RUN_DIR = "run";
 
-	/** Public resources */
-	private static final String MAU_PUBLIC_RESOURCES_RUN_DIR = "public_resources";
+    /** Public resources */
+    private static final String MAU_PUBLIC_RESOURCES_RUN_DIR = "public_resources";
 
-	/** The output print stream to use */
-	protected PrintStream ps;
+    /** The output print stream to use */
+    protected PrintStream ps;
 
-	/** The executor object */
-	protected Executor exec;
+    /** The executor object */
+    protected Executor exec;
 
-	/** The statistics probe object */
-	protected StatisticsProbeImpl spi;
+    /** The statistics probe object */
+    protected StatisticsProbeImpl spi;
 
-	/** The filename to execute */
-	private final String sMAUFile;
+    /** The filename to execute */
+    private final String sFileName;
 
-	/** The parent class loader */
-	private ClassLoader parentClassloader;
+    /** The parent class loader */
+    private ClassLoader parentClassloader;
 
-	/** The port number to use */
-	private int iPort;
+    /** The port number to use */
+    private int iPort;
 
-	private String config;
+    private String config;
 
-	/** The main method that runs the the MAU file.
-	 *
-	 * @param sArgs The command line arguments
-	 * @throws FileNotFoundException The file could not be found
-	 */
-	public static void main(String sArgs[]) throws Exception {
-		// Tone down the logger
-		KernelLoggerFactory.getCoreLogger().setLevel(Level.WARNING);
-		for ( Handler h:KernelLoggerFactory.getCoreLogger().getHandlers() )
-			h.setLevel(Level.WARNING);
+    /** The main method that runs the the MAU file.
+     *
+     * @param sArgs The command line arguments
+     * @throws FileNotFoundException The file could not be found
+     */
+    public static void main(String sArgs[]) throws Exception {
+        // Tone down the logger
+        KernelLoggerFactory.getCoreLogger().setLevel(Level.WARNING);
+        for ( Handler h:KernelLoggerFactory.getCoreLogger().getHandlers() )
+            h.setLevel(Level.WARNING);
 
         // Parse command line arguments
         JSAPResult jsapResult = parseArguments(sArgs);
@@ -122,186 +122,180 @@ public class MAUExecutor {
 
         Properties flowParams = new Properties();
         if (paramFile != null) {
-        	try {
-        		flowParams.load(new FileReader(paramFile));
-        	}
-        	catch (FileNotFoundException e) {
-        		System.err.println("Error: File not found " + paramFile);
-        		System.exit(-1);
-        	}
+            try {
+                flowParams.load(new FileReader(paramFile));
+            }
+            catch (FileNotFoundException e) {
+                System.err.println("Error: File not found " + paramFile);
+                System.exit(-1);
+            }
         }
 
         for (String param : params) {
-        	String key = param.substring(0, param.indexOf('='));
-        	String value = param.substring(key.length() + 1);
-        	flowParams.put(key, value);
+            String key = param.substring(0, param.indexOf('='));
+            String value = param.substring(key.length() + 1);
+            flowParams.put(key, value);
         }
 
         mau.run(flowParams);
-	}
+    }
 
-	private void setConfigFile(String config) {
+    private void setConfigFile(String config) {
         this.config = config;
     }
 
     /** Creates a new MAU execution object for the given filename.
-	 *
-	 * @param sMAUFile The location of the MAU file name
-	 */
-	public MAUExecutor ( String sMAUFile ) {
-		ps = System.out;
-		this.sMAUFile = sMAUFile;
-		this.iPort = 1715;
-	}
+     *
+     * @param sFileName The file name
+     */
+    public MAUExecutor ( String sFileName ) {
+        ps = System.out;
+        this.sFileName = sFileName;
+        this.iPort = 1715;
+    }
 
-	/** Set the WebUI port number to use.
-	 *
-	 * @param iPort The port number
-	 */
-	public void setWebUIPortNumber(int iPort) {
-		this.iPort = iPort;
-	}
+    /** Set the WebUI port number to use.
+     *
+     * @param iPort The port number
+     */
+    public void setWebUIPortNumber(int iPort) {
+        this.iPort = iPort;
+    }
 
-	/** Set the output stream to use.
-	 *
-	 * @param os The output stream
-	 */
-	public void setOutpuStream ( OutputStream os ) {
-		ps  = new PrintStream(os);
-	}
+    /** Set the output stream to use.
+     *
+     * @param os The output stream
+     */
+    public void setOutpuStream ( OutputStream os ) {
+        ps  = new PrintStream(os);
+    }
 
-	/** Get the abort messages if any
-	 *
-	 * @return The abort messages
-	 */
-	public Set<String> getAbortMessages () {
-		if ( exec!=null )
-			return exec.getAbortMessage();
-		else
-			return new HashSet<String>();
-	}
+    /** Get the abort messages if any
+     *
+     * @return The abort messages
+     */
+    public Set<String> getAbortMessages () {
+        if ( exec!=null )
+            return exec.getAbortMessage();
+        else
+            return new HashSet<String>();
+    }
 
-	/** Returns the statistics for the MAU run using a JSONObject.
-	 *
-	 * @return The JSONObject containing the statistics
-	 * @throws ProbeException The statistics could not be retrieved
-	 */
-	public JSONObject getStatistics () throws ProbeException {
-		try {
-			return new JSONObject(spi.serializeProbeInformation());
-		} catch (JSONException e) {
-			throw new ProbeException(e);
-		}
-	}
+    /** Returns the statistics for the MAU run using a JSONObject.
+     *
+     * @return The JSONObject containing the statistics
+     * @throws ProbeException The statistics could not be retrieved
+     */
+    public JSONObject getStatistics () throws ProbeException {
+        try {
+            return new JSONObject(spi.serializeProbeInformation());
+        } catch (JSONException e) {
+            throw new ProbeException(e);
+        }
+    }
 
-	/** Returns the termination status for the execution
-	 *
-	 * @return True if the flow finished without errors, false otherwise
-	 */
-	public boolean hadGracefullTermination() {
-		if ( exec!=null )
-			return exec.hadGracefullTermination();
-		else
-			return false;
-	}
+    /** Returns the termination status for the execution
+     *
+     * @return True if the flow finished without errors, false otherwise
+     */
+    public boolean hadGracefullTermination() {
+        if ( exec!=null )
+            return exec.hadGracefullTermination();
+        else
+            return false;
+    }
 
-	/** Runs the MAU file.
-	 *
-	 * @throws FileNotFoundException The file could not be found
-	 */
-	public void run (Properties flowParams) throws Exception {
-		ps.println("Meandre MAU Executor [" + MAUExecutor.ZMAU_VERSION + "/" + Version.getFullVersion() + "]");
-		ps.println("All rights reserved by DITA, NCSA, UofI (2007-2012)");
-		ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
-		ps.println();
-		ps.flush();
-		ps.println("Executing MAU file " + sMAUFile);
+    /** Runs the MAU file.
+     *
+     * @throws FileNotFoundException The file could not be found
+     */
+    public void run (Properties flowParams) throws Exception {
+        ps.println("Meandre MAU Executor [" + MAUExecutor.ZMAU_VERSION + "/" + Version.getFullVersion() + "]");
+        ps.println("All rights reserved by DITA, NCSA, UofI (2007-2012)");
+        ps.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
+        ps.println();
+        ps.flush();
 
-		String sMAUFileName = new File(sMAUFile).getName();
-		QueryableRepository qr = processModelFromMAU();
+        ps.println("Executing MAU file " + sFileName);
+        File fTmp = new File(sFileName+"."+MAU_RUN_DIR);
+        File fTmpPR = new File(sFileName+"."+MAU_PUBLIC_RESOURCES_RUN_DIR);
+        ps.println("Creating temp dir " + fTmp.toString());
+        ps.println("Creating temp dir " + fTmpPR.toString());
+        fTmp.mkdir();
+        ps.println();
 
-		Resource resURI = qr.getAvailableFlows().iterator().next();
-		ps.println("Preparing flow: "+resURI);
+        QueryableRepository qr = processModelFromMAU();
 
-		File fTmp;
-		File fTmpPR;
+        Resource resURI = qr.getAvailableFlows().iterator().next();
+        ps.println("Preparing flow: "+resURI);
 
-	    Properties props = new Properties();
-		if (config != null) {
-		    props.loadFromXML(new FileInputStream(config));
-	        props.setProperty(CoreConfiguration.MEANDRE_CORE_CONFIG_FILE, config);
-	        fTmp = new File(props.getProperty(CoreConfiguration.MEANDRE_PRIVATE_RUN_DIRECTORY));
-	        fTmpPR = new File(props.getProperty(CoreConfiguration.MEANDRE_PUBLIC_RESOURCE_DIRECTORY));
-		} else {
-			fTmp = new File(sMAUFileName + "." + MAU_RUN_DIR);
-			fTmpPR = new File(sMAUFileName + "." + MAU_PUBLIC_RESOURCES_RUN_DIR);
-    		props.setProperty(CoreConfiguration.MEANDRE_CORE_CONFIG_FILE, "meandre-config-core.xml");
-    		props.setProperty(CoreConfiguration.MEANDRE_BASE_PORT, ""+(iPort-1));
-    		props.setProperty(CoreConfiguration.MEANDRE_HOME_DIRECTORY, ".");
-    		props.setProperty(CoreConfiguration.MEANDRE_PRIVATE_RUN_DIRECTORY, fTmp.toString());
-    		props.setProperty(CoreConfiguration.MEANDRE_PUBLIC_RESOURCE_DIRECTORY, fTmpPR.toString());
-		}
+        Properties props = new Properties();
+        if (config != null) {
+            props.loadFromXML(new FileInputStream(config));
+            props.setProperty(CoreConfiguration.MEANDRE_CORE_CONFIG_FILE, config);
+        } else {
+            props.setProperty(CoreConfiguration.MEANDRE_CORE_CONFIG_FILE, "meandre-config-core.xml");
+        }
+        props.setProperty(CoreConfiguration.MEANDRE_BASE_PORT, ""+(iPort-1));
+        props.setProperty(CoreConfiguration.MEANDRE_HOME_DIRECTORY, ".");
+        props.setProperty(CoreConfiguration.MEANDRE_PRIVATE_RUN_DIRECTORY, fTmp.toString());
+        props.setProperty(CoreConfiguration.MEANDRE_PUBLIC_RESOURCE_DIRECTORY, fTmpPR.toString());
 
-		ps.println("Creating temp run dir " + fTmp.toString());
-		fTmp.mkdirs();
-		ps.println("Creating temp public resources dir " + fTmpPR.toString());
-		fTmpPR.mkdirs();
-		ps.println();
+        CoreConfiguration cnf = new CoreConfiguration(props);
+        cnf.initializeLogging();
 
-		CoreConfiguration cnf = new CoreConfiguration(props);
-		cnf.initializeLogging();
+        Conductor conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
 
-		Conductor conductor = new Conductor(cnf.getConductorDefaultQueueSize(),cnf);
+        exec =null;
+        spi = null;
 
-		exec = null;
-		spi = null;
 
-		try {
-			spi = new StatisticsProbeImpl();
-			spi.initialize();
-			MrProbe mrProbe = new MrProbe(KernelLoggerFactory.getCoreLogger(),spi,false,false);
-			conductor.setParentClassloader(this.getParentClassloader());
-			exec = conductor.buildExecutor(qr, resURI, mrProbe, System.out, flowParams);
-			mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
+        try {
+            spi = new StatisticsProbeImpl();
+            spi.initialize();
+            MrProbe mrProbe = new MrProbe(KernelLoggerFactory.getCoreLogger(),spi,false,false);
+            conductor.setParentClassloader(this.getParentClassloader());
+            exec = conductor.buildExecutor(qr, resURI, mrProbe, System.out, flowParams);
+            mrProbe.setName(exec.getThreadGroupName()+"mr-probe");
 
-			ps.flush();
+            ps.flush();
 
-			// Redirecting the streamers
-			System.setOut(ps);
-			System.setErr(ps);
+            // Redirecting the streamers
+            System.setOut(ps);
+            System.setErr(ps);
 
-			ps.println("Preparation completed correctly\n");
+            ps.println("Preparation completed correctly\n");
 
-			ps.print("Execution started at: ");
-			ps.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
-			ps.println("----------------------------------------------------------------------------");
-			ps.flush();
-			int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
-			String token=System.currentTimeMillis()+"";
-			WebUI webui=exec.initWebUI(nextPort,token);
-			exec.execute(webui);
-			ps.flush();
-			ps.println("----------------------------------------------------------------------------");
-			ps.print("Execution finished at: ");
-			ps.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
-			if ( exec.hadGracefullTermination() ) {
-				//
-				// Graceful termination
-				//
-				ps.println("Execution finished gracefully.");
-			}
-			else {
-				//
-				// Aborted execution.
-				//
-				ps.println("Execution aborted!!!\nReason:\n");
-				for ( String sMsg:exec.getAbortMessage() )
-					ps.println("\t"+sMsg);
-			}
-			ps.flush();
+            ps.print("Execution started at: ");
+            ps.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
+            ps.println("----------------------------------------------------------------------------");
+            ps.flush();
+            int nextPort = PortScroller.getInstance(cnf).nextAvailablePort(exec.getFlowUniqueExecutionID());
+            String token=System.currentTimeMillis()+"";
+            WebUI webui=exec.initWebUI(nextPort,token);
+            exec.execute(webui);
+            ps.flush();
+            ps.println("----------------------------------------------------------------------------");
+            ps.print("Execution finished at: ");
+            ps.println(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
+            if ( exec.hadGracefullTermination() ) {
+                //
+                // Graceful termination
+                //
+                ps.println("Execution finished gracefully.");
+            }
+            else {
+                //
+                // Aborted execution.
+                //
+                ps.println("Execution aborted!!!\nReason:\n");
+                for ( String sMsg:exec.getAbortMessage() )
+                    ps.println("\t"+sMsg);
+            }
+            ps.flush();
 
-		}
-		catch (CorruptedDescriptionException cde) {
+        }
+        catch (CorruptedDescriptionException cde) {
             ps.println("Preparation could not be completed correctly!\n");
             ps.println("----------------------------------------------------------------------------");
             ps.println();
@@ -346,177 +340,181 @@ public class MAUExecutor {
             ps.flush();
         }
 
-		printStatistics();
+        printStatistics();
 
-		// Cleaning the tmp run dir
-		ps.println("Cleaning temp run dir " + fTmp.toString());
-		deleteDir(fTmp);
-		ps.println("Cleaning temp published resources dir " + fTmpPR.toString());
-		deleteDir(fTmpPR);
-		ps.println();
+        // Cleaning the tmp run dir
+        ps.println("Cleaning temp dir " + fTmp.toString());
+        deleteDir(fTmp);
+        ps.println("Cleaning temp dir " + fTmpPR.toString());
+        deleteDir(fTmpPR);
+        ps.println();
 
-	}
+    }
 
-	/**  Deletes all files and subdirectories under dir.
+    /**  Deletes all files and subdirectories under dir.
      *   Returns true if all deletions were successful.
      *   If a deletion fails, the method stops attempting to delete and returns false.
      *
      * @param dir The directory to delete
      * @return True if it was properly cleaned, false otherwise
      */
-	 private boolean deleteDir(File dir) {
-	    if (dir.isDirectory()) {
-	         String[] children = dir.list();
-	         for (int i=0; i<children.length; i++) {
-	             boolean success = deleteDir(new File(dir, children[i]));
-	             if (!success)
-	                 return false;
-	         }
-	     }
-	    // The directory is now empty so delete it
+     private boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+             String[] children = dir.list();
+             for (int i=0; i<children.length; i++) {
+                 boolean success = deleteDir(new File(dir, children[i]));
+                 if (!success)
+                     return false;
+             }
+         }
+        // The directory is now empty so delete it
         if (dir.exists())
-	        return dir.delete();
+            return dir.delete();
         else
-        	return true;
+            return true;
 
-	 }
+     }
 
-	private final HashSet<String> setProcessedJars = new HashSet<String>();
+    private final HashSet<String> setProcessedJars = new HashSet<String>();
 
-	/** Process the model contained on the MAU file and rearrenge the contexts URIs.
-	 *
-	 * @return The edited model
-	 * @throws FileNotFoundException The file could not be retrieved
-	 */
-	protected QueryableRepository processModelFromMAU() throws FileNotFoundException {
-		try {
-			// Extract the repository description
-			Model mod = ModelFactory.createDefaultModel();
-			File file = new File(sMAUFile);
-			URL url = new URL("jar:file:"+file.getAbsolutePath()+"!/repository/repository.ttl");
-			ModelIO.readModelInDialect(mod, url);
-			QueryableRepository qr = new RepositoryImpl(mod);
+    /** Process the model contained on the MAU file and rearrenge the contexts URIs.
+     *
+     * @return The edited model
+     * @throws FileNotFoundException The file could not be retrieved
+     */
+    protected QueryableRepository processModelFromMAU() throws FileNotFoundException {
+        try {
+            // Extract the repository description
+            Model mod = ModelFactory.createDefaultModel();
+            File file = new File(sFileName);
+            URL url = new URL("jar:file:"+file.getAbsolutePath()+"!/repository/repository.ttl");
+            ModelIO.readModelInDialect(mod, url);
+            QueryableRepository qr = new RepositoryImpl(mod);
 
-			// Edit the contexts URI
-			JarFile jar = new JarFile(sMAUFile);
-			Enumeration<JarEntry> iterJE = jar.entries();
-			setProcessedJars.clear();
-			while (iterJE.hasMoreElements()) {
-				JarEntry je = iterJE.nextElement();
-				String [] sa = je.getName().split("/");
-				editContextJarURI(qr,sa[sa.length-1],"jar:file:"+file.getAbsolutePath()+"!/contexts/"+sa[sa.length-1].trim());
-			}
-			return qr;
-		} catch (MalformedURLException e) {
-			throw new FileNotFoundException(e.toString());
-		} catch (IOException e) {
-			throw new FileNotFoundException(e.toString());
-		}
+            // Edit the contexts URI
+            JarFile jar = new JarFile(sFileName);
+            Enumeration<JarEntry> iterJE = jar.entries();
+            setProcessedJars.clear();
+            while (iterJE.hasMoreElements()) {
+                JarEntry je = iterJE.nextElement();
+                String [] sa = je.getName().split("/");
+                editContextJarURI(qr,sa[sa.length-1],"jar:file:"+file.getAbsolutePath()+"!/contexts/"+sa[sa.length-1].trim());
+            }
+            return qr;
+        } catch (MalformedURLException e) {
+            throw new FileNotFoundException(e.toString());
+        } catch (IOException e) {
+            throw new FileNotFoundException(e.toString());
+        }
 
-	}
+    }
 
-	/** Edit the context URI to point to the ones contained in the jar.
-	 *
-	 * @param qr The queryable repository to edit
-	 * @param sJarName The name of the jar
-	 * @param sNewURI The new URI to set
-	 */
-	private void editContextJarURI(QueryableRepository qr, String sJarName, String sNewURI) {
-		String sPrefix = sMAUFile+"."+MAU_PUBLIC_RESOURCES_RUN_DIR+File.separator+"contexts"+File.separator+"java";
-		new File(sPrefix).mkdirs();
+    // TODO: the below may need rewriting
 
-		for ( ExecutableComponentDescription ecd:qr.getAvailableExecutableComponentDescriptions() ) {
-			Set<RDFNode> setNew = new HashSet<RDFNode>();
-			for ( RDFNode rdfNode:ecd.getContext() ) {
-				if ( rdfNode.isResource() &&
-					 rdfNode.toString().endsWith("/" + sJarName) ) {
-					try {
-						InputStream is = new URL(sNewURI).openStream();
-						File fo = new File(sPrefix+File.separator+sJarName);
-						if ( !setProcessedJars.contains(fo.toString()) ) {
-							FileOutputStream fos = new FileOutputStream(fo);
-							byte [] baTmp = new byte[1048576];
-							int iNumBytes = 0;
-							while ( (iNumBytes=is.read(baTmp))>-1 )
-								fos.write(baTmp, 0, iNumBytes);
-							fos.close();
-							is.close();
-							setProcessedJars.add(fo.toString());
-						}
-						setNew.add(qr.getModel().createResource("file:"+fo.getAbsolutePath()));
-					} catch (MalformedURLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+    /** Edit the context URI to point to the ones contained in the jar.
+     *
+     * @param qr The queryable repository to edit
+     * @param sJarName The name of the jar
+     * @param sNewURI The new URI to set
+     */
+    private void editContextJarURI(QueryableRepository qr, String sJarName, String sNewURI) {
+        String sPrefix = sFileName+"."+MAU_PUBLIC_RESOURCES_RUN_DIR+File.separator+"contexts"+File.separator+"java";
+        new File(sPrefix).mkdirs();
 
-				}
-				else
-					setNew.add(rdfNode);
-			}
-			Set<RDFNode> set = ecd.getContext();
-			set.clear();
-			set.addAll(setNew);
-		}
+        for ( ExecutableComponentDescription ecd:qr.getAvailableExecutableComponentDescriptions() ) {
+            Set<RDFNode> setNew = new HashSet<RDFNode>();
+            for ( RDFNode rdfNode:ecd.getContext() ) {
+                if ( rdfNode.isResource() &&
+                     rdfNode.toString().endsWith("/" + sJarName) ) {
+                    try {
+                        InputStream is = new URL(sNewURI).openStream();
+                        File fo = new File(sPrefix+File.separator+sJarName);
+                        ps.println("editCtxJar: fo=" + fo.getAbsolutePath());
 
+                        if ( !setProcessedJars.contains(fo.toString()) ) {
+                            FileOutputStream fos = new FileOutputStream(fo);
+                            byte [] baTmp = new byte[1048576];
+                            int iNumBytes = 0;
+                            while ( (iNumBytes=is.read(baTmp))>-1 )
+                                fos.write(baTmp, 0, iNumBytes);
+                            fos.close();
+                            is.close();
+                            setProcessedJars.add(fo.toString());
+                        }
+                        setNew.add(qr.getModel().createResource("file:"+fo.getAbsolutePath()));
+                    } catch (MalformedURLException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
 
-	}
-
-	/** Print the output statistics to the output stream.
-	 *
-	 */
-	protected void printStatistics() {
-		try {
-			JSONObject jsonStats = new JSONObject(spi.serializeProbeInformation());
-			ps.println("----------------------------------------------------------------------------");
-			ps.println();
-			ps.println("Flow execution statistics");
-			ps.println();
-			ps.println("Flow unique execution ID : "+jsonStats.get("flow_unique_id"));
-			ps.println("Flow state               : "+jsonStats.get("flow_state"));
-			ps.println("Started at               : "+jsonStats.get("started_at"));
-			ps.println("Last update              : "+jsonStats.get("latest_probe_at"));
-			ps.println("Total run time (ms)      : "+jsonStats.get("runtime"));
-			ps.println();
-			ps.flush();
-
-			JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
-			for ( int i=0,iMax=jaEXIS.length() ; i<iMax ; i++ ) {
-				JSONObject joEXIS = (JSONObject) jaEXIS.get(i);
-				ps.println("\tExecutable components instance ID          : "+joEXIS.get("executable_component_instance_id"));
-				ps.println("\tExecutable components state                : "+joEXIS.get("executable_component_state"));
-				ps.println("\tTimes the executable components fired      : "+joEXIS.get("times_fired"));
-				ps.println("\tAccumulated executable components run time : "+joEXIS.get("accumulated_runtime"));
-				ps.println("\tPieces of data pulled                      : "+joEXIS.get("pieces_of_data_in"));
-				ps.println("\tPieces of data pushed                      : "+joEXIS.get("pieces_of_data_out"));
-				ps.println("\tNumber of properties read                  : "+joEXIS.get("number_of_read_properties"));
-				ps.println();
-			}
-			ps.flush();
-		}
-		catch ( Exception e ) {
-			KernelLoggerFactory.getCoreLogger().warning("This exception should have never been thrown\n"+e);
-		}
-		spi.dispose();
-	}
+                }
+                else
+                    setNew.add(rdfNode);
+            }
+            Set<RDFNode> set = ecd.getContext();
+            set.clear();
+            set.addAll(setNew);
+        }
 
 
+    }
 
-	/**
-	 * @return the parentClassloader
-	 */
-	public ClassLoader getParentClassloader() {
-		return parentClassloader;
-	}
+    /** Print the output statistics to the output stream.
+     *
+     */
+    protected void printStatistics() {
+        try {
+            JSONObject jsonStats = new JSONObject(spi.serializeProbeInformation());
+            ps.println("----------------------------------------------------------------------------");
+            ps.println();
+            ps.println("Flow execution statistics");
+            ps.println();
+            ps.println("Flow unique execution ID : "+jsonStats.get("flow_unique_id"));
+            ps.println("Flow state               : "+jsonStats.get("flow_state"));
+            ps.println("Started at               : "+jsonStats.get("started_at"));
+            ps.println("Last update              : "+jsonStats.get("latest_probe_at"));
+            ps.println("Total run time (ms)      : "+jsonStats.get("runtime"));
+            ps.println();
+            ps.flush();
 
-	/**
-	 * @param parentClassloader the parentClassloader to set
-	 */
-	public void setParentClassloader(ClassLoader parentClassloader) {
-		this.parentClassloader = parentClassloader;
-	}
+            JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
+            for ( int i=0,iMax=jaEXIS.length() ; i<iMax ; i++ ) {
+                JSONObject joEXIS = (JSONObject) jaEXIS.get(i);
+                ps.println("\tExecutable components instance ID          : "+joEXIS.get("executable_component_instance_id"));
+                ps.println("\tExecutable components state                : "+joEXIS.get("executable_component_state"));
+                ps.println("\tTimes the executable components fired      : "+joEXIS.get("times_fired"));
+                ps.println("\tAccumulated executable components run time : "+joEXIS.get("accumulated_runtime"));
+                ps.println("\tPieces of data pulled                      : "+joEXIS.get("pieces_of_data_in"));
+                ps.println("\tPieces of data pushed                      : "+joEXIS.get("pieces_of_data_out"));
+                ps.println("\tNumber of properties read                  : "+joEXIS.get("number_of_read_properties"));
+                ps.println();
+            }
+            ps.flush();
+        }
+        catch ( Exception e ) {
+            KernelLoggerFactory.getCoreLogger().warning("This exception should have never been thrown\n"+e);
+        }
+        spi.dispose();
+    }
+
+
+
+    /**
+     * @return the parentClassloader
+     */
+    public ClassLoader getParentClassloader() {
+        return parentClassloader;
+    }
+
+    /**
+     * @param parentClassloader the parentClassloader to set
+     */
+    public void setParentClassloader(ClassLoader parentClassloader) {
+        this.parentClassloader = parentClassloader;
+    }
 
     /**
      * Parses the command line arguments
@@ -531,22 +529,22 @@ public class MAUExecutor {
 
         SimpleJSAP jsap =
             new SimpleJSAP(MAUExecutor.class.getSimpleName(),
-            		generalHelp,
+                    generalHelp,
                     new Parameter[] {
-	                    new UnflaggedOption("mau", JSAP.STRING_PARSER, true, "The MAU file to run"),
-	                    new FlaggedOption("port", JSAP.INTEGER_PARSER,
-	                            "1715", JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
-	                            "port", "The port number to bind to"),
-	                    new FlaggedOption("config", JSAP.STRING_PARSER,
-	                            JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
-	                            "config", "The configuration file to use"),
-	                    new FlaggedOption("param", JSAP.STRING_PARSER,
-	                    		JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
-	                    		"param", "The key=value parameter to be passed to the flow")
-	                    		.setAllowMultipleDeclarations(true),
-                		new FlaggedOption("paramFile", JSAP.STRING_PARSER,
-                        		JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
-                        		"paramFile", "A Java properties file containing the key=value flow parameters to be set")
+                        new UnflaggedOption("mau", JSAP.STRING_PARSER, true, "The MAU file to run"),
+                        new FlaggedOption("port", JSAP.INTEGER_PARSER,
+                                "1715", JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+                                "port", "The port number to bind to"),
+                        new FlaggedOption("config", JSAP.STRING_PARSER,
+                                JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+                                "config", "The configuration file to use"),
+                        new FlaggedOption("param", JSAP.STRING_PARSER,
+                                JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+                                "param", "The key=value parameter to be passed to the flow")
+                                .setAllowMultipleDeclarations(true),
+                        new FlaggedOption("paramFile", JSAP.STRING_PARSER,
+                                JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+                                "paramFile", "A Java properties file containing the key=value flow parameters to be set")
                     });
 
         result = jsap.parse(args);

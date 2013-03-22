@@ -40,8 +40,6 @@
     <typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath"/>
 
     <svnSetting
-          svnkit="true"
-          javahl="false"
           failonerror="false"
           id="svn.settings"/>
 </project>

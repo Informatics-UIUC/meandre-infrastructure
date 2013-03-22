@@ -9,18 +9,18 @@ import org.meandre.core.logger.KernelLoggerFactory;
 
 public class ZigZag implements ZigZagConstants {
 
-  public static String ZIGZAG_VERSION = "1.0.1vcli";
+  public static String ZIGZAG_VERSION = "1.0.2vcli";
 
   protected String sFileName;
 
   protected FlowGenerator fg;
 
   public void setFileName(String fname){
-        this.sFileName = fname;
+    this.sFileName = fname;
   }
 
   public String getFileName(){
-        return this.sFileName;
+    return this.sFileName;
   }
 
   public void initFlowGenerator(){
@@ -28,7 +28,7 @@ public class ZigZag implements ZigZagConstants {
   }
 
   public void setFlowGenerator ( FlowGenerator fg ) {
-        this.fg = fg;
+      this.fg = fg;
   }
 
   public FlowGenerator getFlowGenerator(){
@@ -38,35 +38,36 @@ public class ZigZag implements ZigZagConstants {
   public static void main(String args[]) throws ParseException,FileNotFoundException, IOException {
 
     // Tone down the logger
-        KernelLoggerFactory.getCoreLogger().setLevel(Level.WARNING);
-        for ( Handler h:KernelLoggerFactory.getCoreLogger().getHandlers() )
-                h.setLevel(Level.WARNING);
+    KernelLoggerFactory.getCoreLogger().setLevel(Level.WARNING);
+    for ( Handler h:KernelLoggerFactory.getCoreLogger().getHandlers() )
+        h.setLevel(Level.WARNING);
 
-    if ( args.length<1 ) {
+    if ( args.length != 2 ) {
         System.err.println("Wrong syntax!!!\u005cnThe compiler requires at least one .zz file");
+        System.err.println(String.format("Usage: %s <filename.zz> <baseURL>", ZigZag.class.getSimpleName()));
     }
     else
     {
-        for ( String sFileName:args) {
-                    FileInputStream fis = new FileInputStream(sFileName);
-                    ZigZag parser = new ZigZag(fis);
-                    parser.sFileName = sFileName;
-                    parser.fg = new FlowGenerator();
-                    parser.fg.init(sFileName);
-                    try {
-                        parser.start();
-                        System.out.println();
-                        parser.fg.generateMAU(sFileName);
-                    }
-                    catch ( ParseException pe ) {
-                        throw pe;
-                    }
+        String sFileName = args[0];
+        String sBaseURL = args[1];
+        FileInputStream fis = new FileInputStream(sFileName);
+        ZigZag parser = new ZigZag(fis);
+        parser.sFileName = sFileName;
+        parser.fg = new FlowGenerator();
+        parser.fg.init(sFileName);
+        try {
+            parser.start();
+            System.out.println();
+            parser.fg.generateMAU(sFileName, sBaseURL);
+        }
+        catch ( ParseException pe ) {
+            throw pe;
         }
     }
   }
 
   final public void start() throws ParseException {
-        Token t;
+    Token t;
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -119,33 +120,33 @@ public class ZigZag implements ZigZagConstants {
   }
 
   final public void cda() throws ParseException {
-        Token tRepURI;
-        Token tCompURI;
-        Token tAlias;
+    Token tRepURI;
+    Token tCompURI;
+    Token tAlias;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case IMPORT:
       jj_consume_token(IMPORT);
       tRepURI = jj_consume_token(URI);
-                  fg.importRepository(tRepURI.image,jj_input_stream.getBeginLine()-1);
+          fg.importRepository(tRepURI.image,jj_input_stream.getBeginLine()-1);
       break;
     case ALIAS:
       jj_consume_token(ALIAS);
       tCompURI = jj_consume_token(URI);
       jj_consume_token(AS);
       tAlias = jj_consume_token(SYMBOL);
-                  fg.aliasComponent(tCompURI.image,tAlias.image,jj_input_stream.getBeginLine()-1);
+          fg.aliasComponent(tCompURI.image,tAlias.image,jj_input_stream.getBeginLine()-1);
       break;
     case FROM:
       jj_consume_token(FROM);
       tRepURI = jj_consume_token(URI);
       jj_consume_token(IMPORT);
       tCompURI = jj_consume_token(URI);
-                  fg.importRepository(tRepURI.image,tCompURI.image,jj_input_stream.getBeginLine()-1);
+          fg.importRepository(tRepURI.image,tCompURI.image,jj_input_stream.getBeginLine()-1);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case AS:
         jj_consume_token(AS);
         tAlias = jj_consume_token(SYMBOL);
-                          fg.aliasComponent(tCompURI.image,tAlias.image,jj_input_stream.getBeginLine()-1);
+              fg.aliasComponent(tCompURI.image,tAlias.image,jj_input_stream.getBeginLine()-1);
         break;
       default:
         jj_la1[3] = jj_gen;
@@ -160,10 +161,10 @@ public class ZigZag implements ZigZagConstants {
   }
 
   final public void ci(Token t) throws ParseException {
-        Token tTmp;
-        Queue<String> qSymbols = new LinkedList<String>();
-        Queue<String> qComponents = new LinkedList<String>();
-        qSymbols.offer(t.image);
+    Token tTmp;
+    Queue<String> qSymbols = new LinkedList<String>();
+    Queue<String> qComponents = new LinkedList<String>();
+    qSymbols.offer(t.image);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -176,13 +177,13 @@ public class ZigZag implements ZigZagConstants {
       }
       jj_consume_token(COMA);
       tTmp = jj_consume_token(SYMBOL);
-                  qSymbols.offer(tTmp.image);
+          qSymbols.offer(tTmp.image);
     }
     jj_consume_token(EQUAL);
     tTmp = jj_consume_token(SYMBOL);
     jj_consume_token(LP);
     jj_consume_token(RP);
-          qComponents.offer(tTmp.image);
+      qComponents.offer(tTmp.image);
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -197,30 +198,30 @@ public class ZigZag implements ZigZagConstants {
       tTmp = jj_consume_token(SYMBOL);
       jj_consume_token(LP);
       jj_consume_token(RP);
-                  qComponents.offer(tTmp.image);
+          qComponents.offer(tTmp.image);
     }
-                if ( qSymbols.size()!=qComponents.size() )
-                        {if (true) throw new ParseException (
-                                "Wrong number of elements in assignment, "+
-                                qSymbols.size()+" on the left side and "+
-                                qComponents.size()+" on the right side on line "+
-                                (jj_input_stream.getBeginLine()-1)
-                        );}
-                fg.instantiateComponents(qSymbols,qComponents,jj_input_stream.getBeginLine()-1);
+        if ( qSymbols.size()!=qComponents.size() )
+            {if (true) throw new ParseException (
+                "Wrong number of elements in assignment, "+
+                qSymbols.size()+" on the left side and "+
+                qComponents.size()+" on the right side on line "+
+                (jj_input_stream.getBeginLine()-1)
+            );}
+        fg.instantiateComponents(qSymbols,qComponents,jj_input_stream.getBeginLine()-1);
   }
 
   final public void cm(Token t) throws ParseException {
-        Token tIns;
-        Token tProp;
-        Queue<String> qLeftIns = new LinkedList<String>();
-        Queue<String> qLeftProp = new LinkedList<String>();
-        Queue<String> qRightIns = new LinkedList<String>();
-        Queue<String> qRightProp = new LinkedList<String>();
+    Token tIns;
+    Token tProp;
+    Queue<String> qLeftIns = new LinkedList<String>();
+    Queue<String> qLeftProp = new LinkedList<String>();
+    Queue<String> qRightIns = new LinkedList<String>();
+    Queue<String> qRightProp = new LinkedList<String>();
 
-        qLeftIns.offer(t.image);
+    qLeftIns.offer(t.image);
     jj_consume_token(DOT);
     tProp = jj_consume_token(SYMBOL);
-          qLeftProp.offer(tProp.image);
+      qLeftProp.offer(tProp.image);
     label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -235,19 +236,19 @@ public class ZigZag implements ZigZagConstants {
       tIns = jj_consume_token(SYMBOL);
       jj_consume_token(DOT);
       tProp = jj_consume_token(SYMBOL);
-                  qLeftIns.offer(tIns.image); qLeftProp.offer(tProp.image);
+          qLeftIns.offer(tIns.image); qLeftProp.offer(tProp.image);
     }
     jj_consume_token(EQUAL);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case VALUE:
       tIns = jj_consume_token(VALUE);
-                  qRightIns.offer(tIns.image); qRightProp.offer(null);
+          qRightIns.offer(tIns.image); qRightProp.offer(null);
       break;
     case SYMBOL:
       tIns = jj_consume_token(SYMBOL);
       jj_consume_token(DOT);
       tProp = jj_consume_token(SYMBOL);
-                  qRightIns.offer(tIns.image); qRightProp.offer(tProp.image);
+          qRightIns.offer(tIns.image); qRightProp.offer(tProp.image);
       break;
     default:
       jj_la1[8] = jj_gen;
@@ -268,13 +269,13 @@ public class ZigZag implements ZigZagConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case VALUE:
         tIns = jj_consume_token(VALUE);
-                          qRightIns.offer(tIns.image); qRightProp.offer(null);
+              qRightIns.offer(tIns.image); qRightProp.offer(null);
         break;
       case SYMBOL:
         tIns = jj_consume_token(SYMBOL);
         jj_consume_token(DOT);
         tProp = jj_consume_token(SYMBOL);
-                         qRightIns.offer(tIns.image); qRightProp.offer(tProp.image);
+             qRightIns.offer(tIns.image); qRightProp.offer(tProp.image);
         break;
       default:
         jj_la1[10] = jj_gen;
@@ -282,19 +283,19 @@ public class ZigZag implements ZigZagConstants {
         throw new ParseException();
       }
     }
-                if ( qLeftIns.size()!=qRightIns.size() )
-                        {if (true) throw new ParseException (
-                                "Wrong number of elements in component modification assignment, "+
-                                qLeftIns.size()+" on the left side and "+
-                                qRightIns.size()+" on the right side on line "+
-                                (jj_input_stream.getBeginLine()-1)
-                        );}
+        if ( qLeftIns.size()!=qRightIns.size() )
+            {if (true) throw new ParseException (
+                "Wrong number of elements in component modification assignment, "+
+                qLeftIns.size()+" on the left side and "+
+                qRightIns.size()+" on the right side on line "+
+                (jj_input_stream.getBeginLine()-1)
+            );}
 
-                fg.setProperties(qLeftIns,qLeftProp,qRightIns,qRightProp,jj_input_stream.getBeginLine()-1);
+        fg.setProperties(qLeftIns,qLeftProp,qRightIns,qRightProp,jj_input_stream.getBeginLine()-1);
   }
 
   final public void ii_call(Token tCall) throws ParseException {
-        Token tParallel;
+    Token tParallel;
     jj_consume_token(LP);
     label_6:
     while (true) {
@@ -337,11 +338,11 @@ public class ZigZag implements ZigZagConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case AUTO:
         jj_consume_token(AUTO);
-                  fg.markParallel(tCall.image,0);
+          fg.markParallel(tCall.image,0);
         break;
       case NUMBER:
         tParallel = jj_consume_token(NUMBER);
-                  fg.markParallel(tCall.image,Integer.parseInt(tParallel.image));
+          fg.markParallel(tCall.image,Integer.parseInt(tParallel.image));
         break;
       default:
         jj_la1[14] = jj_gen;
@@ -351,7 +352,7 @@ public class ZigZag implements ZigZagConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case EXCL:
         jj_consume_token(EXCL);
-                          fg.forceOrderedParallel(tCall.image);
+              fg.forceOrderedParallel(tCall.image);
         break;
       default:
         jj_la1[15] = jj_gen;
@@ -362,15 +363,15 @@ public class ZigZag implements ZigZagConstants {
   }
 
   final public void port_binding(Token tTargetIns) throws ParseException {
-        Token tTargetPort;
-        Token tSourceIns;
-        Token tSourcePort;
+    Token tTargetPort;
+    Token tSourceIns;
+    Token tSourcePort;
     tTargetPort = jj_consume_token(SYMBOL);
     jj_consume_token(COLON);
     tSourceIns = jj_consume_token(SYMBOL);
     jj_consume_token(DOT);
     tSourcePort = jj_consume_token(SYMBOL);
-          fg.bindPort(tSourceIns.image,tSourcePort.image,tTargetIns.image,tTargetPort.image,jj_input_stream.getBeginLine()-1);
+      fg.bindPort(tSourceIns.image,tSourcePort.image,tTargetIns.image,tTargetPort.image,jj_input_stream.getBeginLine()-1);
     label_9:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -385,21 +386,21 @@ public class ZigZag implements ZigZagConstants {
       tSourceIns = jj_consume_token(SYMBOL);
       jj_consume_token(DOT);
       tSourcePort = jj_consume_token(SYMBOL);
-                  fg.bindPort(tSourceIns.image,tSourcePort.image,tTargetIns.image,tTargetPort.image,jj_input_stream.getBeginLine()-1);
+          fg.bindPort(tSourceIns.image,tSourcePort.image,tTargetIns.image,tTargetPort.image,jj_input_stream.getBeginLine()-1);
     }
   }
 
   final public void ii_assigment() throws ParseException {
-        Token tBinding;
-        Token tTargetIns;
+    Token tBinding;
+    Token tTargetIns;
 
-        Queue<String> qLeftIns = new LinkedList<String>();
+    Queue<String> qLeftIns = new LinkedList<String>();
 
-        int iLeftCount = 1;
-        int iRightCount = 1;
+    int iLeftCount = 1;
+    int iRightCount = 1;
     jj_consume_token(AT);
     tBinding = jj_consume_token(SYMBOL);
-          fg.createBindingPort(tBinding.image,jj_input_stream.getBeginLine()-1); qLeftIns.offer(tBinding.image);
+      fg.createBindingPort(tBinding.image,jj_input_stream.getBeginLine()-1); qLeftIns.offer(tBinding.image);
     label_10:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -413,11 +414,11 @@ public class ZigZag implements ZigZagConstants {
       jj_consume_token(COMA);
       jj_consume_token(AT);
       tBinding = jj_consume_token(SYMBOL);
-                  fg.createBindingPort(tBinding.image,jj_input_stream.getBeginLine()-1); qLeftIns.offer(tBinding.image); iLeftCount++;
+          fg.createBindingPort(tBinding.image,jj_input_stream.getBeginLine()-1); qLeftIns.offer(tBinding.image); iLeftCount++;
     }
     jj_consume_token(EQUAL);
     tTargetIns = jj_consume_token(SYMBOL);
-          fg.bindBindingPort(qLeftIns.poll(),tTargetIns.image,jj_input_stream.getBeginLine()-1);
+      fg.bindBindingPort(qLeftIns.poll(),tTargetIns.image,jj_input_stream.getBeginLine()-1);
     ii_call(tTargetIns);
     label_11:
     while (true) {
@@ -431,17 +432,17 @@ public class ZigZag implements ZigZagConstants {
       }
       jj_consume_token(COMA);
       tTargetIns = jj_consume_token(SYMBOL);
-                  fg.bindBindingPort(qLeftIns.poll(),tTargetIns.image,jj_input_stream.getBeginLine()-1);
+          fg.bindBindingPort(qLeftIns.poll(),tTargetIns.image,jj_input_stream.getBeginLine()-1);
       ii_call(tTargetIns);
-                  iRightCount++;
+          iRightCount++;
     }
-                if ( iLeftCount!=iRightCount )
-                        {if (true) throw new ParseException (
-                                "Wrong number of elements in component binding assignment, "+
-                                iLeftCount+" on the left side and "+
-                                iRightCount+" on the right side on line "+
-                                (jj_input_stream.getBeginLine()-1)
-                        );}
+        if ( iLeftCount!=iRightCount )
+            {if (true) throw new ParseException (
+                "Wrong number of elements in component binding assignment, "+
+                iLeftCount+" on the left side and "+
+                iRightCount+" on the right side on line "+
+                (jj_input_stream.getBeginLine()-1)
+            );}
   }
 
   /** Generated Token Manager. */
