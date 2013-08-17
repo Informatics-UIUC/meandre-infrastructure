@@ -110,8 +110,10 @@ public class FlowGenerator {
         ps.println();
         ps.flush();
 
-        ps.println("ZigZag compiling file "+sName);
-        ps.println();
+        if (sName != null) {
+            ps.println("ZigZag compiling file "+sName);
+            ps.println();
+        }
 
         // Initializing the repository
         ps.println("Initializing the repository...");
@@ -136,7 +138,6 @@ public class FlowGenerator {
 
         // The base URL
         sBaseURL = "meandre://seasr.org/zigzag/"+System.currentTimeMillis()+"/"+Math.abs((new Random()).nextLong())+"/";
-
     }
 
     /** Import a repository
@@ -616,7 +617,7 @@ public class FlowGenerator {
     public FlowDescription getFlowDescription(String sOutputFileName, String baseURL, boolean bParallelProcess) {
 
         FlowDescription fd = new FlowDescription();
-        String sBaseURI = baseURL+"flow/"+sOutputFileName.replaceAll("\"", "").replaceAll("'", "").replaceAll("\\"+".", "-")+"/";
+        String sBaseURI = baseURL;
 
         // Set the basic flow properties
         fd.setFlowComponent(ri.getModel().createResource(sBaseURI));

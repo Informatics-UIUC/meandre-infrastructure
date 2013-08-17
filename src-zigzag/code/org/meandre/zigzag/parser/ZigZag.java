@@ -50,15 +50,28 @@ public class ZigZag implements ZigZagConstants {
     {
         String sFileName = args[0];
         String sBaseURL = args[1];
-        FileInputStream fis = new FileInputStream(sFileName);
+
+        File inputFile = new File(sFileName);
+        String flowName = inputFile.getName();
+        flowName = flowName.substring(0, flowName.lastIndexOf(".")).replaceAll("\u005c"", "").replaceAll("'", "").replaceAll("\u005c\u005c"+".", "-");
+
+        String sOutputFile = inputFile.getName().replaceFirst("\u005c\u005c\u005c\u005c.zz$", ".mau");
+        FileInputStream fis = new FileInputStream(inputFile);
         ZigZag parser = new ZigZag(fis);
         parser.sFileName = sFileName;
         parser.fg = new FlowGenerator();
         parser.fg.init(sFileName);
+
+        if (!sBaseURL.endsWith("/"))
+            sBaseURL += "/";
+
+        sBaseURL += flowName + "/";
+
+        System.out.println("Using base URL: " + sBaseURL);
         try {
             parser.start();
             System.out.println();
-            parser.fg.generateMAU(sFileName, sBaseURL);
+            parser.fg.generateMAU(sOutputFile, sBaseURL);
         }
         catch ( ParseException pe ) {
             throw pe;
