@@ -60,7 +60,7 @@ public class SaraExecutor {
         if (log != System.err)     System.setErr(log);
 
         log.println("Meandre Executor " + Version.getFullVersion());
-        log.println("All rights reserved by DITA, NCSA, UofI (2007-2012)");
+        log.println("All rights reserved by DITA, NCSA, UofI (2007-2013)");
         log.println("THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.");
         log.println();
         log.flush();

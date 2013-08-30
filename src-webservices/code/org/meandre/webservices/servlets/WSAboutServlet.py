@@ -58,7 +58,7 @@ def __get_installation_information__(request):
     '''Returns all the relevant information about the installation.'''
     install_info = {
             'MEANDRE_VERSION': Version.getFullVersion(),
-            'MEANDRE_RIGHTS': 'All rights reserved by DITA, NCSA, UofI (2007-2012). THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.',
+            'MEANDRE_RIGHTS': 'All rights reserved by DITA, NCSA, UofI (2007-2013). THIS SOFTWARE IS PROVIDED UNDER University of Illinois/NCSA OPEN SOURCE LICENSE.',
             'CURRENT_USER_LOGGED_IN': request.getRemoteUser(),
             'CURRENT_SESSION_ID': request.getSession().getId(),
             'CURRENT_TIME': Date().toString()
