@@ -44,30 +44,30 @@ import com.hp.hpl.jena.rdf.model.Resource;
  */
 public class InteractiveExecution {
 
-	private static final Random RANDOM = new Random();
+    private static final Random RANDOM = new Random();
 
-	/** Executes the requested flow in verbose mode.
-	 *
-	 * @param qr The query repository to use
-	 * @param sURI The URI of the flow to execute
-	 * @param outStream The output stream to use to output messages
-	 * @param cnf The core configuration object
-	 * @param saProbes The name of the probes to use
-	 * @param sToken The token to assign to the execution of the flow
-	 * @param job The job detail information bean
-	 * @param sFUID The flow execution unique ID
-	 * @param jiba The job information back end adapter
-	 * @return True if the execution succeeded, false otherwise
-	 * @throws IOException A problem was encountered when printing content to the output
-	 * @throws CorruptedDescriptionException The flow could not be properly recovered
-	 * @throws ConductorException An execution was thrown during the execution process
-	 */
-	public static boolean executeVerboseFlowURI( QueryableRepository qr,
-			String sURI, OutputStream outStream, CoreConfiguration cnf,
-			String [] saProbes , String sToken, JobDetail job, String sFUID,
-			JobInformationBackendAdapter jiba, Properties flowParams)  {
+    /** Executes the requested flow in verbose mode.
+     *
+     * @param qr The query repository to use
+     * @param sURI The URI of the flow to execute
+     * @param outStream The output stream to use to output messages
+     * @param cnf The core configuration object
+     * @param saProbes The name of the probes to use
+     * @param sToken The token to assign to the execution of the flow
+     * @param job The job detail information bean
+     * @param sFUID The flow execution unique ID
+     * @param jiba The job information back end adapter
+     * @return True if the execution succeeded, false otherwise
+     * @throws IOException A problem was encountered when printing content to the output
+     * @throws CorruptedDescriptionException The flow could not be properly recovered
+     * @throws ConductorException An execution was thrown during the execution process
+     */
+    public static boolean executeVerboseFlowURI( QueryableRepository qr,
+            String sURI, OutputStream outStream, CoreConfiguration cnf,
+            String [] saProbes , String sToken, JobDetail job, String sFUID,
+            JobInformationBackendAdapter jiba, Properties flowParams)  {
 
-		boolean bFailSafe = true;
+        boolean bFailSafe = true;
 
         PersistentPrintStream pw = new PersistentPrintStream(outStream, jiba, sFUID);
 
@@ -199,27 +199,36 @@ public class InteractiveExecution {
                             pw.println();
                             pw.println("Flow execution statistics");
                             pw.println();
-                            pw.println("Flow unique execution ID : " + jsonStats.get("flow_unique_id"));
-                            pw.println("Flow state               : " + jsonStats.get("flow_state"));
-                            pw.println("Started at               : " + jsonStats.get("started_at"));
-                            pw.println("Last update              : " + jsonStats.get("latest_probe_at"));
-                            pw.println("Total run time (ms)      : " + jsonStats.get("runtime"));
+                            if (jsonStats.has("flow_unique_id"))  pw.println("Flow unique execution ID : " + jsonStats.get("flow_unique_id"));
+                            if (jsonStats.has("flow_state"))      pw.println("Flow state               : " + jsonStats.get("flow_state"));
+                            if (jsonStats.has("started_at"))      pw.println("Started at               : " + jsonStats.get("started_at"));
+                            if (jsonStats.has("latest_probe_at")) pw.println("Last update              : " + jsonStats.get("latest_probe_at"));
+                            if (jsonStats.has("runtime"))         pw.println("Total run time (ms)      : " + jsonStats.get("runtime"));
                             pw.println();
-                            // pw.flush();
+                            pw.flush();
 
-                            JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
-                            for (int i = 0, iMax = jaEXIS.length(); i < iMax; i++) {
-                                JSONObject joEXIS = (JSONObject) jaEXIS.get(i);
-                                pw.println("\tExecutable components instance ID          : " + joEXIS.get("executable_component_instance_id"));
-                                pw.println("\tExecutable components state                : " + joEXIS.get("executable_component_state"));
-                                pw.println("\tTimes the executable components fired      : " + joEXIS.get("times_fired"));
-                                pw.println("\tAccumulated executable components run time : " + joEXIS.get("accumulated_runtime"));
-                                pw.println("\tPieces of data pulled                      : " + joEXIS.get("pieces_of_data_in"));
-                                pw.println("\tPieces of data pushed                      : " + joEXIS.get("pieces_of_data_out"));
-                                pw.println("\tNumber of properties read                  : " + joEXIS.get("number_of_read_properties"));
-                                pw.println();
+                            if (jsonStats.has("executable_components_statistics")) {
+                                JSONArray jaEXIS = (JSONArray) jsonStats.get("executable_components_statistics");
+                                for (int i = 0, iMax = jaEXIS.length(); i < iMax; i++) {
+                                    JSONObject joEXIS = (JSONObject) jaEXIS.get(i);
+                                    if (joEXIS.has("executable_component_instance_id"))
+                                        pw.println("\tExecutable components instance ID          : " + joEXIS.get("executable_component_instance_id"));
+                                    if (joEXIS.has("executable_component_state"))
+                                        pw.println("\tExecutable components state                : " + joEXIS.get("executable_component_state"));
+                                    if (joEXIS.has("times_fired"))
+                                        pw.println("\tTimes the executable components fired      : " + joEXIS.get("times_fired"));
+                                    if (joEXIS.has("accumulated_runtime"))
+                                        pw.println("\tAccumulated executable components run time : " + joEXIS.get("accumulated_runtime"));
+                                    if (joEXIS.has("pieces_of_data_in"))
+                                        pw.println("\tPieces of data pulled                      : " + joEXIS.get("pieces_of_data_in"));
+                                    if (joEXIS.has("pieces_of_data_out"))
+                                        pw.println("\tPieces of data pushed                      : " + joEXIS.get("pieces_of_data_out"));
+                                    if (joEXIS.has("number_of_read_properties"))
+                                        pw.println("\tNumber of properties read                  : " + joEXIS.get("number_of_read_properties"));
+                                    pw.println();
+                                }
+                                pw.flush();
                             }
-                            // pw.flush();
                         }
                         catch (Exception e) {
                             KernelLoggerFactory.getCoreLogger().warning("This exception should have never been thrown\n" + e);
@@ -243,27 +252,27 @@ public class InteractiveExecution {
         finally {
             pw.close();
         }
-	}
+    }
 
-	/** Executes the requested flow in silent mode.
-	 *
-	 * @param qr The query repository to use
-	 * @param sURI The URI of the flow to execute
-	 * @param outStream The output stream to use to output messages
-	 * @param cnf The core configuration object
-	 * @param sToken The token to assign to the execution of the flow
-	 * @param job The job detail information bean
-	 * @param sFUID The flow execution unique ID
-	 * @param jiba The job information back end adapter
-	 * @return True if the execution succeeded, false otherwise
-	 * @throws IOException A problem was encountered when printing content to the output
-	 * @throws CorruptedDescriptionException The flow could not be properly recovered
-	 * @throws ConductorException An execution was thrown during the execution process
-	 */
-	public static boolean executeSilentFlowURI( QueryableRepository qr,
-			String sURI, OutputStream outStream, CoreConfiguration cnf,
-			String sToken, JobDetail job, String sFUID,
-			JobInformationBackendAdapter jiba, Properties flowParams) {
+    /** Executes the requested flow in silent mode.
+     *
+     * @param qr The query repository to use
+     * @param sURI The URI of the flow to execute
+     * @param outStream The output stream to use to output messages
+     * @param cnf The core configuration object
+     * @param sToken The token to assign to the execution of the flow
+     * @param job The job detail information bean
+     * @param sFUID The flow execution unique ID
+     * @param jiba The job information back end adapter
+     * @return True if the execution succeeded, false otherwise
+     * @throws IOException A problem was encountered when printing content to the output
+     * @throws CorruptedDescriptionException The flow could not be properly recovered
+     * @throws ConductorException An execution was thrown during the execution process
+     */
+    public static boolean executeSilentFlowURI( QueryableRepository qr,
+            String sURI, OutputStream outStream, CoreConfiguration cnf,
+            String sToken, JobDetail job, String sFUID,
+            JobInformationBackendAdapter jiba, Properties flowParams) {
 
         PersistentPrintStream pw = new PersistentPrintStream(outStream, jiba, sFUID);
 
@@ -363,35 +372,35 @@ public class InteractiveExecution {
         finally {
             pw.close();
         }
-	}
+    }
 
 
-	/** Create a new unique execution flow ID
-	 *
-	 * @param resFlow The flow resource URI
-	 * @param iPort The port number the server is running on
-	 * @return The unique execution ID
-	 */
-	public static String createUniqueExecutionFlowID ( String resFlow, int iPort ) {
-		return resFlow + NetworkTools.getNumericIPValue()
-				+ Integer.toHexString(iPort).toUpperCase() + "/" + System.currentTimeMillis()
-				+ "/" + (Math.abs(RANDOM.nextInt())) + "/";
-	}
+    /** Create a new unique execution flow ID
+     *
+     * @param resFlow The flow resource URI
+     * @param iPort The port number the server is running on
+     * @return The unique execution ID
+     */
+    public static String createUniqueExecutionFlowID ( String resFlow, int iPort ) {
+        return resFlow + NetworkTools.getNumericIPValue()
+                + Integer.toHexString(iPort).toUpperCase() + "/" + System.currentTimeMillis()
+                + "/" + (Math.abs(RANDOM.nextInt())) + "/";
+    }
 
-	/** Instantiates the required probes to use during the flow execution.
-	 *
-	 * @param saProbeNames The probe names
-	 * @param cnf The core configuration object
-	 * @return The probe objects
-	 * @throws ProbeException A probe could not be instantiated
-	 */
-	protected static Probe[] instantiateProbes ( String [] saProbeNames, CoreConfiguration cnf ) throws ProbeException {
-		Probe [] pa = new Probe[saProbeNames.length];
-		int i=0;
-		ProbeFactory pf = ProbeFactory.getProbeFactory(cnf);
-		for ( String sProbName:saProbeNames )
-			pa[i++] = pf.getProbe(sProbName);
+    /** Instantiates the required probes to use during the flow execution.
+     *
+     * @param saProbeNames The probe names
+     * @param cnf The core configuration object
+     * @return The probe objects
+     * @throws ProbeException A probe could not be instantiated
+     */
+    protected static Probe[] instantiateProbes ( String [] saProbeNames, CoreConfiguration cnf ) throws ProbeException {
+        Probe [] pa = new Probe[saProbeNames.length];
+        int i=0;
+        ProbeFactory pf = ProbeFactory.getProbeFactory(cnf);
+        for ( String sProbName:saProbeNames )
+            pa[i++] = pf.getProbe(sProbName);
 
-		return pa;
-	}
+        return pa;
+    }
 }

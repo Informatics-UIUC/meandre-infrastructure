@@ -95,7 +95,7 @@ public class WrappedComponentAllInputsRequired extends WrappedComponent {
             }
         }
         else {
-            // Dangling output case. Never fire
+            // Dangling input case. Never fire
             return false;
         }
     }
