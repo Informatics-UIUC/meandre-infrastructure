@@ -2,7 +2,7 @@
 <project>
 	<!-- app name-->
 	<property name="app.name" value="meandre"/>
-	<property name="build.version" value="1.4.12"/>
+	<property name="build.version" value="1.4.13"/>
 	<property name="build.codename" value="Sara"/>
 
 	<!-- Source code locations -->
